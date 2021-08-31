@@ -1,0 +1,101 @@
+services:
+  dqe:
+    image: ${DQE_IMAGE_NAME}
+    build:
+      context: .
+      dockerfile: dqe/Dockerfile
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./dqe:/opt/src/dqe
+      - ./dqe/templates:/opt/src/templates
+      - ./pqecommon:/opt/src/pqecommon
+    environment:
+      - APP_ROOT_PATH=/data
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8082
+      - CPL_DEBUG=ON
+      - FORWARDED_ALLOW_IPS=*
+      - FF_VRT="yes"
+      - STAC_API_URL=http://mqe:8081
+      - STAC_API_HREF=http://localhost:8080/stac/
+
+      # Used for logging and metrics
+      - APP_INSIGHTS_INSTRUMENTATION_KEY
+    command: [ "uvicorn", "dqe.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers" ]
+  mqe:
+    image: pc-query-stacapi
+    build:
+      context: .
+      dockerfile: mqe/Dockerfile
+    environment:
+      - APP_ROOT_PATH=/stac
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8081
+      - FORWARDED_ALLOW_IPS=*
+      - ENVIRONMENT=local
+      - DEBUG=TRUE
+      - TILER_HREF=http://localhost:8080/data/
+
+      # Used by pgstac backend
+      - POSTGRES_USER=username
+      - POSTGRES_PASS=password
+      - POSTGRES_DBNAME=postgis
+      - POSTGRES_HOST_READER=database
+      - POSTGRES_HOST_WRITER=database
+      - POSTGRES_PORT=5432
+
+      # Used by pypgstac migrate
+      - PGUSER=username
+      - PGPASSWORD=password
+      - PGHOST=database
+      - PGDATABASE=postgis
+
+      # Used for logging and metrics
+      - APP_INSIGHTS_INSTRUMENTATION_KEY
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./pqecommon:/opt/src/pqecommon
+      - ./mqe:/opt/src/mqe
+      - ${LOCAL_PGSTAC_PACKAGE}:${CONTAINER_PGSTAC_PACKAGE}
+      - ./testdata/:/opt/testdata
+    depends_on:
+      - database
+    command: >
+      bash -c "python /opt/src/mqe/mqe/pgready.py && uvicorn mqe.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
+  nginx:
+    image: pqe-nginx
+    container_name: pqe-nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    links:
+      - dqe
+      - mqe
+    depends_on:
+      - dqe
+      - mqe
+    volumes:
+      - ./nginx/etc/nginx:/etc/nginx
+    ports:
+      - 8080:80
+  database:
+    container_name: pqe-stac-db
+    image: pqe-stac-db
+    build:
+      context: ./pgstac
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgis
+    ports:
+      - "5432:5432"
+    volumes:
+      - mqe-pgdata:/var/lib/postgresql/data
+volumes:
+  mqe-pgdata:
+networks:
+  default:
+    name: pqe-dev-network

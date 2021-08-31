@@ -1,0 +1,317 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            -80.625,
+                            26.9375
+                        ],
+                        [
+                            -80.625,
+                            27.0
+                        ],
+                        [
+                            -80.6875,
+                            27.0
+                        ],
+                        [
+                            -80.6875,
+                            26.9375
+                        ],
+                        [
+                            -80.625,
+                            26.9375
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "properties": {
+                "created": "2021-02-12T01:14:20Z",
+                "updated": "2021-02-12T01:14:20Z",
+                "providers": [
+                    {
+                        "name": "USDA Farm Service Agency",
+                        "roles": [
+                            "producer",
+                            "licensor"
+                        ],
+                        "url": "https://www.fsa.usda.gov/programs-and-services/aerial-photography/imagery-programs/naip-imagery/"
+                    }
+                ],
+                "datetime": "2019-12-15T00:00:00Z",
+                "naip:state": "fl",
+                "proj:epsg": 26917,
+                "proj:shape": [
+                    12240,
+                    11040
+                ],
+                "proj:transform": [
+                    0.6,
+                    0.0,
+                    530802.0,
+                    0.0,
+                    -0.6,
+                    2986692.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "proj:bbox": [
+                    530802.0,
+                    2979348.0,
+                    537426.0,
+                    2986692.0
+                ]
+            },
+            "id": "fl_m_2608003_ne_17_060_20191215_20200113",
+            "bbox": [
+                -80.6875,
+                26.9375,
+                -80.625,
+                27.0
+            ],
+            "stac_version": "1.0.0",
+            "assets": {
+                "image": {
+                    "title": "RGBIR COG tile",
+                    "href": "https://naipeuwest.blob.core.windows.net/naip/v002/fl/2019/fl_60cm_2019/26080/m_2608003_ne_17_060_20191215.tif",
+                    "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+                    "roles": [
+                        "data"
+                    ],
+                    "eo:bands": [
+                        {
+                            "name": "Red"
+                        },
+                        {
+                            "name": "Green"
+                        },
+                        {
+                            "name": "Blue"
+                        },
+                        {
+                            "name": "NIR",
+                            "description": "near-infrared"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "title": "FGDC Metdata",
+                    "href": "https://naipeuwest.blob.core.windows.net/naip/v002/fl/2019/fl_fgdc_2019/26080/m_2608003_ne_17_060_20191215.txt",
+                    "type": "text/plain",
+                    "roles": [
+                        "metadata"
+                    ]
+                },
+                "thumbnail": {
+                    "title": "Thumbnail",
+                    "href": "https://naipeuwest.blob.core.windows.net/naip/v002/fl/2019/fl_60cm_2019/26080/m_2608003_ne_17_060_20191215.200.jpg",
+                    "type": "image/jpeg",
+                    "roles": [
+                        "thumbnail"
+                    ]
+                }
+            },
+            "links": [
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/collections/usda-naip/items/fl_m_2608003_ne_17_060_20191215_20200113",
+                    "rel": "self",
+                    "type": "application/geo+json"
+                },
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/collections/usda-naip",
+                    "rel": "parent",
+                    "type": "application/json"
+                },
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/collections/usda-naip",
+                    "rel": "collection",
+                    "type": "application/json"
+                },
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/",
+                    "rel": "root",
+                    "type": "application/json"
+                },
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/collections/usda-naip/items/fl_m_2608003_ne_17_060_20191215_20200113/tiles",
+                    "rel": "alternate",
+                    "type": "application/json",
+                    "title": "tiles"
+                }
+            ],
+            "stac_extensions": [
+                "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+                "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+            ],
+            "collection": "usda-naip"
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            -80.6875,
+                            26.9375
+                        ],
+                        [
+                            -80.6875,
+                            27.0
+                        ],
+                        [
+                            -80.75,
+                            27.0
+                        ],
+                        [
+                            -80.75,
+                            26.9375
+                        ],
+                        [
+                            -80.6875,
+                            26.9375
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "properties": {
+                "created": "2021-02-12T01:14:20Z",
+                "updated": "2021-02-12T01:14:20Z",
+                "providers": [
+                    {
+                        "name": "USDA Farm Service Agency",
+                        "roles": [
+                            "producer",
+                            "licensor"
+                        ],
+                        "url": "https://www.fsa.usda.gov/programs-and-services/aerial-photography/imagery-programs/naip-imagery/"
+                    }
+                ],
+                "datetime": "2019-12-15T00:00:00Z",
+                "naip:state": "fl",
+                "proj:epsg": 26917,
+                "proj:shape": [
+                    12230,
+                    11030
+                ],
+                "proj:transform": [
+                    0.6,
+                    0.0,
+                    524604.0,
+                    0.0,
+                    -0.6,
+                    2986674.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "proj:bbox": [
+                    524604.0,
+                    2979336.0,
+                    531222.0,
+                    2986674.0
+                ]
+            },
+            "id": "fl_m_2608003_nw_17_060_20191215_20200113",
+            "bbox": [
+                -80.75,
+                26.9375,
+                -80.6875,
+                27.0
+            ],
+            "stac_version": "1.0.0",
+            "assets": {
+                "image": {
+                    "title": "RGBIR COG tile",
+                    "href": "https://naipeuwest.blob.core.windows.net/naip/v002/fl/2019/fl_60cm_2019/26080/m_2608003_nw_17_060_20191215.tif",
+                    "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+                    "roles": [
+                        "data"
+                    ],
+                    "eo:bands": [
+                        {
+                            "name": "Red"
+                        },
+                        {
+                            "name": "Green"
+                        },
+                        {
+                            "name": "Blue"
+                        },
+                        {
+                            "name": "NIR",
+                            "description": "near-infrared"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "title": "FGDC Metdata",
+                    "href": "https://naipeuwest.blob.core.windows.net/naip/v002/fl/2019/fl_fgdc_2019/26080/m_2608003_nw_17_060_20191215.txt",
+                    "type": "text/plain",
+                    "roles": [
+                        "metadata"
+                    ]
+                },
+                "thumbnail": {
+                    "title": "Thumbnail",
+                    "href": "https://naipeuwest.blob.core.windows.net/naip/v002/fl/2019/fl_60cm_2019/26080/m_2608003_nw_17_060_20191215.200.jpg",
+                    "type": "image/jpeg",
+                    "roles": [
+                        "thumbnail"
+                    ]
+                }
+            },
+            "links": [
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/collections/usda-naip/items/fl_m_2608003_nw_17_060_20191215_20200113",
+                    "rel": "self",
+                    "type": "application/geo+json"
+                },
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/collections/usda-naip",
+                    "rel": "parent",
+                    "type": "application/json"
+                },
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/collections/usda-naip",
+                    "rel": "collection",
+                    "type": "application/json"
+                },
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/",
+                    "rel": "root",
+                    "type": "application/json"
+                },
+                {
+                    "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/collections/usda-naip/items/fl_m_2608003_nw_17_060_20191215_20200113/tiles",
+                    "rel": "alternate",
+                    "type": "application/json",
+                    "title": "tiles"
+                }
+            ],
+            "stac_extensions": [
+                "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+                "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+            ],
+            "collection": "usda-naip"
+        }
+    ],
+    "links": [
+        {
+            "href": "http://pc-mqe-staging.westeurope.cloudapp.azure.com/collections/usda-naip/items?token=VgZLXbTz&limit=10",
+            "rel": "next",
+            "type": "application/geo+json",
+            "method": "GET"
+        }
+    ],
+    "context": {
+        "returned": 2,
+        "matched": 961492
+    }
+}

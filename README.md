@@ -1,33 +1,61 @@
-# Project
+[![Build Status](https://dev.azure.com/planetary-computer/Planetary%20Computer%20Components/_apis/build/status/metadata-query-api?branchName=master)](https://dev.azure.com/planetary-computer/Planetary%20Computer%20Components/_build/latest?definitionId=5&branchName=master)
+# STAC API + Data Query API
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+This repository contains two components of the Planetary Computer: the STAC API component, and the data query API component.
 
-As the maintainer of this project, please make a few updates:
+## Develop URLs
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+|              |                          |
+|--------------|--------------------------|
+| Nginx        | <http://localhost:8080/> |
+| MQE (STAC)   | <http://localhost:8081/> |
+| DQE          | <http://localhost:8082/> |
 
-## Contributing
+Nginx proxies the dqe and mqe to these URLs:
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+- <http://localhost:8080/stac/v1>
+- <http://localhost:8080/data/v1>
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+Mosaic preview at http://localhost:8080/data/v1/mosaic/naip.2017/map/preview
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-## Trademarks
+## Build and Test
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.
+### Requirements
+
+Most of the development environment runs through docker containers, so have the latest versions of docker and docker-compose installed. This project requires at least docker-compose v1.27+.
+
+### Development environment setup
+
+To setup your development environment, use
+
+```
+> scripts/setup
+```
+
+This will build the project docker images and ingest test data into the development database.
+
+### Running build and test
+
+To build the development containers for this project, use
+
+```
+> scripts/update
+```
+
+To run tests, use
+
+```
+> scripts/test
+```
+
+### Setting APP_ROOT_PATH
+
+The environment variable `APP_ROOT_PATH` is used in the API services when using
+behind a proxy with a stripped path prefix a la [this article](https://fastapi.tiangolo.com/advanced/behind-a-proxy/). This is set to the value the Nginx development server uses as a path prefix in the development environment, mimicing the target deployment environment.
+
+## Notes for Open Sourcing
+
+This section includes notes about what would have to change for the project to be open sourced. Please contribute!
+
+- The Azure Pipelines states the subscription ID explicitly. If we are still deploying through the open source repo, and open the test deploy pipeline, we'd need to move this to a secret value.

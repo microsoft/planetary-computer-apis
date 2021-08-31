@@ -1,0 +1,26 @@
+# Keep in sync with ./.env
+export DQE_IMAGE_NAME="pc-query-dataapi"
+export MQE_IMAGE_NAME="pc-query-stacapi"
+export MIGRATIONS_IMAGE_NAME="pc-query-stacapi-migrations"
+
+function require_env() {
+    v=$(eval echo \$${1})
+
+    if [[ -z ${v} ]]; then
+        echo "Must set ${1} as environment variable" >&2;
+        exit 1;
+    fi
+}
+
+function use_dev_dependencies() {
+    # Allow for loading in local versions of dependencies
+    if [[ -n "${ARTURO_STAC_API_REPO}" ]]; then
+        echo "==USING LOCAL arturo-stac-api AT ${ARTURO_STAC_API_REPO}"
+        export LOCAL_STAC_API_PACKAGE="${ARTURO_STAC_API_REPO}/stac_fastapi"
+        export CONTAINER_STAC_API_PACKAGE="/opt/dev/stac_api"
+    fi
+}
+
+function export_env() {
+    set -o allexport; source $0; set +o allexport;
+}

@@ -1,0 +1,228 @@
+{
+  "id": "test-aster-l1t-v2",
+  "stac_version": "1.0.0-beta.2",
+  "description": "# ASTER L1T\n\n## Overview\n\nThe [ASTER](https://terra.nasa.gov/about/terra-instruments/aster) instrument provides high-resolution (15 to 90 square meters per pixel) images of the Earth in 14 different wavelengths of the electromagnetic spectrum, ranging from visible to thermal infrared light. Scientists use ASTER data to create detailed maps of land surface temperature, emissivity, reflectance, and elevation.\n\nThis dataset represents ASTER L1T data from 2000-2006.  Images will be available in Cloud-Optimized GeoTIFF format; currently images are available in both HDF and COG format, pending finalization of the provisional COG formatting.\n\nASTER imagery is currently in preview on Azure; email [`aiforearthdatasets@microsoft.com`](mailto:aiforearthdatasets@microsoft.com?subject=aster%20question) to request access.\n\n## Storage resources\n\n### Container information\n\nData are stored in blobs in the West Europe Azure region, in the following blob container:\n\n`https://astersa.blob.core.windows.net/aster-cogs`\n\nHDF files are temporarily available in the following blob container:\n\n`https://astersa.blob.core.windows.net/aster`\n\nAs per above, these containers are not world-readable; email [`aiforearthdatasets@microsoft.com`](mailto:aiforearthdatasets@microsoft.com?subject=landsat%20question) to request an access token.\n\n### Scene names\n\nWithin the COG container, each scene corresponds to a folder, named according to:\n\nimages/L1T/`[year]`/`[month]`/`[day]`/`[scene name]`\n\n* `[year]`, `[month]`, and `[day]` are the four-digit year and two-digit month/day\n\n`scene name` follows the [ASTER naming convention](https://lpdaac.usgs.gov/data/get-started-data/collection-overview/missions/aster-overview/#aster-naming-conventions), with the exception that the \"AST_L1T\" prefix has been removed. So scene names look like:\n\n```\nYYYYMMDHHMMSS_yyyymmddhhmmss_id\n```\n\n* `VVV` is always \"003\", for ASTER collection 003\n* `MMDDYYYYHHMMSS` is the acquisition month, day, year, hour, minute, second\n* `mmddyyyyhhmmss` is the processing month, day, year, hour, minute, second\n* `id` is a unique acquisition identifier.\n\nFor example:\n\n`00306042003004247_20150428235500_35366`\n\nPutting that all together, a complete scene folder for an ASTER image from June 4, 2003 looks like:\n\n`https://astersa.blob.core.windows.net/aster-cogs/images/L1T/2003/06/04/00306042003004247_20150428235500_35366/`\n\n\n### ASTER image files\n\nDocumentation pending finalization of the still-provisional COG format.\n\n\n## Region information\n\nLarge-scale processing is best performed in the West Europe Azure region, where the images are stored.  If you are using ASTER data for environmental science applications, consider applying for an [AI for Earth grant](http://aka.ms/ai4egrants) to support your compute requirements.\n\n\n## Contact\n\nFor questions about this dataset, contact [`aiforearthdatasets@microsoft.com`](mailto:aiforearthdatasets@microsoft.com?subject=aster%20question).\n\n\n## Notices\n\nMICROSOFT PROVIDES AZURE OPEN DATASETS ON AN \"AS IS\" BASIS. MICROSOFT MAKES NO WARRANTIES, EXPRESS OR IMPLIED, GUARANTEES OR CONDITIONS WITH RESPECT TO YOUR USE OF THE DATASETS. TO THE EXTENT PERMITTED UNDER YOUR LOCAL LAW, MICROSOFT DISCLAIMS ALL LIABILITY FOR ANY DAMAGES OR LOSSES, INCLUDING DIRECT, CONSEQUENTIAL, SPECIAL, INDIRECT, INCIDENTAL OR PUNITIVE, RESULTING FROM YOUR USE OF THE DATASETS.\n\nThis dataset is provided under the original terms that Microsoft received source data. The dataset may include data sourced from Microsoft.\n",
+  "license": "PDDL-1.0",
+  "links": [
+    {
+      "rel": "license",
+      "href": "https://www.usgs.gov/core-science-systems/hdds/data-policy"
+    }
+  ],
+  "stac_extensions": [
+    "item-assets",
+    "collection-assets"
+  ],
+  "keywords": [
+    "landsat",
+    "usgs",
+    "nasa",
+    "satellite",
+    "global"
+  ],
+  "msft:short_description": "The ASTER instrument, launched on-board NASA's Terra satellite in 1999, provides multispectral images of the Earth at 15m-90m resolution.  This dataset contains ASTER data from 2000-2006.",
+  "msft:storage_account": "astersa",
+  "msft:container": "aster",
+  "providers": [
+    {
+      "name": "NASA",
+      "roles": [
+        "producer",
+        "licensor"
+      ],
+      "url": "https://terra.nasa.gov/about/terra-instruments/aster"
+    },
+    {
+      "name": "USGS",
+      "roles": [
+        "processor",
+        "producer",
+        "licensor"
+      ],
+      "url": "https://lpdaac.usgs.gov/data/get-started-data/collection-overview/missions/aster-overview/"
+    },
+    {
+      "name": "Microsoft",
+      "roles": [
+        "host",
+        "processor"
+      ],
+      "url": "https://planetarycomputer.microsoft.com"
+    }
+  ],
+  "assets": {
+    "thumbnail": {
+      "title": "ASTER L1T",
+      "href": "https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/aster.png",
+      "media_type": "image/png"
+    }
+  },
+  "summaries": {
+    "platform": [
+      "terra"
+    ],
+    "instruments": [
+      "aster"
+    ],
+    "gsd": [
+      15,
+      30,
+      90
+    ],
+    "eo:bands": [
+      {
+        "name": "VNIR_Band1",
+        "common_name": "yellow/green",
+        "description": "visible yellow/green",
+        "gsd": 15,
+        "center_wavelength": 0.56
+      },
+      {
+        "name": "VNIR_Band2",
+        "common_name": "red",
+        "description": "visible red",
+        "gsd": 15,
+        "center_wavelength": 0.66
+      },
+      {
+        "name": "VNIR_Band3N",
+        "common_name": "near infrared",
+        "description": "near infrared",
+        "gsd": 15,
+        "center_wavelength": 0.82
+      },
+      {
+        "name": "SWIR_Band4",
+        "common_name": "swir",
+        "description": "short-wave infrared",
+        "gsd": 30,
+        "center_wavelength": 1.650
+      },
+      {
+        "name": "SWIR_Band5",
+        "common_name": "swir",
+        "description": "short-wave infrared",
+        "gsd": 30,
+        "center_wavelength": 2.165
+      },
+      {
+        "name": "SWIR_Band6",
+        "common_name": "swir",
+        "description": "short-wave infrared",
+        "gsd": 30,
+        "center_wavelength": 2.205
+      },
+      {
+        "name": "SWIR_Band7",
+        "common_name": "swir",
+        "description": "short-wave infrared",
+        "gsd": 30,
+        "center_wavelength": 2.260
+      },
+      {
+        "name": "SWIR_Band8",
+        "common_name": "swir",
+        "description": "short-wave infrared",
+        "gsd": 30,
+        "center_wavelength": 2.339
+      },
+      {
+        "name": "SWIR_Band9",
+        "common_name": "swir",
+        "description": "short-wave infrared",
+        "gsd": 30,
+        "center_wavelength": 2.395
+      },
+      {
+        "name": "TIR_Band10",
+        "common_name": "lwir",
+        "description": "thermal infrared",
+        "gsd": 90,
+        "center_wavelength": 8.300
+      },
+      {
+        "name": "TIR_Band11",
+        "common_name": "lwir",
+        "description": "thermal infrared",
+        "gsd": 90,
+        "center_wavelength": 8.650
+      },
+      {
+        "name": "TIR_Band12",
+        "common_name": "lwir",
+        "description": "thermal infrared",
+        "gsd": 90,
+        "center_wavelength": 9.110
+      },
+      {
+        "name": "TIR_Band13",
+        "common_name": "lwir",
+        "description": "thermal infrared",
+        "gsd": 90,
+        "center_wavelength": 10.600
+      },
+      {
+        "name": "TIR_Band14",
+        "common_name": "lwir",
+        "description": "thermal infrared",
+        "gsd": 90,
+        "center_wavelength": 11.300
+      }
+    ]
+  },
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -180,
+          -90,
+          180,
+          90
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2000-03-04T12:00:00.000000Z",
+          "2006-12-31T12:00:00.000000Z"
+        ]
+      ]
+    }
+  },
+  "item_assets": {
+    "thumbnail": {
+      "title": "Thumbnail",
+      "type": "image/png",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "swir": {
+      "title": "SWIR",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ],
+      "gsd": 15,
+      "eo:bands": [
+        {
+          "name": "B04",
+          "center_wavelength": 1.65
+        },
+        {
+          "name": "B05",
+          "center_wavelength": 2.165
+        },
+        {
+          "name": "B06",
+          "center_wavelength": 2.205
+        },
+        {
+          "name": "B07",
+          "center_wavelength": 2.26
+        }
+      ]
+    }
+  }
+}
