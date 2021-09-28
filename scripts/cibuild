@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+CI build for this project.
+
+Set the BUILD_ONLY env var to only build docker images
+(for publishing).
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    scripts/setup
+
+
+    if [[ -z ${BUILD_ONLY} ]]; then
+        scripts/test
+    fi
+fi

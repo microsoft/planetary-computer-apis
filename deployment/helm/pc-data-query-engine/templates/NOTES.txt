@@ -1,0 +1,3 @@
+Application information:
+{{ include "dqe.selectorLabels" . }}
+Service Fullname: {{ include "dqe.fullname" . }}

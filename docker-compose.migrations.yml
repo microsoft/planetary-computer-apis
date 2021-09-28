@@ -1,0 +1,17 @@
+services:
+  migrations:
+    image: ${MIGRATIONS_IMAGE_NAME}
+    build:
+      context: migrations/.
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=development
+      - POSTGRES_USER=username
+      - POSTGRES_PASS=password
+      - POSTGRES_DBNAME=postgis
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=5432
+    volumes:
+      - ./migrations:/opt/src
+    depends_on:
+      - database

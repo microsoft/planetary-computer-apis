@@ -1,0 +1,6 @@
+{
+    "3dep-seamless": {
+        "msft:storage_account": "ai4edataeuwest",
+        "msft:container": "3dep"
+    }
+}

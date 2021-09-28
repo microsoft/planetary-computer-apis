@@ -1,0 +1,16 @@
+{
+    "nasademeuwest": [
+        "nasadem-stac"
+    ],
+    "cpdataeuwest": [
+        "cpdata-stac"
+    ],
+    "hreadatasa": [
+        "hrea-stac"
+    ],
+    "goeseuwest": [
+        "noaa-goes16",
+        "noaa-goes17",
+        "noaa-goes-cogs"
+    ]
+}

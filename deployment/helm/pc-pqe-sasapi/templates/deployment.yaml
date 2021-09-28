@@ -1,0 +1,99 @@
+{{- if .Values.sas.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sas.fullname" . }}
+  labels:
+    {{- include "sas.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.sas.deploy.autoscaling.enabled }}
+  replicas: {{ .Values.sas.deploy.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "sas.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.sas.deploy.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "sas.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.sas.deploy.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "sas.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.sas.deploy.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.sas.deploy.securityContext | nindent 12 }}
+          image: "{{ .Values.sas.image.repository }}:{{ .Values.sas.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.sas.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: APP_ROOT_PATH
+              value: "{{ .Values.sas.appRootPath }}"
+            - name: APP_HOST
+              value: "{{ .Values.sas.host }}"
+            - name: APP_PORT
+              value: "{{ .Values.sas.port }}"
+            - name: FORWARDED_ALLOW_IPS
+              value: "*"
+            - name: "MAX_WORKERS"
+              value: "{{ .Values.sas.server.maxWorkers }}"
+            - name: ENVIRONMENT
+              value: "{{ .Values.environment }}"
+            - name: MQE_URL
+              value: "{{ .Values.sas.mqeUrl }}"
+            - name: SAS_TENANT_ID
+              value: "{{ .Values.sas.tenantId }}"
+            - name: SAS_CLIENT_ID
+              value: "{{ .Values.sas.clientId }}"
+            - name: SAS_CLIENT_SECRET
+              value: "{{ .Values.sas.clientSecret }}"
+            - name: SAS_EXPIRY_MINUTES_IN_DC
+              value: "{{ .Values.sas.anonymous.expiryMinutesWithinDatacenter }}"
+            - name: SAS_EXPIRY_MINUTES_OUT_OF_DC
+              value: "{{ .Values.sas.anonymous.expiryMinutesOutOfDatacenter }}"
+            - name: SAS_EXPIRY_MINUTES_SUB_IN_DC
+              value: "{{ .Values.sas.subscription.expiryMinutesWithinDatacenter }}"
+            - name: SAS_EXPIRY_MINUTES_SUB_OUT_OF_DC
+              value: "{{ .Values.sas.subscription.expiryMinutesOutOfDatacenter }}"
+            - name: PC_API_SA_CONN_STRING
+              value: "{{ .Values.sas.pcApiSAConnString }}"
+            - name: PC_API_SA_CONTAINER_TABLE
+              value: "{{ .Values.sas.pcApiSATable }}"
+            - name: APP_INSIGHTS_INSTRUMENTATION_KEY
+              value: "{{ .Values.metrics.instrumentationKey }}"
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.sas.deploy.resources | nindent 12 }}
+      {{- with .Values.sas.deploy.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sas.deploy.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sas.deploy.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
