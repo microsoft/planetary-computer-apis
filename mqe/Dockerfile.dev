@@ -1,6 +1,6 @@
 ARG MQE_IMAGE_NAME
 
-FROM pc-query-stacapi
+FROM ${MQE_IMAGE_NAME}
 
 COPY requirements-dev.txt /opt/src/requirements-dev.txt
 

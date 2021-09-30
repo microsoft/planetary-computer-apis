@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: dqe/Dockerfile.dev
       args:
-        DQE_IMAGE_NAME: pc-query-dataapi
+        DQE_IMAGE_NAME: ${DQE_IMAGE_NAME}
     environment:
       - ENVIRONMENT=development
       - FF_VRT="yes"
@@ -37,7 +37,7 @@ services:
       context: .
       dockerfile: mqe/Dockerfile.dev
       args:
-        MQE_IMAGE_NAME: pc-query-stacapi
+        MQE_IMAGE_NAME: ${MQE_IMAGE_NAME}
     environment:
       - ENVIRONMENT=development
       - POSTGRES_USER=username

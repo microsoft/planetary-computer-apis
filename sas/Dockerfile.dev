@@ -1,6 +1,6 @@
 ARG SAS_IMAGE_NAME
 
-FROM pc-sasapi
+FROM ${SAS_IMAGE_NAME}
 
 COPY requirements-dev.txt /opt/src/requirements-dev.txt
 

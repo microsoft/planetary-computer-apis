@@ -1,6 +1,6 @@
 ARG DQE_IMAGE_NAME
 
-FROM pc-query-dataapi
+FROM ${DQE_IMAGE_NAME}
 
 COPY requirements-dev.txt /opt/src/requirements-dev.txt
 
