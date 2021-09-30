@@ -1,0 +1,5 @@
+Application information:
+{{ include "pcingress.selectorLabels" . }}
+Ingress host: {{ .Values.pcingress.ingress.host }}
+Service Fullname: {{ include "pcingress.fullname" . }}
+Cert enabled: {{ .Values.pcingress.certIssuer.enabled }}

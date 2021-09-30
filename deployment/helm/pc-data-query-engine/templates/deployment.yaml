@@ -1,0 +1,105 @@
+{{- if .Values.dqe.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dqe.fullname" . }}
+  labels:
+    {{- include "dqe.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.dqe.deploy.autoscaling.enabled }}
+  replicas: {{ .Values.dqe.deploy.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "dqe.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.dqe.deploy.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "dqe.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.dqe.deploy.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "dqe.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.dqe.deploy.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.dqe.deploy.securityContext | nindent 12 }}
+          image: "{{ .Values.dqe.image.repository }}:{{ .Values.dqe.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.dqe.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: APP_ROOT_PATH
+              value: "{{ .Values.dqe.appRootPath }}"
+            - name: APP_HOST
+              value: "{{ .Values.dqe.host }}"
+            - name: APP_PORT
+              value: "{{ .Values.dqe.port }}"
+            - name: FORWARDED_ALLOW_IPS
+              value: "*"
+            - name: "MAX_WORKERS"
+              value: "{{ .Values.dqe.server.maxWorkers }}"
+            - name: "WEB_CONCURRENCY"
+              value: "{{ .Values.dqe.tiler.webConcurrency }}"
+            - name: "WORKERS_PER_CORE"
+              value: "{{ .Values.dqe.tiler.workersPerCore }}"
+            - name: ENVIRONMENT
+              value: "{{ .Values.environment }}"
+            - name: POSTGRES_USER
+              value: "{{ .Values.postgres.user }}"
+            - name: POSTGRES_PASS
+              value: "{{ .Values.postgres.password }}"
+            - name: POSTGRES_DBNAME
+              value: "{{ .Values.postgres.dbName }}"
+            - name: POSTGRES_PORT
+              value: "{{ .Values.postgres.port }}"
+            - name: POSTGRES_HOST
+              value: "{{ .Values.postgres.serverName }}"
+            - name: POSTGRES_HOST_READER
+              value: "{{ .Values.postgres.serverName }}"
+            - name: POSTGRES_HOST_WRITER
+              value: "{{ .Values.postgres.serverName }}"
+            - name: DB_MIN_CONN_SIZE
+              value: "{{ .Values.dqe.server.minDbConnections }}"
+            - name: DB_MAX_CONN_SIZE
+              value: "{{ .Values.dqe.server.maxDbConnections }}"
+            - name: STAC_API_URL
+              value: "{{ .Values.dqe.stac_api_url}}"
+            - name: STAC_API_HREF
+              value: "{{ .Values.dqe.stac_api_href}}"
+            - name: APP_INSIGHTS_INSTRUMENTATION_KEY
+              value: "{{ .Values.metrics.instrumentationKey }}"
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.dqe.deploy.resources | nindent 12 }}
+      {{- with .Values.dqe.deploy.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dqe.deploy.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dqe.deploy.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

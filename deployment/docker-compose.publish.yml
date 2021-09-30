@@ -1,0 +1,11 @@
+services:
+  publish:
+    container_name: pc-mqe-deploy
+    image: pc-mqe-deploy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - HELM_EXPERIMENTAL_OCI=1
+    volumes:
+      - .:/opt/src

@@ -1,0 +1,14 @@
+cachetools==4.2.1
+fastapi==0.63.0
+pystac==0.5.6
+
+uvicorn[standard]==0.13.3
+uvloop==0.14.0
+gunicorn==20.1.0
+
+azure-identity==1.6.1
+azure-storage-blob==12.8.1
+azure-data-tables==12.1.0
+
+opencensus-ext-azure==1.0.8
+opencensus-ext-logging==0.1.0

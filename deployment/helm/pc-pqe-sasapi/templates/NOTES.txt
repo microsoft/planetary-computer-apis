@@ -1,0 +1,3 @@
+Application information:
+{{ include "sas.selectorLabels" . }}
+Service Fullname: {{ include "sas.fullname" . }}

@@ -1,0 +1,212 @@
+#!/bin/bash
+
+source bin/lib
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0") -t TERRAFORM_DIR [--plan,--skip-tf]
+Deploys the project infrastructure.
+
+-t TERRAFORM_DIR: The terraform directory. Required.
+--plan: Only run Terraform plan.
+--skip-tf: Skips Terraform apply. Will still gather terraform output
+"
+}
+
+###################
+# Parse arguments #
+###################
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+    -t)
+        TERRAFORM_DIR=${2}
+        shift
+        shift
+        ;;
+    --skip-tf)
+        SKIP_TF=1
+        shift
+        ;;
+    --plan)
+        PLAN_ONLY=1
+        shift
+        ;;
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+###################################
+# Check and configure environment #
+###################################
+
+function require_env() {
+    v=$(eval echo \$${1})
+
+    if [[ -z ${v} ]]; then
+        echo "Must set ${1} as environment variable" >&2
+        exit 1
+    fi
+}
+
+if [[ -z ${TERRAFORM_DIR} ]]; then
+    echo "Must pass in TERRAFORM_DIR with -t"
+    exit 1
+fi
+
+require_env "MQE_IMAGE_NAME"
+require_env "DQE_IMAGE_NAME"
+require_env "MIGRATIONS_IMAGE_NAME"
+require_env "IMAGE_TAG"
+require_env "GIT_COMMIT"
+
+# Directory for rendered values and templates
+CONF_DIR='/opt/conf'
+mkdir -p ${CONF_DIR}
+
+# Set up environment
+setup_env
+
+# Print some information
+
+echo "===== Running Deploy ====="
+echo "MQE_IMAGE_NAME: ${MQE_IMAGE_NAME}"
+echo "DQE_IMAGE_NAME: ${DQE_IMAGE_NAME}"
+echo "MIGRATIONS_IMAGE_NAME: ${MIGRATIONS_IMAGE_NAME}"
+echo "IMAGE_TAG: ${IMAGE_TAG}"
+
+# ---------------------------------------------------
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    #####################
+    # Deploy Terraform  #
+    #####################
+
+    pushd ${TERRAFORM_DIR}
+
+    if [[ "${SKIP_TF}" != 1 ]]; then
+        echo "Deploying infrastructure with Terraform..."
+        terraform init --upgrade
+
+        if [ "${PLAN_ONLY}" ]; then
+            terraform plan
+            exit 0
+        fi
+
+        terraform apply -auto-approve
+    fi
+
+    # Gather terraform output
+    gather_tf_output
+
+    popd
+
+    ############################
+    # Render Helm chart values #
+    ############################
+
+    render_values
+
+    ########################
+    # Login to the cluster #
+    ########################
+
+    cluster_login
+
+    ######################
+    # Deploy Helm charts #
+    ######################
+
+    echo "Deploying helm charts..."
+
+    setup_helm
+
+    # Install cert-manager
+
+    echo "Installing cert-manager..."
+
+    helm upgrade --install \
+        cert-manager \
+        --namespace staging \
+        --create-namespace \
+        --version v0.16.1 \
+        --set installCRDs=true jetstack/cert-manager
+
+    echo "======================================"
+    echo "==== Metadata Query Engine (MQE) ====="
+    echo "======================================"
+
+    echo "Deploying MQE helm chart..."
+    helm upgrade --install pc-metadata-query-engine helm/pc-metadata-query-engine \
+        -n staging \
+        --create-namespace \
+        --kube-context "${KUBE_CONTEXT}" \
+        --wait \
+        --timeout 2m0s \
+        -f ${DEPLOY_VALUES_FILE}
+
+    echo "=================================="
+    echo "==== Data Query Engine (DQE) ====="
+    echo "=================================="
+
+    echo "Deploying DQE helm chart..."
+    helm upgrade --install pc-data-query-engine helm/pc-data-query-engine \
+        -n staging \
+        --create-namespace \
+        --kube-context "${KUBE_CONTEXT}" \
+        --wait \
+        --timeout 2m0s \
+        -f ${DEPLOY_VALUES_FILE}
+
+    echo "=============="
+    echo "==== SAS ====="
+    echo "=============="
+
+    echo "Deploying DQE helm chart..."
+    helm upgrade --install pc-pqe-sasapi helm/pc-pqe-sasapi \
+        -n staging \
+        --create-namespace \
+        --kube-context "${KUBE_CONTEXT}" \
+        --wait \
+        --timeout 2m0s \
+        -f ${DEPLOY_VALUES_FILE}
+
+    echo "======================"
+    echo "==== PQE Ingress ====="
+    echo "======================"
+
+    echo "Deploying ingress component..."
+    helm upgrade --install pc-pqe-ingress helm/pc-pqe-ingress \
+        -n staging \
+        --create-namespace \
+        --kube-context "${KUBE_CONTEXT}" \
+        --wait \
+        --timeout 2m0s \
+        -f ${DEPLOY_VALUES_FILE}
+
+    echo "Installing ingress-nginx..."
+    helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
+        -n staging \
+        --create-namespace \
+        --set controller.replicaCount=2 \
+        --set controller.service.externalTrafficPolicy="Local" \
+        --set controller.service.loadBalancerIP="${INGRESS_IP}" \
+        --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${DNS_LABEL}" \
+        --wait \
+        --timeout 2m0s
+
+fi

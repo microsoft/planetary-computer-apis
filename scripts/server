@@ -1,0 +1,42 @@
+#!/bin/bash
+
+source scripts/env
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo $1
+
+    echo -n \
+        "Usage: $(basename "$0") [--detached]
+Runs the development server and database.
+
+--detached: Run in detached mode.
+"
+}
+
+DETACHED_ARG=""
+
+while [[ "$#" > 0 ]]; do case $1 in
+  --detached) DETACHED_ARG="--detach"; shift;;
+  --help) usage; exit 0; shift;;
+  *) break;;
+esac; done
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    # Execute in subshell to avoid leaking exported env vars.
+    (
+        use_dev_dependencies;
+
+        # Set the IP any SAS tokens will be generated for.
+        export SAS_DEV_FOR_IP="$(curl -s https://api.ipify.org)"
+
+        docker-compose \
+            -f docker-compose.yml \
+            up ${DETACHED_ARG} $@;
+    )
+fi

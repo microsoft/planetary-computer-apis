@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Runs tests for the sas project.
+
+This scripts is meant to be run inside the sas-dev container.
+
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    echo "Running mypy for sas..."
+    mypy sas/sas
+
+    echo "Running black for sas..."
+    black --check sas/sas sas/tests
+
+    echo "Running flake8 for sas..."
+    flake8 sas/sas sas/tests
+
+    echo "Running unit tests for sas..."
+    python -m unittest discover sas/tests
+
+fi

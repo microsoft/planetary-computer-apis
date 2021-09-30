@@ -1,0 +1,18 @@
+{{- if .Values.sas.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sas.fullname" . }}
+  labels:
+    {{- include "sas.labels" . | nindent 4 }}
+  {{- with .Values.sas.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.sas.service.type }}
+  ports:
+    - port: {{ .Values.sas.service.port }}
+  selector:
+    {{- include "sas.selectorLabels" . | nindent 4 }}
+{{- end }}

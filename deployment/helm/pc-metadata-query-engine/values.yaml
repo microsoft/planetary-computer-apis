@@ -1,0 +1,93 @@
+environment: "staging"
+
+mqe:
+  enabled: true
+  image:
+    # e.g. myacr.azurecr.io/my-repository
+    repository: ""
+    pullPolicy: Always
+    tag: "latest"
+
+  server:
+    maxWorkers: "1"
+    poolSize: "1"
+
+  service:
+    type: ClusterIP
+    port: 80
+    annotations: {}
+
+  deploy:
+    replicaCount: 1
+    podAnnotations: {}
+    imagePullSecrets: []
+    securityContext: {}
+    podSecurityContext: {}
+    resources: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    autoscaling:
+      enabled: false
+
+  cert:
+    privateKeySecretRef: "letsencrypt-staging"
+    server: "https://acme-staging-v02.api.letsencrypt.org/directory"
+    issuerEmail: ""
+    secretName: ""
+
+  ingress:
+    enabled: false
+    tlsHost: ""
+    hosts: []
+    annotations: {}
+
+  host: "0.0.0.0"
+  port: "80"
+  appRootPath: ""
+  debug: "FALSE"
+
+metrics:
+  instrumentationKey: ""
+
+migrations:
+  enabled: false
+  image:
+    repository: ""
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
+  job:
+    ## Should the job be rescheduled on the same node if it fails, or just stopped
+    restartPolicy: Never
+    annotations:
+      "helm.sh/hook": pre-install,pre-upgrade
+      "helm.sh/hook-delete-policy": before-hook-creation
+
+postgres:
+  serverName: ""
+  user: ""
+  password: ""
+  dbName: "postgis"
+  port: "5432"
+
+cosmos:
+  url: ""
+  key: ""
+  dbName: "stac"
+
+ingress:
+  enabled: false
+  annotations: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+nameOverride: ""
+fullnameOverride: ""
