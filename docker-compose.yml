@@ -1,6 +1,6 @@
 services:
   dqe:
-    image: ${DQE_IMAGE_NAME}
+    image: ghcr.io/microsoft/pc-query-dataapi
     build:
       context: .
       dockerfile: dqe/Dockerfile
@@ -41,7 +41,7 @@ services:
       - database
     command: [ "uvicorn", "dqe.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers" ]
   mqe:
-    image: pc-query-stacapi
+    image: ghcr.io/microsoft/pc-query-stacapi
     platform: linux/amd64
     build:
       context: .
@@ -83,7 +83,7 @@ services:
     command: >
       bash -c "python /opt/src/mqe/mqe/pgready.py && uvicorn mqe.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
   sas:
-    image: pc-sasapi
+    image: ghcr.io/microsoft/pc-sasapi
     platform: linux/amd64
     build:
       context: .
