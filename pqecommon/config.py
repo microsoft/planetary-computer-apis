@@ -26,8 +26,12 @@ class CommonConfig:
         app_insights_instrumentation_key = os.getenv(
             EnvVars.APP_INSIGHTS_INSTRUMENTATION_KEY
         )
-        if app_insights_instrumentation_key is None:
-            logger.warning("App Insights Instumentation Key not in environment.")
+        if (
+            not app_insights_instrumentation_key
+            or len(app_insights_instrumentation_key) < 5
+        ):
+            logger.warning("App Insights Instrumentation Key not in environment.")
+            app_insights_instrumentation_key = None
         return cls(
             app_insights_instrumentation_key=app_insights_instrumentation_key,
         )
