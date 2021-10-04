@@ -14,7 +14,7 @@ HTTP_METHOD = COMMON_ATTRIBUTES["HTTP_METHOD"]
 exporter = (
     AzureExporter(
         connection_string=(
-            "InstrumentationKey={config.app_insights_instrumentation_key}"
+            f"InstrumentationKey={config.app_insights_instrumentation_key}"
         )
     )
     if config.app_insights_instrumentation_key is not None
