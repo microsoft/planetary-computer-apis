@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Type
 from urllib.parse import urljoin
 
 import attr
@@ -191,8 +191,9 @@ class MQEClient(CoreCrudClient):
         return landing
 
     @classmethod
-    def create(cls, extra_conformance_classes: List[str] = []) -> MQEClient:
-        # MyPy is apparently confused by the inheritance here; ignore 'unexpected keyword'
+    def create(cls, extra_conformance_classes: List[str] = []) -> "MQEClient":
+        # MyPy is apparently confused by the inheritance here;
+        # ignore 'unexpected keyword'
         it = cls(  # type: ignore
             landing_page_id=API_LANDING_PAGE_ID,
             title=API_TITLE,

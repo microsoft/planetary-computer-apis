@@ -300,7 +300,7 @@ async def test_item_search_get_query_extension(app_client):
     )
     resp = await app_client.get("/search", params=params)
     resp_json = resp.json()
-    assert resp_json["context"]["matched"] == 12
+    assert len(resp_json["features"]) == 10
     assert (
         resp_json["features"][0]["properties"]["proj:epsg"]
         == first_item["properties"]["proj:epsg"]
@@ -342,7 +342,7 @@ async def test_item_search_get_filter_extension_cql(app_client):
     }
     resp = await app_client.post("/search", json=params)
     resp_json = resp.json()
-    assert resp_json["context"]["matched"] == 12
+    assert len(resp_json["features"]) == 12
     assert (
         resp_json["features"][0]["properties"]["proj:epsg"]
         == first_item["properties"]["proj:epsg"]
@@ -394,7 +394,7 @@ async def test_pagination_item_collection(app_client):
             assert False
 
     # limit is 1; we expect the matched number of requests before we run out of pages
-    assert idx == items_resp.json()["context"]["matched"]
+    assert idx == len(items_resp.json()["features"])
 
     # Confirm we have paginated through all items
     assert not set(item_ids) - set(ids)
@@ -430,7 +430,7 @@ async def test_pagination_post(app_client):
             assert False
 
     # limit is 1; we expect the matched number of requests before we run out of pages
-    assert idx == items_resp.json()["context"]["matched"]
+    assert idx == len(items_resp.json()["features"])
 
     # Confirm we have paginated through all items
     assert not set(item_ids) - set(ids)

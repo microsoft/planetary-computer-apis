@@ -1,5 +1,5 @@
-from typing import Any, Dict
 import urllib.parse
+from typing import Any, Dict
 
 
 def get_param_str(params: Dict[str, Any]) -> str:
