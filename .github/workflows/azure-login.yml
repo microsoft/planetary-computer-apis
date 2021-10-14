@@ -2,7 +2,7 @@ name: Login to Azure
 on:
   push:
     branches:
-      - feaature/js/workflow-to-test-az-login
+      - feature/js/workflow-to-test-az-login
   pull_request:
     branches:
       - cicd-target
