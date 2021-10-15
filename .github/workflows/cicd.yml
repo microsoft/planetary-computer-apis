@@ -63,9 +63,11 @@ jobs:
           push: true
           tags: ${{ steps.add-mqe-image-tags.outputs.tags }}
           labels: ${{ steps.add-mqe-image-tags.outputs.labels }}
+          context: ./mqe
       - name: Build and publish DQE image
         uses: docker/build-push-action@v2
         with:
           push: true
           tags: ${{ steps.add-dqe-image-tags.outputs.tags }}
           labels: ${{ steps.add-dqe-image-tags.outputs.labels }}
+          context: ./dqe
