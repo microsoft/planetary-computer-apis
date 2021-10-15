@@ -32,7 +32,6 @@ jobs:
           images: |
             ghcr.io/microsoft/pc-query-stacapi
             ghcr.io/microsoft/pc-query-dataapi
-            ghcr.io/microsoft/pc-query-sasapi
           tags: |
             type=ref,event=branch
             type=ref,event=pr
