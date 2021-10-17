@@ -1,0 +1,106 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "al_m_3008502_nw_16_060_20191109_20200114",
+  "properties": {
+    "naip:state": "al",
+    "providers": [
+      {
+        "name": "USDA Farm Service Agency",
+        "roles": [
+          "producer",
+          "licensor"
+        ],
+        "url": "https://www.fsa.usda.gov/programs-and-services/aerial-photography/imagery-programs/naip-imagery/"
+      }
+    ],
+    "proj:epsg": 32616,
+    "datetime": "2019-11-09T00:00:00Z"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -85.8125,
+          30.9375
+        ],
+        [
+          -85.8125,
+          31.0
+        ],
+        [
+          -85.875,
+          31.0
+        ],
+        [
+          -85.875,
+          30.9375
+        ],
+        [
+          -85.8125,
+          30.9375
+        ]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "/home/rob/proj/pc/components/planetary-query-engine/testdata/items/al_m_3008502_nw_16_060_20191109_20200114.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "image": {
+      "href": "https://naipeuwest.blob.core.windows.net/naip/v002/al/2019/al_60cm_2019/30085/m_3008502_nw_16_060_20191109.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "RGBIR COG tile",
+      "eo:bands": [
+        {
+          "name": "Red"
+        },
+        {
+          "name": "Green"
+        },
+        {
+          "name": "Blue"
+        },
+        {
+          "name": "NIR",
+          "description": "near-infrared"
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "metadata": {
+      "href": "https://naipeuwest.blob.core.windows.net/naip/v002/al/2019/al_fgdc_2019/30085/m_3008502_nw_16_060_20191109.txt",
+      "type": "text/plain",
+      "title": "FGDC Metdata",
+      "roles": [
+        "metadata"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://naipeuwest.blob.core.windows.net/naip/v002/al/2019/al_60cm_2019/30085/m_3008502_nw_16_060_20191109.200.jpg",
+      "type": "image/jpeg",
+      "title": "Thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "bbox": [
+    -85.875,
+    30.9375,
+    -85.8125,
+    31.0
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+  ],
+  "collection": "naip"
+}

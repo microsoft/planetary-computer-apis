@@ -1,0 +1,46 @@
+#!/usr/bin/python3
+
+import argparse
+import json
+import os
+
+from jinja2 import StrictUndefined, Template
+
+description=('Apply a terrform output JSON file '
+             'and the environment to a Jinja template.')
+
+epilog=('The template will be applied with an "env" object '
+        'with the the values in os.environ, and a "tf" object that '
+        'contains the contents of the terraform output JSON')
+
+parser = argparse.ArgumentParser(description=description)
+parser.add_argument('tf_output_file',
+                    help='JSON file holding the terraform output')
+parser.add_argument('template_file',
+                    help='File containing the text of the template')
+parser.add_argument('output_file',
+                    help='Path to the resulting rendered template')
+
+def template(values, template_text):
+    template = Template(template_text, undefined=StrictUndefined)
+    return template.render(**values)
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+
+    values = {
+        'env': os.environ.copy(),
+        'tf': {}
+    }
+
+    with open(args.tf_output_file) as f:
+         values['tf'] = json.load(f)['resources']['value']
+
+    with open(args.template_file) as f:
+        template_text = f.read()
+
+
+    result = template(values, template_text)
+
+    with open(args.output_file, 'w') as f:
+        f.write(result)

@@ -1,0 +1,115 @@
+{{- if .Values.mqe.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mqe.fullname" . }}
+  labels:
+    {{- include "mqe.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.mqe.deploy.autoscaling.enabled }}
+  replicas: {{ .Values.mqe.deploy.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mqe.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.mqe.deploy.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mqe.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.mqe.deploy.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mqe.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.mqe.deploy.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.mqe.deploy.securityContext | nindent 12 }}
+          image: "{{ .Values.mqe.image.repository }}:{{ .Values.mqe.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.mqe.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: APP_ROOT_PATH
+              value: "{{ .Values.mqe.appRootPath }}"
+            - name: APP_HOST
+              value: "{{ .Values.mqe.host }}"
+            - name: APP_PORT
+              value: "{{ .Values.mqe.port }}"
+            - name: FORWARDED_ALLOW_IPS
+              value: "*"
+            - name: "MAX_WORKERS"
+              value: "{{ .Values.mqe.server.maxWorkers }}"
+            - name: "POOL_SIZE"
+              value: "{{ .Values.mqe.server.poolSize }}"
+            - name: TILER_HREF
+              value: "{{ .Values.mqe.tiler_href }}"
+            - name: COSMOSTAC_URL
+              value: "{{ .Values.cosmos.url }}"
+            - name: COSMOSTAC_KEY
+              value: "{{ .Values.cosmos.key }}"
+            - name: COSMOSTAC_DB_NAME
+              value: "{{ .Values.cosmos.dbName }}"
+            - name: POSTGRES_USER
+              value: "{{ .Values.postgres.user }}"
+            - name: POSTGRES_PASS
+              value: "{{ .Values.postgres.password }}"
+            - name: POSTGRES_DBNAME
+              value: "{{ .Values.postgres.dbName }}"
+            - name: POSTGRES_PORT
+              value: "{{ .Values.postgres.port }}"
+            - name: POSTGRES_HOST_READER
+              value: "{{ .Values.postgres.serverName }}"
+            - name: POSTGRES_HOST_WRITER
+              value: "{{ .Values.postgres.serverName }}"
+            - name: PGUSER
+              value: "{{ .Values.postgres.user }}"
+            - name: PGPASSWORD
+              value: "{{ .Values.postgres.password }}"
+            - name: PGDATABASE
+              value: "{{ .Values.postgres.dbName }}"
+            - name: PGPORT
+              value: "{{ .Values.postgres.port }}"
+            - name: PGHOST
+              value: "{{ .Values.postgres.serverName }}"
+            - name: ENVIRONMENT
+              value: "{{ .Values.environment }}"
+            - name: "PGSSLMODE"
+              value: "require"
+            - name: "DEBUG"
+              value: "{{ .Values.mqe.debug }}"
+            - name: APP_INSIGHTS_INSTRUMENTATION_KEY
+              value: "{{ .Values.metrics.instrumentationKey }}"
+
+          livenessProbe:
+            httpGet:
+              path: /_mgmt/ping
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /_mgmt/ping
+              port: http
+          resources:
+            {{- toYaml .Values.mqe.deploy.resources | nindent 12 }}
+      {{- with .Values.mqe.deploy.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mqe.deploy.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mqe.deploy.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

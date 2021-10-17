@@ -1,0 +1,86 @@
+#!/bin/bash
+
+function setup_env() {
+
+    # Directory for rendered values and templates
+    export CONF_DIR='/opt/conf'
+    mkdir -p ${CONF_DIR}
+
+    # Paths for genrating deployment values
+    export TEMPLATE_PATH=helm/deploy-values.template.yaml
+    export TF_OUTPUT_FILE=${CONF_DIR}/tf-output.json
+    export DEPLOY_VALUES_FILE=${CONF_DIR}/deploy-values.yaml
+}
+
+function tf_output() {
+    echo $(terraform output -json resources | jq -r .${1})
+}
+
+function gather_tf_output() {
+
+    if [ "${1}" ]; then
+        pushd ${1} || return;
+    fi
+
+    echo "Gathering terraform output..."
+
+    # Export output values
+    terraform output -json > ${TF_OUTPUT_FILE}
+
+    # Record terraform output variables for cluster login
+    export RESOURCE_GROUP=$(tf_output resource_group)
+    export CLUSTER_NAME=$(tf_output cluster_name)
+
+    export ENVIRONMENT=$(tf_output environment)
+    export INGRESS_IP=$(tf_output ingress_ip)
+    export DNS_LABEL=$(tf_output dns_label)
+
+    if [ "${1}" ]; then
+        popd
+    fi
+}
+
+function render_values() {
+    echo "Rendering chart value files..."
+
+    bin/jinja ${TF_OUTPUT_FILE} ${TEMPLATE_PATH} ${DEPLOY_VALUES_FILE}
+}
+
+function cluster_login() {
+    echo "Logging into the cluster..."
+
+    az login --service-principal \
+        --username ${AZURE_CLIENT_ID} \
+        --password ${AZURE_CLIENT_SECRET} \
+        --tenant ${AZURE_TENANT_ID}
+
+    az aks get-credentials \
+        --resource-group ${RESOURCE_GROUP} \
+        --name ${CLUSTER_NAME}
+
+    # Gather vars from the cluster
+    export MQE_NODE_RG=$(az aks show --resource-group ${RESOURCE_GROUP} --name ${CLUSTER_NAME} --query nodeResourceGroup -o tsv)
+}
+
+function setup_helm() {
+    # Set the helm context to the same as the kubectl context
+    export KUBE_CONTEXT=$(kubectl config current-context)
+
+    # Add repos
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+}
+
+function full_setup() {
+    if [[ -z ${1} ]]; then
+        echo "Must pass in terraform directory."
+    else
+        echo "Using terraform at ${1}..."
+        setup_env;
+        gather_tf_output ${1};
+        render_values;
+        cluster_login;
+        setup_helm;
+    fi
+}

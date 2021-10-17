@@ -1,0 +1,3 @@
+alembic==1.4.3
+psycopg2-binary==2.8.6
+geoalchemy2==0.8.0

@@ -1,0 +1,7 @@
+ARG SAS_IMAGE_NAME
+
+FROM ${SAS_IMAGE_NAME}
+
+COPY requirements-dev.txt /opt/src/requirements-dev.txt
+
+RUN pip install -r /opt/src/requirements-dev.txt
