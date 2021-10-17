@@ -1,0 +1,68 @@
+environment: "staging"
+
+sas:
+  enabled: true
+  image:
+    # e.g. myacr.azurecr.io/my-repository
+    repository: ""
+    pullPolicy: Always
+    tag: "latest"
+
+  server:
+    maxWorkers: "1"
+
+  tenantId: ""
+  clientId: ""
+  clientSecret: ""
+  anonymous:
+    expiryMinutesWithinDatacenter: ""
+    expiryMinutesOutOfDatacenter: ""
+  subscription:
+    expiryMinutesWithinDatacenter: ""
+    expiryMinutesOutOfDatacenter: ""
+
+  service:
+    type: ClusterIP
+    port: 80
+    annotations: {}
+
+  deploy:
+    replicaCount: 10
+    podAnnotations: {}
+    imagePullSecrets: []
+    securityContext: {}
+    podSecurityContext: {}
+    resources: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    autoscaling:
+      enabled: false
+
+  mqeUrl: ""
+
+  host: "0.0.0.0"
+  port: "80"
+  appRootPath: ""
+
+  # Connection string to the Azure Storage Table
+  # that lists additional containers to serve SAS
+  # tokens for
+  pcApiSAConnString: ""
+  # Table holding container list
+  pcApiSATable: "sascontainers"
+
+metrics:
+  instrumentationKey: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+nameOverride: ""
+fullnameOverride: ""

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0") [--dev, --db, --migrations, --deploy]
+Runs formatting for the project.
+
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    docker-compose  \
+        -f docker-compose.yml \
+        -f docker-compose.dev.yml \
+        run --rm \
+        dqe-dev scripts/bin/format-dqe;
+
+    docker-compose  \
+        -f docker-compose.yml \
+        -f docker-compose.dev.yml \
+        run --rm \
+        mqe-dev scripts/bin/format-mqe;
+
+    docker-compose  \
+        -f docker-compose.yml \
+        -f docker-compose.dev.yml \
+        run --rm \
+        sas-dev scripts/bin/format-sas;
+
+fi

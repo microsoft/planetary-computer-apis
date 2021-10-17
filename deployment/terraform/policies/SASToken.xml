@@ -1,0 +1,129 @@
+<!--
+ Policy that performs rate limiting based on two parameters:
+   - Whether or not the IP is originating from within the datacenter
+   - Whether or not the request has a subscription (header or query param)
+
+ Headers are then added appropriately to the outbound request, either "true" or "false":
+   - X-Within-Datacenter
+   - X-Has-Subscription
+
+ These headers may be used by the receiving endpoint for determining SAS token expiration time
+-->
+<policies>
+    <inbound>
+        <base />
+        <set-backend-service backend-id="pqe-backend" />
+        <set-header name="host" exists-action="override">
+            <value>@(context.Request.OriginalUrl.ToUri().Host)</value>
+        </set-header>
+        <set-header name="X-Within-Datacenter" exists-action="override">
+             <value>@{
+             // The code for determining whether the IP is within a set of CIDRs is based on the following example:
+             // https://docs.microsoft.com/en-us/azure/api-management/policies/filter-ip-addresses-when-using-appgw
+             int HostToNetworkOrder(int host)
+             {
+                 return (((int)HostToNetworkOrderShort((short)host) & 0xFFFF) << 16)
+                     | ((int)HostToNetworkOrderShort((short)(host >> 16)) & 0xFFFF);
+             }
+             short HostToNetworkOrderShort(short host)
+             {
+                 return (short)((((int)host & 0xFF) << 8) | (int)((host >> 8) & 0xFF));
+             }
+
+             // When accessing this through Azure Front Door, the X-Forwarded-For header is set
+             // to the public IP, which we need to use for in-datacenter determination.
+             string ipAddress = context.Request.Headers.GetValueOrDefault("X-Forwarded-For", context.Request.IpAddress);
+             if (!string.IsNullOrEmpty(ipAddress))
+             {
+                 string[] tokens = ipAddress.Split(':');
+                 if(tokens.Length == 2)
+                 { ipAddress = tokens[0]; }
+                 List<string> cidrList = new List<string>(){
+                     "${cidrs}"
+                 };
+                 foreach (string cidrAddress in cidrList)
+                 {
+                     string[] cidrParts = cidrAddress.Split('/');
+                     string[] inputIPParts = ipAddress.Split('.');
+                     string[] cidrIPArray = cidrParts[0].Split('.');
+                      if (inputIPParts.Length == 4 && cidrIPArray.Length == 4)
+                     {
+                         byte[] inputIPBytes = new byte[] {Convert.ToByte(int.Parse(inputIPParts[0])),
+                             Convert.ToByte(int.Parse(inputIPParts[1])),
+                             Convert.ToByte(int.Parse(inputIPParts[2])),
+                             Convert.ToByte(int.Parse(inputIPParts[3])), };
+                         byte[] cidrIPBytes = new byte[] {Convert.ToByte(int.Parse(cidrIPArray[0])),
+                             Convert.ToByte(int.Parse(cidrIPArray[1])),
+                             Convert.ToByte(int.Parse(cidrIPArray[2])),
+                             Convert.ToByte(int.Parse(cidrIPArray[3])), };
+                          int cidrAddr = BitConverter.ToInt32(inputIPBytes,0);
+                         int ipAddr = BitConverter.ToInt32(cidrIPBytes,0);
+                          var host = int.Parse(cidrParts[1]);
+                         host = -1 << (32-host);
+                         var mask = HostToNetworkOrder(host);
+                          if (((ipAddr & mask) == (cidrAddr & mask)))
+                         {
+                             return "true";
+                         }
+                     }
+                 }
+             }
+             return "false"; }</value>
+        </set-header>
+        <set-header name="X-Has-Subscription" exists-action="override">
+             <value>@{
+             if (context.Subscription != null && !String.IsNullOrEmpty(
+                 context.Subscription.Key
+             ))
+             {
+                 return "true";
+             }
+             return "false"; }</value>
+        </set-header>
+        <set-header name="X-Subscription-Key" exists-action="override">
+             <value>@{
+             if (context.Subscription != null)
+             {
+                 return context.Subscription.Key;
+             }
+             return null; }</value>
+        </set-header>
+        <set-header name="X-User-Email" exists-action="override">
+             <value>@{
+             if (context.User != null)
+             {
+                 return context.User.Email;
+             }
+             return null; }</value>
+        </set-header>
+        <choose>
+            <when condition="@(context.Request.Headers.GetValueOrDefault("X-Within-Datacenter","").Equals("true"))">
+                <choose>
+                    <when condition="@(context.Request.Headers.GetValueOrDefault("X-Has-Subscription","").Equals("true"))">
+                        <!-- Within datacenter, has subscription -->
+                        <rate-limit-by-key calls="120" renewal-period="60" counter-key="@(context.Request.IpAddress)" />
+                    </when>
+                    <otherwise>
+                        <!-- Within datacenter, no subscription -->
+                        <rate-limit-by-key calls="60" renewal-period="60" counter-key="@(context.Request.IpAddress)" />
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                <choose>
+                    <when condition="@(context.Request.Headers.GetValueOrDefault("X-Has-Subscription","").Equals("true"))">
+                        <!-- Outside datacenter, has subscription -->
+                        <rate-limit-by-key calls="10" renewal-period="60" counter-key="@(context.Request.IpAddress)" />
+                    </when>
+                    <otherwise>
+                        <!-- Outside datacenter, no subscription -->
+                        <rate-limit-by-key calls="5" renewal-period="60" counter-key="@(context.Request.IpAddress)" />
+                    </otherwise>
+                </choose>
+            </otherwise>
+        </choose>
+    </inbound>
+    <outbound>
+        <base />
+    </outbound>
+</policies>
