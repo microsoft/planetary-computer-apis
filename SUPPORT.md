@@ -1,25 +1,7 @@
-# TODO: The maintainer of this repo has not yet edited this file
-
-**REPO OWNER**: Do you want Customer Service & Support (CSS) support for this product/project?
-
-- **No CSS support:** Fill out this template with information about how to file issues and get help.
-- **Yes CSS support:** Fill out an intake form at [aka.ms/spot](https://aka.ms/spot). CSS will work with/help you to determine next steps. More details also available at [aka.ms/onboardsupport](https://aka.ms/onboardsupport).
-- **Not sure?** Fill out a SPOT intake as though the answer were "Yes". CSS will help you decide.
-
-*Then remove this first heading from this SUPPORT.MD file before publishing your repo.*
-
 # Support
 
-## How to file issues and get help  
+This repository contains the code for Planetary Computer APIs and example deployment of those components into Azure. It is meant to serve as a reference implementation for combining various open source libraries into a set of services that deploy on Azure. As this is a reference implementation and not not intended to be libraries or tools for others to run, users utilizing the code in this repository do so at their own risk, without an expectation of support. Feel free to file Issues for problems specifically with the APIs contained in this repository, with the understanding that there is no guarantee that issues in this repository will be addressed, particularly if the issues pertain to an external utilization of this code.
 
-This project uses GitHub Issues to track bugs and feature requests. Please search the existing 
-issues before filing new issues to avoid duplicates.  For new issues, file your bug or 
-feature request as a new Issue.
+## Microsoft Support Policy
 
-For help and questions about using this project, please **REPO MAINTAINER: INSERT INSTRUCTIONS HERE 
-FOR HOW TO ENGAGE REPO OWNERS OR COMMUNITY FOR HELP. COULD BE A STACK OVERFLOW TAG OR OTHER
-CHANNEL. WHERE WILL YOU HELP PEOPLE?**.
-
-## Microsoft Support Policy  
-
-Support for this **PROJECT or PRODUCT** is limited to the resources listed above.
+Support for this project is limited to the resources listed above.

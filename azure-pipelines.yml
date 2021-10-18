@@ -1,0 +1,118 @@
+# Need to periodically build in order to update Azure service tags
+# for API Management IP restriction for in vs. out of datacenter
+schedules:
+- cron: "0 14 * * Tue"
+  displayName: Weekly master build, Tuesday at 2PM UTC, 10AM Eastern
+  branches:
+    include:
+    - master
+  always: true
+
+trigger:
+  branches:
+    include:
+    - master
+  tags:
+    include:
+      - "*"
+
+pool:
+  vmImage: "ubuntu-18.04"
+
+variables:
+  CI: 1
+  subscriptionId: a84a690d-585b-4c7c-80d9-851a48af5a50
+  pcAcr: pccomponents
+  pcTestAcr: pccomponentstest
+
+  isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  isTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
+
+  mqeImageName: pc-query-stacapi
+  dqeImageName: pc-query-dataapi
+  migrationsImageName: pc-query-stacapi-migrations
+  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+    imageTag: latest
+  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+    imageTag: $[variables['Build.SourceBranchName']]
+  deployEnvironment: staging
+
+jobs:
+
+  - job: BuildAndTest
+    steps:
+      - script: |
+          scripts/cibuild
+        displayName: "Run cibuild"
+
+  - job: Publish
+    steps:
+
+      - script: |
+          export BUILD_ONLY=1
+
+          scripts/cibuild
+        displayName: "Build containers"
+
+      # Publish to PC Test ACR
+
+      - task: Docker@2
+        displayName: Login to PC Test ACR
+        inputs:
+          command: login
+          containerRegistry: pccomponentstest
+
+      - task: AzureCLI@2
+        env:
+            HELM_EXPERIMENTAL_OCI: 1
+        inputs:
+          azureSubscription: 'Planetary Computer Test'
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            scripts/cipublish --acr $(pcTestAcr) --tag $(imageTag)
+        displayName: "Publish to PC Test ACR"
+
+      # Publish to PC ACR
+
+      - task: Docker@2
+        displayName: Login to PC ACR
+        inputs:
+          command: login
+          containerRegistry: pccomponents
+
+      - task: AzureCLI@2
+        env:
+            HELM_EXPERIMENTAL_OCI: 1
+        inputs:
+          azureSubscription: 'pccomponents-arm'
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            scripts/cipublish --acr $(pcAcr) --tag $(imageTag)
+        displayName: "Publish to PC ACR"
+
+    dependsOn: BuildAndTest
+    condition: or(eq(variables.isMaster, true), eq(variables.isTag, true))
+
+  - job: Deploy
+    steps:
+      - task: AzureCLI@2
+        displayName: "Run deploy script"
+        inputs:
+          scriptType: bash
+          scriptLocation: inlineScript
+          azureSubscription: 'Planetary Computer Test'
+          addSpnToEnvironment: true
+          inlineScript: |
+            export subscriptionId=$(subscriptionId)
+            export MQE_IMAGE_NAME=$(mqeImageName)
+            export DQE_IMAGE_NAME=$(dqeImageName)
+            export MIGRATIONS_IMAGE_NAME=$(migrationsImageName)
+            export IMAGE_TAG=$(imageTag)
+            export ENVIRONMENT=$(deployEnvironment)
+
+            scripts/cideploy
+
+    dependsOn: Publish
+    condition: eq(variables.isMaster, true)

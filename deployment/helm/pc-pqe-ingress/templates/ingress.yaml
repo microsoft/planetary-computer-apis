@@ -1,0 +1,40 @@
+{{- if .Values.pcingress.ingress.enabled -}}
+{{- $fullName := include "pcingress.fullname" . -}}
+{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "pcingress.labels" . | nindent 4 }}
+  {{- with .Values.pcingress.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.pcingress.ingress.tlsHost }}
+    secretName: {{ .Values.pcingress.cert.secretName }}
+  rules:
+  {{- range .Values.pcingress.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          {{ if $.Values.mqe.enabled }}
+          - path: {{ $.Values.pcingress.services.mqe.path }}
+            backend:
+              serviceName: {{ $.Values.pcingress.services.mqe.name }}
+              servicePort: {{ $.Values.pcingress.services.mqe.port }}
+          {{- end}}
+          {{ if $.Values.dqe.enabled }}
+          - path: {{ $.Values.pcingress.services.dqe.path }}
+            backend:
+              serviceName: {{ $.Values.pcingress.services.dqe.name }}
+              servicePort: {{ $.Values.pcingress.services.dqe.port }}
+          {{- end}}
+  {{- end }}
+{{- end }}

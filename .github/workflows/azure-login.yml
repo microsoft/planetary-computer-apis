@@ -1,0 +1,19 @@
+name: Login to Azure
+on:
+  push:
+    branches:
+      - feature/js/workflow-to-test-az-login
+  pull_request:
+    branches:
+      - cicd-target
+
+jobs:
+  login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}

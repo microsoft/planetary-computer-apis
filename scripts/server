@@ -1,0 +1,34 @@
+#!/bin/bash
+
+source scripts/env
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo $1
+
+    echo -n \
+        "Usage: $(basename "$0") [--detached]
+Runs the development server and database.
+
+--detached: Run in detached mode.
+"
+}
+
+DETACHED_ARG=""
+
+while [[ "$#" > 0 ]]; do case $1 in
+  --detached) DETACHED_ARG="--detach"; shift;;
+  --help) usage; exit 0; shift;;
+  *) break;;
+esac; done
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    docker-compose \
+        -f docker-compose.yml \
+        up ${DETACHED_ARG} $@;
+fi

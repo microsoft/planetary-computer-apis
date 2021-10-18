@@ -1,0 +1,102 @@
+#!/bin/bash
+
+source scripts/env
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0") [--mqe, --pqe, --db, --migrations, --deploy]
+Runs a console in the development container
+
+--mqe - Drops into a dev container (based on mqe). Default.
+--dqe - Drops into a dev container (based on dqe)
+--db - Drops into a db container
+--deploy - Drops into a deploy container
+"
+}
+
+# Parse args
+DEV_MQE_CONSOLE=1
+while [[ "$#" > 0 ]]; do case $1 in
+    --db)
+        DB_CONSOLE=1
+        shift
+        ;;
+    --mqe)
+        DEV_MQE_CONSOLE=1
+        shift
+        ;;
+    --dqe)
+        DEV_DQE_CONSOLE=1
+        shift
+        ;;
+    --deploy)
+        DEPLOY_CONSOLE=1
+        shift
+        ;;
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    if [[ "${DB_CONSOLE}" ]]; then
+
+        docker-compose \
+            -f docker-compose.yml \
+            exec database psql postgres://username:password@database:5432/postgis
+
+        exit 0
+    fi
+
+    if [[ "${DEV_DQE_CONSOLE}" ]]; then
+        # Execute in subshell to avoid leaking exported env vars.
+        docker-compose \
+            -f docker-compose.yml \
+            -f docker-compose.dev.yml \
+            run --rm \
+            dqe-dev /bin/bash
+
+        exit 0
+    fi
+
+    if [[ "${DEPLOY_CONSOLE}" ]]; then
+        (
+
+            source scripts/env
+
+            GIT_COMMIT="$(git rev-parse --short HEAD)" \
+                docker-compose \
+                -f deployment/docker-compose.yml \
+                run --rm \
+                deploy /bin/bash
+        )
+
+        exit 0
+    fi
+
+    if [[ "${DEV_MQE_CONSOLE}" ]]; then
+        # Execute in subshell to avoid leaking exported env vars.
+        docker-compose \
+            -f docker-compose.yml \
+            -f docker-compose.dev.yml \
+            run --rm \
+            mqe-dev /bin/bash
+
+        exit 0
+    fi
+
+fi
