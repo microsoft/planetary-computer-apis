@@ -115,3 +115,4 @@ jobs:
           DQE_IMAGE_NAME: ghcr.io/microsoft/pc-query-dataapi
           IMAGE_TAG: latest
           GIT_COMMIT: c34aa3d
+          ENVIRONMENT: staging
