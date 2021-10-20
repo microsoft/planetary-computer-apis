@@ -51,7 +51,8 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=sha
+            type=sha,
+            type=match,pattern=main
       - name: Log in to GHCR
         uses: docker/login-action@v1
         with:
@@ -94,3 +95,23 @@ jobs:
       - name: Publish DQE chart
         run: |
           helm chart push ghcr.io/${{ github.repository_owner }}/charts/pc-data-query-engine:${{ github.sha }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs:
+      - build
+      - publish
+    steps:
+      - uses: actions/checkout@v2
+      - name: Sign in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Run cideploy
+        run: ./scripts/cideploy
+        env:
+          MQE_IMAGE_NAME: ghcr.io/microsoft/pc-query-stacapi
+          DQE_IMAGE_NAME: ghcr.io/microsoft/pc-query-dataapi
+          IMAGE_TAG: latest
+          GIT_COMMIT: c34aa3d
