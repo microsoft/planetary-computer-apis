@@ -46,7 +46,7 @@ DOCKER_COMPOSE="docker-compose -f deployment/docker-compose.yml"
 if [ "${DEV_DEPLOY}" = "1" ]; then
     TERRAFORM_DIR=/opt/src/terraform/dev
 else
-    if [[ "${CI}" != "1" ]]; then
+    if [[ "${CI}" != "true" ]]; then
         echo "Only CI can deploy to staging!"
         exit 1
     fi
