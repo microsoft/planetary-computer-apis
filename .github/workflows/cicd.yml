@@ -2,10 +2,10 @@ name: Planetary Computer APIs CI/CD
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [ main ]
     tags: [ v* ]
   pull_request:
-    branches: [ $default-branch, cicd-target ]
+    branches: [ main, cicd-target ]
 
 
 jobs:
