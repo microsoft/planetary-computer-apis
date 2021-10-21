@@ -108,6 +108,11 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Echo json key access
+        run: echo $accessed
+        env:
+          accessed: |
+            ${{ fromJSON('{"a": 1}').a }}
       - name: Run cideploy
         run: ./scripts/cideploy
         env:
