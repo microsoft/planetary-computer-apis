@@ -4,7 +4,7 @@ namespace: "staging"
 mqe:
   enabled: true
   image:
-    repository: "{{ tf.image_registry }}.azurecr.io/{{ env.MQE_IMAGE_NAME }}"
+    repository: "ghcr.io/microsoft/{{ env.MQE_IMAGE_NAME }}"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -26,7 +26,7 @@ mqe:
 dqe:
   enabled: true
   image:
-    repository: "{{ tf.image_registry }}.azurecr.io/{{ env.DQE_IMAGE_NAME }}"
+    repository: "ghcr.io/microsoft/{{ env.DQE_IMAGE_NAME }}"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
