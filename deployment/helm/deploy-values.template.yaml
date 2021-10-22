@@ -79,7 +79,6 @@ pcingress:
     tlsHost: "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
     hosts:
       - "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
-      - "{{ tf.api_management_name }}.azure-api.net"
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: "{{ tf.cluster_cert_issuer }}-pcingress"
