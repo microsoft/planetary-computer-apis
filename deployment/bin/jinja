@@ -33,15 +33,8 @@ if __name__ == '__main__':
         'tf': {}
     }
 
-    print(f"TF file location: {args.tf_output_file}")
-    print(f"Template file location: {args.template_file}")
-    print(f"TF path exists: {os.path.exists(args.tf_output_file)}")
-    print(f"Template file path exists: {os.path.exists(args.template_file)}")
-
     with open(args.tf_output_file) as f:
          values['tf'] = json.load(f)['resources']['value']
-
-    print(f"TF keys: {[x for x in values['tf']]}")
 
     with open(args.template_file) as f:
         template_text = f.read()
