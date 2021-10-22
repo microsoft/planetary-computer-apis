@@ -41,6 +41,8 @@ if __name__ == '__main__':
     with open(args.tf_output_file) as f:
          values['tf'] = json.load(f)['resources']['value']
 
+    print(f"TF keys: {[x for x in values['tf']]}")
+
     with open(args.template_file) as f:
         template_text = f.read()
 
