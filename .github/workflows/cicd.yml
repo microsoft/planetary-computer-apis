@@ -114,7 +114,7 @@ jobs:
         env:
           MQE_IMAGE_NAME: ghcr.io/microsoft/pc-query-stacapi
           DQE_IMAGE_NAME: ghcr.io/microsoft/pc-query-dataapi
-          IMAGE_TAG: latest
+          IMAGE_TAG: pr-10
           GIT_COMMIT: c34aa3d
           ENVIRONMENT: staging
           ARM_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
