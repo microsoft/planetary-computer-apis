@@ -20,6 +20,9 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
+    env:
+      HELM_EXPERIMENTAL_OCI: 1 #enable OCI support
+      HELM_VERSION_TO_INSTALL: 3.5.0 # version of HELM to install
     needs: build
     steps:
       - uses: actions/checkout@v2
@@ -69,3 +72,25 @@ jobs:
           tags: ${{ steps.add-dqe-image-tags.outputs.tags }}
           labels: ${{ steps.add-dqe-image-tags.outputs.labels }}
           file: ./dqe/Dockerfile
+      - name: Install helm
+        uses: Azure/setup-helm@v1
+        with:
+          version: ${{ env.HELM_VERSION_TO_INSTALL }} # default is latest
+      - name: Log into MQE GHCR with helm
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io/${{ github.repository_owner }}/charts/pc-metadata-query-engine -u ${{ github.repository_owner }} --password-stdin
+      - name: Save MQE chart locally
+        run: |
+          helm chart save ./deployment/helm/pc-metadata-query-engine ghcr.io/${{ github.repository_owner }}/charts/pc-metadata-query-engine:${{ github.sha }}
+      - name: Publish MQE chart
+        run: |
+          helm chart push ghcr.io/${{ github.repository_owner }}/charts/pc-metadata-query-engine:${{ github.sha }}
+      - name: Log into DQE GHCR with helm
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io/${{ github.repository_owner }}/charts/pc-data-query-engine -u ${{ github.repository_owner }} --password-stdin
+      - name: Save DQE chart locally
+        run: |
+          helm chart save ./deployment/helm/pc-data-query-engine ghcr.io/${{ github.repository_owner }}/charts/pc-data-query-engine:${{ github.sha }}
+      - name: Publish DQE chart
+        run: |
+          helm chart push ghcr.io/${{ github.repository_owner }}/charts/pc-data-query-engine:${{ github.sha }}
