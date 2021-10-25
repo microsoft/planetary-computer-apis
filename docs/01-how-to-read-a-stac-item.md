@@ -29,7 +29,7 @@ collection.
 
 As an implementation of the STAC API, MQE entries are intended to be simple,
 human-readable JSON. The item we're looking at can be found here:
-[PQE_METADATA_URL/collections/naip/items/md_m_3807619_se_18_060_20181025_20190211](PQE_METADATA_URL/collections/naip/items/md_m_3807619_se_18_060_20181025_20190211).
+[https://planetarycomputer.microsoft.com/api/stac/v1/collections/naip/items/md_m_3807619_se_18_060_20181025_20190211](https://planetarycomputer.microsoft.com/api/stac/v1/collections/naip/items/md_m_3807619_se_18_060_20181025_20190211).
 
 ### Previewing the contents of a Planetry Computer STAC entry
 

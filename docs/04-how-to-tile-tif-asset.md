@@ -34,7 +34,7 @@ metadata and construct a URL template which can be used to provide tiles for a
 The simplest endpoint on the DQE provides asset information necessary to
 construct a tiling URL specific to one of hte supported projections. For the
 purposes of this how-to we'll use this item from the STAC catalog:
-[PQE_METADATA_URL/collections/naip?items/md_m_3807619_se_18_060_20181025_20190211](PQE_METADATA_URL/collections/naip/items/md_m_3807619_se_18_060_20181025_20190211).
+[https://planetarycomputer.microsoft.com/api/stac/v1/collections/naip?items/md_m_3807619_se_18_060_20181025_20190211](https://planetarycomputer.microsoft.com/api/stac/v1/collections/naip/items/md_m_3807619_se_18_060_20181025_20190211).
 This URL includes the collection (naip) as well as the item ID
 (md_m_3807619_se_18_060_20181025_20190211). To access asset information,
 '/map/tiles' is added to the metadata URL. Additionally, `item` and `assets`

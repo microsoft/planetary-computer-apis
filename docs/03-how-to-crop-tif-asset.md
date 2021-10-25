@@ -29,7 +29,7 @@ guarantee good results is verify the external, spatial bounds of the asset in
 question. The URL we'll be constructing requires a minimum x, minimum y, maximum
 x, and maximum y - sometimes referred to as a bounding box. Referring to the
 spatial bounding box reported on the [info
-endpoint](PQE_METADATA_URL/collections/naip?item=md_m_3807619_se_18_060_20181025_20190211)
+endpoint](https://planetarycomputer.microsoft.com/api/stac/v1/collections/naip?item=md_m_3807619_se_18_060_20181025_20190211)
 where the collection = 'naip' and the item =
 md_m_3807619_se_18_060_20181025_20190211, we see that the minimum x is
 -76.6919..., the minimum y is 38.6213..., the maximum x is -76.6200..., and the
