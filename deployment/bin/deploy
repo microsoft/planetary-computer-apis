@@ -72,6 +72,9 @@ require_env "DQE_IMAGE_NAME"
 require_env "MIGRATIONS_IMAGE_NAME"
 require_env "IMAGE_TAG"
 require_env "GIT_COMMIT"
+require_env "AZURE_CLIENT_ID"
+require_env "AZURE_CLIENT_SECRET"
+require_env "AZURE_TENANT_ID"
 
 # Directory for rendered values and templates
 CONF_DIR='/opt/conf'

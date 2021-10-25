@@ -49,9 +49,6 @@ function render_values() {
 function cluster_login() {
     echo "Logging into the cluster..."
 
-    echo "Cluster name: ${CLUSTER_NAME}"
-    echo "Resoruce group: ${RESOURCE_GROUP}"
-
     az login --service-principal \
         --username ${AZURE_CLIENT_ID} \
         --password ${AZURE_CLIENT_SECRET} \
