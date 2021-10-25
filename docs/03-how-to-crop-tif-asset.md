@@ -8,14 +8,14 @@ two flavors of user specification: bounding box `GET` request and polygon
 `POST`.
 
 
-### Prerequisites
+## Prerequisites
 
 - [How to generate SAS token/sign
   requests](./02-how-to-generate-sas-token-sign-requests.md)
 - [How to read a STAC Item in the Planetary Computer STAC
   catalog](./01-how-to-read-a-stac-item.md)
 
-### Cropping an asset by bounding box
+## Cropping an asset by bounding box
 
 Because we're cropping a single asset rather than a (potentially global) mosaic
 of assets, it is not unlikely that the spatial extent represented by the imagery
@@ -81,7 +81,7 @@ attended to, should be:
 PQE_DATA_URL/collections/naip/crop/-76.68,38.63,-76.63,38.68.tif?item=md_m_3807619_se_18_060_20181025_20190211&assets=image
 
 
-### Cropping an asset by polygon
+## Cropping an asset by polygon
 
 Cropping by polygon is just like cropping by bounding box except that, instead
 of providing a bounding box in the API path, a polygon is supplied in a `POST`

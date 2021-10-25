@@ -17,7 +17,7 @@ metadata and construct a URL template which can be used to provide tiles for a
 [tiled web map](https://en.wikipedia.org/wiki/Tiled_web_map).
 
 
-### Prerequisites
+## Prerequisites
 
 - [How to generate SAS token/sign
   requests](./02-how-to-generate-sas-token-sign-requests.md)
@@ -25,7 +25,7 @@ metadata and construct a URL template which can be used to provide tiles for a
   catalog](./01-how-to-read-a-stac-item.md)
 
 
-### Tiling an asset
+## Tiling an asset
 
 The simplest endpoint on the DQE provides asset information necessary to
 construct a tiling URL specific to one of hte supported projections. For the

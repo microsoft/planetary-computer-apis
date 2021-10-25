@@ -13,7 +13,7 @@ indexed in the Planetary Computer's STAC catalog with the help of QGIS and the
 [WMTS protocol](https://www.ogc.org/standards/wmts).
 
 
-### Prerequisites
+## Prerequisites
 
 - [Install QGIS](https://qgis.org/en/site/forusers/download.html)
 - [How to generate SAS token/sign
@@ -22,7 +22,7 @@ indexed in the Planetary Computer's STAC catalog with the help of QGIS and the
   catalog](./01-how-to-read-a-stac-item.md)
 
 
-### Constructing the WMTS URL
+## Constructing the WMTS URL
 
 
 First, refer  to the [API documentation](PC_OPENAPI_URL). There, the URL
@@ -43,7 +43,7 @@ PC_URL/data/v1/pctiler/WebMercatorQuad/WMTSCapabilities.xml?collection=naip&item
 Next, we will use this URL to add a WMTS layer to QGIS.
 
 
-### Adding a WMTS layer to QGIS
+## Adding a WMTS layer to QGIS
 
 With QGIS open, go to `Layer > Add Layer > Add WMS/WMTS layer...` ![Add a
 WMS/WMTS layer](images/add_layer_dialog_wmts.png)
