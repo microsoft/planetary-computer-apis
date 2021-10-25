@@ -4,6 +4,7 @@
   - [Configure Azure resources](#configure-azure-resources)
   - [Build and publish containers](#build-and-publish-containers)
   - [Create Helm apps](#create-helm-apps)
+- [Summary](#summary)
 
 The publicy available Planetary Query Engine is a collection of related services
 that run as containers in Azure Kubernetes Service (AKS). Getting those
@@ -24,8 +25,9 @@ container registry. If you're not familiar with Kubernetes, the cluster is an
 abstraction representing a connection between a _scheduler_ and a _node pool_.
 This is a gross oversimplification, but it's sufficient for describing the
 Planetary Query Engine's Kubernetes deployment. The node pool is responsible for
-providing undifferentiated compute capacity. The scheduler is responsible for
-keeping track of what tasks need to run and assigning them to the node pool.
+providing undifferentiated compute capacity, e.g., "two cores and 8gb of RAM."
+The scheduler is responsible for keeping track of what tasks need to run and
+assigning them to the node pool.
 
 We provision this cluster using terraform, and you can find the cluster
 configuration in [aks.tf](../deployment/terraform/resources/aks.tf).
@@ -38,13 +40,11 @@ Those commands build the containers necessary for running the services, running
 migrations, and more.
 
 After those containers are built, they need to be pushed to a _container
-registry_. That happens in the [`cipublish`](../scripts/cipublish) script. For
-each of the metadata query engine, data query engine, and SAS services, that
-script ships the containers to the configured container registry. You'll need to
-ensure that the relevant variables referred to in that file are set in your
-environment, that the Azure Container Registry referred to exists, and that
-you've logged in to Azure and that container registry with `az login` and `az
-acr login`, but having completed those steps, you can ship the built containers.
+registry_. That happens in [continuous
+integration](../.github/workflows/cicd.yml) in the `publish` job. For each of
+the metadata query engine and data query engine, that script ships the
+containers to the an appropriate container registry associated with this
+repository. These published container images are publicly available.
 
 ## Create Helm apps
 
@@ -58,3 +58,11 @@ template](../deployment/helm/deploy-values.template.yaml). Most of them are
 availabale from Terraform output, if you completed the Terrraform step; however
 some also depend on environment variables that you also already needed. You can
 find the latter category of values prefixed with `env.` in the template.
+
+# Summary
+
+The entire workflow for testing, building, publishing, and deploying the data
+and metadata query engines is publicly viewable in this repository. You can view
+workflow runs in the [`Actions`
+tab](https://github.com/microsoft/planetary-computer-apis/actions/workflows/cicd.yml)
+for this repo at any time.
