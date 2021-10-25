@@ -1,5 +1,9 @@
 # How to tile a TIF asset from the Planetary Computer
 
+- [How to tile a TIF asset from the Planetary Computer](#how-to-tile-a-tif-asset-from-the-planetary-computer)
+  - [Prerequisites](#prerequisites)
+  - [Tiling an asset](#tiling-an-asset)
+
 The Planetary Computer Asset Catalog is an index and store of a variety of
 geospatial assets available for users to incorporate in computational pipelines
 and applications. If accessed from within the appropriate Azure infrastructure,

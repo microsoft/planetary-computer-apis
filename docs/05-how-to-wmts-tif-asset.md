@@ -1,5 +1,10 @@
 # How to access a TIF asset with QGIS through the WMTS protocol
 
+- [How to access a TIF asset with QGIS through the WMTS protocol](#how-to-access-a-tif-asset-with-qgis-through-the-wmts-protocol)
+  - [Prerequisites](#prerequisites)
+  - [Constructing the WMTS URL](#constructing-the-wmts-url)
+  - [Adding a WMTS layer to QGIS](#adding-a-wmts-layer-to-qgis)
+
 The Planetary Computer Asset Catalog is an index and store of a variety of
 geospatial assets available for users to incorporate in computational pipelines
 and applications. If accessed from within the appropriate Azure infrastructure,

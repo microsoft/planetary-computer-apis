@@ -1,5 +1,10 @@
 # Rate limits and access restrictions
 
+- [Rate limits and access restrictions](#rate-limits-and-access-restrictions)
+  - [Within datacenter](#within-datacenter)
+  - [Supplied subscription key](#supplied-subscription-key)
+  - [Rate limits and expirations](#rate-limits-and-expirations)
+
 To prevent abuse, the SAS token related endpoints
 ([token](https://planetarycomputer.microsoft.com/data/v1/token) and
 [sign](https://planetarycomputer.microsoft.com/data/v1/sign) are rate limited by

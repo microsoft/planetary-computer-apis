@@ -1,5 +1,10 @@
 # Deployment
 
+- [Deployment](#deployment)
+  - [Configure Azure resources](#configure-azure-resources)
+  - [Build and publish containers](#build-and-publish-containers)
+  - [Create Helm apps](#create-helm-apps)
+
 The publicy available Planetary Query Engine is a collection of related services
 that run as containers in Azure Kubernetes Service (AKS). Getting those
 containers deployed requires a few steps, that we'll go into more below:

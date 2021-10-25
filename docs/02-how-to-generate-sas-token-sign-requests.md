@@ -1,5 +1,11 @@
 # How to generate SAS token/sign requests
 
+- [How to generate SAS token/sign requests](#how-to-generate-sas-tokensign-requests)
+  - [When a SAS token is needed](#when-a-sas-token-is-needed)
+  - [Endpoints for requesting a SAS token](#endpoints-for-requesting-a-sas-token)
+  - [Supplying an API subscription key](#supplying-an-api-subscription-key)
+  - [Planetary Computer SDK for Python](#planetary-computer-sdk-for-python)
+
 The Planetary Computer service supports several use cases for interacting with
 data, one of which is interacting directly with the underlying imagery. All
 metadata in the Planetary Computer is publicly available. Shared access

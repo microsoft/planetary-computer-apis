@@ -1,5 +1,9 @@
 # How to read a STAC Item in the Planetary Computer STAC catalog
 
+- [How to read a STAC Item in the Planetary Computer STAC catalog](#how-to-read-a-stac-item-in-the-planetary-computer-stac-catalog)
+  - [Locate a tif asset through the Metadata Query Engine](#locate-a-tif-asset-through-the-metadata-query-engine)
+    - [Previewing the contents of a Planetry Computer STAC entry](#previewing-the-contents-of-a-planetry-computer-stac-entry)
+
 The Planetary Computer Asset Catalog is an index and store of a variety of
 geospatial assets available for users to incorporate in computational pipelines
 and applications. The catalog is publicly available, and users can access

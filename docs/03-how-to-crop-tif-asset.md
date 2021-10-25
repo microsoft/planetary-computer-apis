@@ -1,5 +1,10 @@
 # How to crop and scale a TIF asset from the Planetary Computer
 
+- [How to crop and scale a TIF asset from the Planetary Computer](#how-to-crop-and-scale-a-tif-asset-from-the-planetary-computer)
+  - [Prerequisites](#prerequisites)
+  - [Cropping an asset by bounding box](#cropping-an-asset-by-bounding-box)
+  - [Cropping an asset by polygon](#cropping-an-asset-by-polygon)
+
 Tiling assets are cropped according to a predefined pyramid with fewer tiles and
 lower resolution at the top of the pyramid and more, higher resolution tiles on
 the bottom. Sometimes, greater control of image boundaries is required. In this
