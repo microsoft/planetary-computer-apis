@@ -7,9 +7,8 @@ In this how-to you will construct an API call to crop and scale a tif asset acco
 
 ### Prerequisites
 
-- [How-to generate SAS token/sign requests](./how-to-generate-sas-token-sign-requests.md)
-- (optional) Get an account (TODO)
-- [How to read a STAC Item in the Planetary Computer STAC catalog](./how-to-preview-stac-entry.md)
+- [How to generate SAS token/sign requests](./02-how-to-generate-sas-token-sign-requests.md)
+- [How to read a STAC Item in the Planetary Computer STAC catalog](./01-how-to-read-a-stac-item.md)
 
 ### Cropping an asset by bounding box
 

@@ -10,9 +10,8 @@ In this how-to article, you will learn how to access individual `tif` assets ind
 ### Prerequisites
 
 - [Install QGIS](https://qgis.org/en/site/forusers/download.html)
-- [How-to generate SAS token/sign requests](./how-to-generate-sas-token-sign-requests.md)
-- (optional) Get an account (TODO)
-- [How to read a STAC Item in the Planetary Computer STAC catalog](./how-to-preview-stac-entry.md)
+- [How to generate SAS token/sign requests](./02-how-to-generate-sas-token-sign-requests.md)
+- [How to read a STAC Item in the Planetary Computer STAC catalog](./01-how-to-read-a-stac-item.md)
 
 
 ### Constructing the WMTS URL

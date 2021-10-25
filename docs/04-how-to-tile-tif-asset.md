@@ -11,9 +11,8 @@ Turning to the Data Query Engine, we will inspect the tif asset's tiling metadat
 
 ### Prerequisites
 
-- [How-to generate SAS token/sign requests](./how-to-generate-sas-token-sign-requests.md)
-- (optional) Get an account (TODO)
-- [How to read a STAC Item in the Planetary Computer STAC catalog](./how-to-preview-stac-entry.md)
+- [How to generate SAS token/sign requests](./02-how-to-generate-sas-token-sign-requests.md)
+- [How to read a STAC Item in the Planetary Computer STAC catalog](./01-how-to-read-a-stac-item.md)
 
 
 ### Tiling an asset
