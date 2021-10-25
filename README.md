@@ -37,9 +37,6 @@ As such, it is important to have the latest versions of docker and docker-compos
 At a minimum, running and developing locally requires docker-compose v1.27+.
 Confusing and hard to diagnose issues are to be expected if using an older version.
 
-Actual (non-local) deployment of the project requires use of [cipublish](./scripts/cipublish), for which you'll also need the [azure command line client](https://docs.microsoft.com/en-us/cli/azure/) (installation instructions can be found [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)).
-Running [cipublish](./scripts/cipublish) and installing the azure command line client is *not* needed for local development.
-
 ### Running the PQE in a local development environment
 
 This project uses a somewhat simplified variation on [scripts to rule them all](https://github.com/github/scripts-to-rule-them-all).
