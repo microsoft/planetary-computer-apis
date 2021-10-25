@@ -56,14 +56,14 @@ maximum y is 38.6916...:
 > the bounding box as defined in the native projection of the tif whereas `crop`
 > endpoints anticipate a bounding box defined in terms of latitude/longitude
 > coordinates. The info endpoint
-> (PQE_DATA_URL/collections/{collection_id}/map/tiles?item={item_id}), on the
+> (https://planetarycomputer.microsoft.com/api/data/v1/collections/{collection_id}/map/tiles?item={item_id}), on the
 > other hand, will *always* provide an image's extent in terms of
 > latitude/longitude and is thus well suited for the construction of crop
 > boundaries.
 
 Looking to the [API reference](DQE_API_REFERENCE_URL) under the `OGC Tiles`
 heading, you should see that the "Bbox crop" endpoint uses template
-PQE_DATA_URL/collections/{collection_id}/crop/{minx},{miny},{maxx},{maxy}.{format}?item={item_id}&assets=image.
+https://planetarycomputer.microsoft.com/api/data/v1/collections/{collection_id}/crop/{minx},{miny},{maxx},{maxy}.{format}?item={item_id}&assets=image.
 In constructing the {minx},{miny},{maxx},{maxy} portion of the crop template it
 is generally desirable, though not strictly necessary, to keep the minx/miny
 values *higher* than the minimum x/y values and the maxx/maxy values *lower*
@@ -76,14 +76,14 @@ in crop endpoint results.
 A suitable bbox subselection with data throughout the output imagery might be
 minx=-76.68, miny=38.63, maxx=-76.63, maxy=38.68. Filling out the rest of the
 "Bbox crop" template with the same item used in prior examples, we get
-PQE_DATA_URL/collections/naip/crop/-76.68,38.63,-76.63,38.68.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image.
+https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/crop/-76.68,38.63,-76.63,38.68.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image.
 For output format, we'll use `tif` so that spatial information is bundled up
 with the output imagery. This format selection is ideal for analysis in desktop
 GIS software and will enable quick verification of output correctness. Available
 formats are the same as listed above - feel free to try out some of the
 alternatives such as `png` or `npy` The URL, after all templating has been
 attended to, should be:
-PQE_DATA_URL/collections/naip/crop/-76.68,38.63,-76.63,38.68.tif?item=md_m_3807619_se_18_060_20181025_20190211&assets=image
+https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/crop/-76.68,38.63,-76.63,38.68.tif?item=md_m_3807619_se_18_060_20181025_20190211&assets=image
 
 
 ## Cropping an asset by polygon

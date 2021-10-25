@@ -41,7 +41,7 @@ This URL includes the collection (naip) as well as the item ID
 query parameters specifying the item and asset for which metadata should be
 retrieved must be supplied. In this case, the relevant asset found on the STAC
 API is labeled 'image' With these modifications, the updated URL is
-[PQE_DATA_URL/collections/naip/map/tiles?item=md_m_3807619_se_18_060_20181025_20190211&assets=image](PQE_DATA_URL/collections/naip/map/tiles?item=md_m_3807619_se_18_060_20181025_20190211&assets=image).
+[https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/map/tiles?item=md_m_3807619_se_18_060_20181025_20190211&assets=image](https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/map/tiles?item=md_m_3807619_se_18_060_20181025_20190211&assets=image).
 
 An extent property is provided which describes the region for which meaningful
 tiles can be expected.
@@ -72,43 +72,43 @@ This full list is located under the key 'tileMatrixSetLinks':
 [
    {
       "tileMatrixSet":"LINZAntarticaMapTilegrid",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/LINZAntarticaMapTilegrid"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/LINZAntarticaMapTilegrid"
    },
    {
       "tileMatrixSet":"CanadianNAD83_LCC",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/CanadianNAD83_LCC"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/CanadianNAD83_LCC"
    },
    {
       "tileMatrixSet":"NZTM2000",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/NZTM2000"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/NZTM2000"
    },
    {
       "tileMatrixSet":"UPSAntarcticWGS84Quad",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/UPSAntarcticWGS84Quad"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/UPSAntarcticWGS84Quad"
    },
    {
       "tileMatrixSet":"WorldCRS84Quad",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/WorldCRS84Quad"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/WorldCRS84Quad"
    },
    {
       "tileMatrixSet":"WorldMercatorWGS84Quad",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/WorldMercatorWGS84Quad"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/WorldMercatorWGS84Quad"
    },
    {
       "tileMatrixSet":"UPSArcticWGS84Quad",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/UPSArcticWGS84Quad"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/UPSArcticWGS84Quad"
    },
    {
       "tileMatrixSet":"WebMercatorQuad",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/WebMercatorQuad"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/WebMercatorQuad"
    },
    {
       "tileMatrixSet":"UTM31WGS84Quad",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/UTM31WGS84Quad"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/UTM31WGS84Quad"
    },
    {
       "tileMatrixSet":"EuropeanETRS89_LAEAQuad",
-      "tileMatrixSetURI":"PQE_DATA_URL/tileMatrixSets/EuropeanETRS89_LAEAQuad"
+      "tileMatrixSetURI":"https://planetarycomputer.microsoft.com/api/data/v1/tileMatrixSets/EuropeanETRS89_LAEAQuad"
    }
 ]
 ```
@@ -122,7 +122,7 @@ projections. This template can be found in the array of links with the key
 [
    {
       "title":"Slippy Map Tiles",
-      "href":"PQE_DATA_URL/collections/naip/map/tiles/{tileMatrixSetId}/{tileMatrixZoom}/{tileRow}/{tileCol}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image",
+      "href":"https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/map/tiles/{tileMatrixSetId}/{tileMatrixZoom}/{tileRow}/{tileCol}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image",
       "rel":"item",
       "type":"image/png",
       "templated":true
@@ -131,14 +131,14 @@ projections. This template can be found in the array of links with the key
 ```
 
 The template in this case is
-"PQE_DATA_URL/collections/naip/map/tiles/{tileMatrixSetId}/{tileMatrixZoom}/{tileRow}/{tileCol}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image".
+"https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/map/tiles/{tileMatrixSetId}/{tileMatrixZoom}/{tileRow}/{tileCol}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image".
 A bit more information is required for this to work well with web mapping
 libraries.
 
 First, tileMatrixSetId needs to be one of the supported tile matrix sets above.
 Let's keep things simple: we'll use Web Mercator. Its ID is 'WebMercatorQuad',
 so our updated URL should be
-"PQE_DATA_URL/collections/naip/map/tiles/WebMercatorQuad/{tileMatrixZoom}/{tileRow}/{tileCol}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image"
+"https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/map/tiles/WebMercatorQuad/{tileMatrixZoom}/{tileRow}/{tileCol}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image"
 
 Actually viewing this image will require the selection of some specific subset
 of the available bands on the tif. One or more bands will need to be provided
@@ -148,7 +148,7 @@ band, the updated query parameters might be
 case, however, we want to view an RGB composite. Luckily, that's exactly what
 the DQE assumes when three bands are provided. The only thing necessary is to
 separate bands with a comma. The updated template should now look like this:
-"PQE_DATA_URL/collections/naip/map/tiles/WebMercatorQuad/{tileMatrixZoom}/{tileRow}/{tileCol}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image&bidx=1,2,3"
+"https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/map/tiles/WebMercatorQuad/{tileMatrixZoom}/{tileRow}/{tileCol}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image&bidx=1,2,3"
 
 The final necessary modification is to convert tileMatrixZoom, tileRow, and
 tileCol to the expected template values for the web mapping library being used
@@ -162,13 +162,13 @@ similar).
 documentation indicates that {z}, {x}, and {y} are the preferred template values
 for tile pyramids, so we'll switch tileMatrixZoom, tileRow, and tileCol to
 those, respectively. That should leave us with the template URL
-"PQE_DATA_URL/collections/naip/map/tiles/WebMercatorQuad/{z}/{x}/{y}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image&bidx=1,2,3"
+"https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/map/tiles/WebMercatorQuad/{z}/{x}/{y}.{format}?item=md_m_3807619_se_18_060_20181025_20190211&assets=image&bidx=1,2,3"
 
 The only remaining decision is what format we'd like. Available extensions are:
 `png`, `npy` (yes, numpy tiles are supported!), `tif`, "`jpg`, `jp2`, `webp`,
 and `pngraw`. Web mapping libraries typically play nicely with `png`, so let's
 specify that. At this point, the template should be ready for use in Leaflet:
-"PQE_DATA_URL/collections/naip/map/tiles/WebMercatorQuad/{z}/{x}/{y}.png?item=md_m_3807619_se_18_060_20181025_20190211&assets=image&bidx=1,2,3"
+"https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/map/tiles/WebMercatorQuad/{z}/{x}/{y}.png?item=md_m_3807619_se_18_060_20181025_20190211&assets=image&bidx=1,2,3"
 
 Copy the HTML below into a new file named "index.html" and open it with your
 browser of choice to see a tiled web map for the selected NAIP asset.
@@ -199,7 +199,7 @@ browser of choice to see a tiled web map for the selected NAIP asset.
                 maxZoom: 20
             }).addTo(map);
 
-            var mosaicLayer = L.tileLayer("PQE_DATA_URL/collections/naip/map/tiles/WebMercatorQuad/{z}/{x}/{y}.png?item=md_m_3807619_se_18_060_20181025_20190211&assets=image&bidx=1,2,3", {
+            var mosaicLayer = L.tileLayer("https://planetarycomputer.microsoft.com/api/data/v1/collections/naip/map/tiles/WebMercatorQuad/{z}/{x}/{y}.png?item=md_m_3807619_se_18_060_20181025_20190211&assets=image&bidx=1,2,3", {
                 minZoom: 12,
                 maxZoom: 18
             }).addTo(map);
