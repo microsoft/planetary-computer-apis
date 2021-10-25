@@ -1,6 +1,7 @@
 # How to crop and scale a TIF asset from the Planetary Computer
 
-- [How to crop and scale a TIF asset from the Planetary Computer](#how-to-crop-and-scale-a-tif-asset-from-the-planetary-computer)
+- [How to crop and scale a TIF asset from the Planetary
+  Computer](#how-to-crop-and-scale-a-tif-asset-from-the-planetary-computer)
   - [Prerequisites](#prerequisites)
   - [Cropping an asset by bounding box](#cropping-an-asset-by-bounding-box)
   - [Cropping an asset by polygon](#cropping-an-asset-by-polygon)
@@ -56,13 +57,15 @@ maximum y is 38.6916...:
 > the bounding box as defined in the native projection of the tif whereas `crop`
 > endpoints anticipate a bounding box defined in terms of latitude/longitude
 > coordinates. The info endpoint
-> (https://planetarycomputer.microsoft.com/api/data/v1/collections/{collection_id}/map/tiles?item={item_id}), on the
-> other hand, will *always* provide an image's extent in terms of
+> (https://planetarycomputer.microsoft.com/api/data/v1/collections/{collection_id}/map/tiles?item={item_id}),
+> on the other hand, will *always* provide an image's extent in terms of
 > latitude/longitude and is thus well suited for the construction of crop
 > boundaries.
 
-Looking to the [API reference](DQE_API_REFERENCE_URL) under the `OGC Tiles`
-heading, you should see that the "Bbox crop" endpoint uses template
+Looking to the [API
+reference]([DQE_API_REFERENCE_URL](https://planetarycomputer.microsoft.com/api/data/v1/docs))
+under the `OGC Tiles` heading, you should see that the "Bbox crop" endpoint uses
+template
 https://planetarycomputer.microsoft.com/api/data/v1/collections/{collection_id}/crop/{minx},{miny},{maxx},{maxy}.{format}?item={item_id}&assets=image.
 In constructing the {minx},{miny},{maxx},{maxy} portion of the crop template it
 is generally desirable, though not strictly necessary, to keep the minx/miny

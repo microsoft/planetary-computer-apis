@@ -30,9 +30,9 @@ indexed in the Planetary Computer's STAC catalog with the help of QGIS and the
 ## Constructing the WMTS URL
 
 
-First, refer  to the [API documentation](PC_OPENAPI_URL). There, the URL
+First, refer  to the [API documentation](https://planetarycomputer.microsoft.com/api/data/v1/docs). There, the URL
 template for WMTS connections is available:
-`PC_URL/data/v1/pctiler/{TileMatrixSet}/WMTSCapabilities.xml` In addition to the
+`https://planetarycomputer.microsoft.com/api/data/v1/pctiler/{TileMatrixSet}/WMTSCapabilities.xml` In addition to the
 base URL, a few query parameters will be necessary: the collection, item, asset,
 and set of bands which jointly define the minimal set of information necessary
 to view a TIF stored in the Planetary Computer's STAC catalog. Here's what the
@@ -44,7 +44,7 @@ al_m_3008503_ne_16_060_20191118_20200114 within the naip collection. The asset
 which refers to the full scale TIF is 'image' and the first three bands are R,
 G, and B. Using the popular WebMercatorQuad projection and tile matrix set, that
 leaves the URL:
-PC_URL/data/v1/pctiler/WebMercatorQuad/WMTSCapabilities.xml?collection=naip&items=al_m_3008503_ne_16_060_20191118_20200114&assets=image&bidx=1,2,3
+https://planetarycomputer.microsoft.com/api/data/v1/pctiler/WebMercatorQuad/WMTSCapabilities.xml?collection=naip&items=al_m_3008503_ne_16_060_20191118_20200114&assets=image&bidx=1,2,3
 Next, we will use this URL to add a WMTS layer to QGIS.
 
 
@@ -58,7 +58,7 @@ layer](images/create_new_wmts_connection.png)
 
 Add a name/label to keep track of this layer, and paste the URL constructed
 above
-(PC_URL/data/v1/pctiler/WebMercatorQuad/WMTSCapabilities.xml?collection=naip&items=al_m_3008503_ne_16_060_20191118_20200114&assets=image&bidx=1,2,3)
+(https://planetarycomputer.microsoft.com/api/data/v1/pctiler/WebMercatorQuad/WMTSCapabilities.xml?collection=naip&items=al_m_3008503_ne_16_060_20191118_20200114&assets=image&bidx=1,2,3)
 into the URL field. Hit "OK" once it is the Name and URL fields are completed
 ![Create new WMTS layer dialog](images/add_wmts_url.png)
 
