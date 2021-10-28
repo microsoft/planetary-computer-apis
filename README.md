@@ -4,75 +4,89 @@ __Note__: This repository serves as a reference implementation for deploying API
 
 That said, feel free to crib any code that is useful!
 
-## Metadata Query Engine + Data Query Engine
+## STAC API + Tiler
 
-This repository contains two components of the Planetary Computer: the metadata query engine (MQE), and the data query engine (DQE).
-These systems are jointly referred to as the planetary query engine (PQE) and they provide the APIs which allow users of Microsoft's Planetary Computer to access the metadata and data of the Planetary Computer.
+This repository contains two components of the Planetary Computer APIs: the STAC API and the Tiler. These are implementations of the open source [stac-fastapi](https://github.com/stac-utils/stac-fastapi) and [titiler](https://github.com/developmentseed/titiler) projects.
 
-The MQE provides a STAC catalog which indexes Microsoft's publicly available [geospatial data](https://planetarycomputer.microsoft.com/catalog) and an API for searching through this large collection.
-The DQE, on the other hand, makes it easy to use assets indexed within the MQE.
-It does this in a couple of notable ways:
-First, rather than downloading these assets and using desktop analysis software to view them at different zoom levels, the DQE allows users to dynamically generate a [tiled web map](https://en.wikipedia.org/wiki/Tiled_web_map) [url template](https://en.wikipedia.org/wiki/URI_Template) which can be used to zoom and pan around the assets in geospatial context.
-Second, because the geospatial assets within the MQE are often profitably used together, the DQE enables users to define mosaics of imagery which can be used for viewing as well as analysis.
+The `stac` project provides a STAC catalog which indexes Microsoft's publicly available [geospatial data](https://planetarycomputer.microsoft.com/catalog) and an API for searching through this large collection.
+The `tiler` provides visualization and data access capabilities for the data in the Planetary Computer.
 
-This document is focused on *local* development and intended to allow new users to spin up an instance and become familiar with the PQE.
-For a more involved discussion of non-local deployments, refer to [docs/0x-deployment.md](./docs/0x-deployment.md).
+## Deployment
+
+This repository hosts the code that is deployed in the Planetary Computer. It contains deployment code for hosting these services in Azure through running the published docker images and Helm charts in [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service/), which we used to stand up a development version of the services. The production deployment code is not contained in this repository.
+
+For documentation of how you can deploy your own test version of these services, refer to [docs/0x-deployment.md](./docs/0x-deployment.md).
 
 ## Development URLs
 
-|              |                        |
-|--------------|------------------------|
-| Nginx        | <http://localhost:8080/> |
-| MQE          | <http://localhost:8081/stac> |
-| DQE          | <http://localhost:8082/data> |
+|          |                              |
+| -------- | ---------------------------- |
+| Nginx    | <http://localhost:8080/>     |
+| STAC API | <http://localhost:8081/stac> |
+| Tiler    | <http://localhost:8082/data> |
 
 
 ## Building and Testing Locally
 
 ### Requirements
 
-The development environment is run almost entirely through docker containers.
-You should be able to run a fully functional (if significantly smaller) instance of the PQE locally with nothing more than docker and docker-compose.
-As such, it is important to have the latest versions of docker and docker-compose installed.
-At a minimum, running and developing locally requires docker-compose v1.27+.
-Confusing and hard to diagnose issues are to be expected if using an older version.
+The development environment is run almost entirely through docker containers. Developing locally requires docker-compose v1.27+.
 
-### Running the PQE in a local development environment
+### Running the Planetary Computer API services in a local development environment
 
-This project uses a somewhat simplified variation on [scripts to rule them all](https://github.com/github/scripts-to-rule-them-all).
-These are the steps necessary to get everything running locally:
+This project uses a variation on [scripts to rule them all](https://github.com/github/scripts-to-rule-them-all).
 
-#### Building and running containers (the long version)
+#### Environment setup and building images
 
-1. To build (or rebuild) the development containers for this project, run [scripts/update](./scripts/update).
-2. With built containers, should be possible to apply the database migrations which allow Postgres+PostGIS to back a STAC API: just run [scripts/migrate](./scripts/migrate).
-3. Bring the containers up now that migrations are in place with [scripts/server](./scripts/server).
-4. If migrations are in place, this project's example data ([NAIP imagery](https://www.fsa.usda.gov/programs-and-services/aerial-photography/imagery-programs/naip-imagery/), incidentally) can be loaded into the database. Load testing data with [loadtestdata.py](mqe/mqe/loadtestdata.py). `loadtestdata.py` must be run *from within the MQE*. This can be accomplished with the help of docker-compose:
+To set up a local environment, use
+
 ```
-docker-compose \
-    -f docker-compose.yml \
-    run --rm \
-    mqe \
-    python /opt/src/mqe/mqe/loadtestdata.p
+> ./scripts/update
 ```
 
-#### Building and running containers (the short version)
+This will build containers, apply database migrations, and load the development data.
 
-Using `scripts/update`, `scripts/migrate`, `scripts/server`, and finally running migrations should mostly be unecessary as `scripts/setup` manages the whole process for you.
-Building project docker containers from scratch requires only a call to [scripts/setup](./scripts/setup).
-This will build the project docker images, carry out necessary migrations, ingest example data into the development database, and stand up the PQE containers.
-The only difference worth noting is that `scripts/setup` runs the containers in [detached mode](https://docs.docker.com/engine/reference/run/#detached-vs-foreground) (output from containers will run as daemons and thus not appear in the teriminal).
+After migrations and development database loading are in place, you can just rebuild the docker images with
 
-To verify that the containers are now running, check the output of `docker ps`.
-You should see five containers running the following images: `pqe-nginx`, `pc-sasapi`, `pc-query-dataapi`, `pc-query-stacapi`, and `pqe-stac-db`.
-During development it is often useful to see errors and debugging output from these containers; in this situation daemon mode is unhelpful.
-To view application output (to undaemonize these processes), run [scripts/server](./scripts/server).
-Once `scripts/server` has been executed, your terminal window should attach to the running processes and output from all services defined in [docker-compose.yml](./docker-compose.yml) should display in real time.
+```
+> ./scripts/update
+```
 
+#### Running the services
 
-#### Testing, and formatting
+To run the servers, use
 
-To run tests, first ensure that the docker containers are running.
-Tests interact with and make requests to these containers and will fail (miserably) if they aren't up and waiting for requests.
-From there, simply run [scripts/test](./scripts/test)
+```
+> ./scripts/server
+```
 
+This will bring up the development database, STAC API, and Tiler.
+
+#### Testing and and formatting
+
+To run tests, use
+
+```
+./scripts/test
+```
+
+To format code, use
+
+```
+./scripts/format
+```
+
+## Published images and charts
+
+This project publishes images and helm charts, which are used in the deployment of the Planetary Computer.
+
+### Images
+
+Images following images are hosted in the [Microsoft Container Registry](https://github.com/microsoft/ContainerRegistry):
+
+- `mcr.microsoft.com/planetary-computer-apis/stac`
+- `mcr.microsoft.com/planetary-computer-apis/tiler`
+
+### Charts
+
+See the [Helm chart repository](https://microsoft.github.io/planetary-computer-apis) published to GitHub pages for the published charts.
