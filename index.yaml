@@ -33,4 +33,26 @@ entries:
     urls:
     - https://microsoft.github.io/planetary-computer-apis/pc-pqe-ingress-9999.0.0.tgz
     version: 9999.0.0
-generated: "2021-10-28T16:04:57.200878355Z"
+  planetary-computer-stac:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2021-10-28T17:13:39.145828327Z"
+    description: A Helm chart for the Planetary Computer STAC API
+    digest: c19226a04a4dff5a30375c43beae7387ca0247c0b25671f5970115e2dbe5f062
+    name: planetary-computer-stac
+    type: application
+    urls:
+    - https://microsoft.github.io/planetary-computer-apis/planetary-computer-stac-9999.0.0.tgz
+    version: 9999.0.0
+  planetary-computer-tiler:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2021-10-28T17:13:39.146332943Z"
+    description: A Helm chart for the Planetary Computer tiler
+    digest: 14b561b9d517e4be20bc7d87eaf45118c003bd916d7be8cf24256b4b9e914c6f
+    name: planetary-computer-tiler
+    type: application
+    urls:
+    - https://microsoft.github.io/planetary-computer-apis/planetary-computer-tiler-9999.0.0.tgz
+    version: 9999.0.0
+generated: "2021-10-28T17:13:39.144945599Z"
