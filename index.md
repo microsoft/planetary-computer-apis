@@ -13,8 +13,6 @@ $ helm repo add {{ site.repo_name }} {{ site.url }}
 $ helm repo update
 ```
 
-Note that charts with a version of __9999.0.0__ represent the latest `main` branch of the repository.
-
 ## Charts
 
 {% comment %}[0] and [1] below represent key and value{% endcomment %}
@@ -41,9 +39,7 @@ $ helm install --version {{ latest_chart.version }} myrelease {{ site.repo_name 
 | Chart |{% for dep in latest_chart.dependencies %} {{ dep.name | capitalize }} |{% endfor %} App | Date |
 | - | - | - |{% for dep in latest_chart.dependencies %} - |{% endfor %}
 {% for chart in all_charts -%}
-{% unless chart.version contains "-" -%}
 | [{{ chart.name }}-{{ chart.version }}]({{ chart.urls[0] }}) |{% for dep in chart.dependencies %} {{ dep.version | capitalize }} |{% endfor %} {{ chart.appVersion }} | {{ chart.created | date_to_long_string }} |
-{% endunless -%}
 {% endfor -%}
 
 {% endfor %}
