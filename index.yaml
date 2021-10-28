@@ -1,38 +1,5 @@
 apiVersion: v1
 entries:
-  pc-data-query-engine:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2021-10-28T16:04:57.201629585Z"
-    description: A Helm chart for the Planetary Computer data query engine
-    digest: 9cf3fd4971b4ab520229749b4811b94652bf2e0e12f4f5346a18d7dc8f516389
-    name: pc-data-query-engine
-    type: application
-    urls:
-    - https://microsoft.github.io/planetary-computer-apis/pc-data-query-engine-9999.0.0.tgz
-    version: 9999.0.0
-  pc-metadata-query-engine:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2021-10-28T16:04:57.202308111Z"
-    description: A Helm chart for the Planetary Computer metadata query engine
-    digest: 9e38f02e5bf3f61038f4bafe53eece16dea804836b28ef0bd5d30d08a2c30e1e
-    name: pc-metadata-query-engine
-    type: application
-    urls:
-    - https://microsoft.github.io/planetary-computer-apis/pc-metadata-query-engine-9999.0.0.tgz
-    version: 9999.0.0
-  pc-pqe-ingress:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2021-10-28T16:04:57.202816031Z"
-    description: A Helm chart for the ingress for DQE and MQE of the PQE
-    digest: 64843e43a7b26b68775a8918b7972435ee9849c5eb682b81d0c5c754efd0e040
-    name: pc-pqe-ingress
-    type: application
-    urls:
-    - https://microsoft.github.io/planetary-computer-apis/pc-pqe-ingress-9999.0.0.tgz
-    version: 9999.0.0
   planetary-computer-stac:
   - apiVersion: v2
     appVersion: 0.1.0
