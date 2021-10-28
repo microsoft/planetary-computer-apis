@@ -1,0 +1,39 @@
+name: Publish charts
+
+on:
+  push:
+    branches: [ main, feature/rde/publish-charts ]
+    tags: ["*"]
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get the version
+        id: get_version
+        run:
+          case "${GITHUB_REF}" in
+              *tags*)
+                  echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+                  ;;
+              *)
+                  echo ::set-output name=VERSION::9999.0.0
+                  ;;
+          esac
+
+      - name: Publish Helm charts
+        uses: stefanprodan/helm-gh-pages@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: "deployment/helm"
+          linting: "off"
+          helm_version: 3.5.4
+          chart_version: ${{ steps.get_version.outputs.VERSION }}
