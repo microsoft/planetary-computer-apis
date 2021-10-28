@@ -34,7 +34,6 @@ services:
     volumes:
       - ./common:/opt/src/common
       - ./stac:/opt/src/stac
-      - ./testdata/:/opt/testdata
     depends_on:
       - database
     command: >

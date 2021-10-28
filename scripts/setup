@@ -31,7 +31,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         -f docker-compose.yml \
         run --rm \
         stac \
-        python /opt/src/stac/stac/loadtestdata.py
+        python /opt/src/stac/tests/loadtestdata.py
 
     echo "Done."
 
