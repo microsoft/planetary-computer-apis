@@ -1,0 +1,10 @@
+title: Planetary Computer APIs Helm charts for Kubernetes
+description: This site stores Helm chart tarballs for the Planteary Computer APIs
+theme: minima
+url: "https://microsoft.github.io/planetary-computer-apis"
+repo_name: planetary-computer-apis
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - .gitignore
