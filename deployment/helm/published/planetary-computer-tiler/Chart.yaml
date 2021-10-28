@@ -1,0 +1,6 @@
+apiVersion: v2
+name: planetary-computer-tiler
+description: A Helm chart for the Planetary Computer tiler
+type: application
+version: 0.1.0
+appVersion: 0.1.0

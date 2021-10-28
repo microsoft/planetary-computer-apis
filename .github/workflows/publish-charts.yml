@@ -33,7 +33,7 @@ jobs:
         uses: stefanprodan/helm-gh-pages@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: "deployment/helm"
+          charts_dir: "deployment/helm/published"
           linting: "off"
           helm_version: 3.5.4
           chart_version: ${{ steps.get_version.outputs.VERSION }}
