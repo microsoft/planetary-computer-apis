@@ -30,8 +30,8 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     docker-compose \
         -f docker-compose.yml \
         run --rm \
-        mqe \
-        python /opt/src/mqe/mqe/loadtestdata.py
+        stac \
+        python /opt/src/stac/stac/loadtestdata.py
 
     echo "Done."
 

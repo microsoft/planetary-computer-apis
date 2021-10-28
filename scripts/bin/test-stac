@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Runs tests for the STAC service project.
+
+Also checks formatting and runs mypy for the common code.
+
+This scripts is meant to be run inside the stac-dev container.
+
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    echo "Running  mypy for stac..."
+    mypy stac/stac
+
+    echo "Running  mypy for common..."
+    mypy common
+
+    echo "Running black for stac..."
+    black --check stac/stac stac/tests
+
+    echo "Running black for common..."
+    black --check common
+
+    echo "Running flake8 for stac..."
+    flake8 stac/stac stac/tests
+
+    echo "Running unit tests for stac..."
+    python -m pytest stac/tests
+
+fi

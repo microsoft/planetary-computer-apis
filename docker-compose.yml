@@ -1,49 +1,9 @@
 services:
-  dqe:
-    image: ${DQE_IMAGE_NAME}
+  stac:
+    image: pc-apis-stac
     build:
       context: .
-      dockerfile: dqe/Dockerfile
-    ports:
-      - "8082:8082"
-    volumes:
-      - ./dqe:/opt/src/dqe
-      - ./dqe/templates:/opt/src/templates
-      - ./pqecommon:/opt/src/pqecommon
-    environment:
-      - APP_ROOT_PATH=/data
-      - APP_HOST=0.0.0.0
-      - APP_PORT=8082
-      - CPL_DEBUG=ON
-      - FORWARDED_ALLOW_IPS=*
-      - FF_VRT="yes"
-      - STAC_API_URL=http://mqe:8081
-      - STAC_API_HREF=http://localhost:8080/stac/
-      - PC_SDK_SAS_URL=https://planetarycomputer.microsoft.com/api/sas/v1/token
-
-      # titiler.pgstac
-      - POSTGRES_USER=username
-      - POSTGRES_PASS=password
-      - POSTGRES_DBNAME=postgis
-      - POSTGRES_HOST=database
-      - POSTGRES_HOST_READER=database
-      - POSTGRES_HOST_WRITER=database
-      - POSTGRES_PORT=5432
-      - DB_MIN_CONN_SIZE=1
-      - DB_MAX_CONN_SIZE=1
-      - WEB_CONCURRENCY=1
-      - WORKERS_PER_CORE=1
-
-      # Used for logging and metrics
-      - APP_INSIGHTS_INSTRUMENTATION_KEY
-    depends_on:
-      - database
-    command: [ "uvicorn", "dqe.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers" ]
-  mqe:
-    image: ${MQE_IMAGE_NAME}
-    build:
-      context: .
-      dockerfile: mqe/Dockerfile
+      dockerfile: stac/Dockerfile
     environment:
       - APP_ROOT_PATH=/stac
       - APP_HOST=0.0.0.0
@@ -72,32 +32,72 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ./pqecommon:/opt/src/pqecommon
-      - ./mqe:/opt/src/mqe
+      - ./common:/opt/src/common
+      - ./stac:/opt/src/stac
       - ./testdata/:/opt/testdata
     depends_on:
       - database
     command: >
-      bash -c "python /opt/src/mqe/mqe/pgready.py && uvicorn mqe.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
+      bash -c "pypgstac pgready && uvicorn stac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
+  tiler:
+    image: pc-apis-tiler
+    build:
+      context: .
+      dockerfile: tiler/Dockerfile
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./tiler:/opt/src/tiler
+      - ./tiler/templates:/opt/src/templates
+      - ./common:/opt/src/common
+    environment:
+      - APP_ROOT_PATH=/data
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8082
+      - CPL_DEBUG=ON
+      - FORWARDED_ALLOW_IPS=*
+      - FF_VRT="yes"
+      - STAC_API_URL=http://stac:8081
+      - STAC_API_HREF=http://localhost:8080/stac/
+      - PC_SDK_SAS_URL=https://planetarycomputer.microsoft.com/api/sas/v1/token
+
+      # titiler.pgstac
+      - POSTGRES_USER=username
+      - POSTGRES_PASS=password
+      - POSTGRES_DBNAME=postgis
+      - POSTGRES_HOST=database
+      - POSTGRES_HOST_READER=database
+      - POSTGRES_HOST_WRITER=database
+      - POSTGRES_PORT=5432
+      - DB_MIN_CONN_SIZE=1
+      - DB_MAX_CONN_SIZE=1
+      - WEB_CONCURRENCY=1
+      - WORKERS_PER_CORE=1
+
+      # Used for logging and metrics
+      - APP_INSIGHTS_INSTRUMENTATION_KEY
+    depends_on:
+      - database
+    command: [ "uvicorn", "tiler.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers" ]
   nginx:
-    image: pqe-nginx
-    container_name: pqe-nginx
+    image: pc-apis-nginx
+    container_name: pc-apis-nginx
     build:
       context: ./nginx
       dockerfile: Dockerfile
     links:
-      - dqe
-      - mqe
+      - stac
+      - tiler
     depends_on:
-      - dqe
-      - mqe
+      - tiler
+      - stac
     volumes:
       - ./nginx/etc/nginx:/etc/nginx
     ports:
       - 8080:80
   database:
-    container_name: pqe-stac-db
-    image: pqe-stac-db
+    container_name: pc-stac-db
+    image: pc-apis-stac-db
     build:
       context: ./pgstac
       dockerfile: Dockerfile
@@ -108,9 +108,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - mqe-pgdata:/var/lib/postgresql/data
+      - pc-apis-pgdata:/var/lib/postgresql/data
 volumes:
-  mqe-pgdata:
+  pc-apis-pgdata:
 networks:
   default:
-    name: pqe-dev-network
+    name: pc-apis-dev-network

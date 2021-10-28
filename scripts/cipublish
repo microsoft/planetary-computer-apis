@@ -1,0 +1,72 @@
+#!/bin/bash
+
+source scripts/env
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0") --acr ACR_NAME --tag IMAGE_TAG
+Publishes images for this project.
+
+Must be logged in to the ACR (e.g. with az acr login -n ACR_NAME)
+
+--acr: The name of the ACR to publish to
+"
+}
+
+while [[ "$#" > 0 ]]; do case $1 in
+    --acr)
+        ACR_NAME=$2
+        shift
+        shift
+        ;;
+    --tag)
+        IMAGE_TAG=$2
+        shift
+        shift
+        ;;
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+if [[ -z ${ACR_NAME} ]]; then
+    echo "Must pass in ACR_NAME with --acr"
+    exit 1
+fi
+
+if [[ -z ${IMAGE_TAG} ]]; then
+    echo "Must pass in IMAGE_TAG with --tag"
+    exit 1
+fi
+
+function publish_image() {
+    local local_image=$1
+    local published_image=$2
+    local full_image_name = "${ACR_NAME}.azurecr.io/${published_image}:${IMAGE_TAG}"
+
+    echo "Publishing ${local_image} to ${full_image_name}"
+    docker tag "${local_image}" "${full_image_name}"
+    docker push "${full_image_name}"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    # Publish images
+
+    publish_image "pc-apis-stac" "public/planetary-computer-apis/stac"
+    publish_image "pc-apis-tiler" "public/planetary-computer-apis/tiler"
+
+fi
