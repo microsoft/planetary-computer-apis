@@ -40,13 +40,13 @@ while [[ "$#" > 0 ]]; do case $1 in
         ;;
     esac done
 
-DOCKER_COMPOSE="docker-compose -f deployment/docker-compose.yml"
+DOCKER_COMPOSE="docker-compose -f deployment/docker-compose.yml -f deployment/docker-compose.ci.yml"
 
 # Set terraform to deploy to dev or staging
 if [ "${DEV_DEPLOY}" = "1" ]; then
     TERRAFORM_DIR=/opt/src/terraform/dev
 else
-    if [[ "${CI}" != "1" ]]; then
+    if [[ "${CI}" != "true" ]]; then
         echo "Only CI can deploy to staging!"
         exit 1
     fi

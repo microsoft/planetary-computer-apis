@@ -14,10 +14,6 @@ output "resource_group" {
   value = azurerm_resource_group.pqe.name
 }
 
-output "image_registry" {
-  value = data.azurerm_container_registry.pctest.name
-}
-
 # -- Postgres
 
 output "pg_host" {

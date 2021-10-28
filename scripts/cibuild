@@ -20,7 +20,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     scripts/setup
 
 
-    if [[ -z ${BUILD_ONLY} ]]; then
-        scripts/test
-    fi
+    # if [[ -z ${BUILD_ONLY} ]]; then
+    #     scripts/test
+    # fi
 fi

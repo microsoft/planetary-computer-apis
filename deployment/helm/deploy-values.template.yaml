@@ -4,7 +4,7 @@ namespace: "staging"
 mqe:
   enabled: true
   image:
-    repository: "{{ tf.image_registry }}.azurecr.io/{{ env.MQE_IMAGE_NAME }}"
+    repository: "ghcr.io/microsoft/{{ env.MQE_IMAGE_NAME }}"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -26,7 +26,7 @@ mqe:
 dqe:
   enabled: true
   image:
-    repository: "{{ tf.image_registry }}.azurecr.io/{{ env.DQE_IMAGE_NAME }}"
+    repository: "ghcr.io/microsoft/{{ env.DQE_IMAGE_NAME }}"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -79,7 +79,6 @@ pcingress:
     tlsHost: "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
     hosts:
       - "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
-      - "{{ tf.api_management_name }}.azure-api.net"
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: "{{ tf.cluster_cert_issuer }}-pcingress"
