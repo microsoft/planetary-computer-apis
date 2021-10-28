@@ -2,7 +2,7 @@ name: Publish charts (dev)
 
 on:
   push:
-    branches: [ main, feature/rde/publish-charts ]
+    branches: [ main ]
   workflow_dispatch:
 
 defaults:
