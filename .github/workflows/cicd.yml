@@ -2,120 +2,70 @@ name: Planetary Computer APIs CI/CD
 
 on:
   push:
-    branches: [ main ]
-    tags: [ v* ]
-  pull_request:
-    branches: [ main, cicd-target ]
-
+    branches: [ main, feature/rde/publish-charts ]
+    tags: ["*"]
 
 jobs:
-  build:
+  build_and_publish:
 
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Run cibuild
-      run: ./scripts/cibuild
-
-  publish:
-    runs-on: ubuntu-latest
-    env:
-      HELM_EXPERIMENTAL_OCI: 1 #enable OCI support
-      HELM_VERSION_TO_INSTALL: 3.5.0 # version of HELM to install
-    needs: build
     steps:
       - uses: actions/checkout@v2
-      - name: Add MQE image tags
-        uses: docker/metadata-action@v3
-        id: add-mqe-image-tags
-        with:
-          images: |
-            ghcr.io/microsoft/pc-query-stacapi
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
-      - name: Add DQE image tags
-        uses: docker/metadata-action@v3
-        id: add-dqe-image-tags
-        with:
-          images: |
-            ghcr.io/microsoft/pc-query-dataapi
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha,
-            type=match,pattern=main
-      - name: Log in to GHCR
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and publish MQE image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: ${{ steps.add-mqe-image-tags.outputs.tags }}
-          labels: ${{ steps.add-mqe-image-tags.outputs.labels }}
-          file: ./mqe/Dockerfile
-      - name: Build and publish DQE image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: ${{ steps.add-dqe-image-tags.outputs.tags }}
-          labels: ${{ steps.add-dqe-image-tags.outputs.labels }}
-          file: ./dqe/Dockerfile
-      - name: Install helm
-        uses: Azure/setup-helm@v1
-        with:
-          version: ${{ env.HELM_VERSION_TO_INSTALL }} # default is latest
-      - name: Log into MQE GHCR with helm
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io/${{ github.repository_owner }}/charts/pc-metadata-query-engine -u ${{ github.repository_owner }} --password-stdin
-      - name: Save MQE chart locally
-        run: |
-          helm chart save ./deployment/helm/pc-metadata-query-engine ghcr.io/${{ github.repository_owner }}/charts/pc-metadata-query-engine:${{ github.sha }}
-      - name: Publish MQE chart
-        run: |
-          helm chart push ghcr.io/${{ github.repository_owner }}/charts/pc-metadata-query-engine:${{ github.sha }}
-      - name: Log into DQE GHCR with helm
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io/${{ github.repository_owner }}/charts/pc-data-query-engine -u ${{ github.repository_owner }} --password-stdin
-      - name: Save DQE chart locally
-        run: |
-          helm chart save ./deployment/helm/pc-data-query-engine ghcr.io/${{ github.repository_owner }}/charts/pc-data-query-engine:${{ github.sha }}
-      - name: Publish DQE chart
-        run: |
-          helm chart push ghcr.io/${{ github.repository_owner }}/charts/pc-data-query-engine:${{ github.sha }}
-          helm chart push ghcr.io/${{ github.repository_owner }}/charts/pc-data-query-engine:${{ github.sha }}
+
+      - name: Run cibuild
+        run: ./scripts/cibuild
+
+      - name: Get image tag
+        id: get_image_tag
+        run:
+          case "${GITHUB_REF}" in
+            *tags*)
+              echo "::set-output name=tag::${GITHUB_REF/refs\/tags\//}"
+              ;;
+            *)
+              echo "::set-output name=tag::latest"
+              ;;
+          esac
+
+      - name: Log into the ACR
+        env:
+          CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
+          CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
+        run:
+          docker login pcccr.azurecr.io --username ${CLIENT_ID} --password ${CLIENT_SECRET}
+
+      - name: Publish images
+        run: ./scripts/cipublish --acr pcccr --tag ${{steps.get_image_tag.outputs.tag}}
+
+    outputs:
+      image_tag: ${{ steps.get_image_tag.outputs.tag }}
 
   deploy:
     runs-on: ubuntu-latest
-    # if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs:
-      - build
-      - publish
+      - build_and_publish
     steps:
       - uses: actions/checkout@v2
-      - name: Sign in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Run cideploy
+
+      - name: Get image tag
+        id: get_image_tag
+        if: ${{ github.base_ref }}
+        run:
+          case "${GITHUB_REF}" in
+            *tags*)
+              echo "::set-output name=tag::${GITHUB_REF/refs\/tags\//}"
+              ;;
+            *)
+              echo "::set-output name=tag::latest"
+              ;;
+          esac
+
+      - name: Deploy
         run: ./scripts/cideploy
         env:
-          MQE_IMAGE_NAME: ghcr.io/microsoft/pc-query-stacapi
-          DQE_IMAGE_NAME: ghcr.io/microsoft/pc-query-dataapi
-          IMAGE_TAG: pr-10
-          GIT_COMMIT: c34aa3d
+          IMAGE_TAG: ${{needs.build_and_publish.outputs.image_tag}}
           ENVIRONMENT: staging
           ARM_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
           ARM_CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}

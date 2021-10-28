@@ -55,7 +55,7 @@ fi
 function publish_image() {
     local local_image=$1
     local published_image=$2
-    local full_image_name = "${ACR_NAME}.azurecr.io/${published_image}:${IMAGE_TAG}"
+    local full_image_name="${ACR_NAME}.azurecr.io/${published_image}:${IMAGE_TAG}"
 
     echo "Publishing ${local_image} to ${full_image_name}"
     docker tag "${local_image}" "${full_image_name}"
