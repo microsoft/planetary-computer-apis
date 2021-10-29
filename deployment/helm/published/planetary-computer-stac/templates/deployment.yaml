@@ -1,58 +1,58 @@
-{{- if .Values.mqe.enabled -}}
+{{- if .Values.stac.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "mqe.fullname" . }}
+  name: {{ include "pcstac.fullname" . }}
   labels:
-    {{- include "mqe.labels" . | nindent 4 }}
+    {{- include "pcstac.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.mqe.deploy.autoscaling.enabled }}
-  replicas: {{ .Values.mqe.deploy.replicaCount }}
+  {{- if not .Values.stac.deploy.autoscaling.enabled }}
+  replicas: {{ .Values.stac.deploy.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "mqe.selectorLabels" . | nindent 6 }}
+      {{- include "pcstac.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.mqe.deploy.podAnnotations }}
+      {{- with .Values.stac.deploy.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "mqe.selectorLabels" . | nindent 8 }}
+        {{- include "pcstac.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.mqe.deploy.imagePullSecrets }}
+      {{- with .Values.stac.deploy.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "mqe.serviceAccountName" . }}
+      serviceAccountName: {{ include "pcstac.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.mqe.deploy.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.stac.deploy.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.mqe.deploy.securityContext | nindent 12 }}
-          image: "{{ .Values.mqe.image.repository }}:{{ .Values.mqe.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.mqe.image.pullPolicy }}
+            {{- toYaml .Values.stac.deploy.securityContext | nindent 12 }}
+          image: "{{ .Values.stac.image.repository }}:{{ .Values.stac.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.stac.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
           env:
             - name: APP_ROOT_PATH
-              value: "{{ .Values.mqe.appRootPath }}"
+              value: "{{ .Values.stac.appRootPath }}"
             - name: APP_HOST
-              value: "{{ .Values.mqe.host }}"
+              value: "{{ .Values.stac.host }}"
             - name: APP_PORT
-              value: "{{ .Values.mqe.port }}"
+              value: "{{ .Values.stac.port }}"
             - name: FORWARDED_ALLOW_IPS
               value: "*"
             - name: "MAX_WORKERS"
-              value: "{{ .Values.mqe.server.maxWorkers }}"
+              value: "{{ .Values.stac.server.maxWorkers }}"
             - name: "POOL_SIZE"
-              value: "{{ .Values.mqe.server.poolSize }}"
+              value: "{{ .Values.stac.server.poolSize }}"
             - name: TILER_HREF
-              value: "{{ .Values.mqe.tiler_href }}"
+              value: "{{ .Values.stac.tiler_href }}"
             - name: COSMOSTAC_URL
               value: "{{ .Values.cosmos.url }}"
             - name: COSMOSTAC_KEY
@@ -86,7 +86,7 @@ spec:
             - name: "PGSSLMODE"
               value: "require"
             - name: "DEBUG"
-              value: "{{ .Values.mqe.debug }}"
+              value: "{{ .Values.stac.debug }}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
 
@@ -99,16 +99,16 @@ spec:
               path: /_mgmt/ping
               port: http
           resources:
-            {{- toYaml .Values.mqe.deploy.resources | nindent 12 }}
-      {{- with .Values.mqe.deploy.nodeSelector }}
+            {{- toYaml .Values.stac.deploy.resources | nindent 12 }}
+      {{- with .Values.stac.deploy.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.mqe.deploy.affinity }}
+      {{- with .Values.stac.deploy.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.mqe.deploy.tolerations }}
+      {{- with .Values.stac.deploy.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

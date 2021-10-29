@@ -1,6 +1,6 @@
 environment: "staging"
 
-mqe:
+stac:
   enabled: true
   image:
     # e.g. myacr.azurecr.io/my-repository

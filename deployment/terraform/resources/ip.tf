@@ -1,8 +1,8 @@
-resource "azurerm_public_ip" "pqe" {
-  name                = "${local.prefix}-pqe-ip"
-  domain_name_label   = "pct-pqe-${var.environment}"
-  resource_group_name = azurerm_kubernetes_cluster.pqe.node_resource_group
-  location            = azurerm_resource_group.pqe.location
+resource "azurerm_public_ip" "pc" {
+  name                = "${local.prefix}-pc-ip"
+  domain_name_label   = "pct-apis-${var.environment}"
+  resource_group_name = azurerm_kubernetes_cluster.pc.node_resource_group
+  location            = azurerm_resource_group.pc.location
   allocation_method   = "Static"
   sku                 = "Standard"
 

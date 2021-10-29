@@ -7,11 +7,11 @@ output "location" {
 }
 
 output "cluster_name" {
-  value = azurerm_kubernetes_cluster.pqe.name
+  value = azurerm_kubernetes_cluster.pc.name
 }
 
 output "resource_group" {
-  value = azurerm_resource_group.pqe.name
+  value = azurerm_resource_group.pc.name
 }
 
 # -- Postgres
@@ -50,26 +50,26 @@ output "cluster_cert_server" {
 ## Ingress
 
 output "ingress_ip" {
-  value = azurerm_public_ip.pqe.ip_address
+  value = azurerm_public_ip.pc.ip_address
 }
 
 output "dns_label" {
-  value = azurerm_public_ip.pqe.domain_name_label
+  value = azurerm_public_ip.pc.domain_name_label
 }
 
 ## MQE
 
-output "mqe_replica_count" {
-  value = var.mqe_replica_count
+output "stac_replica_count" {
+  value = var.stac_replica_count
 }
 
 ## DQE
 
-output "dqe_replica_count" {
-  value = var.dqe_replica_count
+output "tiler_replica_count" {
+  value = var.tiler_replica_count
 }
 
 ## Application Insights
 output "instrumentation_key" {
-  value = azurerm_application_insights.pqe_application_insights.instrumentation_key
+  value = azurerm_application_insights.pc_application_insights.instrumentation_key
 }

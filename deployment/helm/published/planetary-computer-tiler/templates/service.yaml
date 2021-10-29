@@ -1,18 +1,18 @@
-{{- if .Values.dqe.enabled -}}
+{{- if .Values.tiler.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "dqe.fullname" . }}
+  name: {{ include "pctiler.fullname" . }}
   labels:
-    {{- include "dqe.labels" . | nindent 4 }}
-  {{- with .Values.dqe.service.annotations }}
+    {{- include "pctiler.labels" . | nindent 4 }}
+  {{- with .Values.tiler.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.dqe.service.type }}
+  type: {{ .Values.tiler.service.type }}
   ports:
-    - port: {{ .Values.dqe.service.port }}
+    - port: {{ .Values.tiler.service.port }}
   selector:
-    {{- include "dqe.selectorLabels" . | nindent 4 }}
+    {{- include "pctiler.selectorLabels" . | nindent 4 }}
 {{- end }}

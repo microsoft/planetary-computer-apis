@@ -24,17 +24,17 @@ spec:
     - host: {{ . }}
       http:
         paths:
-          {{ if $.Values.mqe.enabled }}
-          - path: {{ $.Values.pcingress.services.mqe.path }}
+          {{ if $.Values.stac.enabled }}
+          - path: {{ $.Values.pcingress.services.stac.path }}
             backend:
-              serviceName: {{ $.Values.pcingress.services.mqe.name }}
-              servicePort: {{ $.Values.pcingress.services.mqe.port }}
+              serviceName: {{ $.Values.pcingress.services.stac.name }}
+              servicePort: {{ $.Values.pcingress.services.stac.port }}
           {{- end}}
-          {{ if $.Values.dqe.enabled }}
-          - path: {{ $.Values.pcingress.services.dqe.path }}
+          {{ if $.Values.tiler.enabled }}
+          - path: {{ $.Values.pcingress.services.tiler.path }}
             backend:
-              serviceName: {{ $.Values.pcingress.services.dqe.name }}
-              servicePort: {{ $.Values.pcingress.services.dqe.port }}
+              serviceName: {{ $.Values.pcingress.services.tiler.name }}
+              servicePort: {{ $.Values.pcingress.services.tiler.port }}
           {{- end}}
   {{- end }}
 {{- end }}

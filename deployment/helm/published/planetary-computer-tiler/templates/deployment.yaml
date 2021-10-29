@@ -1,58 +1,58 @@
-{{- if .Values.dqe.enabled -}}
+{{- if .Values.tiler.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "dqe.fullname" . }}
+  name: {{ include "pctiler.fullname" . }}
   labels:
-    {{- include "dqe.labels" . | nindent 4 }}
+    {{- include "pctiler.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.dqe.deploy.autoscaling.enabled }}
-  replicas: {{ .Values.dqe.deploy.replicaCount }}
+  {{- if not .Values.tiler.deploy.autoscaling.enabled }}
+  replicas: {{ .Values.tiler.deploy.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "dqe.selectorLabels" . | nindent 6 }}
+      {{- include "pctiler.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.dqe.deploy.podAnnotations }}
+      {{- with .Values.tiler.deploy.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "dqe.selectorLabels" . | nindent 8 }}
+        {{- include "pctiler.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.dqe.deploy.imagePullSecrets }}
+      {{- with .Values.tiler.deploy.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "dqe.serviceAccountName" . }}
+      serviceAccountName: {{ include "pctiler.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.dqe.deploy.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.tiler.deploy.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.dqe.deploy.securityContext | nindent 12 }}
-          image: "{{ .Values.dqe.image.repository }}:{{ .Values.dqe.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.dqe.image.pullPolicy }}
+            {{- toYaml .Values.tiler.deploy.securityContext | nindent 12 }}
+          image: "{{ .Values.tiler.image.repository }}:{{ .Values.tiler.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.tiler.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
           env:
             - name: APP_ROOT_PATH
-              value: "{{ .Values.dqe.appRootPath }}"
+              value: "{{ .Values.tiler.appRootPath }}"
             - name: APP_HOST
-              value: "{{ .Values.dqe.host }}"
+              value: "{{ .Values.tiler.host }}"
             - name: APP_PORT
-              value: "{{ .Values.dqe.port }}"
+              value: "{{ .Values.tiler.port }}"
             - name: FORWARDED_ALLOW_IPS
               value: "*"
             - name: "MAX_WORKERS"
-              value: "{{ .Values.dqe.server.maxWorkers }}"
+              value: "{{ .Values.tiler.server.maxWorkers }}"
             - name: "WEB_CONCURRENCY"
-              value: "{{ .Values.dqe.tiler.webConcurrency }}"
+              value: "{{ .Values.tiler.server.webConcurrency }}"
             - name: "WORKERS_PER_CORE"
-              value: "{{ .Values.dqe.tiler.workersPerCore }}"
+              value: "{{ .Values.tiler.server.workersPerCore }}"
             - name: ENVIRONMENT
               value: "{{ .Values.environment }}"
             - name: POSTGRES_USER
@@ -70,13 +70,13 @@ spec:
             - name: POSTGRES_HOST_WRITER
               value: "{{ .Values.postgres.serverName }}"
             - name: DB_MIN_CONN_SIZE
-              value: "{{ .Values.dqe.server.minDbConnections }}"
+              value: "{{ .Values.tiler.server.minDbConnections }}"
             - name: DB_MAX_CONN_SIZE
-              value: "{{ .Values.dqe.server.maxDbConnections }}"
+              value: "{{ .Values.tiler.server.maxDbConnections }}"
             - name: STAC_API_URL
-              value: "{{ .Values.dqe.stac_api_url}}"
+              value: "{{ .Values.tiler.stac_api_url}}"
             - name: STAC_API_HREF
-              value: "{{ .Values.dqe.stac_api_href}}"
+              value: "{{ .Values.tiler.stac_api_href}}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
 
@@ -89,16 +89,16 @@ spec:
               path: /
               port: http
           resources:
-            {{- toYaml .Values.dqe.deploy.resources | nindent 12 }}
-      {{- with .Values.dqe.deploy.nodeSelector }}
+            {{- toYaml .Values.tiler.deploy.resources | nindent 12 }}
+      {{- with .Values.tiler.deploy.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.dqe.deploy.affinity }}
+      {{- with .Values.tiler.deploy.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.dqe.deploy.tolerations }}
+      {{- with .Values.tiler.deploy.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

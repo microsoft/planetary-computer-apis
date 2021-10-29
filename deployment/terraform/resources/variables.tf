@@ -23,11 +23,11 @@ variable "cluster_cert_server" {
   type = string
 }
 
-variable "mqe_replica_count" {
+variable "stac_replica_count" {
   type = number
 }
 
-variable "dqe_replica_count" {
+variable "tiler_replica_count" {
   type = number
 }
 
@@ -60,32 +60,10 @@ variable "pg_password_secret_name" {
 }
 
 # -----------------
-# Attach ACR
-# Defaults to common resources in Planetary Computer Test
-
-variable "pc_test_resources_rg" {
-  type    = string
-  default = "pc-test-manual-resources"
-}
-
-variable "pc_test_resources_kv" {
-  type    = string
-  default = "pc-test-deploy-secrets"
-}
-
-variable "pc_test_resources_acr" {
-  type    = string
-  default = "pccomponentstest"
-}
-
-# -----------------
 # Local variables
 
 locals {
-  stack_id              = "pct-pqe"
+  stack_id              = "pct-apis"
   location              = lower(replace(var.region, " ", ""))
   prefix                = "${local.stack_id}-${local.location}-${var.environment}"
-  deploy_secrets_prefix = "${local.stack_id}-${var.environment}"
-  pqe_dns               = "${local.stack_id}-${var.environment}.${local.location}.cloudapp.azure.com"
-
 }

@@ -1,10 +1,10 @@
 environment: "{{ tf.environment }}"
 namespace: "staging"
 
-mqe:
+stac:
   enabled: true
   image:
-    repository: "ghcr.io/microsoft/{{ env.MQE_IMAGE_NAME }}"
+    repository: "mcr.microsoft.com/planetary-computer-apis/stac"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -13,9 +13,9 @@ mqe:
     poolSize: "1"
 
   deploy:
-    replicaCount: {{ tf.mqe_replica_count }}
+    replicaCount: {{ tf.stac_replica_count }}
     podAnnotations:
-      "pqe/gitsha": "{{ env.GIT_COMMIT }}"
+      "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
   appRootPath: "/stac"
   port: "80"
@@ -26,7 +26,7 @@ mqe:
 dqe:
   enabled: true
   image:
-    repository: "ghcr.io/microsoft/{{ env.DQE_IMAGE_NAME }}"
+    repository: "mcr.microsoft.com/planetary-computer-apis/tiler"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -40,14 +40,14 @@ dqe:
     webConcurrency: "1"
 
   deploy:
-    replicaCount: {{ tf.dqe_replica_count }}
+    replicaCount: {{ tf.tiler_replica_count }}
     podAnnotations:
-      "pqe/gitsha": "{{ env.GIT_COMMIT }}"
+      "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
   appRootPath: "/data"
   port: "80"
 
-  stac_api_url: http://pc-metadata-query-engine.staging.svc.cluster.local
+  stac_api_url: http://planetary-computer-stac.staging.svc.cluster.local
   stac_api_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/stac/
 
 metrics:
@@ -57,11 +57,11 @@ pcingress:
   services:
     mqe:
       path: "/stac(/|$)(.*)"
-      name: "pc-metadata-query-engine"
+      name: "planetary-computer-stac"
       port: "80"
     dqe:
       path: "/data(/|$)(.*)"
-      name: "pc-data-query-engine"
+      name: "planetary-computer-tiler"
       port: "80"
 
   cert:

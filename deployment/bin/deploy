@@ -67,9 +67,6 @@ if [[ -z ${TERRAFORM_DIR} ]]; then
     exit 1
 fi
 
-require_env "MQE_IMAGE_NAME"
-require_env "DQE_IMAGE_NAME"
-require_env "MIGRATIONS_IMAGE_NAME"
 require_env "IMAGE_TAG"
 require_env "GIT_COMMIT"
 require_env "ARM_CLIENT_ID"
@@ -86,9 +83,6 @@ setup_env
 # Print some information
 
 echo "===== Running Deploy ====="
-echo "MQE_IMAGE_NAME: ${MQE_IMAGE_NAME}"
-echo "DQE_IMAGE_NAME: ${DQE_IMAGE_NAME}"
-echo "MIGRATIONS_IMAGE_NAME: ${MIGRATIONS_IMAGE_NAME}"
 echo "IMAGE_TAG: ${IMAGE_TAG}"
 
 # ---------------------------------------------------
@@ -144,57 +138,44 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     helm upgrade --install \
         cert-manager \
-        --namespace staging \
+        --namespace pc \
         --create-namespace \
         --version v0.16.1 \
         --set installCRDs=true jetstack/cert-manager
 
-    echo "======================================"
-    echo "==== Metadata Query Engine (MQE) ====="
-    echo "======================================"
+    echo "==================="
+    echo "==== STAC API ====="
+    echo "==================="
 
-    echo "Deploying MQE helm chart..."
-    helm upgrade --install pc-metadata-query-engine helm/pc-metadata-query-engine \
-        -n staging \
+    echo "Deploying STAC API helm chart..."
+    helm upgrade --install planetary-computer-stac helm/published/planetary-computer-stac \
+        -n pc \
         --create-namespace \
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
         -f ${DEPLOY_VALUES_FILE}
 
-    echo "=================================="
-    echo "==== Data Query Engine (DQE) ====="
-    echo "=================================="
+    echo "================"
+    echo "==== Tiler ====="
+    echo "================"
 
-    echo "Deploying DQE helm chart..."
-    helm upgrade --install pc-data-query-engine helm/pc-data-query-engine \
-        -n staging \
+    echo "Deploying Tiler helm chart..."
+    helm upgrade --install planetary-computer-tiler helm/published/planetary-computer-tiler \
+        -n pc \
         --create-namespace \
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
         -f ${DEPLOY_VALUES_FILE}
 
-    echo "=============="
-    echo "==== SAS ====="
-    echo "=============="
-
-    echo "Deploying DQE helm chart..."
-    helm upgrade --install pc-pqe-sasapi helm/pc-pqe-sasapi \
-        -n staging \
-        --create-namespace \
-        --kube-context "${KUBE_CONTEXT}" \
-        --wait \
-        --timeout 2m0s \
-        -f ${DEPLOY_VALUES_FILE}
-
-    echo "======================"
-    echo "==== PQE Ingress ====="
-    echo "======================"
+    echo "=================="
+    echo "==== Ingress ====="
+    echo "=================="
 
     echo "Deploying ingress component..."
-    helm upgrade --install pc-pqe-ingress helm/pc-pqe-ingress \
-        -n staging \
+    helm upgrade --install pc-apis-ingress helm/pc-apis-ingress \
+        -n pc \
         --create-namespace \
         --kube-context "${KUBE_CONTEXT}" \
         --wait \

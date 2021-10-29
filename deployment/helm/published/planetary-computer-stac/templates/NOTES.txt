@@ -1,4 +1,4 @@
 Application information:
-{{ include "mqe.selectorLabels" . }}
-Ingress host: {{ .Values.mqe.ingress.host }}
-Service Fullname: {{ include "mqe.fullname" . }}
+{{ include "pcstac.selectorLabels" . }}
+Ingress host: {{ .Values.stac.ingress.host }}
+Service Fullname: {{ include "pcstac.fullname" . }}

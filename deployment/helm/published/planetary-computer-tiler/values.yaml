@@ -1,6 +1,6 @@
 environment: "staging"
 
-dqe:
+tiler:
   enabled: true
   image:
     # e.g. myacr.azurecr.io/my-repository
@@ -12,8 +12,6 @@ dqe:
     maxWorkers: "1"
     minDbConnections: "1"
     maxDbConnections: "1"
-
-  tiler:
     workersPerCore: "1"
     webConcurrency: "1"
 

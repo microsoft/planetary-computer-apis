@@ -1,10 +1,10 @@
 environment: "staging"
 namespace: "default"
 
-mqe:
+stac:
   enabled: true
 
-dqe:
+tiler:
   enabled: true
 
 pcingress:
