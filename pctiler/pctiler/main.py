@@ -21,7 +21,7 @@ from pccommon.logging import init_logging
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.db import close_db_connection, connect_to_db
-from pctiler.endpoints import item, pg_mosaic, vrt
+from pctiler.endpoints import item, pg_mosaic
 from pctiler.middleware import count_data_requests, trace_request
 
 # Initialize logging
@@ -50,12 +50,6 @@ app.include_router(
     prefix=get_settings().mosaic_endpoint_prefix,
     tags=["PgSTAC Mosaic endpoints"],
 )
-
-if settings.feature_flags.VRT:
-    app.include_router(
-        vrt.vrt_factory.router, prefix="/vrt", tags=["Planetary Computer VRT Service"]
-    )
-
 
 @app.middleware("http")
 async def _count_data_requests(

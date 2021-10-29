@@ -2,7 +2,6 @@ geojson-pydantic==0.3.1
 jinja2==2.11.3
 cachetools==4.2.1
 pystac==1.0.0-rc.2
-stac_vrt==1.0.3
 stac-pydantic==2.0.0
 planetary-computer==0.3.0-rc.0
 
