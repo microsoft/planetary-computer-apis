@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source scripts/env
-
 set -e
 
 if [[ "${CI}" ]]; then

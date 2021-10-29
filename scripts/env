@@ -1,8 +1,0 @@
-function require_env() {
-    v=$(eval echo \$${1})
-
-    if [[ -z ${v} ]]; then
-        echo "Must set ${1} as environment variable" >&2;
-        exit 1;
-    fi
-}
