@@ -3,7 +3,7 @@ services:
     image: pc-apis-stac-dev
     build:
       context: .
-      dockerfile: stac/Dockerfile.dev
+      dockerfile: pcstac/Dockerfile.dev
     environment:
       - ENVIRONMENT=development
       - POSTGRES_USER=username
@@ -23,7 +23,7 @@ services:
     image: pc-apis-tiler-dev
     build:
       context: .
-      dockerfile: tiler/Dockerfile.dev
+      dockerfile: pctiler/Dockerfile.dev
     environment:
       - ENVIRONMENT=development
       - FF_VRT="yes"

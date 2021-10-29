@@ -3,7 +3,7 @@ services:
     image: pc-apis-stac
     build:
       context: .
-      dockerfile: stac/Dockerfile
+      dockerfile: pcstac/Dockerfile
     environment:
       - APP_ROOT_PATH=/stac
       - APP_HOST=0.0.0.0
@@ -32,23 +32,23 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ./common:/opt/src/common
-      - ./stac:/opt/src/stac
+      - ./pccommon:/opt/src/pccommon
+      - ./pcstac:/opt/src/pcstac
     depends_on:
       - database
     command: >
-      bash -c "pypgstac pgready && uvicorn stac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
+      bash -c "pypgstac pgready && uvicorn pcstac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
   tiler:
     image: pc-apis-tiler
     build:
       context: .
-      dockerfile: tiler/Dockerfile
+      dockerfile: pctiler/Dockerfile
     ports:
       - "8082:8082"
     volumes:
-      - ./tiler:/opt/src/tiler
-      - ./tiler/templates:/opt/src/templates
-      - ./common:/opt/src/common
+      - ./pctiler:/opt/src/pctiler
+      - ./pctiler/templates:/opt/src/templates
+      - ./pccommon:/opt/src/common
     environment:
       - APP_ROOT_PATH=/data
       - APP_HOST=0.0.0.0
@@ -77,7 +77,7 @@ services:
       - APP_INSIGHTS_INSTRUMENTATION_KEY
     depends_on:
       - database
-    command: [ "uvicorn", "tiler.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers" ]
+    command: [ "uvicorn", "pctiler.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers" ]
   nginx:
     image: pc-apis-nginx
     container_name: pc-apis-nginx

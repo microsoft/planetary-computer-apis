@@ -9,7 +9,7 @@ fi
 function usage() {
     echo -n \
         "Usage: $(basename "$0")
-Runs formatting for the stac project, as well as common.
+Runs formatting for the pcstac project, as well as pccommon.
 
 This scripts is meant to be run inside the stac-dev container.
 
@@ -18,12 +18,12 @@ This scripts is meant to be run inside the stac-dev container.
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Formatting stac..."
-    isort --overwrite-in-place stac/stac
-    isort --overwrite-in-place stac/tests
-    black stac/stac
-    black stac/tests
+    isort --overwrite-in-place pcstac/pcstac
+    isort --overwrite-in-place pcstac/tests
+    black pcstac/pcstac
+    black pcstac/tests
 
     echo "Formatting common..."
-    isort --overwrite-in-place common
-    black common
+    isort --overwrite-in-place pccommon
+    black pccommon
 fi

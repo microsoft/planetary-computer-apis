@@ -18,15 +18,15 @@ This scripts is meant to be run inside the tiler-dev container.
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     echo "Running mypy for tiler..."
-    mypy tiler/tiler
+    mypy pctiler/pctiler
 
     echo "Running black for tiler..."
-    black --check tiler/tiler tiler/tests
+    black --check pctiler/pctiler pctiler/tests
 
     echo "Running flake8 for tiler..."
-    flake8 tiler/tiler tiler/tests
+    flake8 pctiler/pctiler pctiler/tests
 
     echo "Running unit tests for tiler..."
-    python -m unittest discover tiler/tests
+    python -m unittest discover pctiler/tests
 
 fi
