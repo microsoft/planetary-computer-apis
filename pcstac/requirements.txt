@@ -5,15 +5,10 @@ gunicorn==20.1.0
 orjson==3.5.2
 cachetools==4.2.1
 
-# TODO:
-# Installed from source in Dockerfile
-# Including fix from https://github.com/stac-utils/stac-fastapi/pull/271
-# Remove after release >2.1.2
-#
-# stac-fastapi.types==2.1.1
-# stac-fastapi.api==2.1.1
-# stac-fastapi.extensions==2.1.1
-# stac-fastapi.pgstac==2.1.1
+stac-fastapi.types==2.2.0
+stac-fastapi.api==2.2.0
+stac-fastapi.extensions==2.2.0
+stac-fastapi.pgstac==2.2.0
 
 packaging==20.8
 fastapi==0.67.*
