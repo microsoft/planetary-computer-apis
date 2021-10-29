@@ -18,5 +18,5 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     scripts/setup
 
     # Test the build.
-    # scripts/test
+    scripts/test
 fi
