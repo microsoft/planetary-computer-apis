@@ -71,11 +71,6 @@ postgres:
   dbName: "postgis"
   port: "5432"
 
-cosmos:
-  url: ""
-  key: ""
-  dbName: "stac"
-
 ingress:
   enabled: false
   annotations: {}

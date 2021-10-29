@@ -140,7 +140,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         cert-manager \
         --namespace pc \
         --create-namespace \
-        --version v0.16.1 \
+        --version v1.6.0 \
         --set installCRDs=true jetstack/cert-manager
 
     echo "==================="
@@ -150,7 +150,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Deploying STAC API helm chart..."
     helm upgrade --install planetary-computer-stac helm/published/planetary-computer-stac \
         -n pc \
-        --create-namespace \
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
@@ -163,7 +162,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Deploying Tiler helm chart..."
     helm upgrade --install planetary-computer-tiler helm/published/planetary-computer-tiler \
         -n pc \
-        --create-namespace \
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
@@ -176,7 +174,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Deploying ingress component..."
     helm upgrade --install pc-apis-ingress helm/pc-apis-ingress \
         -n pc \
-        --create-namespace \
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
@@ -184,8 +181,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     echo "Installing ingress-nginx..."
     helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-        -n staging \
-        --create-namespace \
+        -n pc \
         --set controller.replicaCount=2 \
         --set controller.service.externalTrafficPolicy="Local" \
         --set controller.service.loadBalancerIP="${INGRESS_IP}" \

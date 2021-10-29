@@ -1,18 +1,18 @@
 services:
   deploy:
-    container_name: pc-mqe-deploy
-    image: pc-mqe-deploy
+    container_name: pc-apis-deploy
+    image: pc-apis-deploy
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      - IMAGE_TAG=${IMAGE_TAG}
-      - GIT_COMMIT=${GIT_COMMIT}
+      - IMAGE_TAG
+      - GIT_COMMIT
 
-      - ARM_SUBSCRIPTION_ID=${subscriptionId}
-      - ARM_TENANT_ID=${tenantId}
-      - ARM_CLIENT_ID=${servicePrincipalId}
-      - ARM_CLIENT_SECRET=${servicePrincipalKey}
+      - ARM_SUBSCRIPTION_ID
+      - ARM_TENANT_ID
+      - ARM_CLIENT_ID
+      - ARM_CLIENT_SECRET
 
       # Used in the dev stack as an identifier
       - TF_VAR_username=${USER}

@@ -1,5 +1,5 @@
 environment: "{{ tf.environment }}"
-namespace: "staging"
+namespace: "pc"
 
 stac:
   enabled: true
@@ -23,7 +23,7 @@ stac:
 
   tiler_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/data/
 
-dqe:
+tiler:
   enabled: true
   image:
     repository: "mcr.microsoft.com/planetary-computer-apis/tiler"
@@ -47,7 +47,7 @@ dqe:
   appRootPath: "/data"
   port: "80"
 
-  stac_api_url: http://planetary-computer-stac.staging.svc.cluster.local
+  stac_api_url: http://planetary-computer-stac.pc.svc.cluster.local
   stac_api_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/stac/
 
 metrics:
@@ -55,11 +55,11 @@ metrics:
 
 pcingress:
   services:
-    mqe:
+    stac:
       path: "/stac(/|$)(.*)"
       name: "planetary-computer-stac"
       port: "80"
-    dqe:
+    tiler:
       path: "/data(/|$)(.*)"
       name: "planetary-computer-tiler"
       port: "80"

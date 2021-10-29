@@ -53,12 +53,6 @@ spec:
               value: "{{ .Values.stac.server.poolSize }}"
             - name: TILER_HREF
               value: "{{ .Values.stac.tiler_href }}"
-            - name: COSMOSTAC_URL
-              value: "{{ .Values.cosmos.url }}"
-            - name: COSMOSTAC_KEY
-              value: "{{ .Values.cosmos.key }}"
-            - name: COSMOSTAC_DB_NAME
-              value: "{{ .Values.cosmos.dbName }}"
             - name: POSTGRES_USER
               value: "{{ .Values.postgres.user }}"
             - name: POSTGRES_PASS

@@ -57,13 +57,13 @@ output "dns_label" {
   value = azurerm_public_ip.pc.domain_name_label
 }
 
-## MQE
+## STAC API
 
 output "stac_replica_count" {
   value = var.stac_replica_count
 }
 
-## DQE
+## TILER
 
 output "tiler_replica_count" {
   value = var.tiler_replica_count

@@ -9,11 +9,11 @@ tiler:
 
 pcingress:
   services:
-    mqe:
+    stac:
       path: ""
       name: ""
       port: ""
-    dqe:
+    tiler:
       path: ""
       name: ""
       port: ""

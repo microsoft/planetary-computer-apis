@@ -57,9 +57,6 @@ function cluster_login() {
     az aks get-credentials \
         --resource-group ${RESOURCE_GROUP} \
         --name ${CLUSTER_NAME}
-
-    # Gather vars from the cluster
-    export MQE_NODE_RG=$(az aks show --resource-group ${RESOURCE_GROUP} --name ${CLUSTER_NAME} --query nodeResourceGroup -o tsv)
 }
 
 function setup_helm() {

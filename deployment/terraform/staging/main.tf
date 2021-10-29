@@ -8,8 +8,8 @@ module "resources" {
   cluster_cert_server = "https://acme-v02.api.letsencrypt.org/directory"
 
   aks_node_count = 2
-  mqe_replica_count = 2
-  dqe_replica_count = 2
+  stac_replica_count = 2
+  tiler_replica_count = 2
 
 }
 

@@ -6,6 +6,16 @@ variable "region" {
   type = string
 }
 
+variable "pc_test_resources_rg" {
+  type    = string
+  default = "pc-test-manual-resources"
+}
+
+variable "pc_test_resources_kv" {
+  type    = string
+  default = "pc-test-deploy-secrets"
+}
+
 variable "aks_node_count" {
   type = number
 }
