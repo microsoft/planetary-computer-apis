@@ -3,6 +3,7 @@ import unittest
 from fastapi.testclient import TestClient
 from openapi_spec_validator import validate_spec
 from requests.models import Response
+
 from pctiler.main import app
 
 VALIDATING_SCHEMA = False

@@ -51,6 +51,7 @@ app.include_router(
     tags=["PgSTAC Mosaic endpoints"],
 )
 
+
 @app.middleware("http")
 async def _count_data_requests(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
