@@ -18,7 +18,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     # Run database migrations
     docker-compose \
         -f docker-compose.yml \
-        run --rm mqe \
-        bash -c "python /opt/src/mqe/mqe/pgready.py && pypgstac migrate"
+        run --rm stac \
+        bash -c "pypgstac pgready && pypgstac migrate"
 
 fi

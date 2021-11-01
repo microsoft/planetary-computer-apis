@@ -1,0 +1,3 @@
+Application information:
+{{ include "pctiler.selectorLabels" . }}
+Service Fullname: {{ include "pctiler.fullname" . }}

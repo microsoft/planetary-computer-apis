@@ -1,0 +1,5 @@
+FROM pc-apis-tiler
+
+COPY requirements-dev.txt /opt/src/requirements-dev.txt
+
+RUN pip install -r /opt/src/requirements-dev.txt

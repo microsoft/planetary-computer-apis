@@ -19,12 +19,12 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         -f docker-compose.yml \
         -f docker-compose.dev.yml \
         run --rm \
-        dqe-dev scripts/bin/test-dqe
+        tiler-dev scripts/bin/test-tiler
 
     docker-compose \
         -f docker-compose.yml \
         -f docker-compose.dev.yml \
         run --rm \
-        mqe-dev scripts/bin/test-mqe
+        stac-dev scripts/bin/test-stac
 
 fi

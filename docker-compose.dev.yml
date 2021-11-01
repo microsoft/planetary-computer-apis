@@ -1,15 +1,33 @@
 services:
-  dqe-dev:
-    image: pc-query-dataapi-dev
+  stac-dev:
+    image: pc-apis-stac-dev
     build:
       context: .
-      dockerfile: dqe/Dockerfile.dev
-      args:
-        DQE_IMAGE_NAME: ${DQE_IMAGE_NAME}
+      dockerfile: pcstac/Dockerfile.dev
+    environment:
+      - ENVIRONMENT=development
+      - POSTGRES_USER=username
+      - POSTGRES_PASS=password
+      - POSTGRES_DBNAME=postgis
+      - POSTGRES_HOST=database
+      - POSTGRES_HOST_READER=database
+      - POSTGRES_HOST_WRITER=database
+      - POSTGRES_PORT=5432
+    volumes:
+      - .:/opt/src
+    command: >
+      /bin/bash
+    depends_on:
+      - stac
+  tiler-dev:
+    image: pc-apis-tiler-dev
+    build:
+      context: .
+      dockerfile: pctiler/Dockerfile.dev
     environment:
       - ENVIRONMENT=development
       - FF_VRT="yes"
-      - STAC_API_URL=http://mqe:8081
+      - STAC_API_URL=http://stac:8081
       - STAC_API_HREF=http://localhost:8080/stac/
 
       # titiler.pgstac
@@ -27,27 +45,5 @@ services:
     command: >
       /bin/bash
     depends_on:
-      - mqe
-      - dqe
-  mqe-dev:
-    image: pc-query-stacapi-dev
-    build:
-      context: .
-      dockerfile: mqe/Dockerfile.dev
-      args:
-        MQE_IMAGE_NAME: ${MQE_IMAGE_NAME}
-    environment:
-      - ENVIRONMENT=development
-      - POSTGRES_USER=username
-      - POSTGRES_PASS=password
-      - POSTGRES_DBNAME=postgis
-      - POSTGRES_HOST=database
-      - POSTGRES_HOST_READER=database
-      - POSTGRES_HOST_WRITER=database
-      - POSTGRES_PORT=5432
-    volumes:
-      - .:/opt/src
-    command: >
-      /bin/bash
-    depends_on:
-      - mqe
+      - stac
+      - tiler

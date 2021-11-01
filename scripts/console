@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source scripts/env
-
 set -e
 
 if [[ "${CI}" ]]; then
@@ -10,29 +8,29 @@ fi
 
 function usage() {
     echo -n \
-        "Usage: $(basename "$0") [--mqe, --pqe, --db, --migrations, --deploy]
+        "Usage: $(basename "$0") [--stac, --tiler, --db, --deploy]
 Runs a console in the development container
 
---mqe - Drops into a dev container (based on mqe). Default.
---dqe - Drops into a dev container (based on dqe)
+--stac - Drops into a dev stac service container. Default.
+--tiler - Drops into a dev tiler service container.
 --db - Drops into a db container
 --deploy - Drops into a deploy container
 "
 }
 
 # Parse args
-DEV_MQE_CONSOLE=1
+DEV_STAC_CONSOLE=1
 while [[ "$#" > 0 ]]; do case $1 in
     --db)
         DB_CONSOLE=1
         shift
         ;;
-    --mqe)
-        DEV_MQE_CONSOLE=1
+    --stac)
+        DEV_STAC_CONSOLE=1
         shift
         ;;
-    --dqe)
-        DEV_DQE_CONSOLE=1
+    --tiler)
+        DEV_TILER_CONSOLE=1
         shift
         ;;
     --deploy)
@@ -54,7 +52,6 @@ while [[ "$#" > 0 ]]; do case $1 in
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     if [[ "${DB_CONSOLE}" ]]; then
-
         docker-compose \
             -f docker-compose.yml \
             exec database psql postgres://username:password@database:5432/postgis
@@ -62,39 +59,31 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         exit 0
     fi
 
-    if [[ "${DEV_DQE_CONSOLE}" ]]; then
-        # Execute in subshell to avoid leaking exported env vars.
+    if [[ "${DEV_TILER_CONSOLE}" ]]; then
         docker-compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             run --rm \
-            dqe-dev /bin/bash
+            tiler-dev /bin/bash
 
         exit 0
     fi
 
     if [[ "${DEPLOY_CONSOLE}" ]]; then
-        (
-
-            source scripts/env
-
-            GIT_COMMIT="$(git rev-parse --short HEAD)" \
-                docker-compose \
-                -f deployment/docker-compose.yml \
-                run --rm \
-                deploy /bin/bash
-        )
+        GIT_COMMIT="$(git rev-parse --short HEAD)" docker-compose \
+            -f deployment/docker-compose.yml \
+            run --rm \
+            deploy /bin/bash
 
         exit 0
     fi
 
-    if [[ "${DEV_MQE_CONSOLE}" ]]; then
-        # Execute in subshell to avoid leaking exported env vars.
+    if [[ "${DEV_STAC_CONSOLE}" ]]; then
         docker-compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             run --rm \
-            mqe-dev /bin/bash
+            stac-dev /bin/bash
 
         exit 0
     fi

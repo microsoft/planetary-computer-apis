@@ -1,7 +1,0 @@
-ARG DQE_IMAGE_NAME
-
-FROM ${DQE_IMAGE_NAME}
-
-COPY requirements-dev.txt /opt/src/requirements-dev.txt
-
-RUN pip install -r /opt/src/requirements-dev.txt

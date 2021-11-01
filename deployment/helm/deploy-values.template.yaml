@@ -1,10 +1,10 @@
 environment: "{{ tf.environment }}"
-namespace: "staging"
+namespace: "pc"
 
-mqe:
+stac:
   enabled: true
   image:
-    repository: "{{ tf.image_registry }}.azurecr.io/{{ env.MQE_IMAGE_NAME }}"
+    repository: "mcr.microsoft.com/planetary-computer-apis/stac"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -13,9 +13,9 @@ mqe:
     poolSize: "1"
 
   deploy:
-    replicaCount: {{ tf.mqe_replica_count }}
+    replicaCount: {{ tf.stac_replica_count }}
     podAnnotations:
-      "pqe/gitsha": "{{ env.GIT_COMMIT }}"
+      "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
   appRootPath: "/stac"
   port: "80"
@@ -23,10 +23,10 @@ mqe:
 
   tiler_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/data/
 
-dqe:
+tiler:
   enabled: true
   image:
-    repository: "{{ tf.image_registry }}.azurecr.io/{{ env.DQE_IMAGE_NAME }}"
+    repository: "mcr.microsoft.com/planetary-computer-apis/tiler"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -40,14 +40,14 @@ dqe:
     webConcurrency: "1"
 
   deploy:
-    replicaCount: {{ tf.dqe_replica_count }}
+    replicaCount: {{ tf.tiler_replica_count }}
     podAnnotations:
-      "pqe/gitsha": "{{ env.GIT_COMMIT }}"
+      "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
   appRootPath: "/data"
   port: "80"
 
-  stac_api_url: http://pc-metadata-query-engine.staging.svc.cluster.local
+  stac_api_url: http://planetary-computer-stac.pc.svc.cluster.local
   stac_api_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/stac/
 
 metrics:
@@ -55,13 +55,13 @@ metrics:
 
 pcingress:
   services:
-    mqe:
+    stac:
       path: "/stac(/|$)(.*)"
-      name: "pc-metadata-query-engine"
+      name: "planetary-computer-stac"
       port: "80"
-    dqe:
+    tiler:
       path: "/data(/|$)(.*)"
-      name: "pc-data-query-engine"
+      name: "planetary-computer-tiler"
       port: "80"
 
   cert:
@@ -79,7 +79,6 @@ pcingress:
     tlsHost: "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
     hosts:
       - "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
-      - "{{ tf.api_management_name }}.azure-api.net"
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: "{{ tf.cluster_cert_issuer }}-pcingress"

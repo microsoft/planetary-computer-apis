@@ -1,4 +1,0 @@
-Application information:
-{{ include "mqe.selectorLabels" . }}
-Ingress host: {{ .Values.mqe.ingress.host }}
-Service Fullname: {{ include "mqe.fullname" . }}

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Runs formatting for the pctiler project.
+
+This scripts is meant to be run inside the tiler-dev container.
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    echo "Formatting tiler..."
+    isort --overwrite-in-place pctiler/pctiler
+    isort  --overwrite-in-place pctiler/tests
+    black pctiler/pctiler
+    black pctiler/tests
+fi

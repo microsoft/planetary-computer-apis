@@ -1,0 +1,18 @@
+{{- if .Values.tiler.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pctiler.fullname" . }}
+  labels:
+    {{- include "pctiler.labels" . | nindent 4 }}
+  {{- with .Values.tiler.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.tiler.service.type }}
+  ports:
+    - port: {{ .Values.tiler.service.port }}
+  selector:
+    {{- include "pctiler.selectorLabels" . | nindent 4 }}
+{{- end }}

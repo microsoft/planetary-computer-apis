@@ -1,0 +1,18 @@
+{{- if .Values.stac.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pcstac.fullname" . }}
+  labels:
+    {{- include "pcstac.labels" . | nindent 4 }}
+  {{- with .Values.stac.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.stac.service.type }}
+  ports:
+    - port: {{ .Values.stac.service.port }}
+  selector:
+    {{- include "pcstac.selectorLabels" . | nindent 4 }}
+{{- end }}

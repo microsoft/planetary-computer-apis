@@ -1,0 +1,30 @@
+name: Publish charts (release)
+
+on:
+  push:
+    tags: ["*"]
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get tag
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: Publish Helm charts
+        uses: stefanprodan/helm-gh-pages@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: "deployment/helm/published"
+          linting: "off"
+          helm_version: 3.5.4
+          chart_version: ${{steps.previoustag.outputs.tag}}

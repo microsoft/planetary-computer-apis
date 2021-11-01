@@ -1,19 +1,13 @@
 # Deployment
 
-This folder contains the code to run a deployment of the metadata query engine in the test infrastructure. It includes a few steps that use Terraform and Helm.
+This folder contains the code to run a deployment of the Planetary Computer APIs in Azure. It includes a few steps that use Terraform and Helm.
 
 ## Deploy script
 
-The logic for the deployment workflow is encapsulated in the [bin/deploy](bin/deploy) script. This should be run from the top level of the repository via `scripts/cideploy` by CI. You can also drop into a console to manually run steps for a dev deployment via
+The logic for the deployment workflow is encapsulated in the [bin/deploy](bin/deploy) script. You can run from the top level of the repository via `scripts/cideploy` by CI. You can also drop into a console to manually run steps for a dev deployment via
 
 ```
 scripts/console --deploy
-```
-
-or run a dev deployment via
-
-```
-scripts/deploy --dev
 ```
 
 ## Manual resources
