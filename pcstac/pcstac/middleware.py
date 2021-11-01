@@ -2,7 +2,7 @@ import logging
 import re
 from typing import Awaitable, Callable, Optional, Tuple
 
-from fastapi import Request, Response
+from fastapi import HTTPException, Request, Response
 from opencensus.stats import aggregation as aggregation_module
 from opencensus.stats import measure as measure_module
 from opencensus.stats import view as view_module

@@ -23,7 +23,7 @@ from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.db import close_db_connection, connect_to_db
 from pctiler.endpoints import item, pg_mosaic
-from pctiler.middleware import count_data_requests, trace_request
+from pctiler.middleware import count_data_requests, handle_exceptions, trace_request
 
 # Initialize logging
 init_logging("tiler")
@@ -59,6 +59,11 @@ async def _trace_requests(
 ) -> Response:
     return await trace_request(request, call_next)
 
+@app.middleware("http")
+async def _handle_exceptions(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    return await handle_exceptions(request, call_next)
 
 @app.middleware("http")
 async def _handle_exceptions(
