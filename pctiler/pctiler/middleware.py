@@ -2,7 +2,7 @@ import logging
 from typing import Awaitable, Callable
 from urllib.parse import urlparse
 
-from fastapi import Request, Response
+from fastapi import HTTPException, Request, Response
 from opencensus.stats import aggregation as aggregation_module
 from opencensus.stats import measure as measure_module
 from opencensus.stats import view as view_module
@@ -133,3 +133,21 @@ async def count_data_requests(request: Request, call_next):  # type: ignore
             request,
         )
     return await call_next(request)
+
+async def handle_exceptions(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+    try:
+        raise Exception("ha")
+        return call_next(request)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Exception when handling request", extra={
+            "custom_dimensions": {
+                "stackTrace": f"{e}",
+                HTTP_URL: str(request.url),
+                HTTP_METHOD: str(request.method),
+                HTTP_PATH: request_to_path(request),
+                "service": "tiler"
+            }
+        })
+        raise
