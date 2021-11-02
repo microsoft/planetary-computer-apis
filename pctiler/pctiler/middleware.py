@@ -2,7 +2,7 @@ import logging
 from typing import Awaitable, Callable
 from urllib.parse import urlparse
 
-from fastapi import HTTPException, Request, Response
+from fastapi import Request, Response
 from opencensus.stats import aggregation as aggregation_module
 from opencensus.stats import measure as measure_module
 from opencensus.stats import view as view_module
