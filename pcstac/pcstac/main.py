@@ -7,7 +7,6 @@ from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
-from pccommon.middleware import handle_exceptions
 from stac_fastapi.api.errors import DEFAULT_STATUS_CODES
 from stac_fastapi.extensions.core import FieldsExtension, QueryExtension, SortExtension
 from stac_fastapi.pgstac.config import Settings
@@ -16,6 +15,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
 from pccommon.logging import init_logging
+from pccommon.middleware import handle_exceptions
 from pccommon.openapi import fixup_schema
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
@@ -96,11 +96,13 @@ async def _count_collection_requests(
 ) -> Response:
     return await count_collection_requests(request, call_next)
 
+
 @app.middleware("http")
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     return await handle_exceptions(request, call_next)
+
 
 @app.middleware("http")
 async def _trace_request(
