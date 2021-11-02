@@ -8,6 +8,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.openapi.utils import get_openapi
 from morecantile.defaults import tms as defaultTileMatrices
 from morecantile.models import TileMatrixSet
+from pccommon.middleware import handle_exceptions
 from starlette import status
 from starlette.middleware.cors import CORSMiddleware
 from titiler.application.middleware import (
@@ -22,7 +23,7 @@ from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.db import close_db_connection, connect_to_db
 from pctiler.endpoints import item, pg_mosaic
-from pctiler.middleware import count_data_requests, handle_exceptions, trace_request
+from pctiler.middleware import count_data_requests, trace_request
 
 # Initialize logging
 init_logging("tiler")
