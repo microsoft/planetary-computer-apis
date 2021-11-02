@@ -13,8 +13,7 @@ async def handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     try:
-        raise Exception("ha")
-        return call_next(request)
+        return await call_next(request)
     except HTTPException:
         raise
     except Exception as e:
