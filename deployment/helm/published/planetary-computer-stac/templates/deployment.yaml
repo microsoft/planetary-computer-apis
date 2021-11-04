@@ -83,14 +83,16 @@ spec:
               value: "{{ .Values.stac.debug }}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
+            - name: APP_LIVENESS_PROBE_PATH
+              value: "/stac/_mgmt/ping"
 
           livenessProbe:
             httpGet:
-              path: /_mgmt/ping
+              path: "/_mgmt/ping"
               port: http
           readinessProbe:
             httpGet:
-              path: /_mgmt/ping
+              path: "/_mgmt/ping"
               port: http
           resources:
             {{- toYaml .Values.stac.deploy.resources | nindent 12 }}
