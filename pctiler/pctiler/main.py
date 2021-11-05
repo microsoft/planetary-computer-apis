@@ -67,12 +67,6 @@ async def _handle_exceptions(
     return await handle_exceptions(request, call_next)
 
 
-@app.middleware("http")
-async def _handle_exceptions(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    return await handle_exceptions(request, call_next)
-
 
 @app.middleware("http")
 async def _count_data_requests(

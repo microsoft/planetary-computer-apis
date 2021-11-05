@@ -91,13 +91,6 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def _count_collection_requests(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    return await count_collection_requests(request, call_next)
-
-
-@app.middleware("http")
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
