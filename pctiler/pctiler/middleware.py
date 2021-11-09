@@ -77,18 +77,6 @@ async def trace_request(
         return await call_next(request)
 
 
-async def count_data_requests(request: Request, call_next):  # type: ignore
-    if _log_metrics:
-        log_collection_request(
-            "tiler",
-            logger,
-            request.query_params.get("collection"),
-            request.query_params.get("item"),
-            request,
-        )
-    return await call_next(request)
-
-
 async def handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
