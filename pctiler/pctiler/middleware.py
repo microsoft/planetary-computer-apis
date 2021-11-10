@@ -1,7 +1,7 @@
 import logging
 from typing import Awaitable, Callable
 
-from fastapi import HTTPException, Request, Response
+from fastapi import Request, Response
 from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
@@ -12,7 +12,6 @@ from pccommon.tracing import (
     HTTP_PATH,
     HTTP_STATUS_CODE,
     HTTP_URL,
-    LIVENESS_PATH,
     exporter,
 )
 
@@ -24,10 +23,10 @@ _log_metrics = exporter is not None
 async def trace_request(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
+    request_path = request_to_path(request).strip("/")
     if (
         _log_metrics
         and request.method.lower() != "head"
-        and request_to_path(request) != LIVENESS_PATH
     ):
         tracer = Tracer(
             exporter=exporter,
@@ -46,7 +45,7 @@ async def trace_request(
             response = await call_next(request)
 
             tracer.add_attribute_to_current_span(
-                attribute_key=HTTP_PATH, attribute_value=request_to_path(request)
+                attribute_key=HTTP_PATH, attribute_value=request_path
             )
             tracer.add_attribute_to_current_span(
                 attribute_key=HTTP_STATUS_CODE, attribute_value=response.status_code
@@ -75,26 +74,3 @@ async def trace_request(
         return response
     else:
         return await call_next(request)
-
-
-async def handle_exceptions(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    try:
-        return await call_next(request)
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.exception(
-            "Exception when handling request",
-            extra={
-                "custom_dimensions": {
-                    "stackTrace": f"{e}",
-                    HTTP_URL: str(request.url),
-                    HTTP_METHOD: str(request.method),
-                    HTTP_PATH: request_to_path(request),
-                    "service": "tiler",
-                }
-            },
-        )
-        raise

@@ -13,7 +13,6 @@ from pccommon.tracing import (
     HTTP_PATH,
     HTTP_STATUS_CODE,
     HTTP_URL,
-    LIVENESS_PATH,
     exporter,
 )
 
@@ -41,10 +40,10 @@ def _collection_item_from_request(
 async def trace_request(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
+    request_path = request_to_path(request).strip("/")
     if (
         _log_metrics
         and request.method.lower() != "head"
-        and request_to_path(request) != LIVENESS_PATH
     ):
         tracer = Tracer(
             exporter=exporter,
@@ -68,7 +67,7 @@ async def trace_request(
                 attribute_key=HTTP_URL, attribute_value=f"{request.url}"
             )
             tracer.add_attribute_to_current_span(
-                attribute_key=HTTP_PATH, attribute_value=request_to_path(request)
+                attribute_key=HTTP_PATH, attribute_value=request_path
             )
             tracer.add_attribute_to_current_span(
                 attribute_key=HTTP_METHOD, attribute_value=str(request.method)

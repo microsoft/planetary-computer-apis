@@ -79,8 +79,6 @@ spec:
               value: "{{ .Values.tiler.stac_api_href}}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
-            - name: APP_LIVENESS_PROBE_PATH
-              value: "/data/"
 
           livenessProbe:
             httpGet:

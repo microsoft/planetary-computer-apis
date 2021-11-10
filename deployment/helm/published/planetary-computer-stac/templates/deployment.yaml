@@ -83,8 +83,6 @@ spec:
               value: "{{ .Values.stac.debug }}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
-            - name: APP_LIVENESS_PROBE_PATH
-              value: "/stac/_mgmt/ping"
 
           livenessProbe:
             httpGet:
