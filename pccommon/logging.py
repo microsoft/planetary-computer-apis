@@ -72,32 +72,6 @@ def init_logging(service_name: str) -> None:
         logger.info("Not adding Azure log handler since no instrumentation key defined")
 
 
-def log_collection_request(
-    domain: str,
-    logger: logging.Logger,
-    collection_id: Optional[str],
-    item_id: Optional[str],
-    request: Request,
-) -> None:
-    logger.info(
-        f"{domain} request for collection {collection_id}",
-        extra={
-            "custom_dimensions": dict(
-                [
-                    (k, v)
-                    for k, v in {
-                        "collection_id": collection_id,
-                        "item_id": item_id,
-                        "url": f"{request.url}",
-                        "service_name": domain,
-                    }.items()
-                    if v is not None
-                ]
-            )
-        },
-    )
-
-
 def request_to_path(request: Request) -> str:
     parsed_url = urlparse(f"{request.url}")
     return parsed_url.path

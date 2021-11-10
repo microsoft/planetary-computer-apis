@@ -7,7 +7,7 @@ from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
 
-from pccommon.logging import log_collection_request, request_to_path
+from pccommon.logging import request_to_path
 from pccommon.tracing import (
     HTTP_METHOD,
     HTTP_PATH,
@@ -91,13 +91,3 @@ async def trace_request(
         return response
     else:
         return await call_next(request)
-
-
-async def count_collection_requests(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    if _log_metrics:
-        (collection_id, item_id) = _collection_item_from_request(request)
-        if collection_id:
-            log_collection_request("stac", logger, collection_id, item_id, request)
-    return await call_next(request)

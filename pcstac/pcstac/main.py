@@ -21,7 +21,7 @@ from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import API_DESCRIPTION, API_TITLE, API_VERSION, get_settings
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.middleware import count_collection_requests, trace_request
+from pcstac.middleware import trace_request
 from pcstac.search import PCItemCollectionUri, PCSearch, PCSearchGetRequest
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
