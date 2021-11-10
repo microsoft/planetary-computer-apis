@@ -2,7 +2,7 @@ name: Planetary Computer APIs CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/js/ship-errors-to-app-insights]
     tags: ["*"]
 
 jobs:
