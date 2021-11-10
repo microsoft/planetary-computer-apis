@@ -24,10 +24,7 @@ async def trace_request(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     request_path = request_to_path(request).strip("/")
-    if (
-        _log_metrics
-        and request.method.lower() != "head"
-    ):
+    if _log_metrics and request.method.lower() != "head":
         tracer = Tracer(
             exporter=exporter,
             sampler=ProbabilitySampler(1.0),
