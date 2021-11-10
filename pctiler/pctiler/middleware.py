@@ -6,7 +6,7 @@ from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
 
-from pccommon.logging import log_collection_request, request_to_path
+from pccommon.logging import request_to_path
 from pccommon.tracing import (
     HTTP_METHOD,
     HTTP_PATH,
