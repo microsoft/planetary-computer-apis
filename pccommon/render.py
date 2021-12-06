@@ -200,6 +200,14 @@ COLLECTION_RENDER_CONFIG = {
         requires_token=False,
         minzoom=7,
     ),
+    "nrcan-landcover": DefaultRenderConfig(
+        assets=["landcover"],
+        render_params={"colormap_name": "nrcan-lulc"},
+        mosaic_preview_zoom=7,
+        mosaic_preview_coords=[51.3913, -124.8087],
+        requires_token=True,
+        minzoom=4,
+    ),
     "sentinel-2-l2a": DefaultRenderConfig(
         assets=["visual"],
         render_params={"bidx": [1, 2, 3], "nodata": 0},
