@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     item_endpoint_prefix: str = "/item"
     collection_endpoint_prefix: str = "/collection"
     mosaic_endpoint_prefix: str = "/mosaic"
+    legend_endpoint_prefix: str = "/legend"
     debug: bool = os.getenv("TILER_DEBUG", "False").lower() == "true"
     api_version: str = "1.0"
 
