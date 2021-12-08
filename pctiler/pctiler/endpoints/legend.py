@@ -13,22 +13,9 @@ from ..colormaps import custom_colormaps, registered_cmaps
 legend_router = APIRouter()
 
 
-@legend_router.get("/colormap/{cmap_name}", response_class=Response)
-async def get_legend(
-    cmap_name: str, height: float = 0.15, width: float = 5, trim_end: int = 0
-):
-    """Generate a legend image for a given colormap."""
-    if registered_cmaps.get(cmap_name) is None:
-        raise HTTPException(status_code=404, detail=f"Colormap {cmap_name} not found")
-
-    img = make_colormap_image(cmap_name, height, width, trim_end)
-
-    return Response(content=img.read(), media_type="image/jpg")
-
-
 @legend_router.get("/classmap/{classmap_name}")
 async def get_classmap_legend(classmap_name: str):
-    """Generate labels and color swatches for a given classmap."""
+    """Generate values and color swatches mapping for a given classmap."""
     classmap = custom_colormaps.get(classmap_name)
     if classmap is None:
         raise HTTPException(
@@ -38,29 +25,62 @@ async def get_classmap_legend(classmap_name: str):
     return Response(classmap, media_type="application/json")
 
 
-def make_colormap_image(cmap_name: str, height: int, width: int, trim_end: int):
+@legend_router.get("/colormap/{cmap_name}", response_class=Response)
+async def get_legend(
+    cmap_name: str,
+    height: float = 0.15,
+    width: float = 5,
+    trim_start: int = 0,
+    trim_end: int = 0,
+):
+    """Generate a legend image for a given colormap."""
+    if registered_cmaps.get(cmap_name) is None:
+        raise HTTPException(status_code=404, detail=f"Colormap {cmap_name} not found")
+
+    img = make_colormap_image(cmap_name, height, width, trim_start, trim_end)
+
+    return Response(content=img.read(), media_type="image/jpg")
+
+
+def make_colormap_image(
+    cmap_name: str, height: int, width: int, trim_start: int, trim_end: int
+):
     """Generate a color gradient image for a given colormap."""
+
+    # Setup the drawing canvas
     _, ax = plt.subplots(nrows=1, figsize=(width, height))
 
+    # Determine the number of color entries, allowing for items to be trimmed
+    # from the begining and end of the colormap
     is_custom = cmap_name in custom_colormaps
     length = len(custom_colormaps[cmap_name]) if is_custom else 255
-    length = min(length, 255) - trim_end
+    adjusted_length = min(length, 255) - trim_end - trim_start
 
-    gradient = np.linspace(0, 1, length + 1)
+    # Create a gradient array from 0 to 1 at the desired length, and a matplotlib
+    # colormap representation of the specified colormap
+    gradient = np.linspace(0, 1, adjusted_length + 1)
     gradient = np.vstack((gradient, gradient))
+    cmap = make_colormap(cmap_name, trim_start, adjusted_length)
 
-    ax.imshow(gradient, aspect="auto", cmap=make_colormap(cmap_name, length))
+    # Draw the gradient on the canvas with no hash marks
     ax.set_axis_off()
+    ax.imshow(
+        gradient,
+        aspect="auto",
+        cmap=cmap,
+    )
 
+    # Save the image to a buffer with no additional padding on the canvas
     img = BytesIO()
     plt.savefig(img, pad_inches=0, bbox_inches="tight", transparent=False)
     img.seek(0)
+
     return img
 
 
-def make_colormap(name: str, length: int):
+def make_colormap(name: str, trim_start: int, length: int):
     """Use registered rio-tiler colormaps to create matplotlib colormap"""
     colors = make_lut(registered_cmaps.get(name))
-    colors = colors[0 : length + 1]
+    colors = colors[trim_start : length + 1]
     # rescale to 0-1
     return ListedColormap(colors / 256, name=name, N=length)
