@@ -1,12 +1,11 @@
 from io import BytesIO
 
-from fastapi import APIRouter, HTTPException
-from starlette.responses import Response
-from matplotlib.colors import ListedColormap
-from rio_tiler.colormap import make_lut
-
 import matplotlib.pyplot as plt
 import numpy as np
+from fastapi import APIRouter, HTTPException
+from matplotlib.colors import ListedColormap
+from rio_tiler.colormap import make_lut
+from starlette.responses import JSONResponse, Response
 
 from ..colormaps import custom_colormaps, registered_cmaps
 
@@ -14,15 +13,16 @@ legend_router = APIRouter()
 
 
 @legend_router.get("/classmap/{classmap_name}")
-async def get_classmap_legend(classmap_name: str):
+async def get_classmap_legend(classmap_name: str) -> JSONResponse:
     """Generate values and color swatches mapping for a given classmap."""
     classmap = custom_colormaps.get(classmap_name)
+
     if classmap is None:
         raise HTTPException(
             status_code=404, detail=f"Classmap {classmap_name} not found"
         )
 
-    return Response(classmap, media_type="application/json")
+    return JSONResponse(content=classmap)
 
 
 @legend_router.get("/colormap/{cmap_name}", response_class=Response)
@@ -32,8 +32,23 @@ async def get_legend(
     width: float = 5,
     trim_start: int = 0,
     trim_end: int = 0,
-):
-    """Generate a legend image for a given colormap."""
+) -> Response:
+    """Generate a legend image for a given colormap.
+
+    If the colormap has non-contiguous values at the beginning or end,
+    which aren't desired in the output image, they can be trimmed by specifying
+    the number of values to trim.
+
+    Args:
+        cmap_name (string): The name of the registered colormap to generate a legend for
+        height (float, optional): The output height of the legend image
+        width (float, optional): The output width of the legend image
+        trim_start (int, optional): Number of items to trim from the start of the cmap
+        trim_end (int, optional): Number of items to trim from the end of the cmap
+
+    Returns:
+        HTTP response with jpeg encoded image data
+    """
     if registered_cmaps.get(cmap_name) is None:
         raise HTTPException(status_code=404, detail=f"Colormap {cmap_name} not found")
 
@@ -43,8 +58,8 @@ async def get_legend(
 
 
 def make_colormap_image(
-    cmap_name: str, height: int, width: int, trim_start: int, trim_end: int
-):
+    cmap_name: str, height: float, width: float, trim_start: int, trim_end: int
+) -> BytesIO:
     """Generate a color gradient image for a given colormap."""
 
     # Setup the drawing canvas
@@ -78,7 +93,7 @@ def make_colormap_image(
     return img
 
 
-def make_colormap(name: str, trim_start: int, length: int):
+def make_colormap(name: str, trim_start: int, length: int) -> ListedColormap:
     """Use registered rio-tiler colormaps to create matplotlib colormap"""
     colors = make_lut(registered_cmaps.get(name))
     colors = colors[trim_start : length + 1]
