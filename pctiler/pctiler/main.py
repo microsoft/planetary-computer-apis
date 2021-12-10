@@ -22,8 +22,8 @@ from pccommon.middleware import handle_exceptions
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.db import close_db_connection, connect_to_db
-from pctiler.endpoints import item, pg_mosaic
-from pctiler.middleware import trace_request
+from pctiler.endpoints import item, legend, pg_mosaic
+from pctiler.middleware import count_data_requests, trace_request
 
 # Initialize logging
 init_logging("tiler")
@@ -50,6 +50,12 @@ app.include_router(
     pg_mosaic.pgstac_mosaic_factory.router,
     prefix=get_settings().mosaic_endpoint_prefix,
     tags=["PgSTAC Mosaic endpoints"],
+)
+
+app.include_router(
+    legend.legend_router,
+    prefix=get_settings().legend_endpoint_prefix,
+    tags=["Legend endpoints"],
 )
 
 

@@ -14,6 +14,7 @@ from .mtbs import mtbs_colormaps
 # The use of enums requires us to roll our own RenderParams dependency type
 # if we want documentation on par with the default RenderParams class
 ################################################################################
+registered_cmaps = cmap
 custom_colormaps: Dict[str, Dict[int, List[int]]] = {
     **jrc_colormaps,
     **lulc_colormaps,
@@ -21,10 +22,10 @@ custom_colormaps: Dict[str, Dict[int, List[int]]] = {
 }
 
 for k, v in custom_colormaps.items():
-    cmap = cmap.register({k: v})
+    registered_cmaps = registered_cmaps.register({k: v})
 
 PCColorMapNames = Enum(  # type: ignore
-    "ColorMapNames", [(a, a) for a in sorted(cmap.list())]
+    "ColorMapNames", [(a, a) for a in sorted(registered_cmaps.list())]
 )
 
 

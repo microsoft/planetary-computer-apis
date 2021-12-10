@@ -11,7 +11,7 @@ DEFAULT_LIMIT = 250
 class PCSearch(PgstacSearch):
     # Increase the default limit for performance
     # Ignore "Illegal type annotation: call expression not allowed"
-    limit: Optional[conint(ge=0, le=10000)] = DEFAULT_LIMIT  # type:ignore
+    limit: Optional[conint(ge=1, le=1000)] = DEFAULT_LIMIT  # type:ignore
 
 
 @attr.s
