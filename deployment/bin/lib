@@ -56,7 +56,8 @@ function cluster_login() {
 
     az aks get-credentials \
         --resource-group ${RESOURCE_GROUP} \
-        --name ${CLUSTER_NAME}
+        --name ${CLUSTER_NAME} \
+        --subscription ${ARM_SUBSCRIPTION_ID}
 }
 
 function setup_helm() {
