@@ -23,7 +23,7 @@ from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.db import close_db_connection, connect_to_db
 from pctiler.endpoints import item, legend, pg_mosaic
-from pctiler.middleware import count_data_requests, trace_request
+from pctiler.middleware import trace_request
 
 # Initialize logging
 init_logging("tiler")
