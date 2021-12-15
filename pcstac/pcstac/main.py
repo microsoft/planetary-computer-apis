@@ -15,12 +15,13 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
 from pccommon.logging import init_logging
+from pccommon.middleware import handle_exceptions
 from pccommon.openapi import fixup_schema
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import API_DESCRIPTION, API_TITLE, API_VERSION, get_settings
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.middleware import count_collection_requests, trace_request
+from pcstac.middleware import trace_request
 from pcstac.search import PCItemCollectionUri, PCSearch, PCSearchGetRequest
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
@@ -90,10 +91,10 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def _count_collection_requests(
+async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await count_collection_requests(request, call_next)
+    return await handle_exceptions(request, call_next)
 
 
 @app.middleware("http")

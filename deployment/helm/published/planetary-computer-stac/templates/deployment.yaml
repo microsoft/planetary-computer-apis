@@ -86,11 +86,11 @@ spec:
 
           livenessProbe:
             httpGet:
-              path: /_mgmt/ping
+              path: "/_mgmt/ping"
               port: http
           readinessProbe:
             httpGet:
-              path: /_mgmt/ping
+              path: "/_mgmt/ping"
               port: http
           resources:
             {{- toYaml .Values.stac.deploy.resources | nindent 12 }}
