@@ -13,6 +13,20 @@ WORKDIR /opt/src
 
 RUN pip install -r requirements.txt
 
+# This code used to depend on unreleased stac-fastapi
+# Including fix from https://github.com/stac-utils/stac-fastapi/pull/282
+# Based on 2.2.0 release
+RUN mkdir -p /opt/lib/stac-fastapi && \
+    cd /opt/lib/stac-fastapi && \
+    git init && \
+    git remote add origin https://github.com/stac-utils/stac-fastapi.git && \
+    git fetch origin 256ae3dbc81c6a067f1d18f600d119f62b1bb662 && \
+    git reset --hard FETCH_HEAD && \
+    make pybase-install && \
+    make pgstac-install && \
+    make sqlalchemy-install
+
+
 COPY .isort.cfg /opt/src/.isort.cfg
 COPY pcstac /opt/src/pcstac
 COPY pccommon /opt/src/pccommon

@@ -8,7 +8,13 @@ from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.errors import DEFAULT_STATUS_CODES
-from stac_fastapi.extensions.core import FieldsExtension, QueryExtension, SortExtension
+from stac_fastapi.api.models import create_get_request_model, create_post_request_model
+from stac_fastapi.extensions.core import (
+    FieldsExtension,
+    QueryExtension,
+    SortExtension,
+    TokenPaginationExtension,
+)
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from starlette.middleware.cors import CORSMiddleware
@@ -22,7 +28,7 @@ from pcstac.client import PCClient
 from pcstac.config import API_DESCRIPTION, API_TITLE, API_VERSION, get_settings
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
 from pcstac.middleware import trace_request
-from pcstac.search import PCItemCollectionUri, PCSearch, PCSearchGetRequest
+from pcstac.search import PCSearch
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 
@@ -40,7 +46,12 @@ logger.info(f"INCLUDE_TRANSACTIONS: {INCLUDE_TRANSACTIONS}")
 POOL_SIZE = int(os.environ.get("POOL_SIZE", "1"))
 logger.info(f"POOL_SIZE: {POOL_SIZE}")
 
-extensions = [QueryExtension(), SortExtension(), FieldsExtension()]
+extensions = [
+    QueryExtension(),
+    SortExtension(),
+    FieldsExtension(),
+    TokenPaginationExtension(),
+]
 
 # Planetary Computer conformance classes differ from the default
 # stac-fastapi case so they are manually specified
@@ -73,9 +84,10 @@ api = PCStacApi(
     client=PCClient.create(extra_conformance_classes=extra_conformance_classes),
     extensions=extensions,
     app=FastAPI(root_path=APP_ROOT_PATH, default_response_class=ORJSONResponse),
-    search_request_model=PCSearch,
-    search_get_request=PCSearchGetRequest,
-    item_collection_uri=PCItemCollectionUri,
+    search_get_request_model=create_get_request_model(extensions),
+    search_post_request_model=create_post_request_model(
+        extensions, base_model=PCSearch
+    ),
     response_class=ORJSONResponse,
     exceptions={**DEFAULT_STATUS_CODES, **PC_DEFAULT_STATUS_CODES},
 )

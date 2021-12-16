@@ -2,7 +2,7 @@ from typing import Optional
 
 import attr
 from pydantic.types import conint
-from stac_fastapi.api.models import ItemCollectionUri, SearchGetRequest
+from stac_fastapi.api.models import ItemCollectionUri, BaseSearchGetRequest
 from stac_fastapi.pgstac.types.search import PgstacSearch
 
 DEFAULT_LIMIT = 250
@@ -20,5 +20,5 @@ class PCItemCollectionUri(ItemCollectionUri):
 
 
 @attr.s
-class PCSearchGetRequest(SearchGetRequest):
+class PCSearchGetRequest(BaseSearchGetRequest):
     limit: Optional[int] = attr.ib(default=DEFAULT_LIMIT)  # type:ignore
