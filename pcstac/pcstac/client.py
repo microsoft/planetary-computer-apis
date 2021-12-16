@@ -101,7 +101,9 @@ class PCClient(CoreCrudClient):
             collections_endpoint_cache["/collections"] = collections
             return collections
 
-    async def get_collection(self, collection_id: str, **kwargs: Dict[str, Any]) -> Collection:
+    async def get_collection(
+        self, collection_id: str, **kwargs: Dict[str, Any]
+    ) -> Collection:
         """Get collection by id and inject PQE links.
         Called with `GET /collections/{collection_id}`.
 
