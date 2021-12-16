@@ -101,15 +101,15 @@ class PCClient(CoreCrudClient):
             collections_endpoint_cache["/collections"] = collections
             return collections
 
-    async def get_collection(self, id: str, **kwargs: Dict[str, Any]) -> Collection:
+    async def get_collection(self, collection_id: str, **kwargs: Dict[str, Any]) -> Collection:
         """Get collection by id and inject PQE links.
-        Called with `GET /collections/{collectionId}`.
+        Called with `GET /collections/{collection_id}`.
 
         In the Planetary Computer, this method has been modified to inject
         links which facilitate users to accessing rendered assets and
         associated metadata.
         Args:
-            id: Id of the collection.
+            collection_id: Id of the collection.
         Returns:
             Collection.
         """
@@ -117,21 +117,21 @@ class PCClient(CoreCrudClient):
             "Single collection requested",
             extra={
                 "custom_dimensions": {
-                    "container": id,
+                    "container": collection_id,
                 }
             },
         )
         try:
-            render_config = COLLECTION_RENDER_CONFIG.get(id)
+            render_config = COLLECTION_RENDER_CONFIG.get(collection_id)
 
             # If there's a configuration and it's set to hidden,
             # pretend we never found it.
             if render_config and render_config.hidden:
                 raise NotFoundError
 
-            result = await super().get_collection(id, **kwargs)
+            result = await super().get_collection(collection_id, **kwargs)
         except NotFoundError:
-            raise NotFoundError(f"No collection with id '{id}' found!")
+            raise NotFoundError(f"No collection with id '{collection_id}' found!")
         return self.inject_collection_links(result)
 
     async def _search_base(
