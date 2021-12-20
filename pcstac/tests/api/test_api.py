@@ -1,9 +1,9 @@
 STAC_CORE_ROUTES = [
     "GET /",
     "GET /collections",
-    "GET /collections/{collectionId}",
-    "GET /collections/{collectionId}/items",
-    "GET /collections/{collectionId}/items/{itemId}",
+    "GET /collections/{collection_id}",
+    "GET /collections/{collection_id}/items",
+    "GET /collections/{collection_id}/items/{item_id}",
     "GET /conformance",
     "GET /search",
     "POST /search",

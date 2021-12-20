@@ -4,7 +4,6 @@ from urllib.parse import urljoin
 
 import attr
 from stac_fastapi.pgstac.core import CoreCrudClient
-from stac_fastapi.pgstac.types.search import PgstacSearch
 from stac_fastapi.types.errors import NotFoundError
 from stac_fastapi.types.stac import (
     Collection,
@@ -31,7 +30,6 @@ class PCClient(CoreCrudClient):
     """Client for core endpoints defined by stac."""
 
     extra_conformance_classes: List[str] = attr.ib(factory=list)
-    search_request_model: Type[PgstacSearch] = attr.ib(init=False, default=PgstacSearch)
 
     def conformance_classes(self) -> List[str]:
         """Generate conformance classes list."""
@@ -160,40 +158,17 @@ class PCClient(CoreCrudClient):
             }
         )
 
-    # Override to add fix from https://github.com/stac-utils/stac-fastapi/pull/270
-    # TODO: Remove once released (stac-fastapi >2.1.1)
-    async def get_item(
-        self, item_id: str, collection_id: str, **kwargs: Dict[str, Any]
-    ) -> Item:
-        """Get item by id.
-
-        Called with `GET /collections/{collectionId}/items/{itemId}`.
-
-        Args:
-            id: Id of the item.
-
-        Returns:
-            Item.
-        """
-        # If collection does not exist, NotFoundError wil be raised
-        await self.get_collection(collection_id, **kwargs)
-
-        req = PCSearch(ids=[item_id], collections=[collection_id], limit=1)
-        item_collection = await self._search_base(req, **kwargs)
-        if not item_collection["features"]:
-            raise NotFoundError(
-                f"Item {item_id} in Collection {collection_id} does not exist."
-            )
-
-        return Item(**item_collection["features"][0])
-
     async def landing_page(self, **kwargs: Dict[str, Any]) -> LandingPage:
         landing = await super().landing_page(**kwargs)
         landing["type"] = "Catalog"
         return landing
 
     @classmethod
-    def create(cls, extra_conformance_classes: List[str] = []) -> "PCClient":
+    def create(
+        cls,
+        post_request_model: Type[PCSearch],
+        extra_conformance_classes: List[str] = [],
+    ) -> "PCClient":
         # MyPy is apparently confused by the inheritance here;
         # ignore 'unexpected keyword'
         it = cls(  # type: ignore
@@ -201,5 +176,6 @@ class PCClient(CoreCrudClient):
             title=API_TITLE,
             description=API_DESCRIPTION,
             extra_conformance_classes=extra_conformance_classes,
+            post_request_model=post_request_model,
         )
         return it

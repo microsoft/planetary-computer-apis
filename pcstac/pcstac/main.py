@@ -10,7 +10,9 @@ from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.errors import DEFAULT_STATUS_CODES
 from stac_fastapi.api.models import create_get_request_model, create_post_request_model
 from stac_fastapi.extensions.core import (
+    ContextExtension,
     FieldsExtension,
+    FilterExtension,
     QueryExtension,
     SortExtension,
     TokenPaginationExtension,
@@ -50,7 +52,9 @@ extensions = [
     QueryExtension(),
     SortExtension(),
     FieldsExtension(),
+    FilterExtension(),
     TokenPaginationExtension(),
+    ContextExtension(),
 ]
 
 # Planetary Computer conformance classes differ from the default
@@ -76,18 +80,22 @@ collections_conformance_classes: List[str] = [
 
 extra_conformance_classes = cql_conformance_classes + collections_conformance_classes
 
+search_get_request_model = create_get_request_model(extensions)
+search_post_request_model = create_post_request_model(extensions, base_model=PCSearch)
+
 api = PCStacApi(
     title=API_TITLE,
     description=API_DESCRIPTION,
     api_version=API_VERSION,
     settings=Settings(debug=DEBUG),
-    client=PCClient.create(extra_conformance_classes=extra_conformance_classes),
+    client=PCClient.create(
+        post_request_model=search_post_request_model,
+        extra_conformance_classes=extra_conformance_classes,
+    ),
     extensions=extensions,
     app=FastAPI(root_path=APP_ROOT_PATH, default_response_class=ORJSONResponse),
-    search_get_request_model=create_get_request_model(extensions),
-    search_post_request_model=create_post_request_model(
-        extensions, base_model=PCSearch
-    ),
+    search_get_request_model=search_get_request_model,
+    search_post_request_model=search_post_request_model,
     response_class=ORJSONResponse,
     exceptions={**DEFAULT_STATUS_CODES, **PC_DEFAULT_STATUS_CODES},
 )

@@ -10,7 +10,15 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from httpx import AsyncClient
 from pypgstac import pypgstac
-from stac_fastapi.extensions.core import FieldsExtension, QueryExtension, SortExtension
+from stac_fastapi.api.models import create_get_request_model, create_post_request_model
+from stac_fastapi.extensions.core import (
+    ContextExtension,
+    FieldsExtension,
+    FilterExtension,
+    QueryExtension,
+    SortExtension,
+    TokenPaginationExtension,
+)
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 
@@ -52,15 +60,30 @@ async def pqe_pg():
 @pytest.fixture(scope="session")
 def api_client(pqe_pg):
     print("creating client with settings", settings, settings.reader_connection_string)
+    extensions = [
+        QueryExtension(),
+        SortExtension(),
+        FilterExtension(),
+        FieldsExtension(),
+        TokenPaginationExtension(),
+        ContextExtension(),
+    ]
+    search_get_request_model = create_get_request_model(extensions)
+    search_post_request_model = create_post_request_model(
+        extensions, base_model=PCSearch
+    )
     api = PCStacApi(
         title="test title",
         description="test description",
         api_version="1.0.0",
         settings=Settings(debug=True),
-        client=PCClient.create(),
-        extensions=[QueryExtension(), SortExtension(), FieldsExtension()],
+        client=PCClient.create(
+            post_request_model=search_post_request_model,
+        ),
+        extensions=extensions,
         app=FastAPI(default_response_class=ORJSONResponse),
-        search_request_model=PCSearch,
+        search_get_request_model=search_get_request_model,
+        search_post_request_model=search_post_request_model,
     )
 
     return api
