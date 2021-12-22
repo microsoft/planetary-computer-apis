@@ -12,15 +12,8 @@ from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.reader import ItemSTACReader
 
-try:
-    from importlib.resources import files as resources_files  # type: ignore
-except ImportError:
-    # Try backported to PY<39 `importlib_resources`.
-    from importlib_resources import files as resources_files  # type: ignore
 
-
-# templates = Jinja2Templates(directory="/opt/src/templates")
-templates = Jinja2Templates(directory=str(resources_files(__package__) / "templates"))  # type: ignore
+templates = Jinja2Templates(directory="/opt/src/templates")
 
 
 def ItemPathParams(
