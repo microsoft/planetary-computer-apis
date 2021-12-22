@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import attr
 import morecantile
@@ -9,19 +9,15 @@ from cachetools.keys import hashkey
 from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
 from geojson_pydantic import Point, Polygon
-from morecantile import TileMatrixSet
-from psycopg2.pool import ThreadedConnectionPool
-from rio_tiler.constants import WEB_MERCATOR_TMS
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
-from rio_tiler.io.base import BaseReader, MultiBaseReader
-from rio_tiler.io.stac import COGReader, STACReader
+from rio_tiler.io.base import BaseReader
+from rio_tiler.io.stac import STACReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
-from titiler.pgstac.mosaic import PGSTACBackend
+from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
 
 from pccommon.render import COLLECTION_RENDER_CONFIG, BlobCDN
-from pctiler.db import Connection, with_retry_connection
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
 cache_config = CacheSettings()
@@ -29,6 +25,8 @@ cache_config = CacheSettings()
 
 @attr.s
 class ItemSTACReader(STACReader):
+
+    # TODO: remove CustomCOGReader once moved to rasterio 1.3
     reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
 
     def _get_asset_url(self, asset: str) -> str:
@@ -43,8 +41,8 @@ class ItemSTACReader(STACReader):
 
 
 @attr.s
-class MosaicSTACReader(MultiBaseReader):
-    """Simplified STAC Reader.
+class CustomSTACReader(pgstac_mosaic.CustomSTACReader):
+    """Extended version of pgstac_mosaic.CustomSTACReader.
 
     Items should be in form of:
     {
@@ -60,26 +58,6 @@ class MosaicSTACReader(MultiBaseReader):
 
     """
 
-    item: Dict[str, Any] = attr.ib()
-    tms: TileMatrixSet = attr.ib(default=WEB_MERCATOR_TMS)
-    minzoom: int = attr.ib(default=None)
-    maxzoom: int = attr.ib(default=None)
-    collection_id: Optional[str] = attr.ib(default=None)
-    reader: Type[BaseReader] = attr.ib(default=COGReader)
-    reader_options: Dict = attr.ib(factory=dict)
-
-    def __attrs_post_init__(self) -> None:
-        """Set reader spatial infos and list of valid assets."""
-        self.bounds = self.item["bbox"]
-        self.assets = list(self.item["assets"])
-        self.collection_id = self.item.get("collection", None)
-
-        if self.minzoom is None:
-            self.minzoom = self.tms.minzoom
-
-        if self.maxzoom is None:
-            self.maxzoom = self.tms.maxzoom
-
     def _get_asset_url(self, asset: str) -> str:
         """Validate asset names and return asset's url.
 
@@ -93,10 +71,11 @@ class MosaicSTACReader(MultiBaseReader):
         if asset not in self.assets:
             raise InvalidAssetName(f"{asset} is not valid")
 
-        asset_url = BlobCDN.transform_if_available(self.item["assets"][asset]["href"])
+        asset_url = BlobCDN.transform_if_available(self.input["assets"][asset]["href"])
 
-        if self.collection_id:
-            render_config = COLLECTION_RENDER_CONFIG.get(self.collection_id)
+        collection = self.input.get("collection", None)
+        if collection:
+            render_config = COLLECTION_RENDER_CONFIG.get(collection)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
@@ -104,10 +83,10 @@ class MosaicSTACReader(MultiBaseReader):
 
 
 @attr.s
-class CustomPGSTACBackend(PGSTACBackend):
+class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
     """PgSTAC Mosaic Backend."""
 
-    reader: Type[MosaicSTACReader] = attr.ib(init=False, default=MosaicSTACReader)
+    reader: Type[CustomSTACReader] = attr.ib(init=False, default=CustomSTACReader)
 
     # Override from PGSTACBackend to use collection
     def assets_for_tile(
@@ -124,6 +103,7 @@ class CustomPGSTACBackend(PGSTACBackend):
         render_config = COLLECTION_RENDER_CONFIG.get(collection)
         if render_config and render_config.minzoom and render_config.minzoom > z:
             return []
+
         bbox = self.tms.bounds(morecantile.Tile(x, y, z))
         return self.get_assets(Polygon.from_bounds(*bbox), **kwargs)
 
@@ -152,13 +132,13 @@ class CustomPGSTACBackend(PGSTACBackend):
         exitwhenfull = True if exitwhenfull is None else exitwhenfull
         skipcovered = True if skipcovered is None else skipcovered
 
-        def fetch_features(conn: Connection) -> Dict[str, Any]:
+        with self.pool.connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
                     "SELECT * FROM geojsonsearch(%s, %s, %s, %s, %s, %s, %s, %s);",
                     (
                         geom.json(exclude_none=True),
-                        self.path,
+                        self.input,
                         json.dumps(fields),
                         scan_limit,
                         items_limit,
@@ -167,11 +147,8 @@ class CustomPGSTACBackend(PGSTACBackend):
                         skipcovered,
                     ),
                 )
-                return cursor.fetchone()[0]
+                resp = cursor.fetchone()[0]
 
-        resp = with_retry_connection(
-            cast(ThreadedConnectionPool, self.pool), fetch_features
-        )
         return resp.get("features", [])
 
     # override from PGSTACBackend to pass through collection
@@ -181,6 +158,7 @@ class CustomPGSTACBackend(PGSTACBackend):
         tile_y: int,
         tile_z: int,
         reverse: bool = False,
+        collection: Optional[str] = None,
         scan_limit: Optional[int] = None,
         items_limit: Optional[int] = None,
         time_limit: Optional[int] = None,
@@ -189,19 +167,16 @@ class CustomPGSTACBackend(PGSTACBackend):
         **kwargs: Any,
     ) -> Tuple[ImageData, List[str]]:
         """Get Tile from multiple observation."""
-
-        collection = kwargs.pop("collection", None)
-
         mosaic_assets = self.assets_for_tile(
             tile_x,
             tile_y,
             tile_z,
+            collection=collection,
             scan_limit=scan_limit,
             items_limit=items_limit,
             time_limit=time_limit,
             exitwhenfull=exitwhenfull,
             skipcovered=skipcovered,
-            collection=collection,
         )
 
         if not mosaic_assets:
@@ -215,7 +190,7 @@ class CustomPGSTACBackend(PGSTACBackend):
         def _reader(
             item: Dict[str, Any], x: int, y: int, z: int, **kwargs: Any
         ) -> ImageData:
-            with self.reader(item, **self.reader_options) as src_dst:
+            with self.reader(item, tms=self.tms, **self.reader_options) as src_dst:
                 return src_dst.tile(x, y, z, **kwargs)
 
         return mosaic_reader(
