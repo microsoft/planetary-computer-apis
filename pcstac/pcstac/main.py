@@ -25,11 +25,11 @@ from starlette.responses import PlainTextResponse
 from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import handle_exceptions
 from pccommon.openapi import fixup_schema
+from pccommon.tracing import trace_request
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import API_DESCRIPTION, API_TITLE, API_VERSION, get_settings
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.middleware import trace_request
 from pcstac.search import PCSearch
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
@@ -121,7 +121,7 @@ async def _handle_exceptions(
 async def _trace_request(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await trace_request(request, call_next)
+    return await trace_request(ServiceName.STAC, request, call_next)
 
 
 @app.on_event("startup")

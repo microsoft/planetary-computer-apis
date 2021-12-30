@@ -20,10 +20,10 @@ from titiler.core.errors import DEFAULT_STATUS_CODES, add_exception_handlers
 from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import handle_exceptions
 from pccommon.openapi import fixup_schema
+from pccommon.tracing import trace_request
 from pctiler.config import get_settings
 from pctiler.db import close_db_connection, connect_to_db
-from pctiler.endpoints import item, legend, pg_mosaic, health
-from pctiler.middleware import trace_request
+from pctiler.endpoints import health, item, legend, pg_mosaic
 
 # Initialize logging
 init_logging(ServiceName.TILER)
@@ -65,7 +65,7 @@ app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 async def _trace_requests(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await trace_request(request, call_next)
+    return await trace_request(ServiceName.TILER, request, call_next)
 
 
 @app.middleware("http")
