@@ -56,13 +56,27 @@ def _collection_item_from_request(
         return (collection_id, item_id)
 
 
+def _should_trace_request(request: Request) -> bool:
+    """
+    Determine if we should trace a request.
+        - Not a HEAD request
+        - Not a health check endpoint
+    """
+    return (
+        isTraceEnabled
+        and request.method.lower() != "head"
+        and not request.url.path.strip("/").endswith("_mgmt/ping")
+    )
+
+
 async def trace_request(
     service_name: str,
     request: Request,
     call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
+    """Construct a request trace with custom dimensions"""
     request_path = request_to_path(request).strip("/")
-    if isTraceEnabled and request.method.lower() != "head":
+    if _should_trace_request(request):
         tracer = Tracer(
             exporter=exporter,
             sampler=ProbabilitySampler(1.0),
