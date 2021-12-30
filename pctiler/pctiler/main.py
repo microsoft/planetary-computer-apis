@@ -17,7 +17,7 @@ from titiler.application.middleware import (
 )
 from titiler.core.errors import DEFAULT_STATUS_CODES, add_exception_handlers
 
-from pccommon.logging import init_logging
+from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import handle_exceptions
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
@@ -26,7 +26,7 @@ from pctiler.endpoints import item, legend, pg_mosaic, health
 from pctiler.middleware import trace_request
 
 # Initialize logging
-init_logging("tiler")
+init_logging(ServiceName.TILER)
 logger = logging.getLogger(__name__)
 
 # Get the root path if set in the environment
@@ -72,7 +72,7 @@ async def _trace_requests(
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await handle_exceptions(request, call_next)
+    return await handle_exceptions(ServiceName.TILER, request, call_next)
 
 
 add_exception_handlers(

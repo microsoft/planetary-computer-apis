@@ -22,7 +22,7 @@ from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
-from pccommon.logging import init_logging
+from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import handle_exceptions
 from pccommon.openapi import fixup_schema
 from pcstac.api import PCStacApi
@@ -35,7 +35,7 @@ from pcstac.search import PCSearch
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 
 # Initialize logging
-init_logging("stac")
+init_logging(ServiceName.STAC)
 logger = logging.getLogger(__name__)
 
 # Get the root path if set in the environment
@@ -114,7 +114,7 @@ app.add_middleware(
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await handle_exceptions(request, call_next)
+    return await handle_exceptions(ServiceName.STAC, request, call_next)
 
 
 @app.middleware("http")

@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 async def handle_exceptions(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    service_name: str,
+    request: Request,
+    call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
     try:
         return await call_next(request)
@@ -25,7 +27,7 @@ async def handle_exceptions(
                     HTTP_URL: str(request.url),
                     HTTP_METHOD: str(request.method),
                     HTTP_PATH: request_to_path(request),
-                    "service": "tiler",
+                    "service": service_name,
                 }
             },
         )

@@ -6,7 +6,7 @@ from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
 
-from pccommon.logging import request_to_path
+from pccommon.logging import ServiceName, request_to_path
 from pccommon.tracing import (
     HTTP_METHOD,
     HTTP_PATH,
@@ -54,7 +54,7 @@ async def trace_request(
                 attribute_key=HTTP_METHOD, attribute_value=str(request.method)
             )
             tracer.add_attribute_to_current_span(
-                attribute_key="service", attribute_value="tiler"
+                attribute_key="service", attribute_value=ServiceName.TILER
             )
             tracer.add_attribute_to_current_span(
                 attribute_key="in-server", attribute_value="true"
