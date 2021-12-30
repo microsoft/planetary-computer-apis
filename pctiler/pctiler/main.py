@@ -22,7 +22,7 @@ from pccommon.middleware import handle_exceptions
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.db import close_db_connection, connect_to_db
-from pctiler.endpoints import item, legend, pg_mosaic
+from pctiler.endpoints import item, legend, pg_mosaic, health
 from pctiler.middleware import trace_request
 
 # Initialize logging
@@ -57,6 +57,8 @@ app.include_router(
     prefix=get_settings().legend_endpoint_prefix,
     tags=["Legend endpoints"],
 )
+
+app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 
 
 @app.middleware("http")
