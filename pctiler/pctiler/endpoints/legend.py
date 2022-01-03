@@ -106,7 +106,7 @@ def make_colormap(name: str, trim_start: int, length: int) -> ListedColormap:
     if len(cm) > 256 or max(cm) >= 256:
         raise Exception("Cannot make a colormap for discrete colormap")
 
-    colors = make_lut(registered_cmaps.get(name))
+    colors = make_lut(cm)
 
     colors = colors[trim_start : length + 1]
     # rescale to 0-1

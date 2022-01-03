@@ -9,12 +9,13 @@ from cachetools.keys import hashkey
 from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
 from geojson_pydantic import Point, Polygon
+from rio_tiler.constants import WEB_MERCATOR_TMS, WGS84_CRS
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
-from rio_tiler.io.base import BaseReader
+from rio_tiler.io.base import BaseReader, MultiBaseReader
+from rio_tiler.io.cogeo import COGReader
 from rio_tiler.io.stac import STACReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
-from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
 
 from pccommon.render import COLLECTION_RENDER_CONFIG, BlobCDN
@@ -41,8 +42,8 @@ class ItemSTACReader(STACReader):
 
 
 @attr.s
-class CustomSTACReader(pgstac_mosaic.CustomSTACReader):
-    """Extended version of pgstac_mosaic.CustomSTACReader.
+class CustomSTACReader(MultiBaseReader):
+    """Simplified STAC Reader.
 
     Items should be in form of:
     {
@@ -57,6 +58,27 @@ class CustomSTACReader(pgstac_mosaic.CustomSTACReader):
     }
 
     """
+    input: Dict[str, Any] = attr.ib()
+    tms: morecantile.TileMatrixSet = attr.ib(default=WEB_MERCATOR_TMS)
+    reader_options: Dict = attr.ib(factory=dict)
+
+    reader: Type[BaseReader] = attr.ib(default=COGReader)
+
+    minzoom: int = attr.ib(default=None)
+    maxzoom: int = attr.ib(default=None)
+
+    def __attrs_post_init__(self) -> None:
+        """Set reader spatial infos and list of valid assets."""
+        self.bounds = self.input["bbox"]
+        self.crs = WGS84_CRS  # Per specification STAC items are in WGS84
+
+        self.assets = list(self.input["assets"])
+
+        if self.minzoom is None:
+            self.minzoom = self.tms.minzoom
+
+        if self.maxzoom is None:
+            self.maxzoom = self.tms.maxzoom
 
     def _get_asset_url(self, asset: str) -> str:
         """Validate asset names and return asset's url.
