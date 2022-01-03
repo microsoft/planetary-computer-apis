@@ -1,6 +1,7 @@
+import json
 import logging
 import re
-from typing import Awaitable, Callable, Optional, Tuple
+from typing import Awaitable, Callable, List, Optional, Tuple, Union
 
 from fastapi import Request, Response
 from opencensus.ext.azure.trace_exporter import AzureExporter
@@ -10,7 +11,7 @@ from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
 
 from pccommon.config import CommonConfig
-from pccommon.logging import request_to_path
+from pccommon.logging import ServiceName, request_to_path
 
 config = CommonConfig.from_environment()
 logger = logging.getLogger(__name__)
@@ -34,41 +35,6 @@ exporter = (
 isTraceEnabled = exporter is not None
 
 
-collection_id_re = re.compile(
-    r".*/collections/?(?P<collection_id>[a-zA-Z0-9\-\%]+)?(/items/(?P<item_id>.*))?.*"  # noqa
-)
-
-
-def _collection_item_from_request(
-    request: Request,
-) -> Tuple[Optional[str], Optional[str]]:
-    """Attempt to get collection and item ids from the request path or querystring."""
-    collection_id_match = collection_id_re.match(f"{request.url}")
-    if collection_id_match:
-        collection_id = collection_id_match.group("collection_id")
-        item_id = collection_id_match.group("item_id")
-        return (collection_id, item_id)
-    else:
-        collection_id = request.query_params.get("collection")
-        # Some endpoints, like preview/, take an `items`` parameter, but
-        # conventionally it is a single item id
-        item_id = request.query_params.get("item") or request.query_params.get("items")
-        return (collection_id, item_id)
-
-
-def _should_trace_request(request: Request) -> bool:
-    """
-    Determine if we should trace a request.
-        - Not a HEAD request
-        - Not a health check endpoint
-    """
-    return (
-        isTraceEnabled
-        and request.method.lower() != "head"
-        and not request.url.path.strip("/").endswith("_mgmt/ping")
-    )
-
-
 async def trace_request(
     service_name: str,
     request: Request,
@@ -82,7 +48,9 @@ async def trace_request(
             sampler=ProbabilitySampler(1.0),
         )
         with tracer.span("main") as span:
-            (collection_id, item_id) = _collection_item_from_request(request)
+            (collection_id, item_id) = await _collection_item_from_request(
+                service_name, request
+            )
             span.span_kind = SpanKind.SERVER
 
             # Throwing the main span into request state lets us create child spans
@@ -122,3 +90,142 @@ async def trace_request(
         return response
     else:
         return await call_next(request)
+
+
+collection_id_re = re.compile(
+    r".*/collections/?(?P<collection_id>[a-zA-Z0-9\-\%]+)?(/items/(?P<item_id>.*))?.*"  # noqa
+)
+
+
+async def _collection_item_from_request(
+    service_name: str,
+    request: Request,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Attempt to get collection and item ids from the request path or querystring."""
+    url = request.url
+
+    try:
+        collection_id_match = collection_id_re.match(f"{url}")
+        if collection_id_match:
+            collection_id = collection_id_match.group("collection_id")
+            item_id = collection_id_match.group("item_id")
+            return (collection_id, item_id)
+        elif service_name == ServiceName.STAC and url.path.strip("/").endswith(
+            "/search"
+        ):
+            return await _parse_collection_from_search(request)
+        else:
+            collection_id = request.query_params.get("collection")
+            # Some endpoints, like preview/, take an `items` parameter, but
+            # conventionally it is a single item id
+            item_id = request.query_params.get("item") or request.query_params.get(
+                "items"
+            )
+            return (collection_id, item_id)
+    except Exception as e:
+        logger.exception(e)
+        return (None, None)
+
+
+def _should_trace_request(request: Request) -> bool:
+    """
+    Determine if we should trace a request.
+        - Not a HEAD request
+        - Not a health check endpoint
+    """
+    return (
+        isTraceEnabled
+        and request.method.lower() != "head"
+        and not request.url.path.strip("/").endswith("_mgmt/ping")
+    )
+
+
+async def _parse_collection_from_search(
+    request: Request,
+) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Parse the collection id from a search request.
+
+    The search endpoint is a bit of a special case. If it's a GET, the collection
+    and item ids are in the querystring. If it's a POST, the collection and item may
+    be in either a CQL-JSON or CQL2-JSON filter body, or a query/stac-ql body.
+    """
+
+    if request.method.lower() == "get":
+        collection_id = request.query_params.get("collections")
+        item_id = request.query_params.get("ids")
+        return (collection_id, item_id)
+    elif request.method.lower() == "post":
+        try:
+            body = await request.json()
+            if "collections" in body:
+                return _parse_queryjson(body)
+            elif "filter" in body:
+                return _parse_cqljson(body["filter"])
+        except json.JSONDecodeError:
+            logger.warning(
+                "Unable to parse search body as JSON. Ignoring collection parameter."
+            )
+    return (None, None)
+
+
+def _parse_cqljson(cql: dict) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Parse the collection id from a CQL-JSON filter.
+
+    The CQL-JSON filter is a bit of a special case. It's a JSON object in either
+    CQL or CQL2 syntax. Parse the object and look for the collection and item
+    ids. If multiple collections or items are found, format them to a CSV.
+    """
+    collections = _iter_cql(cql, property_name="collection")
+    ids = _iter_cql(cql, property_name="id")
+
+    if isinstance(collections, list):
+        collections = ",".join(collections)
+    if isinstance(ids, list):
+        ids = ",".join(ids)
+
+    return (collections, ids)
+
+
+def _parse_queryjson(query: dict) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Parse the collection and item ids from a traditional STAC API Item Search body.
+
+    The query is a JSON object with relevant keys, "collections" and "ids".
+    """
+    collection_ids = query.get("collections")
+    item_ids = query.get("ids")
+
+    # Collection and ids are List[str] per the spec, but the client may allow just a single item
+    if isinstance(collection_ids, list):
+        collection_ids = ",".join(collection_ids)
+    if isinstance(item_ids, list):
+        item_ids = ",".join(item_ids)
+
+    return (collection_ids, item_ids)
+
+
+def _iter_cql(cql: dict, property_name: str) -> Optional[Union[str, List[str]]]:
+    """
+    Recurse through a CQL or CQL2 filter body, returning the value of the
+    provided property name, if found. Typical usage will be to provide
+    `collection` and `id`.
+    """
+    for _, v in cql.items():
+        if isinstance(v, dict):
+            result = _iter_cql(v, property_name)
+            if result is not None:
+                return result
+        elif isinstance(v, list):
+            for item in v:
+                if isinstance(item, dict):
+                    if "property" in item:
+                        if item["property"] == property_name:
+                            return v[1]
+                    else:
+                        result = _iter_cql(item, property_name)
+                        if result is not None:
+                            return result
+    # No collection was found
+    return None
