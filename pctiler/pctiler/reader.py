@@ -59,6 +59,7 @@ class CustomSTACReader(MultiBaseReader):
     }
 
     """
+
     input: Dict[str, Any] = attr.ib()
     tms: morecantile.TileMatrixSet = attr.ib(default=WEB_MERCATOR_TMS)
     reader_options: Dict = attr.ib(factory=dict)
