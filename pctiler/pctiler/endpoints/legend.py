@@ -99,7 +99,7 @@ def make_colormap(name: str, trim_start: int, length: int) -> ListedColormap:
     cm = registered_cmaps.get(name)
 
     # Make sure we can use `make_lut`
-    # see: https://github.com/cogeotiff/rio-tiler/blob/master/rio_tiler/colormap.py#L98-L108
+    # see: https://github.com/cogeotiff/rio-tiler/blob/master/rio_tiler/colormap.py#L98-L108  # noqa
     if isinstance(cm, Sequence):
         raise Exception("Cannot make a colormap from Intervals colormap")
 
