@@ -204,7 +204,7 @@ class CustomCOGReader(COGReader):
             mask,
             bounds=self.dataset.bounds,
             crs=self.dataset.crs,
-            assets=[self.filepath],
+            assets=[self.input],
         )
 
     def preview(
@@ -224,7 +224,7 @@ class CustomCOGReader(COGReader):
             rio_tiler.models.ImageData: ImageData instance with data, mask and input spatial info.
 
         """
-        if "goeseuwest.blob.core.windows.net" in self.filepath:
+        if "goeseuwest.blob.core.windows.net" in self.input:
             return self.preview_goes(indexes, expression, **kwargs)
 
         return super().preview(indexes, expression, **kwargs)

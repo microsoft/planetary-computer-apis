@@ -133,7 +133,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
 
     @cached(
         TTLCache(maxsize=cache_config.maxsize, ttl=cache_config.ttl),
-        key=lambda self, geom, **kwargs: hashkey(self.path, str(geom), **kwargs),
+        key=lambda self, geom, **kwargs: hashkey(self.input, str(geom), **kwargs),
     )
     def get_assets(
         self,
