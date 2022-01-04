@@ -32,7 +32,7 @@ exporter = (
     else None
 )
 
-isTraceEnabled = exporter is not None
+is_trace_enabled = exporter is not None
 
 
 async def trace_request(
@@ -42,6 +42,7 @@ async def trace_request(
 ) -> Response:
     """Construct a request trace with custom dimensions"""
     request_path = request_to_path(request).strip("/")
+
     if _should_trace_request(request):
         tracer = Tracer(
             exporter=exporter,
@@ -134,7 +135,7 @@ def _should_trace_request(request: Request) -> bool:
         - Not a health check endpoint
     """
     return (
-        isTraceEnabled
+        is_trace_enabled
         and request.method.lower() != "head"
         and not request.url.path.strip("/").endswith("_mgmt/ping")
     )
