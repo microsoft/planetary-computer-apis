@@ -16,6 +16,7 @@ from rio_tiler.io.cogeo import COGReader
 from rio_tiler.io.stac import STACReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
+from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
 
 from pccommon.render import COLLECTION_RENDER_CONFIG, BlobCDN
