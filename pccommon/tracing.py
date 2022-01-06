@@ -246,8 +246,7 @@ def get_request_ip(request: Request) -> str:
     """Gets the IP address of the request."""
 
     ip_header = (
-        config.dev_for_ip
-        or request.headers.get(X_AZURE_CLIENTIP)  # set by Front Door
+        request.headers.get(X_AZURE_CLIENTIP)  # set by Front Door
         or request.headers.get(X_ORIGINAL_FORWARDED_FOR)
         or request.headers.get(X_FORWARDED_FOR)
     )
