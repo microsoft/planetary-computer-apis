@@ -22,6 +22,12 @@ HTTP_URL = COMMON_ATTRIBUTES["HTTP_URL"]
 HTTP_STATUS_CODE = COMMON_ATTRIBUTES["HTTP_STATUS_CODE"]
 HTTP_METHOD = COMMON_ATTRIBUTES["HTTP_METHOD"]
 
+# Headers containing information about the requester's
+# IP address. Checked in the order listed here.
+X_AZURE_CLIENTIP = "X-Azure-ClientIP"
+X_ORIGINAL_FORWARDED_FOR = "X-Original-Forwarded-For"
+X_FORWARDED_FOR = "X-Forwarded-For"
+
 exporter = (
     AzureExporter(
         connection_string=(
@@ -61,6 +67,10 @@ async def trace_request(
 
             response = await call_next(request)
 
+            tracer.add_attribute_to_current_span(
+                attribute_key="request_ip",
+                attribute_value=get_request_ip(request),
+            )
             tracer.add_attribute_to_current_span(
                 attribute_key=HTTP_STATUS_CODE, attribute_value=response.status_code
             )
@@ -230,3 +240,17 @@ def _iter_cql(cql: dict, property_name: str) -> Optional[Union[str, List[str]]]:
                             return result
     # No collection was found
     return None
+
+
+def get_request_ip(request: Request) -> str:
+    """Gets the IP address of the request."""
+
+    ip_header = (
+        config.dev_for_ip
+        or request.headers.get(X_AZURE_CLIENTIP)  # set by Front Door
+        or request.headers.get(X_ORIGINAL_FORWARDED_FOR)
+        or request.headers.get(X_FORWARDED_FOR)
+    )
+
+    # If multiple IPs, take the first one
+    return ip_header.split(",")[0]
