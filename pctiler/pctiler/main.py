@@ -3,25 +3,24 @@ import logging
 import os
 from typing import Awaitable, Callable, Dict, List
 
-from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import FastAPI, Request, Response
 from fastapi.openapi.utils import get_openapi
 from morecantile.defaults import tms as defaultTileMatrices
 from morecantile.models import TileMatrixSet
-from starlette import status
 from starlette.middleware.cors import CORSMiddleware
-from titiler.application.middleware import (
+from titiler.core.middleware import (
     CacheControlMiddleware,
     LoggerMiddleware,
     TotalTimeMiddleware,
 )
 from titiler.core.errors import DEFAULT_STATUS_CODES, add_exception_handlers
+from titiler.mosaic.errors import MOSAIC_STATUS_CODES
+from titiler.pgstac.db import close_db_connection, connect_to_db
 
 from pccommon.logging import init_logging
 from pccommon.middleware import handle_exceptions
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
-from pctiler.db import close_db_connection, connect_to_db
 from pctiler.endpoints import item, legend, pg_mosaic
 from pctiler.middleware import trace_request
 
@@ -73,9 +72,8 @@ async def _handle_exceptions(
     return await handle_exceptions(request, call_next)
 
 
-add_exception_handlers(
-    app, {**DEFAULT_STATUS_CODES, NoAssetFoundError: status.HTTP_404_NOT_FOUND}
-)  # type: ignore
+add_exception_handlers(app, DEFAULT_STATUS_CODES)
+add_exception_handlers(app, MOSAIC_STATUS_CODES)
 
 app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
 app.add_middleware(TotalTimeMiddleware)

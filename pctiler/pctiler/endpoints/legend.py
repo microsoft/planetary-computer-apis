@@ -1,3 +1,4 @@
+from typing import Sequence
 from io import BytesIO
 
 import matplotlib.pyplot as plt
@@ -95,7 +96,18 @@ def make_colormap_image(
 
 def make_colormap(name: str, trim_start: int, length: int) -> ListedColormap:
     """Use registered rio-tiler colormaps to create matplotlib colormap"""
-    colors = make_lut(registered_cmaps.get(name))
+    cm = registered_cmaps.get(name)
+
+    # Make sure we can use `make_lut`
+    # see: https://github.com/cogeotiff/rio-tiler/blob/master/rio_tiler/colormap.py#L98-L108  # noqa
+    if isinstance(cm, Sequence):
+        raise Exception("Cannot make a colormap from Intervals colormap")
+
+    if len(cm) > 256 or max(cm) >= 256:
+        raise Exception("Cannot make a colormap for discrete colormap")
+
+    colors = make_lut(cm)
+
     colors = colors[trim_start : length + 1]
     # rescale to 0-1
     return ListedColormap(colors / 256, name=name, N=length)

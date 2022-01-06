@@ -8,6 +8,9 @@ work in certain cases.
 Specifically, the GOES thumbnails would not render correctly
 due to the WarpedVRT not being able to handle errors coming from
 the custom CRS of those COGs.
+
+TODO: Delete once moved to rasterio 1.3 (https://github.com/rasterio/rasterio/pull/2357)
+
 """
 import math
 import warnings
@@ -76,7 +79,6 @@ def goes_thumbnail_read(
 
     if indexes is None:
         indexes = non_alpha_indexes(src_dst)
-        print(indexes)
         if indexes != src_dst.indexes:
             warnings.warn(
                 "Alpha band was removed from the output data array", AlphaBandWarning
@@ -202,7 +204,7 @@ class CustomCOGReader(COGReader):
             mask,
             bounds=self.dataset.bounds,
             crs=self.dataset.crs,
-            assets=[self.filepath],
+            assets=[self.input],
         )
 
     def preview(
@@ -222,7 +224,7 @@ class CustomCOGReader(COGReader):
             rio_tiler.models.ImageData: ImageData instance with data, mask and input spatial info.
 
         """
-        if "goeseuwest.blob.core.windows.net" in self.filepath:
+        if "goeseuwest.blob.core.windows.net" in self.input:
             return self.preview_goes(indexes, expression, **kwargs)
 
         return super().preview(indexes, expression, **kwargs)
