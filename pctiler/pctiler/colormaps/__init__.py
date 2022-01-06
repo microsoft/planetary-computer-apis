@@ -1,8 +1,9 @@
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from fastapi import Query
 from rio_tiler.colormap import cmap
+from rio_tiler.types import ColorMapType
 from titiler.core.dependencies import ColorMapParams
 
 from .jrc import jrc_colormaps
@@ -15,7 +16,7 @@ from .mtbs import mtbs_colormaps
 # if we want documentation on par with the default RenderParams class
 ################################################################################
 registered_cmaps = cmap
-custom_colormaps: Dict[str, Dict[int, List[int]]] = {
+custom_colormaps: Dict[str, ColorMapType] = {
     **jrc_colormaps,
     **lulc_colormaps,
     **mtbs_colormaps,
@@ -32,7 +33,7 @@ PCColorMapNames = Enum(  # type: ignore
 def PCColorMapParams(
     colormap_name: PCColorMapNames = Query(None, description="Colormap name"),
     colormap: str = Query(None, description="JSON encoded custom Colormap"),
-) -> Optional[Dict]:
+) -> Optional[ColorMapType]:
     if colormap_name:
         cm = custom_colormaps.get(colormap_name.value)
         if cm:
