@@ -2,6 +2,7 @@ from typing import Dict, List
 
 lidarclass_colormaps: Dict[str, Dict[int, List[int]]] = {
     "lidar-classification": {
+        0: [211, 211, 211, 255],
         2: [139, 51, 38, 255],
         3: [143, 201, 157, 255],
         4: [5, 159, 43, 255],
@@ -23,9 +24,8 @@ lidarclass_colormaps: Dict[str, Dict[int, List[int]]] = {
         21: [58, 55, 9, 255],
         22: [76, 46, 58, 255],
         23: [20, 76, 38, 255],
-        26: [78, 92, 32, 255]
+        26: [78, 92, 32, 255],
     }
-
 }
 
 lidarreturns_colormaps: Dict[str, Dict[int, List[int]]] = {
@@ -37,9 +37,8 @@ lidarreturns_colormaps: Dict[str, Dict[int, List[int]]] = {
         4: [210, 63, 63, 255],
         5: [84, 218, 138, 255],
         6: [245, 130, 48, 255],
-        7: [51, 141, 75, 255]
+        7: [51, 141, 75, 255],
     }
-
 }
 
 
@@ -52,9 +51,8 @@ lidarhag_colormaps: Dict[str, Dict[float, List[int]]] = {
         5.0: [255, 255, 255, 255],
         8.0: [255, 165, 0, 255],
         16.0: [255, 0, 0, 255],
-        48.0: [255, 255, 255, 255]
+        48.0: [255, 255, 255, 255],
     }
-
 }
 
 lidarintensity_colormaps: Dict[str, Dict[float, List[int]]] = {
@@ -74,13 +72,13 @@ lidarintensity_colormaps: Dict[str, Dict[float, List[int]]] = {
         12: [50, 50, 50, 255],
         13: [33, 33, 33, 255],
         14: [16, 16, 16, 255],
-        15: [0, 0, 0, 255]
+        15: [0, 0, 0, 255],
     }
 }
 
 """
-Standard USGS LiDAR Classification color set (not complete)
-
+Standard USGS LiDAR Classification color set
+0 211 211 211 255 None
 2 139 51 38 255 Ground
 3 143 201 157 255 Low Veg
 4 5 159 43 255 Med Veg
@@ -104,4 +102,3 @@ Standard USGS LiDAR Classification color set (not complete)
 23 20 76 38 255 255 Reserved
 26 78 92 32 255 255 Reserved
 """
-
