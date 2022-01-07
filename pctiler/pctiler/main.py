@@ -8,19 +8,18 @@ from fastapi.openapi.utils import get_openapi
 from morecantile.defaults import tms as defaultTileMatrices
 from morecantile.models import TileMatrixSet
 from starlette.middleware.cors import CORSMiddleware
+from titiler.core.errors import DEFAULT_STATUS_CODES, add_exception_handlers
 from titiler.core.middleware import (
     CacheControlMiddleware,
     LoggerMiddleware,
     TotalTimeMiddleware,
 )
-from titiler.core.errors import DEFAULT_STATUS_CODES, add_exception_handlers
 from titiler.mosaic.errors import MOSAIC_STATUS_CODES
 from titiler.pgstac.db import close_db_connection, connect_to_db
 
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import handle_exceptions
+from pccommon.middleware import RequestTracingMiddleware, handle_exceptions
 from pccommon.openapi import fixup_schema
-from pccommon.tracing import trace_request
 from pctiler.config import get_settings
 from pctiler.endpoints import health, item, legend, pg_mosaic
 
@@ -59,12 +58,7 @@ app.include_router(
 
 app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 
-
-@app.middleware("http")
-async def _trace_requests(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    return await trace_request(ServiceName.TILER, request, call_next)
+app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.TILER)
 
 
 @app.middleware("http")

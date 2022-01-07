@@ -23,9 +23,8 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import handle_exceptions
+from pccommon.middleware import RequestTracingMiddleware, handle_exceptions
 from pccommon.openapi import fixup_schema
-from pccommon.tracing import trace_request
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import API_DESCRIPTION, API_TITLE, API_VERSION, get_settings
@@ -109,19 +108,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.STAC)
+
 
 @app.middleware("http")
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     return await handle_exceptions(ServiceName.STAC, request, call_next)
-
-
-@app.middleware("http")
-async def _trace_request(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    return await trace_request(ServiceName.STAC, request, call_next)
 
 
 @app.on_event("startup")

@@ -114,16 +114,14 @@ async def _collection_item_from_request(
 ) -> Tuple[Optional[str], Optional[str]]:
     """Attempt to get collection and item ids from the request path or querystring."""
     url = request.url
-
+    path = url.path.strip("/")
     try:
         collection_id_match = collection_id_re.match(f"{url}")
         if collection_id_match:
             collection_id = collection_id_match.group("collection_id")
             item_id = collection_id_match.group("item_id")
             return (collection_id, item_id)
-        elif service_name == ServiceName.STAC and url.path.strip("/").endswith(
-            "/search"
-        ):
+        elif path.endswith("/search") or path.endswith("/register"):
             return await _parse_collection_from_search(request)
         else:
             collection_id = request.query_params.get("collection")
@@ -252,4 +250,4 @@ def get_request_ip(request: Request) -> str:
     )
 
     # If multiple IPs, take the first one
-    return ip_header.split(",")[0]
+    return ip_header.split(",")[0] if ip_header else ""
