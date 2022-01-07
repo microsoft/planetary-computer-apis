@@ -31,6 +31,8 @@ services:
       - APP_INSIGHTS_INSTRUMENTATION_KEY
     ports:
       - "8081:8081"
+    volumes:
+      - ./pcstac:/opt/src/pcstac
     depends_on:
       - database
     command: >
@@ -43,6 +45,8 @@ services:
       dockerfile: pctiler/Dockerfile
     ports:
       - "8082:8082"
+    volumes:
+      - ./pctiler:/opt/src/pctiler
     environment:
       - APP_ROOT_PATH=/data
       - APP_HOST=0.0.0.0
