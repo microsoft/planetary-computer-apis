@@ -1,5 +1,5 @@
-from typing import Sequence
 from io import BytesIO
+from typing import Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np

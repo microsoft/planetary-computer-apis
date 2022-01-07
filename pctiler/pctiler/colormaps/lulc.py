@@ -1,6 +1,6 @@
 from typing import Dict
-from rio_tiler.types import ColorMapType
 
+from rio_tiler.types import ColorMapType
 
 lulc_colormaps: Dict[str, ColorMapType] = {
     "ai4g-lulc": {
