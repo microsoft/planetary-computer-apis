@@ -31,24 +31,18 @@ services:
       - APP_INSIGHTS_INSTRUMENTATION_KEY
     ports:
       - "8081:8081"
-    volumes:
-      - ./pccommon:/opt/src/pccommon
-      - ./pcstac:/opt/src/pcstac
     depends_on:
       - database
     command: >
       bash -c "pypgstac pgready && uvicorn pcstac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
   tiler:
     image: pc-apis-tiler
+    platform: linux/amd64
     build:
       context: .
       dockerfile: pctiler/Dockerfile
     ports:
       - "8082:8082"
-    volumes:
-      - ./pctiler:/opt/src/pctiler
-      - ./pctiler/templates:/opt/src/templates
-      - ./pccommon:/opt/src/common
     environment:
       - APP_ROOT_PATH=/data
       - APP_HOST=0.0.0.0

@@ -1,0 +1,4 @@
+include pctiler/templates/*.html
+
+recursive-exclude tests *
+

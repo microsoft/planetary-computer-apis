@@ -9,8 +9,6 @@ FROM python:3.8.7-buster
 # exposure.
 ARG DEVOPS_PAT
 
-EXPOSE 8000
-
 RUN apt-get update && \
     apt-get install -y build-essential libgeos++-dev libproj-dev
 
@@ -18,19 +16,15 @@ ENV CURL_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 
 RUN pip install --upgrade pip setuptools wheel
 
-RUN mkdir -p /opt/src/pctiler
-
-COPY .isort.cfg /opt/src/.isort.cfg
-COPY pctiler/requirements.txt /opt/src/
-COPY pctiler/requirements.txt /opt/src/requirements.txt
-
-RUN pip install -r /opt/src/requirements.txt
-
-ENV PYTHONPATH=/opt/src/pctiler:$PYTHONPATH
-
 WORKDIR /opt/src
 
-COPY pctiler/templates /opt/src/templates
+COPY .isort.cfg .isort.cfg
+COPY pctiler/gunicorn_conf.py gunicorn_conf.py
+
+COPY pctiler pctiler
+COPY pccommon pccommon
+RUN pip install ./pccommon ./pctiler["server"]
+RUN rm -rf pccommon pctiler
 
 # GDAL config
 ENV GDAL_CACHEMAX 200
@@ -46,14 +40,10 @@ ENV VSI_CACHE_SIZE 5000000
 ENV MOSAIC_CONCURRENCY 1
 
 RUN mkdir -p /opt/conf
-COPY pctiler/gunicorn_conf.py /opt/src/pctiler/gunicorn_conf.py
 
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=80
 
-COPY pccommon /opt/src/pccommon
-COPY pctiler/pctiler /opt/src/pctiler/pctiler
-
 # Do not use --preload, because it doesn't work correctly with OpenCensus
 CMD gunicorn pctiler.main:app -k uvicorn.workers.UvicornWorker \
-    -c /opt/src/pctiler/gunicorn_conf.py --bind ${APP_HOST}:${APP_PORT} --log-level info
+    -c gunicorn_conf.py --bind ${APP_HOST}:${APP_PORT} --log-level info
