@@ -1,3 +1,5 @@
 FROM pc-apis-tiler
 
-RUN pip install pytest pytest-asyncio
+COPY requirements-dev.txt /opt/src/requirements-dev.txt
+
+RUN pip install -r /opt/src/requirements-dev.txt

@@ -15,8 +15,6 @@ COPY pccommon pccommon
 RUN pip install ./pccommon ./pcstac["server"]
 RUN rm -rf pcstac pccommon
 
-RUN pip install pypgstac==0.4.0
-
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=81
 

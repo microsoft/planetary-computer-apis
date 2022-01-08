@@ -21,6 +21,7 @@ services:
       - stac
   tiler-dev:
     image: pc-apis-tiler-dev
+    platform: linux/amd64
     build:
       context: .
       dockerfile: pctiler/Dockerfile.dev

@@ -6,7 +6,8 @@ from setuptools import find_packages, setup
 inst_reqs = [
     "orjson==3.5.2",
     "cachetools==4.2.1",
-    # stac_fastapi Installed from source
+
+    # TODO: remove. stac_fastapi Installed from source
     # Including upgrade for pgStac 0.4.0
     # Remove after release >2.2.0
     "stac_fastapi.types @ git+https://github.com/stac-utils/stac-fastapi.git@a1e32cb3d32d3a7f031275296b98309b0c6be1cf#subdirectory=stac_fastapi/types",
@@ -17,9 +18,14 @@ inst_reqs = [
     # "stac-fastapi.api==2.2.0",
     # "stac-fastapi.extensions==2.2.0",
     # "stac-fastapi.pgstac==2.2.0",
+
     "fastapi==0.67.*",
     "pystac==1.*",
     "pccommon",  # Planetary Computer Commons
+
+    # TODO: remove. pypgstac is a `test/dev` dependency but
+    # the way CI is designed we have to install it by default
+    "pypgstac==0.4.0",
 ]
 
 extra_reqs = {
