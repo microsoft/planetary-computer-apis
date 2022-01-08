@@ -162,5 +162,5 @@ def custom_openapi() -> Dict[str, Any]:
         app.openapi_schema = fixup_schema(app.root_path, schema)
         import json
 
-        print(json.dumps(app.openapi_schema["paths"], indent=2))
+        print(json.dumps(app.openapi_schema["paths"], indent=2))  # type: ignore
         return schema
