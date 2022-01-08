@@ -133,7 +133,7 @@ def custom_openapi() -> Dict:
             routes=app.routes,
         )
         app.openapi_schema = fixup_schema(app.root_path, schema)
-    return app.openapi_schema
+    return app.openapi_schema  # type: ignore
 
 
 app.openapi = custom_openapi  # type: ignore
