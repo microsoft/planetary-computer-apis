@@ -32,5 +32,12 @@ to deploy to your subscription:
 - `servicePrincipalId`
 - `servicePrincipalKey`
 
+If you want to deploy local code changes, instead of the published images, be
+sure to set the following environment variables with the correct public Azure
+Container Registry repo where you published your local images:
+
+- `ACR_STAC_REPO`
+- `ACR_TILER_REPO`
+- `IMAGE_TAG`
 
 __Note:__ Remember to bring down your resources after testing with `terraform destroy`!

@@ -12,7 +12,6 @@ from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.reader import ItemSTACReader
 
-
 templates = Jinja2Templates(directory="/opt/src/templates")
 
 

@@ -2,7 +2,7 @@ from typing import Optional
 
 import attr
 from pydantic.types import conint
-from stac_fastapi.api.models import ItemCollectionUri, BaseSearchGetRequest
+from stac_fastapi.api.models import BaseSearchGetRequest, ItemCollectionUri
 from stac_fastapi.pgstac.types.search import PgstacSearch
 
 DEFAULT_LIMIT = 250

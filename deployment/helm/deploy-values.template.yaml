@@ -4,7 +4,7 @@ namespace: "pc"
 stac:
   enabled: true
   image:
-    repository: "mcr.microsoft.com/planetary-computer-apis/stac"
+    repository: "{{ env.ACR_STAC_REPO }}"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -26,7 +26,7 @@ stac:
 tiler:
   enabled: true
   image:
-    repository: "mcr.microsoft.com/planetary-computer-apis/tiler"
+    repository: "{{ env.ACR_TILER_REPO }}"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 

@@ -1,6 +1,6 @@
 from typing import Dict
-from rio_tiler.types import ColorMapType
 
+from rio_tiler.types import ColorMapType
 
 jrc_colormaps: Dict[str, ColorMapType] = {
     "jrc-occurrence": {
