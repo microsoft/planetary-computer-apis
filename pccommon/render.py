@@ -77,6 +77,15 @@ COLLECTION_RENDER_CONFIG = {
         mosaic_preview_coords=[37.2141, -104.2947],
         minzoom=9,
     ),
+    "chloris-biomass": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "chloris-biomass", "rescale": [1, 750000]},
+        has_mosaic=False,
+        mosaic_preview_zoom=2,
+        mosaic_preview_coords=[30.0572, 80.1735],
+        requires_token=True,
+        minzoom=2,
+    ),
     "cop-dem-glo-30": DefaultRenderConfig(
         assets=["data"],
         render_params={"colormap_name": "terrain", "rescale": [-1000, 4000]},
