@@ -20,7 +20,7 @@ RUN mkdir -p /opt/lib/stac-fastapi && \
     cd /opt/lib/stac-fastapi && \
     git init && \
     git remote add origin https://github.com/stac-utils/stac-fastapi.git && \
-    git fetch origin a1e32cb3d32d3a7f031275296b98309b0c6be1cf && \
+    git fetch origin 9ef0d693f54b1b75f92b8f1514aa169202a2d4f1 && \
     git reset --hard FETCH_HEAD && \
     make pybase-install && \
     make pgstac-install && \
