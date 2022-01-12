@@ -82,11 +82,11 @@ spec:
 
           livenessProbe:
             httpGet:
-              path: /
+              path: "/_mgmt/ping"
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: "/_mgmt/ping"
               port: http
           resources:
             {{- toYaml .Values.tiler.deploy.resources | nindent 12 }}

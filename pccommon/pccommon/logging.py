@@ -13,6 +13,11 @@ from opencensus.ext.azure.log_exporter import AzureLogHandler
 from pccommon.config import CommonConfig
 
 
+class ServiceName:
+    STAC = "stac"
+    TILER = "tiler"
+
+
 # Custom filter that outputs custom_dimensions, only if present
 class OptionalCustomDimensionsFilter(logging.Formatter):
     def __init__(

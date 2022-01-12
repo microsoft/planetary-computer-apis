@@ -38,4 +38,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Running unit tests for stac..."
     python -m pytest pcstac/tests
 
+    echo "Running unit tests for common..."
+    python -m pytest pccommon/tests
 fi

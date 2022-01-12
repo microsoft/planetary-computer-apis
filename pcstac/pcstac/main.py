@@ -22,20 +22,19 @@ from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
-from pccommon.logging import init_logging
-from pccommon.middleware import handle_exceptions
+from pccommon.logging import ServiceName, init_logging
+from pccommon.middleware import RequestTracingMiddleware, handle_exceptions
 from pccommon.openapi import fixup_schema
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import API_DESCRIPTION, API_TITLE, API_VERSION, get_settings
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.middleware import trace_request
 from pcstac.search import PCSearch
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 
 # Initialize logging
-init_logging("stac")
+init_logging(ServiceName.STAC)
 logger = logging.getLogger(__name__)
 
 # Get the root path if set in the environment
@@ -109,19 +108,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.STAC)
+
 
 @app.middleware("http")
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await handle_exceptions(request, call_next)
-
-
-@app.middleware("http")
-async def _trace_request(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    return await trace_request(request, call_next)
+    return await handle_exceptions(ServiceName.STAC, request, call_next)
 
 
 @app.on_event("startup")

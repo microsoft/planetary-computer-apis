@@ -6,6 +6,7 @@ from rio_tiler.colormap import cmap
 from rio_tiler.types import ColorMapType
 from titiler.core.dependencies import ColorMapParams
 
+from .chloris import chloris_colormaps
 from .jrc import jrc_colormaps
 from .lulc import lulc_colormaps
 from .mtbs import mtbs_colormaps
@@ -20,6 +21,7 @@ custom_colormaps: Dict[str, ColorMapType] = {
     **jrc_colormaps,
     **lulc_colormaps,
     **mtbs_colormaps,
+    **chloris_colormaps,
 }
 
 for k, v in custom_colormaps.items():
