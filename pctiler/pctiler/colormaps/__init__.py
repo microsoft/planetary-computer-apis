@@ -10,6 +10,7 @@ from .chloris import chloris_colormaps
 from .jrc import jrc_colormaps
 from .lulc import lulc_colormaps
 from .mtbs import mtbs_colormaps
+from .noaa_c_cap import noaa_c_cap_colormaps
 
 ################################################################################
 # Custom ColorMap Query Parameter Support
@@ -22,6 +23,7 @@ custom_colormaps: Dict[str, ColorMapType] = {
     **lulc_colormaps,
     **mtbs_colormaps,
     **chloris_colormaps,
+    **noaa_c_cap_colormaps,
 }
 
 for k, v in custom_colormaps.items():
