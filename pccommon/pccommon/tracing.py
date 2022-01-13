@@ -1,3 +1,9 @@
+import json
+import logging
+import re
+from typing import Awaitable, Callable, List, Optional, Tuple, Union
+
+from fastapi import Request, Response
 from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.trace.attributes_helper import COMMON_ATTRIBUTES
 from opencensus.trace.samplers import ProbabilitySampler
@@ -5,7 +11,7 @@ from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
 
 from pccommon.config import CommonConfig
-from pccommon.logging import ServiceName, request_to_path
+from pccommon.logging import request_to_path
 
 config = CommonConfig.from_environment()
 logger = logging.getLogger(__name__)
@@ -200,7 +206,8 @@ def _parse_queryjson(query: dict) -> Tuple[Optional[str], Optional[str]]:
     collection_ids = query.get("collections")
     item_ids = query.get("ids")
 
-    # Collection and ids are List[str] per the spec, but the client may allow just a single item
+    # Collection and ids are List[str] per the spec,
+    # but the client may allow just a single item
     if isinstance(collection_ids, list):
         collection_ids = ",".join(collection_ids)
     if isinstance(item_ids, list):
