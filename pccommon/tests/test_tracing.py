@@ -1,6 +1,6 @@
 import unittest
 
-from ..tracing import _parse_cqljson
+from pccommon.tracing import _parse_cqljson
 from .data.cql import cql, cql2, cql2_nested, cql2_no_collection, cql_multi
 
 
