@@ -21,4 +21,5 @@ async def load_test_data() -> None:
                 i = orjson.loads(f.read())
                 await load_iterator([i], tables.items, conn, loadopt.upsert)
 
+
 asyncio.run(load_test_data())
