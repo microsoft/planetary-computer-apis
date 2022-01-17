@@ -54,7 +54,7 @@ class PCClient(CoreCrudClient):
             {
                 "rel": "describedby",
                 "href": urljoin(
-                    "https://planetarycomputer.microsoft.com/dataset",
+                    "https://planetarycomputer.microsoft.com/dataset/",
                     collection["id"],
                 ),
                 "title": "Human readable dataset overview and reference",
