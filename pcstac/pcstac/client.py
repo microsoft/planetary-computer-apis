@@ -113,14 +113,6 @@ class PCClient(CoreCrudClient):
         Returns:
             Collection.
         """
-        logger.info(
-            "Single collection requested",
-            extra={
-                "custom_dimensions": {
-                    "container": collection_id,
-                }
-            },
-        )
         try:
             render_config = COLLECTION_RENDER_CONFIG.get(collection_id)
 
