@@ -54,7 +54,7 @@ def map(
     tilejson_params = get_param_str(
         {
             "collection": collection,
-            "items": item,
+            "item": item,
             "assets": ",".join(render_config.assets),
         }
     )
