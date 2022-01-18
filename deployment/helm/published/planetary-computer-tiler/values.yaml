@@ -35,6 +35,7 @@ tiler:
 
   stac_api_url: ""
   stac_api_href: ""
+  pc_sdk_sas_url: ""
 
   host: "0.0.0.0"
   port: "80"

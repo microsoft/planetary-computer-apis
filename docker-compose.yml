@@ -58,7 +58,7 @@ services:
       - FF_VRT="yes"
       - STAC_API_URL=http://stac:8081
       - STAC_API_HREF=http://localhost:8080/stac/
-      - PC_SDK_SAS_URL=https://planetarycomputer.microsoft.com/api/sas/v1/token
+      - PC_SDK_SAS_URL=https://planetarycomputer-staging.microsoft.com/api/sas/v1/token
 
       # titiler.pgstac
       - POSTGRES_USER=username
