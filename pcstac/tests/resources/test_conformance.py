@@ -16,7 +16,9 @@ async def test_landing_page(app_client):
     assert "stac_version" in resp_json
 
     # Make sure OpenAPI docs are linked
-    docs = next(filter(lambda link: link["rel"] == "docs", resp_json["links"]))["href"]
+    docs = next(filter(lambda link: link["rel"] == "service-doc", resp_json["links"]))[
+        "href"
+    ]
     resp = await app_client.get(docs)
     assert resp.status_code == 200
 

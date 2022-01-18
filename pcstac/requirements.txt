@@ -5,14 +5,10 @@ gunicorn==20.1.0
 orjson==3.5.2
 cachetools==4.2.1
 
-# Installed from source in Dockerfile
-# Including upgrade for pgStac 0.4.0
-# Remove after release >2.2.0
-#
-# stac-fastapi.types==2.2.0
-# stac-fastapi.api==2.2.0
-# stac-fastapi.extensions==2.2.0
-# stac-fastapi.pgstac==2.2.0
+stac-fastapi.types==2.3.0
+stac-fastapi.api==2.3.0
+stac-fastapi.extensions==2.3.0
+stac-fastapi.pgstac==2.3.0
 
 packaging==20.8
 fastapi==0.67.*
