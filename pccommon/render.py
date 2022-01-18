@@ -160,6 +160,13 @@ COLLECTION_RENDER_CONFIG = {
         mosaic_preview_coords=[-0.8749, 109.8456],
         minzoom=4,
     ),
+    "io-lulc-9-class": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "io-lulc-9-class"},
+        mosaic_preview_zoom=4,
+        mosaic_preview_coords=[-0.8749, 109.8456],
+        minzoom=4,
+    ),
     "jrc-gsw": DefaultRenderConfig(
         assets=["occurrence"],
         render_params={"colormap_name": "jrc-occurrence", "nodata": 0},
