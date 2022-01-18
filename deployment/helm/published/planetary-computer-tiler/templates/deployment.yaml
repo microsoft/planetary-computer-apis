@@ -77,6 +77,8 @@ spec:
               value: "{{ .Values.tiler.stac_api_url}}"
             - name: STAC_API_HREF
               value: "{{ .Values.tiler.stac_api_href}}"
+            - name: PC_SDK_SAS_URL
+              value: "{{ .Values.tiler.pc_sdk_sas_url}}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
 

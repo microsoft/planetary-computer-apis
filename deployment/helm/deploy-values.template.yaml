@@ -49,6 +49,7 @@ tiler:
 
   stac_api_url: http://planetary-computer-stac.pc.svc.cluster.local
   stac_api_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/stac/
+  pc_sdk_sas_url: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/sas/
 
 metrics:
   instrumentationKey: "{{ tf.instrumentation_key }}"
