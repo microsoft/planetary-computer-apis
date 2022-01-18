@@ -26,6 +26,6 @@ stac_fastapi.pgstac @ git+https://github.com/stac-utils/stac-fastapi.git@d5c9d6c
 pystac==1.*
 
 # TODO: remove, pypgstac is not really needed to run stac-fastapi application
-pypgstac==0.4.0
+pypgstac==0.4.3
 
 # pccommon

@@ -23,7 +23,7 @@ COPY pcstac/gunicorn_conf.py gunicorn_conf.py
 COPY pcstac /opt/src/pcstac
 COPY pccommon /opt/src/pccommon
 # Use --no-deps flag because they were previously installed with requirement.txt
-RUN pip install ./pccommon ./pcstac --no-deps
+RUN pip install -e ./pccommon -e ./pcstac --no-deps
 
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=81
