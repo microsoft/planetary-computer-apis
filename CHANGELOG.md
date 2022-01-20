@@ -22,8 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added endpoints to generate legends from colormap or registered classmaps [#17](https://github.com/microsoft/planetary-computer-apis/pull/17)
 - Configuration for chloris-biomass, nrcan-landcover, noaa-c-cap
 - Configuration for io-lulc-9-class [#34](https://github.com/microsoft/planetary-computer-apis/pull/34)
+- Configuration for gnatsgo [#36](https://github.com/microsoft/planetary-computer-apis/pull/36)
 
 ### Fixed
 
 - Updated search limit constraints to avoid 500s [#15](https://github.com/microsoft/planetary-computer-apis/pull/15)
 - Fixed STAC `describedby` and `preview` links [#33](https://github.com/microsoft/planetary-computer-apis/pull/33)
+- Default search limit restored to 250 [#36](https://github.com/microsoft/planetary-computer-apis/pull/36)
