@@ -24,7 +24,7 @@ from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
-from pcstac.search import PCSearch
+from pcstac.search import PCSearch, PCSearchGetRequest
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
@@ -68,7 +68,9 @@ def api_client(pqe_pg):
         TokenPaginationExtension(),
         ContextExtension(),
     ]
-    search_get_request_model = create_get_request_model(extensions)
+    search_get_request_model = create_get_request_model(
+        extensions, base_model=PCSearchGetRequest
+    )
     search_post_request_model = create_post_request_model(
         extensions, base_model=PCSearch
     )
