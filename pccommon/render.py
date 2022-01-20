@@ -112,7 +112,7 @@ COLLECTION_RENDER_CONFIG = {
     ),
     "gnatsgo-rasters": DefaultRenderConfig(
         create_links=False,
-        assets=["aws0-100"],
+        assets=["aws0_100"],
         render_params={"colormap_name": "cividis"},
         mosaic_preview_zoom=6,
         mosaic_preview_coords=[44.1454, -112.6404],
