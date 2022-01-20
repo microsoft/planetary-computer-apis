@@ -29,3 +29,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated search limit constraints to avoid 500s [#15](https://github.com/microsoft/planetary-computer-apis/pull/15)
 - Fixed STAC `describedby` and `preview` links [#33](https://github.com/microsoft/planetary-computer-apis/pull/33)
 - Default search limit restored to 250 [#36](https://github.com/microsoft/planetary-computer-apis/pull/36)
+- Work around issue with LandPage stac_extensions [#37](https://github.com/microsoft/planetary-computer-apis/pull/37)
