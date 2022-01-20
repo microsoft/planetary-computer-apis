@@ -29,7 +29,7 @@ from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import API_DESCRIPTION, API_TITLE, API_VERSION, get_settings
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.search import PCSearch
+from pcstac.search import PCSearch, PCSearchGetRequest
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 
@@ -79,7 +79,9 @@ collections_conformance_classes: List[str] = [
 
 extra_conformance_classes = cql_conformance_classes + collections_conformance_classes
 
-search_get_request_model = create_get_request_model(extensions)
+search_get_request_model = create_get_request_model(
+    extensions, base_model=PCSearchGetRequest
+)
 search_post_request_model = create_post_request_model(extensions, base_model=PCSearch)
 
 api = PCStacApi(

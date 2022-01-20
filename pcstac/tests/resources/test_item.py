@@ -300,7 +300,7 @@ async def test_item_search_get_query_extension(app_client):
     )
     resp = await app_client.get("/search", params=params)
     resp_json = resp.json()
-    assert len(resp_json["features"]) == 10
+    assert len(resp_json["features"]) == 12
     assert (
         resp_json["features"][0]["properties"]["proj:epsg"]
         == first_item["properties"]["proj:epsg"]
@@ -534,3 +534,29 @@ async def test_search_bbox_errors(app_client):
     params = {"bbox": "100.0,0.0,0.0,105.0"}
     resp = await app_client.get("/search", params=params)
     assert resp.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_items_page_limits(app_client):
+    resp = await app_client.get("/collections/naip/items")
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    assert len(resp_json["features"]) == 10
+
+
+@pytest.mark.asyncio
+async def test_search_get_page_limits(app_client):
+    resp = await app_client.get("/search?collection=naip")
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    assert len(resp_json["features"]) == 12
+
+
+@pytest.mark.asyncio
+async def test_search_post_page_limits(app_client):
+    params = {"op": "=", "args": [{"property": "collection"}, "naip"]}
+
+    resp = await app_client.post("/search", json=params)
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    assert len(resp_json["features"]) == 12
