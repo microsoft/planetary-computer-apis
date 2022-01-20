@@ -7,24 +7,58 @@ if [[ "${CI}" ]]; then
 fi
 
 function usage() {
+    if [[ "${1}" ]]; then
+        echo "${1}"
+    fi
     echo -n \
-        "Usage: $(basename "$0") [--dev, --db, --migrations, --deploy]
+        "Usage: $(basename "$0") [OPTIONS]
 Runs tests for the project.
 
+Options
+    --stac
+        Only test pcstac
+    --tiler
+        Only test pctiler
 "
 }
 
-if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-    docker-compose \
-        -f docker-compose.yml \
-        -f docker-compose.dev.yml \
-        run --rm \
-        tiler-dev scripts/bin/test-tiler
+# Parse args
+while [[ $# -gt 0 ]]; do case $1 in
+    --stac)
+        STAC_ONLY="1"
+        shift
+        ;;
+    --tiler)
+        TILER_ONLY="1"
+        shift
+        ;;
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        exit 1
+        ;;
+    esac done
 
-    docker-compose \
-        -f docker-compose.yml \
-        -f docker-compose.dev.yml \
-        run --rm \
-        stac-dev scripts/bin/test-stac
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    if [ -z ${STAC_ONLY} ]; then
+        docker-compose \
+            -f docker-compose.yml \
+            -f docker-compose.dev.yml \
+            run --rm \
+            tiler-dev scripts/bin/test-tiler
+    fi
+
+    if [ -z ${TILER_ONLY} ]; then
+
+        docker-compose \
+            -f docker-compose.yml \
+            -f docker-compose.dev.yml \
+            run --rm \
+            stac-dev scripts/bin/test-stac
+    fi
 
 fi
