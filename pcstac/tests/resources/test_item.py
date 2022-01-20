@@ -587,3 +587,28 @@ async def test_search_post_page_limits(app_client):
     assert resp.status_code == 200
     resp_json = resp.json()
     assert len(resp_json["features"]) == 12
+
+
+@pytest.mark.asyncio
+async def test_item_search_geometry_collection(app_client):
+    """Test POST search by item id (core)"""
+    ids = ["al_m_3008506_nw_16_060_20191118_20200114"]
+
+    aoi = {
+        "type": "GeometryCollection",
+        "geometries": [
+            {"type": "Point", "coordinates": [-67.67578124999999, 4.390228926463396]},
+            {"type": "Point", "coordinates": [-74.619140625, 4.302591077119676]},
+            {
+                "type": "LineString",
+                "coordinates": [
+                    [-59.765625, 6.227933930268672],
+                    [-63.984375, -2.108898659243126],
+                ],
+            },
+        ],
+    }
+
+    params = {"collections": ["naip"], "intersects": aoi}
+    resp = await app_client.post("/search", json=params)
+    assert resp.status_code == 200

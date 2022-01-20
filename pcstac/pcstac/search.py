@@ -1,6 +1,15 @@
 from typing import List, Optional, Union
 
 import attr
+from geojson_pydantic.geometries import (
+    GeometryCollection,
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
+    Point,
+    Polygon
+)
 from pydantic import validator
 from pydantic.types import conint
 from pystac.utils import str_to_datetime
@@ -14,6 +23,19 @@ class PCSearch(PgstacSearch):
     # Increase the default limit for performance
     # Ignore "Illegal type annotation: call expression not allowed"
     limit: Optional[conint(ge=1, le=1000)] = DEFAULT_LIMIT  # type:ignore
+
+    # Can be removed when https://github.com/stac-utils/stac-fastapi/issues/187 is closed
+    intersects: Optional[
+        Union[
+            Point,
+            MultiPoint,
+            LineString,
+            MultiLineString,
+            Polygon,
+            MultiPolygon,
+            GeometryCollection,
+        ]
+    ]
 
     @validator("datetime")
     def validate_datetime(cls, v: str) -> str:
