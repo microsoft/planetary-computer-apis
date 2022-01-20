@@ -2,7 +2,6 @@ from typing import Dict
 
 from rio_tiler.types import ColorMapType
 
-
 noaa_c_cap_colormaps: Dict[str, ColorMapType] = {
     "c-cap": {
         0: (0, 0, 0, 255),

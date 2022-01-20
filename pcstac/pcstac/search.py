@@ -8,7 +8,7 @@ from geojson_pydantic.geometries import (
     MultiPoint,
     MultiPolygon,
     Point,
-    Polygon
+    Polygon,
 )
 from pydantic import validator
 from pydantic.types import conint
@@ -24,7 +24,8 @@ class PCSearch(PgstacSearch):
     # Ignore "Illegal type annotation: call expression not allowed"
     limit: Optional[conint(ge=1, le=1000)] = DEFAULT_LIMIT  # type:ignore
 
-    # Can be removed when https://github.com/stac-utils/stac-fastapi/issues/187 is closed
+    # Can be removed when
+    # https://github.com/stac-utils/stac-fastapi/issues/187 is closed
     intersects: Optional[
         Union[
             Point,

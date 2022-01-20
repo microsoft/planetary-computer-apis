@@ -1,7 +1,8 @@
 from typing import Any, Dict
-import pytest
 
 import pystac
+import pytest
+
 
 def remove_root(stac_object: Dict[str, Any]) -> None:
     links = []
@@ -9,6 +10,7 @@ def remove_root(stac_object: Dict[str, Any]) -> None:
         if link["rel"] != "root":
             links.append(link)
     stac_object["links"] = links
+
 
 @pytest.mark.asyncio
 async def test_landing_page(app_client):

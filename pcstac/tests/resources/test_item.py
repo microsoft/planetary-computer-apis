@@ -592,8 +592,6 @@ async def test_search_post_page_limits(app_client):
 @pytest.mark.asyncio
 async def test_item_search_geometry_collection(app_client):
     """Test POST search by item id (core)"""
-    ids = ["al_m_3008506_nw_16_060_20191118_20200114"]
-
     aoi = {
         "type": "GeometryCollection",
         "geometries": [
