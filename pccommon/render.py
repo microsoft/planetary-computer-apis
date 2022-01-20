@@ -110,7 +110,7 @@ COLLECTION_RENDER_CONFIG = {
         requires_token=False,
         minzoom=5,
     ),
-    "gnatsgo": DefaultRenderConfig(
+    "gnatsgo-rasters": DefaultRenderConfig(
         create_links=False,
         assets=["aws0-100"],
         render_params={"colormap_name": "cividis"},
