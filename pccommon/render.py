@@ -110,6 +110,15 @@ COLLECTION_RENDER_CONFIG = {
         requires_token=False,
         minzoom=5,
     ),
+    "gnatsgo": DefaultRenderConfig(
+        create_links=False,
+        assets=["aws0-100"],
+        render_params={"colormap_name": "cividis"},
+        mosaic_preview_zoom=6,
+        mosaic_preview_coords=[44.1454, -112.6404],
+        requires_token=True,
+        minzoom=4,
+    ),
     "goes-mcmip": DefaultRenderConfig(
         create_links=True,  # Issues with colormap size, rendering
         assets=["data"],
