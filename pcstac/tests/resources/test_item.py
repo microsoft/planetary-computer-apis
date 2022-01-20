@@ -243,6 +243,33 @@ async def test_item_search_temporal_window_get(app_client):
 
 
 @pytest.mark.asyncio
+async def test_item_search_temporal_window_get_date_only(app_client):
+    """Test GET search with spatio-temporal query (core)"""
+    items_resp = await app_client.get("/collections/naip/items")
+    assert items_resp.status_code == 200
+
+    first_item = items_resp.json()["features"][0]
+    item_date = datetime.strptime(first_item["properties"]["datetime"], DATETIME_RFC339)
+    item_date_before = item_date - timedelta(days=1)
+    item_date_after = item_date + timedelta(days=1)
+
+    params = {
+        "collections": first_item["collection"],
+        "bbox": ",".join([str(coord) for coord in first_item["bbox"]]),
+        "datetime": f"{item_date_before.strftime('%Y-%m-%d')}/"
+        f"{item_date_after.strftime('%Y-%m-%d')}",
+    }
+    resp = await app_client.get("/search", params=params)
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    import json
+
+    print(json.dumps(resp_json, indent=2))
+
+    assert resp_json["features"][0]["id"] == first_item["id"]
+
+
+@pytest.mark.asyncio
 async def test_item_search_post_without_collection(app_client):
     """Test POST search without specifying a collection"""
     items_resp = await app_client.get("/collections/naip/items")
@@ -560,3 +587,26 @@ async def test_search_post_page_limits(app_client):
     assert resp.status_code == 200
     resp_json = resp.json()
     assert len(resp_json["features"]) == 12
+
+
+@pytest.mark.asyncio
+async def test_item_search_geometry_collection(app_client):
+    """Test POST search by item id (core)"""
+    aoi = {
+        "type": "GeometryCollection",
+        "geometries": [
+            {"type": "Point", "coordinates": [-67.67578124999999, 4.390228926463396]},
+            {"type": "Point", "coordinates": [-74.619140625, 4.302591077119676]},
+            {
+                "type": "LineString",
+                "coordinates": [
+                    [-59.765625, 6.227933930268672],
+                    [-63.984375, -2.108898659243126],
+                ],
+            },
+        ],
+    }
+
+    params = {"collections": ["naip"], "intersects": aoi}
+    resp = await app_client.post("/search", json=params)
+    assert resp.status_code == 200

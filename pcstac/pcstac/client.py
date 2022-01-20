@@ -150,9 +150,10 @@ class PCClient(CoreCrudClient):
             }
         )
 
+    # Remove once https://github.com/stac-utils/stac-fastapi/issues/334 is fixed.
     async def landing_page(self, **kwargs: Dict[str, Any]) -> LandingPage:
         landing = await super().landing_page(**kwargs)
-        landing["type"] = "Catalog"
+        del landing["stac_extensions"]
         return landing
 
     @classmethod
