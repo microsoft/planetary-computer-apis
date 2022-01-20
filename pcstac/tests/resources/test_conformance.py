@@ -1,5 +1,14 @@
+from typing import Any, Dict
 import pytest
 
+import pystac
+
+def remove_root(stac_object: Dict[str, Any]) -> None:
+    links = []
+    for link in stac_object["links"]:
+        if link["rel"] != "root":
+            links.append(link)
+    stac_object["links"] = links
 
 @pytest.mark.asyncio
 async def test_landing_page(app_client):
@@ -13,6 +22,10 @@ async def test_landing_page(app_client):
     # }
     # result = set(resp_json)
     # assert result == expected
+
+    remove_root(resp_json)
+    pystac.Catalog.from_dict(resp_json).validate()
+
     assert "stac_version" in resp_json
 
     # Make sure OpenAPI docs are linked
