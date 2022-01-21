@@ -11,7 +11,7 @@ from stac_fastapi.extensions.core import (
 )
 from stac_fastapi.extensions.core.filter.filter import FilterConformanceClasses
 
-API_VERSION = "1.1"
+API_VERSION = "1.2"
 STAC_API_VERSION = "v1.0.0-beta.4"
 
 API_LANDING_PAGE_ID = "microsoft-pc"
@@ -61,7 +61,7 @@ class Settings(BaseSettings):
     tiler_href: str = os.environ.get("TILER_HREF_ENV_VAR", "")
     openapi_url: str = "/openapi.json"
     debug: bool = os.getenv("PQE_DEBUG", "False").lower() == "true"
-    api_version: str = "v1.1"
+    api_version: str = f"v{API_VERSION}"
 
 
 @lru_cache
