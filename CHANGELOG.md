@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [2022.1.1]
+
+### Fixed
+
 - Fixed conformance classes [#39](https://github.com/microsoft/planetary-computer-apis/pull/39)
 - Fixed STAC API version in API documentation [#39](https://github.com/microsoft/planetary-computer-apis/pull/39)
 
