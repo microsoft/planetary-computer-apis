@@ -2,6 +2,14 @@ import os
 from functools import lru_cache
 
 from pydantic import BaseSettings
+from stac_fastapi.extensions.core import (
+    FieldsExtension,
+    FilterExtension,
+    QueryExtension,
+    SortExtension,
+    TokenPaginationExtension,
+)
+from stac_fastapi.extensions.core.filter.filter import FilterConformanceClasses
 
 API_VERSION = "1.1"
 
@@ -11,16 +19,25 @@ API_DESCRIPTION = (
     "Searchable spatiotemporal metadata describing Earth science datasets "
     "hosted by the Microsoft Planetary Computer"
 )
-API_CONFORMANCE_CLASSES = [
-    "https://api.stacspec.org/v1.0.0-beta.3/core",
-    "https://api.stacspec.org/v1.0.0-beta.3/item-search",
-    "https://api.stacspec.org/v1.0.0-beta.3/item-search#query",
-    "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core",
-    "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/oas30",
-    "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/geojson",
-]
 
 TILER_HREF_ENV_VAR = "TILER_HREF"
+
+EXTENSIONS = [
+    # STAC API Extensions
+    QueryExtension(),
+    SortExtension(),
+    FieldsExtension(),
+    FilterExtension(
+        conformance_classes=[
+            FilterConformanceClasses.FILTER,
+            FilterConformanceClasses.ITEM_SEARCH_FILTER,
+            FilterConformanceClasses.BASIC_CQL,
+            FilterConformanceClasses.CQL_JSON,
+        ]
+    ),
+    # stac_fastapi extensions
+    TokenPaginationExtension(),
+]
 
 
 class Settings(BaseSettings):
