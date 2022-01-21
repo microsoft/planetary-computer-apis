@@ -12,6 +12,7 @@ from stac_fastapi.extensions.core import (
 from stac_fastapi.extensions.core.filter.filter import FilterConformanceClasses
 
 API_VERSION = "1.1"
+STAC_API_VERSION = "v1.0.0-beta.4"
 
 API_LANDING_PAGE_ID = "microsoft-pc"
 API_TITLE = "Microsoft Planetary Computer STAC API"

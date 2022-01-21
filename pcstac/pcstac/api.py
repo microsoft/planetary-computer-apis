@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 from stac_fastapi.api.app import StacApi
 
 from pccommon.openapi import fixup_schema
+from pcstac.config import STAC_API_VERSION
 
 STAC_API_OPENAPI_TAG = "STAC API v1.0.0-beta.2"
 

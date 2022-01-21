@@ -3,6 +3,8 @@ from typing import Any, Dict
 import pystac
 import pytest
 
+from pcstac.config import STAC_API_VERSION
+
 
 def remove_root(stac_object: Dict[str, Any]) -> None:
     links = []
@@ -18,12 +20,6 @@ async def test_landing_page(app_client):
     resp = await app_client.get("/")
     assert resp.status_code == 200
     resp_json = resp.json()
-    # expected = {
-    #     "id", "stac_extensions", "description", "stac_version", "license",
-    #     "summaries", "extent", "links", "title", "keywords", "providers"
-    # }
-    # result = set(resp_json)
-    # assert result == expected
 
     remove_root(resp_json)
     pystac.Catalog.from_dict(resp_json).validate()
@@ -38,8 +34,16 @@ async def test_landing_page(app_client):
     assert resp.status_code == 200
 
     # Make sure conformance classes are linked
-    conf = next(filter(lambda link: link["rel"] == "conformance", resp_json["links"]))[
-        "href"
-    ]
-    resp = await app_client.get(conf)
+    conformance_link = next(
+        filter(lambda link: link["rel"] == "conformance", resp_json["links"])
+    )
+
+    assert "conformsTo" in resp_json
+    conforms_to = resp_json["conformsTo"]
+
+    # Make sure conformance classes are of the right STAC version
+    for conformance_class in conforms_to:
+        if "api.stacspec.org" in conformance_class:
+            assert STAC_API_VERSION in conformance_class
+    resp = await app_client.get(conformance_link["href"])
     assert resp.status_code == 200
