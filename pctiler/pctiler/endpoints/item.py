@@ -5,7 +5,6 @@ from fastapi import Query, Request, Response
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
 from titiler.core.factory import MultiBaseTilerFactory
-from pccommon import render
 
 from pccommon.render import COLLECTION_RENDER_CONFIG
 from pccommon.utils import get_param_str
