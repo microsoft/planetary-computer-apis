@@ -58,7 +58,7 @@ class TileInfo:
             (
                 "collection/tilejson.json?"
                 f"collection={self.collection_id}"
-                f"&assets={self.render_config.get_assets_param()}"
+                f"{self.render_config.get_assets_params()}"
                 f"{render_params_part}"
             ),
         )
@@ -91,8 +91,8 @@ class TileInfo:
             (
                 f"item/preview.png?"
                 f"collection={self.collection_id}"
-                f"&items={item_id}"
-                f"&assets={self.render_config.get_assets_param()}"
+                f"&item={item_id}"
+                f"{self.render_config.get_assets_params()}"
                 f"{render_params_part}"
             ),
         )
@@ -113,8 +113,8 @@ class TileInfo:
             (
                 "item/tilejson.json?"
                 f"collection={self.collection_id}"
-                f"&items={item_id}"
-                f"&assets={self.render_config.get_assets_param()}"
+                f"&item={item_id}"
+                f"{self.render_config.get_assets_params()}"
                 f"{render_params_part}"
             ),
         )

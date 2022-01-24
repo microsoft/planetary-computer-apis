@@ -18,9 +18,9 @@ class DefaultRenderConfig:
     normal human vision, parameters will likely encode this rendering.
     """
 
-    assets: List[str]
     render_params: Dict[str, Any]
     minzoom: int
+    assets: Optional[List[str]] = None
     maxzoom: Optional[int] = 18
     create_links: bool = True
     has_mosaic: bool = False
@@ -29,8 +29,14 @@ class DefaultRenderConfig:
     requires_token: bool = False
     hidden: bool = False  # Hide from API
 
-    def get_assets_param(self) -> str:
-        return ",".join(self.assets)
+    def get_assets_params(self) -> str:
+        if self.assets is None:
+            return ""
+
+        if len(self.assets) == 1:
+            return f"&assets={self.assets[0]}"
+
+        return "&assets=".join(self.assets)
 
     def get_render_params(self) -> str:
         return get_param_str(self.render_params)
@@ -72,7 +78,7 @@ COLLECTION_RENDER_CONFIG = {
     ),
     "aster-l1t": DefaultRenderConfig(
         assets=["VNIR"],
-        render_params={"bidx": [2, 3, 1], "nodata": 0},
+        render_params={"asset_bidx": "VNIR|2,3,1", "nodata": 0},
         mosaic_preview_zoom=9,
         mosaic_preview_coords=[37.2141, -104.2947],
         minzoom=9,
@@ -111,9 +117,8 @@ COLLECTION_RENDER_CONFIG = {
         minzoom=5,
     ),
     "gnatsgo-rasters": DefaultRenderConfig(
-        create_links=False,
         assets=["aws0_100"],
-        render_params={"colormap_name": "cividis"},
+        render_params={"colormap_name": "cividis", "rescale": [0, 600]},
         mosaic_preview_zoom=6,
         mosaic_preview_coords=[44.1454, -112.6404],
         requires_token=True,
@@ -130,7 +135,6 @@ COLLECTION_RENDER_CONFIG = {
     ),
     "goes-cmi": DefaultRenderConfig(
         create_links=True,
-        assets=["data"],
         render_params={
             "expression": (
                 "C02_2km_wm,"
@@ -212,7 +216,7 @@ COLLECTION_RENDER_CONFIG = {
     ),
     "naip": DefaultRenderConfig(
         assets=["image"],
-        render_params={"bidx": [1, 2, 3]},
+        render_params={"asset_bidx": "image|1,2,3"},
         mosaic_preview_zoom=13,
         mosaic_preview_coords=[36.0891, -111.8577],
         minzoom=11,
@@ -235,7 +239,7 @@ COLLECTION_RENDER_CONFIG = {
     ),
     "sentinel-2-l2a": DefaultRenderConfig(
         assets=["visual"],
-        render_params={"bidx": [1, 2, 3], "nodata": 0},
+        render_params={"asset_bidx": "visual|1,2,3", "nodata": 0},
         mosaic_preview_zoom=9,
         mosaic_preview_coords=[-16.4940, 124.0274],
         requires_token=True,

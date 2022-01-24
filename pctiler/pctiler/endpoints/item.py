@@ -5,6 +5,7 @@ from fastapi import Query, Request, Response
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
 from titiler.core.factory import MultiBaseTilerFactory
+from pccommon import render
 
 from pccommon.render import COLLECTION_RENDER_CONFIG
 from pccommon.utils import get_param_str
@@ -51,12 +52,15 @@ def map(
             content=f"No item map available for collection {collection}",
         )
 
-    tilejson_params = get_param_str(
-        {
-            "collection": collection,
-            "item": item,
-            "assets": ",".join(render_config.assets),
-        }
+    tilejson_params = (
+        get_param_str(
+            {
+                "collection": collection,
+                "item": item,
+            }
+        )
+        + render_config.get_assets_params()
+        + f"&{render_config.get_render_params()}"
     )
 
     tilejson_url = pc_tile_factory.url_for(request, "tilejson")
@@ -75,6 +79,5 @@ def map(
             "collectionId": collection,
             "itemId": item,
             "itemUrl": item_url,
-            "renderParams": get_param_str(render_config.render_params),
         },
     )
