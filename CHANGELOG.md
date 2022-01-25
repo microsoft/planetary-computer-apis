@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+
+## [2022.1.3]
+
+### Fixed
+
+- Fixes and tests for item render links [#43](https://github.com/microsoft/planetary-computer-apis/pull/43)
+
 ## [2022.1.2]
 
 ### Fixed
