@@ -29,17 +29,33 @@ class DefaultRenderConfig:
     requires_token: bool = False
     hidden: bool = False  # Hide from API
 
+    def get_full_render_qs(self, collection: str, item: Optional[str] = None) -> str:
+        """
+        Return the full render query string, including the
+        item, collection, render and assets parameters.
+        """
+        collection_part = f"collection={collection}" if collection else ""
+        item_part = f"&item={item}" if item else ""
+        asset_part = self.get_assets_params()
+        render_part = self.get_render_params()
+
+        return "".join([collection_part, item_part, asset_part, render_part])
+
     def get_assets_params(self) -> str:
-        if self.assets is None:
-            return ""
+        """
+        Convert listed assets to a query string format with multiple `asset` keys
+            None -> ""
+            [data1] -> "&asset=data1"
+            [data1, data2] -> "&asset=data1&asset=data2"
+        """
+        assets = self.assets or []
+        keys = ["&assets="] * len(assets)
+        params = ["".join(item) for item in zip(keys, assets)]
 
-        if len(self.assets) == 1:
-            return f"&assets={self.assets[0]}"
-
-        return "&assets=".join(self.assets)
+        return "".join(params)
 
     def get_render_params(self) -> str:
-        return get_param_str(self.render_params)
+        return f"&{get_param_str(self.render_params)}"
 
     @property
     def should_add_collection_links(self) -> bool:
