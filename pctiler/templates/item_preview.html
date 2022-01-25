@@ -28,10 +28,6 @@
                 ).addTo(map);
 
                 var tiles = tileJson.tiles[0];
-                var renderParams = "{{ renderParams }}";
-                if (renderParams) {
-                    tiles += "&" + renderParams;
-                }
 
                 var tileLayer = L.tileLayer(tiles, {
                     minZoom: tileJson.minzoon,
