@@ -37,7 +37,7 @@ EXTENSIONS = [
             FilterConformanceClasses.ITEM_SEARCH_FILTER,
             FilterConformanceClasses.BASIC_CQL,
             FilterConformanceClasses.CQL_JSON,
-        ]
+        ],
     ),
     # stac_fastapi extensions
     TokenPaginationExtension(),

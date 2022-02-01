@@ -4,6 +4,7 @@ import requests
 
 from stac_fastapi.types.core import AsyncBaseFiltersClient
 
+
 class MSPCFiltersClient(AsyncBaseFiltersClient):
     """Defines a pattern for implementing the STAC filter extension."""
 
@@ -20,5 +21,7 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
         if not collection_id:
             return await super().get_queryables(collection_id, **kwargs)
         else:
-            r = requests.get(f"https://planetarycomputer.microsoft.com/stac/{collection_id}/queryables.json")
+            r = requests.get(
+                f"https://planetarycomputer.microsoft.com/stac/{collection_id}/queryables.json"
+            )
             return r.json()
