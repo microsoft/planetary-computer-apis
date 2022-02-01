@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional
 
 import requests
-
+from fastapi import HTTPException
 from stac_fastapi.types.core import AsyncBaseFiltersClient
 
 
@@ -24,4 +24,7 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
             r = requests.get(
                 f"https://planetarycomputer.microsoft.com/stac/{collection_id}/queryables.json"
             )
-            return r.json()
+            if r.status_code == 404:
+                raise HTTPException(status_code=404)
+            elif r.status_code == 200:
+                return r.json()
