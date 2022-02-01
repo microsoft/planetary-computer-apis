@@ -11,6 +11,8 @@ from stac_fastapi.extensions.core import (
 )
 from stac_fastapi.extensions.core.filter.filter import FilterConformanceClasses
 
+from pcstac.filter import MSPCFiltersClient
+
 API_VERSION = "1.2"
 STAC_API_VERSION = "v1.0.0-beta.4"
 
@@ -29,6 +31,7 @@ EXTENSIONS = [
     SortExtension(),
     FieldsExtension(),
     FilterExtension(
+        client=MSPCFiltersClient(),
         conformance_classes=[
             FilterConformanceClasses.FILTER,
             FilterConformanceClasses.ITEM_SEARCH_FILTER,
