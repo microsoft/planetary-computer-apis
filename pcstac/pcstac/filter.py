@@ -1,10 +1,8 @@
 import asyncio
-from functools import reduce
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Set
 
 import requests
-from fastapi import Request
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from stac_fastapi.types.core import AsyncBaseFiltersClient
 
 
@@ -12,9 +10,18 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
     """Defines a pattern for implementing the STAC filter extension."""
 
     queryable_intersection = None
+    queryable_url_template = (
+        "https://planetarycomputer.microsoft.com/stac/{cid}/queryables.json"
+    )
 
-    async def get_queryable_intersection(self, **kwargs) -> Dict[str, Any]:
-        request: Request = kwargs["request"]
+    async def get_queryable_intersection(self, request: Request) -> dict:
+        """Generate json schema with intersecting properties of all collections.
+        When queryables are requested without specifying a collection (/queryable
+        from the root), a json schema encapsulating only the properties shared by all
+        collections should be returned. This function gathers all collection
+        queryables, calculates the intersection, and caches the results so that the
+        work can be saved for future queries.
+        """
         pool = request.app.state.readpool
 
         async with pool.acquire() as conn:
@@ -24,9 +31,18 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
                 """
             )
         collection_ids = [collection["id"] for collection in collections]
-        all_queryables = await asyncio.gather(*[self.get_queryables(cid) for cid in collection_ids])
-        all_properties = [queryable["properties"] for queryable in all_queryables]
-        property_name_intersection = list(reduce(lambda x, y: x & y.keys(), all_properties))
+        all_queryables = await asyncio.gather(
+            *[self.get_queryables(cid) for cid in collection_ids]
+        )
+        all_properties: List[dict] = [
+            queryable["properties"] for queryable in all_queryables
+        ]
+        all_property_keys: List[Set[str]] = list(
+            map(lambda x: set(x.keys()), all_properties)
+        )
+        property_name_intersection: List[str] = list(
+            set.intersection(*all_property_keys)
+        )
         intersecting_props = {}
         for name in property_name_intersection:
             for idx, properties in enumerate(all_properties):
@@ -43,13 +59,13 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
             "$id": "https://example.org/queryables",
             "type": "object",
             "title": "",
-            "properties": intersecting_props
+            "properties": intersecting_props,
         }
         self.queryable_intersection = intersection_schema
         return intersection_schema
 
     async def get_queryables(
-        self, collection_id: Optional[str] = None, **kwargs
+        self, collection_id: Optional[str] = None, **kwargs: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Get the queryables available for the given collection_id.
         If collection_id is None, returns the intersection of all
@@ -60,14 +76,15 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
         """
         if not collection_id:
             if self.queryable_intersection:
-                return self.queryable_intersection
+                queryable_resp = self.queryable_intersection
             else:
-                return await self.get_queryable_intersection(**kwargs)
+                request = kwargs["request"]
+                if isinstance(request, Request):
+                    queryable_resp = await self.get_queryable_intersection(request)
         else:
-            r = requests.get(
-                f"https://planetarycomputer.microsoft.com/stac/{collection_id}/queryables.json"
-            )
+            r = requests.get(self.queryable_url_template.format(cid=collection_id))
             if r.status_code == 404:
                 raise HTTPException(status_code=404)
             elif r.status_code == 200:
-                return r.json()
+                queryable_resp = r.json()
+        return queryable_resp

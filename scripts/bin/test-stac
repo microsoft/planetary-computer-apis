@@ -21,10 +21,10 @@ This scripts is meant to be run inside the stac-dev container.
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     echo "Running  mypy for stac..."
-    mypy pcstac/pcstac
+    mypy --implicit-reexport pcstac/pcstac
 
     echo "Running  mypy for common..."
-    mypy pccommon
+    mypy --implicit-reexport pccommon
 
     echo "Running black for stac..."
     black --check pcstac/pcstac pcstac/tests
