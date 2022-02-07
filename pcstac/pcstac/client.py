@@ -54,7 +54,7 @@ class PCClient(CoreCrudClient):
             {
                 "rel": "describedby",
                 "href": urljoin(
-                    "https://planetarycomputer.microsoft.com/dataset",
+                    "https://planetarycomputer.microsoft.com/dataset/",
                     collection["id"],
                 ),
                 "title": "Human readable dataset overview and reference",
@@ -113,14 +113,6 @@ class PCClient(CoreCrudClient):
         Returns:
             Collection.
         """
-        logger.info(
-            "Single collection requested",
-            extra={
-                "custom_dimensions": {
-                    "container": collection_id,
-                }
-            },
-        )
         try:
             render_config = COLLECTION_RENDER_CONFIG.get(collection_id)
 
@@ -158,9 +150,10 @@ class PCClient(CoreCrudClient):
             }
         )
 
+    # Remove once https://github.com/stac-utils/stac-fastapi/issues/334 is fixed.
     async def landing_page(self, **kwargs: Dict[str, Any]) -> LandingPage:
         landing = await super().landing_page(**kwargs)
-        landing["type"] = "Catalog"
+        del landing["stac_extensions"]
         return landing
 
     @classmethod

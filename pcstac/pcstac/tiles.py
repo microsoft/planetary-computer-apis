@@ -51,17 +51,8 @@ class TileInfo:
         assets["rendered_preview"] = self._get_item_preview_asset(item_id)
 
     def _get_collection_tilejson_asset(self) -> Dict[str, Any]:
-        render_params = self.render_config.get_render_params()
-        render_params_part = f"&{render_params}" if render_params else ""
-        href = urljoin(
-            self.tiler_href,
-            (
-                "collection/tilejson.json?"
-                f"collection={self.collection_id}"
-                f"&assets={self.render_config.get_assets_param()}"
-                f"{render_params_part}"
-            ),
-        )
+        qs = self.render_config.get_full_render_qs(self.collection_id)
+        href = urljoin(self.tiler_href, f"collection/tilejson.json?{qs}")
 
         return {
             "title": "Mosaic TileJSON with default rendering",
@@ -84,18 +75,8 @@ class TileInfo:
         }
 
     def _get_item_preview_asset(self, item_id: str) -> Dict[str, Any]:
-        render_params = self.render_config.get_render_params()
-        render_params_part = f"&{render_params}" if render_params else ""
-        href = urljoin(
-            self.tiler_href,
-            (
-                f"item/preview.png?"
-                f"collection={self.collection_id}"
-                f"&items={item_id}"
-                f"&assets={self.render_config.get_assets_param()}"
-                f"{render_params_part}"
-            ),
-        )
+        qs = self.render_config.get_full_render_qs(self.collection_id, item_id)
+        href = urljoin(self.tiler_href, f"item/preview.png?{qs}")
 
         return {
             "title": "Rendered preview",
@@ -106,18 +87,8 @@ class TileInfo:
         }
 
     def _get_item_tilejson_asset(self, item_id: str) -> Dict[str, Any]:
-        render_params = self.render_config.get_render_params()
-        render_params_part = f"&{render_params}" if render_params else ""
-        href = urljoin(
-            self.tiler_href,
-            (
-                "item/tilejson.json?"
-                f"collection={self.collection_id}"
-                f"&items={item_id}"
-                f"&assets={self.render_config.get_assets_param()}"
-                f"{render_params_part}"
-            ),
-        )
+        qs = self.render_config.get_full_render_qs(self.collection_id, item_id)
+        href = urljoin(self.tiler_href, f"item/tilejson.json?{qs}")
 
         return {
             "title": "TileJSON with default rendering",

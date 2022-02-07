@@ -11,17 +11,10 @@ gunicorn==20.1.0
 orjson==3.5.2
 cachetools==4.2.1
 
-# TODO: remove. stac_fastapi Installed from source
-# Including upgrade for pgStac 0.4.3
-# Remove after release >2.2.0
-stac_fastapi.types @ git+https://github.com/stac-utils/stac-fastapi.git@d5c9d6cdc4c29588ae4fbe1cf5427a5ce5cde66a#subdirectory=stac_fastapi/types
-stac_fastapi.api @ git+https://github.com/stac-utils/stac-fastapi.git@d5c9d6cdc4c29588ae4fbe1cf5427a5ce5cde66a#subdirectory=stac_fastapi/api
-stac_fastapi.extensions @ git+https://github.com/stac-utils/stac-fastapi.git@d5c9d6cdc4c29588ae4fbe1cf5427a5ce5cde66a#subdirectory=stac_fastapi/extensions
-stac_fastapi.pgstac @ git+https://github.com/stac-utils/stac-fastapi.git@d5c9d6cdc4c29588ae4fbe1cf5427a5ce5cde66a#subdirectory=stac_fastapi/pgstac
-# "stac-fastapi.types==2.2.0",
-# "stac-fastapi.api==2.2.0",
-# "stac-fastapi.extensions==2.2.0",
-# "stac-fastapi.pgstac==2.2.0",
+stac-fastapi.types==2.3.0
+stac-fastapi.api==2.3.0
+stac-fastapi.extensions==2.3.0
+stac-fastapi.pgstac==2.3.0
 
 pystac==1.*
 

@@ -7,7 +7,6 @@ from starlette.responses import HTMLResponse
 from titiler.core.factory import MultiBaseTilerFactory
 
 from pccommon.render import COLLECTION_RENDER_CONFIG
-from pccommon.utils import get_param_str
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.reader import ItemSTACReader
@@ -61,16 +60,9 @@ def map(
             content=f"No item map available for collection {collection}",
         )
 
-    tilejson_params = get_param_str(
-        {
-            "collection": collection,
-            "item": item,
-            "assets": ",".join(render_config.assets),
-        }
-    )
-
+    qs = render_config.get_full_render_qs(collection, item)
     tilejson_url = pc_tile_factory.url_for(request, "tilejson")
-    tilejson_url += f"?{tilejson_params}"
+    tilejson_url += f"?{qs}"
 
     item_url = urljoin(
         get_settings().stac_api_href,
@@ -85,6 +77,5 @@ def map(
             "collectionId": collection,
             "itemId": item,
             "itemUrl": item_url,
-            "renderParams": get_param_str(render_config.render_params),
         },
     )
