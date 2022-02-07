@@ -5,23 +5,29 @@ RUN apt-get update && \
 
 ENV CURL_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 
-RUN mkdir -p /opt/src/pcstac
-
-COPY pcstac/requirements.txt /opt/src/requirements.txt
-
 WORKDIR /opt/src
 
+# PCCommon
+COPY pccommon/requirements.txt requirements.txt
 RUN pip install -r requirements.txt
+RUN rm -rf requirements.txt
+
+# PCStac
+COPY pcstac/requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+RUN rm -rf requirements.txt
 
 COPY .isort.cfg /opt/src/.isort.cfg
+COPY pcstac/gunicorn_conf.py gunicorn_conf.py
+
 COPY pcstac /opt/src/pcstac
 COPY pccommon /opt/src/pccommon
+# Use --no-deps flag because they were previously installed with requirement.txt
+RUN pip install -e ./pccommon -e ./pcstac --no-deps
 
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=81
 
-ENV PYTHONPATH=/opt/src/pcstac:$PYTHONPATH
-
 # Do not use --preload, because it doesn't work correctly with OpenCensus
 CMD gunicorn pcstac.main:app -k uvicorn.workers.UvicornWorker \
-    -c /opt/src/pcstac/gunicorn_conf.py --bind ${APP_HOST}:${APP_PORT} --log-level info
+    -c gunicorn_conf.py --bind ${APP_HOST}:${APP_PORT} --log-level info

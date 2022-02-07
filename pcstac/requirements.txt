@@ -1,3 +1,9 @@
+# pccommon deps
+fastapi==0.67.*
+opencensus-ext-azure==1.0.8
+opencensus-ext-logging==0.1.0
+
+# server deps
 uvicorn[standard]==0.13.3
 uvloop==0.14.0
 gunicorn==20.1.0
@@ -10,10 +16,9 @@ stac-fastapi.api==2.3.0
 stac-fastapi.extensions==2.3.0
 stac-fastapi.pgstac==2.3.0
 
-packaging==20.8
-fastapi==0.67.*
-opencensus-ext-azure==1.0.8
-opencensus-ext-logging==0.1.0
-pypgstac==0.4.0
-
 pystac==1.*
+
+# TODO: remove, pypgstac is not really needed to run stac-fastapi application
+pypgstac==0.4.3
+
+# pccommon

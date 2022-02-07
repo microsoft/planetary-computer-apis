@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlparse
 
 import pystac
 import pytest
-from shapely.geometry import Polygon
+from geojson_pydantic.geometries import Polygon
 from stac_fastapi.pgstac.models.links import CollectionLinks
 from stac_pydantic.shared import DATETIME_RFC339
 from starlette.requests import Request
@@ -517,7 +517,7 @@ async def test_field_extension_exclude_default_includes(app_client):
 async def test_search_intersects_and_bbox(app_client):
     """Test POST search intersects and bbox are mutually exclusive (core)"""
     bbox = [-118, 34, -117, 35]
-    geoj = Polygon.from_bounds(*bbox).__geo_interface__
+    geoj = Polygon.from_bounds(*bbox).dict(exclude_none=True)
     params = {"bbox": bbox, "intersects": geoj}
     resp = await app_client.post("/search", json=params)
     assert resp.status_code == 400
