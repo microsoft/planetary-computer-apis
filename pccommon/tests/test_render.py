@@ -1,7 +1,7 @@
 import unittest
 from urllib.parse import quote_plus
 
-from ..render import DefaultRenderConfig
+from pccommon.render import DefaultRenderConfig
 
 multi_assets = DefaultRenderConfig(
     assets=["data1", "data2"],
