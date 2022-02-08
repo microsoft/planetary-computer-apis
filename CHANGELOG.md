@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Update titiler-pgstac version to `0.1.0.a4` in `pctiler` (https://github.com/microsoft/planetary-computer-apis/pull/46)
+
 ### Added
 
 - Added support for /queryables endpoint [#44](https://github.com/microsoft/planetary-computer-apis/pull/44)
