@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added support for /queryables endpoint [#44](https://github.com/microsoft/planetary-computer-apis/pull/44)
+
 ### Fixed
 
 
@@ -25,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed renderconfigs for item tile links [#41](https://github.com/microsoft/planetary-computer-apis/pull/41)
-- Fixes hostname setting for URLs used in item links
+- Fixed hostname setting for URLs used in item links
 
 ## [2022.1.1]
 
