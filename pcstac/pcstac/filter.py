@@ -84,7 +84,7 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
         """
         if not collection_id:
             try:
-                queryable_resp = queryables_endpoint_cache["/collections"]
+                queryable_resp = queryables_endpoint_cache["/queryables"]
             except KeyError:
                 request = kwargs["request"]
                 if isinstance(request, Request):
