@@ -1,0 +1,514 @@
+{
+  "3dep-seamless": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "terrain",
+        "rescale": [
+          -1000,
+          4000
+        ]
+      },
+      "minzoom": 8,
+      "assets": [
+        "data"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 8,
+      "mosaic_preview_coords": [
+        47.1113,
+        -120.8578
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "alos-dem": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "terrain",
+        "rescale": [
+          -1000,
+          4000
+        ]
+      },
+      "minzoom": 8,
+      "assets": [
+        "data"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 8,
+      "mosaic_preview_coords": [
+        35.6837,
+        138.4281
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "aster-l1t": {
+    "render_config": {
+      "render_params": {
+        "asset_bidx": "VNIR|2,3,1",
+        "nodata": 0
+      },
+      "minzoom": 9,
+      "assets": [
+        "VNIR"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 9,
+      "mosaic_preview_coords": [
+        37.2141,
+        -104.2947
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "chloris-biomass": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "chloris-biomass",
+        "rescale": [
+          1,
+          750000
+        ]
+      },
+      "minzoom": 2,
+      "assets": [
+        "data"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 2,
+      "mosaic_preview_coords": [
+        30.0572,
+        80.1735
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "cop-dem-glo-30": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "terrain",
+        "rescale": [
+          -1000,
+          4000
+        ]
+      },
+      "minzoom": 8,
+      "assets": [
+        "data"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 8,
+      "mosaic_preview_coords": [
+        30.0572,
+        80.1735
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "cop-dem-glo-90": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "terrain",
+        "rescale": [
+          -1000,
+          4000
+        ]
+      },
+      "minzoom": 8,
+      "assets": [
+        "data"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 8,
+      "mosaic_preview_coords": [
+        46.8776,
+        12.1444
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "gap": {
+    "render_config": {
+      "render_params": {
+        "tile_format": "png",
+        "colormap_name": "gap-lulc"
+      },
+      "minzoom": 5,
+      "assets": [
+        "data"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 7,
+      "mosaic_preview_coords": [
+        26.7409,
+        -80.9714
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "gnatsgo-rasters": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "cividis",
+        "rescale": [
+          0,
+          600
+        ]
+      },
+      "minzoom": 4,
+      "assets": [
+        "aws0_100"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 6,
+      "mosaic_preview_coords": [
+        44.1454,
+        -112.6404
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "goes-mcmip": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "gap-lulc"
+      },
+      "minzoom": 6,
+      "assets": [
+        "data"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 13,
+      "mosaic_preview_coords": [
+        39.9534,
+        -75.16333
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "goes-cmi": {
+    "render_config": {
+      "render_params": {
+        "expression": "C02_2km_wm,0.45*C02_2km_wm+0.1*C03_2km_wm+0.45*C01_2km_wm,C01_2km_wm",
+        "nodata": -1,
+        "rescale": [
+          1,
+          1000
+        ],
+        "color_formula": "Gamma RGB 2.5 Saturation 1.4 Sigmoidal RGB 2 0.7",
+        "resampling": "bilinear"
+      },
+      "minzoom": 2,
+      "assets": null,
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": true,
+      "mosaic_preview_zoom": 4,
+      "mosaic_preview_coords": [
+        33.4872,
+        -114.4842
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "hgb": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "greens",
+        "nodata": 0,
+        "rescale": [
+          0,
+          255
+        ]
+      },
+      "minzoom": 2,
+      "assets": [
+        "aboveground"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 9,
+      "mosaic_preview_coords": [
+        -7.641129,
+        39.162521
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "hrea": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "magma",
+        "rescale": [
+          1,
+          200
+        ]
+      },
+      "minzoom": 3,
+      "assets": [
+        "estimated-brightness"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 3,
+      "mosaic_preview_coords": [
+        11.828,
+        20.6367
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "io-lulc": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "io-lulc"
+      },
+      "minzoom": 4,
+      "assets": [
+        "data"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 4,
+      "mosaic_preview_coords": [
+        -0.8749,
+        109.8456
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "io-lulc-9-class": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "io-lulc-9-class"
+      },
+      "minzoom": 4,
+      "assets": [
+        "data"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 4,
+      "mosaic_preview_coords": [
+        -0.8749,
+        109.8456
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "jrc-gsw": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "jrc-occurrence",
+        "nodata": 0
+      },
+      "minzoom": 4,
+      "assets": [
+        "occurrence"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 10,
+      "mosaic_preview_coords": [
+        24.21647,
+        91.015209
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "landsat-8-c2-l2": {
+    "render_config": {
+      "render_params": {
+        "color_formula": "gamma RGB 2.7, saturation 1.5, sigmoidal RGB 15 0.55"
+      },
+      "minzoom": 8,
+      "assets": [
+        "SR_B4",
+        "SR_B3",
+        "SR_B2"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 11,
+      "mosaic_preview_coords": [
+        37.4069,
+        118.8188
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "mobi": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "magma",
+        "nodata": 128,
+        "rescale": "0,1"
+      },
+      "minzoom": 3,
+      "assets": [
+        "SpeciesRichness_All"
+      ],
+      "maxzoom": 18,
+      "create_links": false,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 4,
+      "mosaic_preview_coords": [
+        37.3052,
+        -85.8457
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "mtbs": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "mtbs-severity"
+      },
+      "minzoom": 3,
+      "assets": [
+        "burn-severity"
+      ],
+      "maxzoom": 18,
+      "create_links": false,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 9,
+      "mosaic_preview_coords": [
+        39.2234,
+        -122.6932
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "naip": {
+    "render_config": {
+      "render_params": {
+        "asset_bidx": "image|1,2,3"
+      },
+      "minzoom": 11,
+      "assets": [
+        "image"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 13,
+      "mosaic_preview_coords": [
+        36.0891,
+        -111.8577
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "nasadem": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "terrain",
+        "rescale": [
+          -100,
+          4000
+        ]
+      },
+      "minzoom": 7,
+      "assets": [
+        "elevation"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 7,
+      "mosaic_preview_coords": [
+        -10.727,
+        -74.762
+      ],
+      "requires_token": false,
+      "hidden": false
+    }
+  },
+  "nrcan-landcover": {
+    "render_config": {
+      "render_params": {
+        "colormap_name": "nrcan-lulc"
+      },
+      "minzoom": 4,
+      "assets": [
+        "landcover"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 7,
+      "mosaic_preview_coords": [
+        51.3913,
+        -124.8087
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  },
+  "sentinel-2-l2a": {
+    "render_config": {
+      "render_params": {
+        "asset_bidx": "visual|1,2,3",
+        "nodata": 0
+      },
+      "minzoom": 9,
+      "assets": [
+        "visual"
+      ],
+      "maxzoom": 18,
+      "create_links": true,
+      "has_mosaic": false,
+      "mosaic_preview_zoom": 9,
+      "mosaic_preview_coords": [
+        -16.494,
+        124.0274
+      ],
+      "requires_token": true,
+      "hidden": false
+    }
+  }
+}
