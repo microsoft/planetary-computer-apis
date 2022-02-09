@@ -25,6 +25,12 @@ from pctiler.reader_cog import CustomCOGReader  # type:ignore
 cache_config = CacheSettings()
 
 
+def get_cache_key(
+    backend: "PGSTACBackend", geom: Union[Point, Polygon], **kwargs: Any
+) -> Any:
+    return hashkey(backend.input, str(geom), **kwargs)
+
+
 @attr.s
 class ItemSTACReader(STACReader):
 
@@ -132,8 +138,8 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
         return self.get_assets(Polygon.from_bounds(*bbox), **kwargs)
 
     @cached(
-        TTLCache(maxsize=cache_config.maxsize, ttl=cache_config.ttl),
-        key=lambda self, geom, **kwargs: hashkey(self.input, str(geom), **kwargs),
+        cache=TTLCache(maxsize=cache_config.maxsize, ttl=cache_config.ttl),
+        key=get_cache_key,
     )
     def get_assets(
         self,
