@@ -11,7 +11,7 @@ from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
 
 from pccommon.config import CommonConfig
-from pccommon.logging import ServiceName, request_to_path
+from pccommon.logging import request_to_path
 
 config = CommonConfig.from_environment()
 logger = logging.getLogger(__name__)
@@ -206,7 +206,8 @@ def _parse_queryjson(query: dict) -> Tuple[Optional[str], Optional[str]]:
     collection_ids = query.get("collections")
     item_ids = query.get("ids")
 
-    # Collection and ids are List[str] per the spec, but the client may allow just a single item
+    # Collection and ids are List[str] per the spec,
+    # but the client may allow just a single item
     if isinstance(collection_ids, list):
         collection_ids = ",".join(collection_ids)
     if isinstance(item_ids, list):

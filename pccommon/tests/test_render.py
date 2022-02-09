@@ -1,7 +1,7 @@
 import unittest
 from urllib.parse import quote_plus
 
-from pccommon.render import DefaultRenderConfig
+from pccommon.collections import DefaultRenderConfig
 
 multi_assets = DefaultRenderConfig(
     assets=["data1", "data2"],
@@ -30,14 +30,16 @@ class TestRenderParams(unittest.TestCase):
         qs = multi_assets.get_full_render_qs("my_collection_id", "my_item_id")
         self.assertEqual(
             qs,
-            "collection=my_collection_id&item=my_item_id&assets=data1&assets=data2&colormap_name=terrain&rescale=-1000,4000",
+            "collection=my_collection_id&item=my_item_id&"
+            "assets=data1&assets=data2&colormap_name=terrain&rescale=-1000,4000",
         )
 
     def test_single_asset(self) -> None:
         qs = single_asset.get_full_render_qs("my_collection_id", "my_item_id")
         self.assertEqual(
             qs,
-            "collection=my_collection_id&item=my_item_id&assets=data1&colormap_name=terrain&rescale=-1000,4000",
+            "collection=my_collection_id&item=my_item_id&assets=data1&"
+            "colormap_name=terrain&rescale=-1000,4000",
         )
 
     def test_no_asset(self) -> None:
@@ -45,12 +47,14 @@ class TestRenderParams(unittest.TestCase):
         encoded_params = quote_plus("asset1,0.45*asset2,asset3/asset1")
         self.assertEqual(
             qs,
-            f"collection=my_collection_id&item=my_item_id&expression={encoded_params}&colormap_name=terrain&rescale=-1000,4000",
+            f"collection=my_collection_id&item=my_item_id&expression={encoded_params}"
+            "&colormap_name=terrain&rescale=-1000,4000",
         )
 
     def test_collection_only(self) -> None:
         qs = single_asset.get_full_render_qs("my_collection_id")
         self.assertEqual(
             qs,
-            "collection=my_collection_id&assets=data1&colormap_name=terrain&rescale=-1000,4000",
+            "collection=my_collection_id&assets=data1&colormap_name=terrain&"
+            "rescale=-1000,4000",
         )
