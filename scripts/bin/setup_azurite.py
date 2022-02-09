@@ -15,7 +15,7 @@ from pccommon.constants import (
     DEFAULT_COLLECTION_CONFIG_TABLE_NAME,
 )
 from pccommon.config.collections import CollectionConfig, CollectionConfigTable
-from pccommon.config.config import ContainerConfig, ContainerConfigTable
+from pccommon.config.containers import ContainerConfig, ContainerConfigTable
 
 TEST_DATA_DIR = Path(pccommon.__file__).parent.parent / "tests" / "data-files"
 COLLECTION_CONFIG_PATH = TEST_DATA_DIR / "collection_config.json"
@@ -49,31 +49,31 @@ def setup_azurite() -> None:
             print(f"~ ~ Creating table {table}...")
             table_service_client.create_table(table)
 
-    with ContainerConfigTable(
+    container_config_table = ContainerConfigTable(
         lambda: (
             None,
             table_service_client.get_table_client(DEFAULT_CONTAINER_CONFIG_TABLE_NAME),
         )
-    ) as container_config_table:
-        with open(CONTAINER_CONFIG_PATH) as f:
-            js = json.load(f)
-        for container_path, config_dict in js.items():
-            sa, container = container_path.split("/")
-            container_config_table.set_config(
-                sa, container, ContainerConfig(**config_dict)
-            )
+    )
+    with open(CONTAINER_CONFIG_PATH) as f:
+        js = json.load(f)
+    for container_path, config_dict in js.items():
+        sa, container = container_path.split("/")
+        container_config_table.set_config(
+            sa, container, ContainerConfig(**config_dict)
+        )
 
-    with CollectionConfigTable(
+    collection_config_table = CollectionConfigTable(
         lambda: (
             None,
             table_service_client.get_table_client(DEFAULT_COLLECTION_CONFIG_TABLE_NAME),
         )
-    ) as collection_config_table:
-        with open(COLLECTION_CONFIG_PATH) as f:
-            js = json.load(f)
-        for collection_id, config_dict in js.items():
-            config = CollectionConfig(**config_dict)
-            collection_config_table.set_config(collection_id, config)
+    )
+    with open(COLLECTION_CONFIG_PATH) as f:
+        js = json.load(f)
+    for collection_id, config_dict in js.items():
+        config = CollectionConfig(**config_dict)
+        collection_config_table.set_config(collection_id, config)
 
     print("~ Done Azurite setup.")
 
