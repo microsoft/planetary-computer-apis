@@ -56,3 +56,13 @@ def test_collection_only() -> None:
         "collection=my_collection_id&assets=data1&colormap_name=terrain&"
         "rescale=-1000,4000"
     )
+
+
+def test_get_render_config() -> None:
+    config = get_render_config("naip")
+    assert config
+    encoded_params = quote_plus("image|1,2,3")
+    assert (
+        config.get_full_render_qs("naip")
+        == f"collection=naip&assets=image&asset_bidx={encoded_params}"
+    )
