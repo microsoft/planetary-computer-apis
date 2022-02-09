@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Runs tests for the common project.
+
+This scripts is meant to be run inside the stac-dev container.
+
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    echo "Running mypy for common..."
+    mypy pccommon
+
+    echo "Running black for common..."
+    black --check pccommon
+
+    echo "Running flake8 for common..."
+    flake8 pccommon/pccommon pccommon/tests
+
+    echo "Running unit tests for common..."
+    python -m pytest pccommon/tests
+fi
