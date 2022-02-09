@@ -19,7 +19,8 @@ from rio_tiler.mosaic import mosaic_reader
 from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
 
-from pccommon.render import COLLECTION_RENDER_CONFIG, BlobCDN
+from pccommon.cdn import BlobCDN
+from pccommon.config import get_render_config
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
 cache_config = CacheSettings()
@@ -41,7 +42,7 @@ class ItemSTACReader(STACReader):
         asset_url = BlobCDN.transform_if_available(super()._get_asset_url(asset))
 
         if self.item.collection_id:
-            render_config = COLLECTION_RENDER_CONFIG.get(self.item.collection_id)
+            render_config = get_render_config(self.item.collection_id)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
@@ -105,7 +106,7 @@ class CustomSTACReader(MultiBaseReader):
 
         collection = self.input.get("collection", None)
         if collection:
-            render_config = COLLECTION_RENDER_CONFIG.get(collection)
+            render_config = get_render_config(collection)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
@@ -130,7 +131,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
             )
 
         # Check that the zoom isn't lower than minZoom
-        render_config = COLLECTION_RENDER_CONFIG.get(collection)
+        render_config = get_render_config(collection)
         if render_config and render_config.minzoom and render_config.minzoom > z:
             return []
 
