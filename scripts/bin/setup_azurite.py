@@ -14,8 +14,8 @@ from pccommon.constants import (
     DEFAULT_CONTAINER_CONFIG_TABLE_NAME,
     DEFAULT_COLLECTION_CONFIG_TABLE_NAME,
 )
-from pccommon.collections import CollectionConfig, CollectionConfigTable
-from pccommon.config import ContainerConfig, ContainerConfigTable
+from pccommon.config.collections import CollectionConfig, CollectionConfigTable
+from pccommon.config.config import ContainerConfig, ContainerConfigTable
 
 TEST_DATA_DIR = Path(pccommon.__file__).parent.parent / "tests" / "data-files"
 COLLECTION_CONFIG_PATH = TEST_DATA_DIR / "collection_config.json"

@@ -10,10 +10,10 @@ from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
 
-from pccommon.config import CommonConfig
+from pccommon.config import get_apis_config
 from pccommon.logging import request_to_path
 
-config = CommonConfig.from_environment()
+_config = get_apis_config()
 logger = logging.getLogger(__name__)
 
 
@@ -31,10 +31,10 @@ X_FORWARDED_FOR = "X-Forwarded-For"
 exporter = (
     AzureExporter(
         connection_string=(
-            f"InstrumentationKey={config.app_insights_instrumentation_key}"
+            f"InstrumentationKey={_config.app_insights_instrumentation_key}"
         )
     )
-    if config.app_insights_instrumentation_key is not None
+    if _config.app_insights_instrumentation_key is not None
     else None
 )
 

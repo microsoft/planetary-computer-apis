@@ -1,8 +1,5 @@
-from functools import partial
 from typing import Any, Dict, List, Optional
 
-from cachetools import Cache, TTLCache, cachedmethod
-from cachetools.keys import hashkey
 from pydantic import BaseModel
 
 from pccommon.tables import ModelTableService
@@ -80,13 +77,9 @@ class CollectionConfig(BaseModel):
 
 class CollectionConfigTable(ModelTableService[CollectionConfig]):
     _model = CollectionConfig
-    _cache: Cache = TTLCache(maxsize=100, ttl=600)
 
-    @cachedmethod(cache=lambda self: self._cache, key=partial(hashkey, "config"))
     def get_config(self, collection_id: str) -> Optional[CollectionConfig]:
-        with self as table:
-            return table.get("", collection_id)
+        return self.get("", collection_id)
 
     def set_config(self, collection_id: str, config: CollectionConfig) -> None:
-        with self as table:
-            table.upsert("", collection_id, config)
+        self.upsert("", collection_id, config)

@@ -1,6 +1,6 @@
 import re
 
-from pccommon.config import CommonConfig
+from pccommon.config.core import PCAPIsConfig
 
 BLOB_REGEX = re.compile(r".*/([^/]+?)\.blob\.core\.windows\.net/([^/]+?).*")
 
@@ -13,7 +13,7 @@ class BlobCDN:
             storage_account = m.group(1)
             container = m.group(2)
             config = (
-                CommonConfig.from_environment()
+                PCAPIsConfig.from_environment()
                 .get_container_config_table()
                 .get_config(storage_account, container)
             )

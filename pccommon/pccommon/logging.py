@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 from fastapi import Request
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 
-from pccommon.config import CommonConfig
+from pccommon.config import get_apis_config
 
 
 class ServiceName:
@@ -47,7 +47,7 @@ class CustomDimensionsFilter(logging.Filter):
 # Initialize logging, including a console handler, and sending all logs containing
 # custom_dimensions to Application Insights
 def init_logging(service_name: str) -> None:
-    config = CommonConfig.from_environment()
+    config = get_apis_config()
 
     # Setup logging
     log_level = logging.DEBUG if config.debug else logging.INFO

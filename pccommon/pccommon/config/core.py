@@ -2,13 +2,14 @@ import logging
 from functools import partial
 from typing import Optional
 
-from cachetools import Cache, LRUCache, TTLCache, cachedmethod
+from cachetools import Cache, LRUCache, cachedmethod
 from cachetools.func import lru_cache
 from cachetools.keys import hashkey
-from pydantic import BaseModel, BaseSettings, Field
+from pccommon.constants import DEFAULT_TABLE_TTL
+from pydantic import BaseModel, BaseSettings, Field, PrivateAttr
 
-from pccommon.collections import CollectionConfigTable, DefaultRenderConfig
-from pccommon.tables import ModelTableService
+from pccommon.config.collections import CollectionConfigTable
+from pccommon.config.containers import ContainerConfigTable
 
 logger = logging.getLogger(__name__)
 
@@ -24,30 +25,8 @@ class TableConfig(BaseModel):
     account_url: Optional[str] = None
 
 
-class ContainerConfig(BaseModel):
-    has_cdn: bool = False
-
-
-class ContainerConfigTable(ModelTableService[ContainerConfig]):
-    _model = ContainerConfig
-    _cache: Cache = TTLCache(maxsize=1024, ttl=600)
-
-    @cachedmethod(cache=lambda self: self._cache)
-    def get_config(
-        self, storage_account: str, container: str
-    ) -> Optional[ContainerConfig]:
-        with self as table:
-            return table.get(storage_account, container)
-
-    def set_config(
-        self, storage_account: str, container: str, config: ContainerConfig
-    ) -> None:
-        with self as table:
-            table.upsert(storage_account, container, config)
-
-
-class CommonConfig(BaseSettings):
-    _cache: Cache = LRUCache(maxsize=1024)
+class PCAPIsConfig(BaseSettings):
+    _cache: Cache = PrivateAttr(default_factory=lambda: LRUCache(maxsize=10))
 
     app_insights_instrumentation_key: Optional[str] = Field(  # type: ignore
         default=None,
@@ -55,6 +34,8 @@ class CommonConfig(BaseSettings):
     )
     collection_config: TableConfig
     container_config: TableConfig
+
+    table_value_ttl: int = Field(default=DEFAULT_TABLE_TTL)
 
     debug: bool = False
 
@@ -65,6 +46,7 @@ class CommonConfig(BaseSettings):
             account_name=self.collection_config.account_name,
             account_key=self.collection_config.account_key,
             table_name=self.collection_config.table_name,
+            ttl=self.table_value_ttl,
         )
 
     @cachedmethod(cache=lambda self: self._cache, key=partial(hashkey, "container"))
@@ -74,23 +56,15 @@ class CommonConfig(BaseSettings):
             account_name=self.container_config.account_name,
             account_key=self.container_config.account_key,
             table_name=self.container_config.table_name,
+            ttl=self.table_value_ttl,
         )
 
     @classmethod
     @lru_cache(maxsize=1)
-    def from_environment(cls) -> "CommonConfig":
-        return CommonConfig()  # type: ignore
+    def from_environment(cls) -> "PCAPIsConfig":
+        return PCAPIsConfig()  # type: ignore
 
     class Config:
         env_prefix = ENV_VAR_PCAPIS_PREFIX
         extra = "ignore"
         env_nested_delimiter = "__"
-
-
-def get_render_config(collection_id: str) -> Optional[DefaultRenderConfig]:
-    table = CommonConfig.from_environment().get_collection_config_table()
-    collection_config = table.get_config(collection_id)
-    if collection_config:
-        return collection_config.render_config
-    else:
-        return None

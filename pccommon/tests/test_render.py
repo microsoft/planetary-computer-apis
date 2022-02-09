@@ -1,7 +1,7 @@
 from urllib.parse import quote_plus
 
 from pccommon.config import get_render_config
-from pccommon.collections import DefaultRenderConfig
+from pccommon.config.collections import DefaultRenderConfig
 
 multi_assets = DefaultRenderConfig(
     assets=["data1", "data2"],
