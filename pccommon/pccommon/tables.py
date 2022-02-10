@@ -1,4 +1,14 @@
-from typing import Any, Callable, Dict, Generic, Optional, Tuple, Type, TypeVar
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
 from azure.core.credentials import AzureNamedKeyCredential, AzureSasCredential
 from azure.core.exceptions import ResourceNotFoundError
@@ -125,6 +135,22 @@ class TableService:
 class ModelTableService(Generic[M], TableService):
     _model: Type[M]
 
+    def _parse_model(
+        self, entity: Dict[str, Any], partition_key: str, row_key: str
+    ) -> M:
+        data: Any = entity.get("Data")
+        if not data:
+            raise TableError(
+                "Data column expected but not found. "
+                f"partition_key={partition_key} row_key={row_key}"
+            )
+        if not isinstance(data, str):
+            raise TableError(
+                "Data column must be a string. "
+                f"partition_key={partition_key} row_key={row_key}"
+            )
+        return self._model(**decode_dict(data))
+
     def insert(self, partition_key: str, row_key: str, entity: M) -> None:
         with self as table_client:
             table_client.create_entity(
@@ -162,17 +188,17 @@ class ModelTableService(Generic[M], TableService):
                 entity = table_client.get_entity(
                     partition_key=partition_key, row_key=row_key
                 )
-                data: Any = entity.get("Data")
-                if not data:
-                    raise TableError(
-                        "Data column expected but not found. "
-                        f"partition_key={partition_key} row_key={row_key}"
-                    )
-                if not isinstance(data, str):
-                    raise TableError(
-                        "Data column must be a string. "
-                        f"partition_key={partition_key} row_key={row_key}"
-                    )
-                return self._model(**decode_dict(data))
+                return self._parse_model(entity, partition_key, row_key)
+
             except ResourceNotFoundError:
                 return None
+
+    def get_all(self) -> Iterable[Tuple[Optional[str], Optional[str], M]]:
+        with self as table_client:
+            for entity in table_client.query_entities(""):
+                partition_key, row_key = entity.get("PartitionKey"), entity.get("RowKey")
+                yield (
+                    partition_key,
+                    row_key,
+                    self._parse_model(entity, partition_key, row_key),
+                )
