@@ -41,6 +41,10 @@ variable "tiler_replica_count" {
   type = number
 }
 
+variable "k8s_version" {
+  type = string
+}
+
 # -- Postgres
 
 variable "pg_host" {
