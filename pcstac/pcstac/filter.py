@@ -1,10 +1,10 @@
 import asyncio
 from typing import Any, Dict, List, Optional, Set
-from pccommon.config import get_collection_config
 
 from fastapi import HTTPException, Request
 from stac_fastapi.types.core import AsyncBaseFiltersClient
 
+from pccommon.config import get_collection_config
 from pcstac.cache import queryables_endpoint_cache
 
 

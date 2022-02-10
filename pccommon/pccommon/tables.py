@@ -10,11 +10,11 @@ from typing import (
     TypeVar,
 )
 
+import orjson
 from azure.core.credentials import AzureNamedKeyCredential, AzureSasCredential
 from azure.core.exceptions import ResourceNotFoundError
 from azure.data.tables import TableClient, TableServiceClient
 from cachetools import Cache, TTLCache, cachedmethod
-import orjson
 from pydantic import BaseModel
 
 from pccommon.constants import DEFAULT_TABLE_TTL
@@ -196,7 +196,9 @@ class ModelTableService(Generic[M], TableService):
     def get_all(self) -> Iterable[Tuple[Optional[str], Optional[str], M]]:
         with self as table_client:
             for entity in table_client.query_entities(""):
-                partition_key, row_key = entity.get("PartitionKey"), entity.get("RowKey")
+                partition_key, row_key = entity.get("PartitionKey"), entity.get(
+                    "RowKey"
+                )
                 yield (
                     partition_key,
                     row_key,

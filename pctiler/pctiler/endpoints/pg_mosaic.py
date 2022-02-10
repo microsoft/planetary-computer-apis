@@ -2,11 +2,11 @@ from dataclasses import dataclass
 
 from fastapi import Query, Request
 from fastapi.responses import ORJSONResponse
-from pccommon.config import get_collection_config
-from pccommon.config.collections import MosaicInfo
 from titiler.core import dependencies
 from titiler.pgstac.factory import MosaicTilerFactory
 
+from pccommon.config import get_collection_config
+from pccommon.config.collections import MosaicInfo
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.reader import PGSTACBackend

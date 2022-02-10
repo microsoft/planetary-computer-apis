@@ -3,9 +3,9 @@ import json
 import sys
 from typing import Any, Dict, List, Optional
 
+from pccommon.config.collections import CollectionConfig, CollectionConfigTable
+from pccommon.config.containers import ContainerConfig, ContainerConfigTable
 from pccommon.constants import DEFAULT_COLLECTION_CONFIG_TABLE_NAME
-from pccommon.config.collections import CollectionConfigTable, CollectionConfig
-from pccommon.config.containers import ContainerConfigTable, ContainerConfig
 from pccommon.version import __version__
 
 
@@ -15,19 +15,19 @@ def load(sas: str, account: str, table: str, type: str, file: str) -> int:
         rows = json.load(f)
 
     if type == "collection":
-        config_table = CollectionConfigTable.from_sas_token(
+        col_config_table = CollectionConfigTable.from_sas_token(
             account_url=account_url, sas_token=sas, table_name=table
         )
         for coll_id, config in rows.items():
-            config_table.set_config(coll_id, CollectionConfig(**config))
+            col_config_table.set_config(coll_id, CollectionConfig(**config))
 
     elif type == "container":
-        config_table = ContainerConfigTable.from_sas_token(
+        cont_config_table = ContainerConfigTable.from_sas_token(
             account_url=account_url, sas_token=sas, table_name=table
         )
         for path, config in rows.items():
             storage_account, container = path.split("/")
-            config_table.set_config(
+            cont_config_table.set_config(
                 storage_account, container, ContainerConfig(**config)
             )
     else:
@@ -42,19 +42,20 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
     account_url = f"https://{account}.table.core.windows.net"
     result: Dict[str, Dict[str, Any]] = {}
     if type == "collection":
-        config_table = CollectionConfigTable.from_sas_token(
+        col_config_table = CollectionConfigTable.from_sas_token(
             account_url=account_url, sas_token=sas, table_name=table
         )
 
-        for (_, collection_id, config) in config_table.get_all():
-            result[collection_id] = config.dict()
+        for (_, collection_id, col_config) in col_config_table.get_all():
+            assert collection_id
+            result[collection_id] = col_config.dict()
 
     elif type == "container":
-        config_table = ContainerConfigTable.from_sas_token(
+        con_config_table = ContainerConfigTable.from_sas_token(
             account_url=account_url, sas_token=sas, table_name=table
         )
-        for (storage_account, container, config) in config_table.get_all():
-            result[f"{storage_account}/{container}"] = config.dict()
+        for (storage_account, container, con_config) in con_config_table.get_all():
+            result[f"{storage_account}/{container}"] = con_config.dict()
     else:
         print(f"Unknown type: {type}")
         return 1
@@ -133,10 +134,10 @@ def parse_args(args: List[str]) -> Optional[Dict[str, Any]]:
     return parsed_args
 
 
-def cli():
+def cli() -> int:
     args = parse_args(sys.argv[1:])
     if not args:
-        return None
+        return -1
 
     cmd = args.pop("command")
 
@@ -144,6 +145,8 @@ def cli():
         return load(**args)
     elif cmd == "dump":
         return dump(**args)
+
+    return 2
 
 
 if __name__ == "__main__":

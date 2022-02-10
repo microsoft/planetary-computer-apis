@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Optional
 
 import orjson
-from pydantic import BaseModel
 from humps import camelize
+from pydantic import BaseModel
 
 from pccommon.tables import ModelTableService
 from pccommon.utils import get_param_str, orjson_dumps

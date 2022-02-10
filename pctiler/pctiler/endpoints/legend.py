@@ -4,7 +4,7 @@ from typing import Sequence
 import matplotlib.pyplot as plt
 import numpy as np
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import Response, ORJSONResponse
+from fastapi.responses import ORJSONResponse, Response
 from matplotlib.colors import ListedColormap
 from rio_tiler.colormap import make_lut
 

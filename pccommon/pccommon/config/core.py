@@ -4,11 +4,11 @@ from typing import Optional
 from cachetools import Cache, LRUCache, cachedmethod
 from cachetools.func import lru_cache
 from cachetools.keys import hashkey
-from pccommon.constants import DEFAULT_TABLE_TTL
 from pydantic import BaseModel, BaseSettings, Field, PrivateAttr
 
 from pccommon.config.collections import CollectionConfigTable
 from pccommon.config.containers import ContainerConfigTable
+from pccommon.constants import DEFAULT_TABLE_TTL
 
 logger = logging.getLogger(__name__)
 

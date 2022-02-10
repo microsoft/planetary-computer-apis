@@ -1,7 +1,7 @@
 from typing import Callable, Optional, Tuple
 
-from azure.data.tables import TableServiceClient, TableClient
 import orjson
+from azure.data.tables import TableClient, TableServiceClient
 from pydantic import BaseModel
 
 from pccommon.tables import ModelTableService
