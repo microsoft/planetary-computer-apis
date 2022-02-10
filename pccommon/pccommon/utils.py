@@ -1,6 +1,8 @@
 import urllib.parse
 from typing import Any, Callable, Dict, Optional, TypeVar
 
+import orjson
+
 T = TypeVar("T")
 U = TypeVar("U")
 
@@ -19,3 +21,8 @@ def map_opt(fn: Callable[[T], U], v: Optional[T]) -> Optional[U]:
     None if the input option is None.
     """
     return v if v is None else fn(v)
+
+
+def orjson_dumps(v: Dict[str, Any], *args: Any, default: Any) -> str:
+    # orjson.dumps returns bytes, to match standard json.dumps we need to decode
+    return orjson.dumps(v, default=default).decode()

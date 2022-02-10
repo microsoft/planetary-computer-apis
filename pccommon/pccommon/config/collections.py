@@ -1,10 +1,11 @@
 from typing import Any, Dict, List, Optional
 
+import orjson
 from pydantic import BaseModel
 from humps import camelize
 
 from pccommon.tables import ModelTableService
-from pccommon.utils import get_param_str
+from pccommon.utils import get_param_str, orjson_dumps
 
 
 class DefaultRenderConfig(BaseModel):
@@ -71,11 +72,17 @@ class DefaultRenderConfig(BaseModel):
     def should_add_item_links(self) -> bool:
         return self.create_links and (not self.hidden)
 
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
+
 
 class CamelModel(BaseModel):
     class Config:
         alias_generator = camelize
         allow_population_by_field_name = True
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
 
 
 class Mosaics(CamelModel):
@@ -115,6 +122,10 @@ class CollectionConfig(BaseModel):
     render_config: DefaultRenderConfig
     queryables: Dict[str, Any]
     mosaic_info: MosaicInfo
+
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
 
 
 class CollectionConfigTable(ModelTableService[CollectionConfig]):

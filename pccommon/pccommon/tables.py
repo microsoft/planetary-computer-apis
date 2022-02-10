@@ -1,10 +1,10 @@
-import json
 from typing import Any, Callable, Dict, Generic, Optional, Tuple, Type, TypeVar
 
 from azure.core.credentials import AzureNamedKeyCredential, AzureSasCredential
 from azure.core.exceptions import ResourceNotFoundError
 from azure.data.tables import TableClient, TableServiceClient
 from cachetools import Cache, TTLCache, cachedmethod
+import orjson
 from pydantic import BaseModel
 
 from pccommon.constants import DEFAULT_TABLE_TTL
@@ -29,7 +29,7 @@ def encode_model(m: BaseModel) -> str:
 
 
 def decode_dict(s: str) -> Dict[str, Any]:
-    return json.loads(s)
+    return orjson.loads(s)
 
 
 class TableService:
