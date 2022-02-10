@@ -4,17 +4,17 @@ from typing import Sequence
 import matplotlib.pyplot as plt
 import numpy as np
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import Response, ORJSONResponse
 from matplotlib.colors import ListedColormap
 from rio_tiler.colormap import make_lut
-from starlette.responses import JSONResponse, Response
 
 from ..colormaps import custom_colormaps, registered_cmaps
 
 legend_router = APIRouter()
 
 
-@legend_router.get("/classmap/{classmap_name}")
-async def get_classmap_legend(classmap_name: str) -> JSONResponse:
+@legend_router.get("/classmap/{classmap_name}", response_class=ORJSONResponse)
+async def get_classmap_legend(classmap_name: str) -> ORJSONResponse:
     """Generate values and color swatches mapping for a given classmap."""
     classmap = custom_colormaps.get(classmap_name)
 
@@ -23,7 +23,7 @@ async def get_classmap_legend(classmap_name: str) -> JSONResponse:
             status_code=404, detail=f"Classmap {classmap_name} not found"
         )
 
-    return JSONResponse(content=classmap)
+    return ORJSONResponse(content=classmap)
 
 
 @legend_router.get("/colormap/{cmap_name}", response_class=Response)
