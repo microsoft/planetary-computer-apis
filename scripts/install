@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0") [submit|ingest|func|deploy]
+Installs python projects into local environment.
+"
+}
+
+while [[ $# -gt 0 ]]; do case $1 in
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+source scripts/env
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    for DIR in "${PACKAGE_DIRS[@]}"; do
+        echo "Installing ${DIR}"
+        pip install -e ${DIR}
+    done
+
+fi
