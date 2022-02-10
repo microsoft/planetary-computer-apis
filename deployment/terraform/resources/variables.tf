@@ -16,6 +16,11 @@ variable "pc_test_resources_kv" {
   default = "pc-test-deploy-secrets"
 }
 
+variable "pc_test_resources_acr" {
+  type    = string
+  default = "pccomponentstest"
+}
+
 variable "aks_node_count" {
   type = number
 }
