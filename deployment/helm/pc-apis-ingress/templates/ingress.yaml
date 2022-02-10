@@ -1,7 +1,7 @@
 {{- if .Values.pcingress.ingress.enabled -}}
 {{- $fullName := include "pcingress.fullname" . -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 {{- else -}}
 apiVersion: extensions/v1beta1
 {{- end }}
@@ -26,15 +26,21 @@ spec:
         paths:
           {{ if $.Values.stac.enabled }}
           - path: {{ $.Values.pcingress.services.stac.path }}
+            pathType: Exact
             backend:
-              serviceName: {{ $.Values.pcingress.services.stac.name }}
-              servicePort: {{ $.Values.pcingress.services.stac.port }}
+              service:
+                name: {{ $.Values.pcingress.services.stac.name }}
+                port:
+                  number: {{ $.Values.pcingress.services.stac.port }}
           {{- end}}
           {{ if $.Values.tiler.enabled }}
           - path: {{ $.Values.pcingress.services.tiler.path }}
+            pathType: Exact
             backend:
-              serviceName: {{ $.Values.pcingress.services.tiler.name }}
-              servicePort: {{ $.Values.pcingress.services.tiler.port }}
+              service:
+                name: {{ $.Values.pcingress.services.tiler.name }}
+                port:
+                  number: {{ $.Values.pcingress.services.tiler.port }}
           {{- end}}
   {{- end }}
 {{- end }}
