@@ -1,5 +1,4 @@
 import logging
-from functools import partial
 from typing import Optional
 
 from cachetools import Cache, LRUCache, cachedmethod
@@ -39,7 +38,7 @@ class PCAPIsConfig(BaseSettings):
 
     debug: bool = False
 
-    @cachedmethod(cache=lambda self: self._cache, key=partial(hashkey, "collections"))
+    @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("collection"))
     def get_collection_config_table(self) -> CollectionConfigTable:
         return CollectionConfigTable.from_account_key(
             account_url=self.collection_config.account_url,
@@ -49,7 +48,7 @@ class PCAPIsConfig(BaseSettings):
             ttl=self.table_value_ttl,
         )
 
-    @cachedmethod(cache=lambda self: self._cache, key=partial(hashkey, "container"))
+    @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("container"))
     def get_container_config_table(self) -> ContainerConfigTable:
         return ContainerConfigTable.from_account_key(
             account_url=self.container_config.account_url,

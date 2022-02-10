@@ -22,6 +22,78 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        },
+        "threedep:region": {
+          "title": "Region",
+          "type": "string"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "description": "",
+          "cql": [
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2020-05-06"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Elevation (terrain)",
+          "description": "Elevation data scaled -1000 to 4000 with terrain colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=terrain",
+          "minZoom": 8
+        },
+        {
+          "name": "Elevation (viridis)",
+          "description": "Elevation data scaled -1000 to 4000 with viridis colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=viridis",
+          "minZoom": 8
+        },
+        {
+          "name": "Elevation (gray)",
+          "description": "Elevation data scaled -1000 to 4000 with gray colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=gray_r",
+          "minZoom": 8
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 8,
+        "coordinates": [
+          47.1113,
+          -120.8578
+        ]
+      }
     }
   },
   "alos-dem": {
@@ -47,6 +119,77 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2016-12-07T00:00:00Z",
+                    "2016-12-07T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Elevation (terrain)",
+          "description": "Elevation data scaled -1000 to 4000 with terrain colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=terrain",
+          "minZoom": 8
+        },
+        {
+          "name": "Elevation (viridis)",
+          "description": "Elevation data scaled -1000 to 4000 with viridis colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=viridis",
+          "minZoom": 8
+        },
+        {
+          "name": "Elevation (gray)",
+          "description": "Elevation data scaled -1000 to 4000 with gray colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=gray_r",
+          "minZoom": 8
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 8,
+        "coordinates": [
+          35.6837,
+          138.4281
+        ]
+      }
     }
   },
   "aster-l1t": {
@@ -69,6 +212,231 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "Queryables for Planetary Computer Landsat 8 C2 L2 STAC API",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        },
+        "eo:cloud_cover": {
+          "$ref": "https://stac-extensions.github.io/eo/v1.0.0/schema.json#/definitions/fields/properties/eo:cloud_cover"
+        },
+        "view:off_nadir": {
+          "$ref": "https://stac-extensions.github.io/view/v1.0.0/schema.json#/definitions/fields/properties/view:off_nadir"
+        },
+        "view:sun_azimuth": {
+          "$ref": "https://stac-extensions.github.io/view/v1.0.0/schema.json#/definitions/fields/properties/view:sun_azimuth"
+        },
+        "view:sun_elevation": {
+          "$ref": "https://stac-extensions.github.io/view/v1.0.0/schema.json#/definitions/fields/properties/view:sun_elevation"
+        },
+        "sat:orbit_state": {
+          "title": "Orbit State",
+          "$ref": "https://stac-extensions.github.io/sat/v1.0.0/schema.json#/definitions/fields/properties/sat:orbit_state"
+        },
+        "aster:processing_number": {
+          "title": "Processing #",
+          "type": "string"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2006-12-31T23:59:59Z"
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Most recent (any cloud cover)",
+          "description": "",
+          "cql": [
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2006-12-31T23:59:59Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Oct \u2013 Dec 2006 (low-cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2006-10-01",
+                    "2006-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                20
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jul \u2013 Sep 2006 (low-cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2006-07-01",
+                    "2006-09-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                20
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Apr \u2013 Jun 2006 (low-cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2006-04-01",
+                    "2006-06-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                20
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jan \u2013 Mar 2006 (low-cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2006-01-01",
+                    "2006-03-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                20
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "SWIR - Pseudo RGB",
+          "description": "SWIR spectral bands 1,3,5",
+          "options": "assets=SWIR&asset_bidx=SWIR|1,3,5&nodata=0&skipcovered=False&exitwhenfull=False&items_limit=15&time_limit=5&color_formula=gamma RGB 2.7, saturation 1.2, sigmoidal RGB 15 0.55",
+          "minZoom": 9
+        },
+        {
+          "name": "VNIR - Pseudo RGB",
+          "description": "VNIR spectral bands 2,3,1",
+          "options": "assets=VNIR&asset_bidx=VNIR|2,3,1&nodata=0&skipcovered=False&exitwhenfull=False&items_limit=15&time_limit=5&items_limit=15",
+          "minZoom": 9
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 9,
+        "coordinates": [
+          37.2141,
+          -104.2947
+        ]
+      },
+      "defaultCustomQuery": {}
     }
   },
   "chloris-biomass": {
@@ -94,6 +462,404 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "All years",
+          "description": "",
+          "cql": []
+        },
+        {
+          "name": "2019",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-08-01",
+                    "2019-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2018",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2017-08-01",
+                    "2018-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2017",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2016-08-01",
+                    "2017-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2016",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2015-08-01",
+                    "2016-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2015",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2014-08-01",
+                    "2015-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2014",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2013-08-01",
+                    "2014-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2013",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2012-08-01",
+                    "2013-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2012",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2011-08-01",
+                    "2012-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2011",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2010-08-01",
+                    "2011-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2010",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2009-08-01",
+                    "2010-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2009",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2008-08-01",
+                    "2009-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2008",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2007-08-01",
+                    "2008-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2007",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2006-08-01",
+                    "2007-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2006",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2005-08-01",
+                    "2006-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2005",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2004-08-01",
+                    "2005-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2004",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2003-08-01",
+                    "2004-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2003",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2002-08-01",
+                    "2003-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Aboveground Biomass (tonnes)",
+          "description": "Annual estimates of aboveground woody biomass",
+          "options": "assets=biomass_wm&colormap_name=chloris-biomass&rescale=1,750000",
+          "minZoom": 2,
+          "legend": {
+            "type": "continuous",
+            "labels": [
+              "0",
+              "375k",
+              "> 750k"
+            ]
+          }
+        },
+        {
+          "name": "Biomass Change from prior year (tonnes)",
+          "description": "Annual estimates of changes (gains and losses) in aboveground woody biomass.",
+          "options": "assets=biomass_change_wm&colormap_name=spectral&rescale=-5000,5000",
+          "minZoom": 2
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 4,
+        "coordinates": [
+          -4.3028,
+          -58.0357
+        ]
+      }
     }
   },
   "cop-dem-glo-30": {
@@ -119,6 +885,74 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "description": "",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2021-04-22"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Elevation (terrain)",
+          "description": "Elevation data scaled -1000 to 4000 with terrain colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=terrain",
+          "minZoom": 8
+        },
+        {
+          "name": "Elevation (viridis)",
+          "description": "Elevation data scaled -1000 to 4000 with viridis colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=viridis",
+          "minZoom": 8
+        },
+        {
+          "name": "Elevation (gray)",
+          "description": "Elevation data scaled -1000 to 4000 with gray colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=gray_r",
+          "minZoom": 8
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 8,
+        "coordinates": [
+          30.0572,
+          80.1735
+        ]
+      }
     }
   },
   "cop-dem-glo-90": {
@@ -144,6 +978,74 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "description": "",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2021-04-22"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Elevation (terrain)",
+          "description": "Elevation data scaled -1000 to 4000 with terrain colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=terrain",
+          "minZoom": 8
+        },
+        {
+          "name": "Elevation (viridis)",
+          "description": "Elevation data scaled -1000 to 4000 with viridis colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=viridis",
+          "minZoom": 8
+        },
+        {
+          "name": "Elevation (gray)",
+          "description": "Elevation data scaled -1000 to 4000 with gray colormap",
+          "options": "assets=data&rescale=-1000,4000&colormap_name=gray_r",
+          "minZoom": 8
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 8,
+        "coordinates": [
+          46.8776,
+          12.1444
+        ]
+      }
     }
   },
   "gap": {
@@ -166,6 +1068,64 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1998-01-01",
+                    "2012-01-01"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Default",
+          "description": "Land cover classification using custom GAP colormap",
+          "options": "assets=data&exitwhenfull=False&skipcovered=False&colormap_name=gap-lulc",
+          "minZoom": 5
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 7,
+        "coordinates": [
+          26.7409,
+          -80.9714
+        ]
+      }
     }
   },
   "gnatsgo-rasters": {
@@ -191,6 +1151,385 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "cql": []
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Available water storage estimate, aws0_100 (mm)",
+          "description": "Available water storage estimate (aws) in standard zone 4 (0-100 cm depth), expressed in mm. the volume of plant available water that the soil can store in this zone based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws0_100&rescale=0.0,600.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws0_150 (mm)",
+          "description": "Available water storage estimate (aws) in standard zone 5 (0-150 cm depth), expressed in mm. the volume of plant available water that the soil can store in this zone based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws0_150&rescale=0.0,879.1&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws0_20 (mm)",
+          "description": "Available water storage estimate (aws) in standard zone 2 (0-20 cm depth), expressed in mm. the volume of plant available water that the soil can store in this zone based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws0_20&rescale=0.0,120.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws0_30 (mm)",
+          "description": "Available water storage estimate (aws) in standard zone 3 (0-30 cm depth), expressed in mm. the volume of plant available water that the soil can store in this zone based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws0_30&rescale=0.0,180.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws0_5 (mm)",
+          "description": "Available water storage estimate (aws) in a standard zone 1 (0-5 cm depth), expressed in mm. the volume of plant available water that the soil can store in this layer based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws0_5&rescale=0.0,30.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws0_999 (mm)",
+          "description": "Available water storage estimate (aws) in total soil profile (0 cm to the reported depth of the soil profile), expressed in mm. the volume of plant available water that the soil can store in this layer based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws0_999&rescale=0.0,1350.39&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws100_150 (mm)",
+          "description": "Available water storage estimate (aws) in standard layer 5 (100-150 cm depth), expressed in mm. the volume of plant available water that the soil can store in this layer based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws100_150&rescale=0.0,287.42&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws150_999 (mm)",
+          "description": "Available water storage estimate (aws) in standard layer 6 (150 cm to the reported depth of the soil profile), expressed in mm. the volume of plant available water that the soil can store in this layer based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws150_999&rescale=0.0,600.1&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws20_50 (mm)",
+          "description": "Available water storage estimate (aws) in standard layer 3 (20-50 cm depth), expressed in mm. the volume of plant available water that the soil can store in this layer based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws20_50&rescale=0.0,180.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws50_100 (mm)",
+          "description": "Available water storage estimate (aws) in standard layer 3 (50-100 cm depth), expressed in mm. the volume of plant available water that the soil can store in this layer based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws50_100&rescale=0.0,300.55&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Available water storage estimate, aws5_20 (mm)",
+          "description": "Available water storage estimate (aws) in standard layer 2 (5-20 cm depth), expressed in mm. the volume of plant available water that the soil can store in this layer based on all map unit components (weighted average). null values are presented where data are incomplete or not available.",
+          "options": "assets=aws5_20&rescale=0.0,90.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "National commodity crop productivity index for corn, nccpi3corn",
+          "description": "National commodity crop productivity index for corn (weighted average) for major earthy components. values range from .01 (low productivity) to .99 (high productivity). earthy components are those soil series or higher level taxa components that can support crop growth (dobos et al., 2012). major components are those soil components where the majorcompflag = 'yes' (ssurgo component table). null values are presented where data are incomplete or not available.",
+          "options": "assets=nccpi3corn&rescale=0.0,0.991&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "National commodity crop productivity index for cotton, nccpi3cot",
+          "description": "National commodity crop productivity index for cotton (weighted average) for major earthy components. values range from .01 (low productivity) to .99 (high productivity). earthy components are those soil series or higher level taxa components that can support crop growth (dobos et al., 2012). major components are those soil components where the majorcompflag = 'yes' (ssurgo component table). null values are presented where data are incomplete or not available.",
+          "options": "assets=nccpi3cot&rescale=0.0,0.901&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "National commodity crop productivity index for small grains, nccpi3sg",
+          "description": "National commodity crop productivity index for small grains (weighted average) for major earthy components. values range from .01 (low productivity) to .99 (high productivity). earthy components are those soil series or higher level taxa components that can support crop growth (dobos et al., 2012). major components are those soil components where the majorcompflag = 'yes' (ssurgo component table). null values are presented where data are incomplete or not available.",
+          "options": "assets=nccpi3sg&rescale=0.0,0.983&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "National commodity crop productivity index for soybeans, nccpi3soy",
+          "description": "National commodity crop productivity index for soybeans (weighted average) for major earthy components. values range from .01 (low productivity) to .99 (high productivity). earthy components are those soil series or higher level taxa components that can support crop growth (dobos et al., 2012). major components are those soil components where the majorcompflag = 'yes' (ssurgo component table). null values are presented where data are incomplete or not available.",
+          "options": "assets=nccpi3soy&rescale=0.0,0.981&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "National commodity crop productivity index that has the highest value among corn and soybeans, small grains, or cotton, nccpi3all",
+          "description": "National commodity crop productivity index that has the highest value among corn and soybeans, small grains, or cotton (weighted average) for major earthy components. values range from .01 (low productivity) to .99 (high productivity). earthy components are those soil series or higher level taxa components that can support crop growth (dobos et al., 2012). major components are those soil components where the majorcompflag = 'yes' (ssurgo component table). null values are presented where data are incomplete or not available.",
+          "options": "assets=nccpi3all&rescale=0.0,0.991&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Potential wetland soil landscapes, pwsl1pomu",
+          "description": "Potential wetland soil landscapes (pwsl) is expressed as the percentage of the map unit that meets the pwsl criteria. the hydric rating (soil component variable \u201chydricrating\u201d) is an indicator of wet soils. for version 1 (pwsl1), those soil components that meet the following criteria are tagged as pwsl and their comppct_r values are summed for each map unit. soil components with hydricrating = 'yes' are considered pwsl. soil components with hydricrating = \u201cno\u201d are not pwsl. soil components with hydricrating = 'unranked' are tested using other attributes, and will be considered pwsl if any of the following conditions are met: drainagecl = 'poorly drained' or 'very poorly drained' or the localphase or the otherph data fields contain any of the phrases \"drained\" or \"undrained\" or \"channeled\" or \"protected\" or \"ponded\" or \"flooded\". if these criteria do not determine the pwsl for a component and hydricrating = 'unranked', then the map unit will be classified as pwsl if the map unit name contains any of the phrases \"drained\" or \"undrained\" or \"channeled\" or \"protected\" or \"ponded\" or \"flooded\". for version 1 (pwsl1), waterbodies are identified as \"999\" when map unit names match a list of terms that identify water or intermittent water or map units have a sum of the comppct_r for \"water\" that is 80% or greater. null values are presented where data are incomplete or not available.",
+          "options": "assets=pwsl1pomu&rescale=1,999&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Root zone depth is the depth within the soil profile that commodity crop, rootznemc",
+          "description": "Root zone depth is the depth within the soil profile that commodity crop (cc) roots can effectively extract water and nutrients for growth. root zone depth influences soil productivity significantly. soil component horizon criteria for root-limiting depth include: presence of hard bedrock, soft bedrock, a fragipan, a duripan, sulfuric material, a dense layer, a layer having a ph of less than 3.5, or a layer having an electrical conductivity of more than 12 within the component soil profile. if no root-restricting zone is identified, a depth of 150 cm is used to approximate the root zone depth (dobos et al., 2012). root zone depth is computed for all map unit major earthy components (weighted average). earthy components are those soil series or higher level taxa components that can support crop growth (dobos et al., 2012). major components are those soil components where the majorcompflag = 'yes' (ssurgo component table). null values are presented where data are incomplete or not available.",
+          "options": "assets=rootznemc&rescale=0,150&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Root zone, rootznaws (mm)",
+          "description": "Root zone (commodity crop) available water storage estimate (rzaws) , expressed in mm, is the volume of plant available water that the soil can store within the root zone based on all map unit earthy major components (weighted average). earthy components are those soil series or higher level taxa components that can support crop growth (dobos et al., 2012). major components are those soil components where the majorcompflag = 'yes' (ssurgo component table). null values are presented where data are incomplete or not available.",
+          "options": "assets=rootznaws&rescale=0,900&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc0_100 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard zone 4 (0-100 cm depth). the concentration of organic carbon present in the soil expressed in grams c per square meter to a depth of 100 cm. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc0_100&rescale=0.0,802441.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc0_150 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard zone 5 (0-150 cm depth). the concentration of organic carbon present in the soil expressed in grams c per square meter to a depth of 150 cm. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc0_150&rescale=0.0,1178783.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc0_20 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard zone 2 (0-20 cm depth). the concentration of organic carbon present in the soil expressed in grams c per square meter to a depth of 20 cm. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc0_20&rescale=0.0,160518.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc0_30 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard zone 3 (0-30 cm depth). the concentration of organic carbon present in the soil expressed in grams c per square meter to a depth of 30 cm. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc0_30&rescale=0.0,240770.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc0_5 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard layer 1 or standard zone 1 (0-5 cm depth). the concentration of organic carbon present in the soil expressed in grams c per square meter to a depth of 5 cm. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc0_5&rescale=0.0,40130.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc0_999 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in total soil profile (0 cm to the reported depth of the soil profile). the concentration of organic carbon present in the soil expressed in grams c per square meter for the total reported soil profile depth. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc0_999&rescale=0.0,1182344.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc100_150 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard layer 5 (100-150 cm depth). the concentration of organic carbon present in the soil expressed in grams c per square meter for the 100-150 cm layer. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc100_150&rescale=0.0,376342.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc150_999 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard layer 6 (150 cm to the reported depth of the soil profile). the concentration of organic carbon present in the soil expressed in grams c per square meter for the 150 cm and greater depth layer. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc150_999&rescale=0.0,126247.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc20_50 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard layer 3 (20-50 cm depth). the concentration of organic carbon present in the soil expressed in grams c per square meter for the 20-50 cm layer. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc20_50&rescale=0.0,240743.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc50_100 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard layer 4 (50-100 cm depth). the concentration of organic carbon present in the soil expressed in grams c per square meter for the 50-100 cm layer. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc50_100&rescale=0.0,401179.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Soil organic carbon stock estimate, soc5_20 (g/m2)",
+          "description": "Soil organic carbon stock estimate (soc) in standard layer 2 (5-20 cm depth). the concentration of organic carbon present in the soil expressed in grams c per square meter for the 5-20 cm layer. null values are presented where data are incomplete or not available.",
+          "options": "assets=soc5_20&rescale=0.0,120389.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "The national commodity crop productivity index map unit percent earthy is the map unit summed comppct_r for major earthy comps. earthy comps are those soil series or higher level taxa comps that can support crop growth, pctearthmc",
+          "description": "The national commodity crop productivity index map unit percent earthy is the map unit summed comppct_r for major earthy components. earthy components are those soil series or higher level taxa components that can support crop growth (dobos et al., 2012). major components are those soil components where the majorcompflag = 'yes' (ssurgo component table). useful metadata information. null values are presented where data are incomplete or not available.",
+          "options": "assets=pctearthmc&rescale=0,100&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "The sum of the comppct_r, musumcpct",
+          "description": "The sum of the comppct_r (ssurgo component table) values for all listed components in the map unit. useful metadata information. null values are presented where data are incomplete or not available.",
+          "options": "assets=musumcpct&rescale=0,110&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "The sum of the comppct_r, musumcpcta",
+          "description": "The sum of the comppct_r (ssurgo component table) values used in the available water storage calculation for the map unit. useful metadata information. null values are presented where data are incomplete or not available.",
+          "options": "assets=musumcpcta&rescale=1,110&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "The sum of the comppct_r, musumcpcts",
+          "description": "The sum of the comppct_r (ssurgo component table) values used in the soil organic carbon calculation for the map unit. useful metadata information. null values are presented where data are incomplete or not available.",
+          "options": "assets=musumcpcts&rescale=1,110&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 1 or std zone 1, tk0_5a (cm)",
+          "description": "Thickness of soil components used in standard layer 1 or standard zone 1 (0-5 cm) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_5a&rescale=0.05,5.5&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 1 or std zone 1, tk0_5s (cm)",
+          "description": "Thickness of soil components used in standard layer 1 or standard zone 1 (0-5 cm) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_5s&rescale=0.0,6.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 2, tk5_20a (cm)",
+          "description": "Thickness of soil components used in standard layer 2 (5-20 cm) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk5_20a&rescale=0.03,16.5&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 2, tk5_20s (cm)",
+          "description": "Thickness of soil components used in standard layer 2 (5-20 cm) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk5_20s&rescale=0.0,17.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 3, tk20_50a (cm)",
+          "description": "Thickness of soil components used in standard layer 3 (20-50 cm) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk20_50a&rescale=0.06,37.65&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 3, tk20_50s (cm)",
+          "description": "Thickness of soil components used in standard layer 3 (20-50 cm) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk20_50s&rescale=0.0,38.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 4, tk50_100a (cm)",
+          "description": "Thickness of soil components used in standard layer 4 (50-100 cm) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk50_100a&rescale=0.03,55.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 4, tk50_100s (cm)",
+          "description": "Thickness of soil components used in standard layer 4 (50-100 cm) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk50_100s&rescale=0.0,55.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 5, tk100_150a (cm)",
+          "description": "Thickness of soil components used in standard layer 5 (100-150 cm) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk100_150a&rescale=0.04,55.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 5, tk100_150s (cm)",
+          "description": "Thickness of soil components used in standard layer 5 (100-150 cm) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk100_150s&rescale=0.0,55.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 6, tk150_999a (cm)",
+          "description": "Thickness of soil components used in standard layer 6 (150 cm to the reported depth of the soil profile) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk150_999a&rescale=0.0,307.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std layer 6, tk150_999s (cm)",
+          "description": "Thickness of soil components used in standard layer 6 (150 cm to the reported depth of the soil profile) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk150_999s&rescale=0.0,307.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std zone 2, tk0_20a (cm)",
+          "description": "Thickness of soil components used in standard zone 2 (0-20 cm) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_20a&rescale=0.08,22.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std zone 2, tk0_20s (cm)",
+          "description": "Thickness of soil components used in standard zone 2 (0-20 cm) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_20s&rescale=0.0,22.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std zone 3, tk0_30a (cm)",
+          "description": "Thickness of soil components used in standard zone 3 (0-30 cm) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_30a&rescale=0.08,33.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std zone 3, tk0_30s (cm)",
+          "description": "Thickness of soil components used in standard zone 3 (0-30 cm) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_30s&rescale=0.0,33.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std zone 4, tk0_100a (cm)",
+          "description": "Thickness of soil components used in standard zone 4 (0-100 cm) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_100a&rescale=0.08,110.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std zone 4, tk0_100s (cm)",
+          "description": "Thickness of soil components used in standard zone 4 (0-100 cm) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_100s&rescale=0.0,110.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std zone 5, tk0_150a (cm)",
+          "description": "Thickness of soil components used in standard zone 5 (0-150 cm) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_150a&rescale=0.08,165.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in std zone 5, tk0_150s (cm)",
+          "description": "Thickness of soil components used in standard zone 5 (0-150 cm) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_150s&rescale=0.0,165.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in total soil profile, tk0_999a (cm)",
+          "description": "Thickness of soil components used in total soil profile (0 cm to the reported depth of the soil profile) expressed in cm (weighted average) for the available water storage calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_999a&rescale=0.08,457.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Thickness of soil comps used in total soil profile, tk0_999s (cm)",
+          "description": "Thickness of soil components used in total soil profile (0 cm to the reported depth of the soil profile) expressed in cm (weighted average) for the soil organic carbon calculation. null values are presented where data are incomplete or not available.",
+          "options": "assets=tk0_999s&rescale=0.0,457.0&colormap_name=cividis",
+          "minZoom": 4
+        },
+        {
+          "name": "Zone for commodity crops that is \u2264 6 inches, droughty",
+          "description": "Zone for commodity crops that is less than or equal to 6 inches (152 mm) expressed as \"1\" for a drought vulnerable soil landscape map unit or \"0\" for a non-droughty soil landscape map unit or null for miscellaneous areas (includes water bodies) or where data were not available. it is computed as a weighted average for major earthy components. earthy components are those soil series or higher level taxa components that can support crop growth (dobos et al., 2012). major components are those soil components where the majorcompflag = 'yes'",
+          "options": "assets=droughty&rescale=0,1&colormap_name=cividis",
+          "minZoom": 4
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 6,
+        "coordinates": [
+          44.1454,
+          -112.6404
+        ]
+      }
     }
   },
   "goes-mcmip": {
@@ -212,6 +1551,78 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "Queryables for Planetary Computer GOES-R CMI STAC API",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        },
+        "platform": {
+          "description": "Platform",
+          "type": "string",
+          "title": "Platform",
+          "enum": [
+            "GOES-16",
+            "GOES-17"
+          ]
+        },
+        "goes:image-type": {
+          "description": "Image type",
+          "type": "string",
+          "title": "Image Type",
+          "enum": [
+            "FULL DISK",
+            "CONUS",
+            "MESOSCALE"
+          ]
+        },
+        "goes:mode": {
+          "title": "Scanning Mode",
+          "type": "string",
+          "enum": [
+            "3",
+            "4",
+            "6"
+          ]
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "description": "",
+          "cql": []
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Fire Temperature",
+          "description": "",
+          "options": "assets=Temp&rescale=0,3000&colormap_name=magma",
+          "minZoom": 10
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 4,
+        "coordinates": [
+          33.4872,
+          -114.4842
+        ]
+      }
     }
   },
   "goes-cmi": {
@@ -238,6 +1649,136 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "Queryables for Planetary Computer GOES-R CMI STAC API",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        },
+        "platform": {
+          "description": "Platform",
+          "type": "string",
+          "title": "Platform",
+          "enum": [
+            "GOES-16",
+            "GOES-17"
+          ]
+        },
+        "goes:image-type": {
+          "description": "Image type",
+          "type": "string",
+          "title": "Image Type",
+          "enum": [
+            "FULL DISK",
+            "CONUS",
+            "MESOSCALE"
+          ]
+        },
+        "goes:mode": {
+          "title": "Scanning Mode",
+          "type": "string",
+          "enum": [
+            "3",
+            "4",
+            "6"
+          ]
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent (Full disk)",
+          "description": "",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "goes:image-type"
+                },
+                "FULL DISK"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Most recent (CONUS)",
+          "description": "",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "goes:image-type"
+                },
+                "CONUS"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Most recent (Mesoscale)",
+          "description": "",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "goes:image-type"
+                },
+                "MESOSCALE"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Most recent (any type)",
+          "description": "",
+          "cql": []
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Natural color",
+          "description": "Natural color representation with Green represented by formula: `0.45*C02_2km+0.1*C03_2km+0.45*C01_2km`",
+          "options": "expression=C02_2km_wm,0.45*C02_2km_wm+0.1*C03_2km_wm+0.45*C01_2km_wm,C01_2km_wm&nodata=-1&rescale=1,2000&color_formula=Gamma RGB 2.5 Saturation 1.4 Sigmoidal RGB 2 0.7",
+          "minZoom": 2,
+          "legend": {
+            "type": "none"
+          }
+        },
+        {
+          "name": "Natural color (low contrast)",
+          "description": "Lower contrast natural color representation with Green represented by formula: `0.45*C02_2km+0.1*C03_2km+0.45*C01_2km`",
+          "options": "expression=C02_2km_wm,0.45*C02_2km_wm+0.1*C03_2km_wm+0.45*C01_2km_wm,C01_2km_wm&nodata=-1&rescale=1,3000&color_formula=Gamma RGB 2.5 Saturation 1.4 Sigmoidal RGB 2 0.7",
+          "minZoom": 2,
+          "legend": {
+            "type": "none"
+          }
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 4,
+        "coordinates": [
+          33.4872,
+          -114.4842
+        ]
+      },
+      "defaultCustomQuery": {}
     }
   },
   "hgb": {
@@ -264,6 +1805,83 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2010-12-31T00:00:00Z",
+                    "2010-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Above ground biomass carbon density",
+          "description": "",
+          "options": "assets=aboveground&colormap_name=greens&nodata=0&rescale=0,255",
+          "minZoom": 2
+        },
+        {
+          "name": "Below ground biomass carbon density",
+          "description": "",
+          "options": "assets=belowground&colormap_name=greens&nodata=0&rescale=0,255",
+          "minZoom": 2
+        },
+        {
+          "name": "Above ground biomass - accumulated uncertainty",
+          "description": "",
+          "options": "assets=aboveground_uncertainty&colormap_name=reds&nodata=0&rescale=0,50",
+          "minZoom": 2
+        },
+        {
+          "name": "Below ground biomass - accumulated uncertainty",
+          "description": "",
+          "options": "assets=belowground_uncertainty&colormap_name=reds&nodata=0&rescale=0,50",
+          "minZoom": 2
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 9,
+        "coordinates": [
+          -7.641129,
+          39.162521
+        ]
+      }
     }
   },
   "hrea": {
@@ -289,6 +1907,224 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent (2019)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2019-01-01",
+                    "2019-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2018",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-01-01",
+                    "2018-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2017",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2017-01-01",
+                    "2017-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2016",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2016-01-01",
+                    "2016-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2015",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2015-01-01",
+                    "2015-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2014",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2014-01-01",
+                    "2014-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2013",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2013-01-01",
+                    "2013-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2012",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2012-01-01",
+                    "2012-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Nighttime light composite",
+          "description": "",
+          "options": "assets=light-composite&colormap_name=magma&rescale=0.9,2&skipcovered=False&exitwhenfull=False",
+          "minZoom": 3
+        },
+        {
+          "name": "Estimated brightness",
+          "description": "",
+          "options": "assets=estimated-brightness&colormap_name=magma&rescale=0,200&skipcovered=False&exitwhenfull=False",
+          "minZoom": 3
+        },
+        {
+          "name": "Probability of electrification",
+          "description": "",
+          "options": "assets=lightscore&colormap_name=magma&rescale=0,1&skipcovered=False&exitwhenfull=False",
+          "minZoom": 3
+        },
+        {
+          "name": "Brightness proportion to uninhabited areas",
+          "description": "Proportion of nights a settlement is brighter than uninhabited areas",
+          "options": "assets=night-proportion&colormap_name=magma&rescale=0,1&skipcovered=False&exitwhenfull=False",
+          "minZoom": 3
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 3,
+        "coordinates": [
+          11.828,
+          20.6367
+        ]
+      },
+      "defaultCustomQuery": {}
     }
   },
   "io-lulc": {
@@ -310,6 +2146,66 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        },
+        "io:supercell_id": {
+          "title": "Supercell ID",
+          "type": "string"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "description": "Most recent Land Use/Land Cover",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2020-06-01"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Default",
+          "description": "Land cover classification using 10 class custom colormap",
+          "options": "assets=data&exitwhenfull=False&skipcovered=False&colormap_name=io-lulc",
+          "minZoom": 4
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 4,
+        "coordinates": [
+          -0.8749,
+          109.8456
+        ]
+      }
     }
   },
   "io-lulc-9-class": {
@@ -331,6 +2227,100 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        },
+        "io:supercell_id": {
+          "title": "Supercell ID",
+          "type": "string"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "2019",
+          "description": "2019 Use/Land Cover",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2019-06-01"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2018",
+          "description": "2018 Land Use/Land Cover",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2018-06-01"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2017",
+          "description": "2017 Land Use/Land Cover",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2017-06-01"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Default",
+          "description": "Land cover classification using 9 class custom colormap",
+          "options": "assets=data&exitwhenfull=False&skipcovered=False&colormap_name=io-lulc-9-class",
+          "minZoom": 4
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 4,
+        "coordinates": [
+          -0.8749,
+          109.8456
+        ]
+      }
     }
   },
   "jrc-gsw": {
@@ -353,6 +2343,127 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "description": "",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2020-07-01"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Water occurrence",
+          "description": "Shows where surface water occurred between 1984 and 2020",
+          "options": "assets=occurrence&colormap_name=jrc-occurrence&nodata=0",
+          "minZoom": 4,
+          "legend": {
+            "type": "continuous",
+            "labels": [
+              "Sometimes water",
+              "Always water"
+            ],
+            "trimStart": 1
+          }
+        },
+        {
+          "name": "Annual water recurrence",
+          "description": "Shows frequency that water returns from one year to another",
+          "options": "assets=recurrence&colormap_name=jrc-recurrence&nodata=0",
+          "minZoom": 4,
+          "legend": {
+            "type": "continuous",
+            "labels": [
+              ">0%",
+              "100%"
+            ],
+            "trimStart": 1,
+            "trimEnd": 2
+          }
+        },
+        {
+          "name": "Water Occurrence change intensity",
+          "description": "Shows where surface water occurrence increased, decreased, or did not change between 1984 and 2020",
+          "options": "assets=change&colormap_name=jrc-change&nodata=0",
+          "minZoom": 4,
+          "legend": {
+            "type": "continuous",
+            "labels": [
+              "Decrease",
+              "No change",
+              "Increase"
+            ],
+            "trimEnd": 3
+          }
+        },
+        {
+          "name": "Water seasonality",
+          "description": "Indicates more seasonal or permanent surface water features during the course of a year",
+          "options": "assets=seasonality&colormap_name=jrc-seasonality&nodata=0",
+          "minZoom": 4,
+          "legend": {
+            "type": "continuous",
+            "labels": [
+              "Seasonal",
+              "Permanent"
+            ],
+            "trimStart": 1,
+            "trimEnd": 1
+          }
+        },
+        {
+          "name": "Water transitions",
+          "description": "Classifies the change in water state between the first and last years of observation",
+          "options": "assets=transitions&colormap_name=jrc-transitions&nodata=0",
+          "minZoom": 4
+        },
+        {
+          "name": "Maximum water extent",
+          "description": "Show the maximum observed water extent during the course of 1984 to 2020",
+          "options": "assets=extent&colormap_name=jrc-extent&nodata=0",
+          "minZoom": 4
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 10,
+        "coordinates": [
+          24.21647,
+          91.015209
+        ]
+      }
     }
   },
   "landsat-8-c2-l2": {
@@ -376,6 +2487,604 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "Queryables for Planetary Computer Landsat 8 C2 L2 STAC API",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        },
+        "eo:cloud_cover": {
+          "$ref": "https://stac-extensions.github.io/eo/v1.0.0/schema.json#/definitions/fields/properties/eo:cloud_cover"
+        },
+        "view:off_nadir": {
+          "$ref": "https://stac-extensions.github.io/view/v1.0.0/schema.json#/definitions/fields/properties/view:off_nadir"
+        },
+        "view:sun_azimuth": {
+          "$ref": "https://stac-extensions.github.io/view/v1.0.0/schema.json#/definitions/fields/properties/view:sun_azimuth"
+        },
+        "view:sun_elevation": {
+          "$ref": "https://stac-extensions.github.io/view/v1.0.0/schema.json#/definitions/fields/properties/view:sun_elevation"
+        },
+        "landsat:wrs_row": {
+          "title": "WRS Row",
+          "type": "string"
+        },
+        "landsat:wrs_path": {
+          "title": "WRS Path",
+          "type": "string"
+        },
+        "landsat:scene_id": {
+          "title": "Scene ID",
+          "type": "string"
+        },
+        "landsat:cloud_cover_land": {
+          "title": "Cloud Cover Land",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "landsat:collection_category": {
+          "title": "Collection Cat.",
+          "type": "string",
+          "enum": [
+            "T1",
+            "T2"
+          ]
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Most recent (any cloud cover)",
+          "description": "",
+          "cql": []
+        },
+        {
+          "name": "Sep \u2013 Nov, 2021 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2021-09-01",
+                    "2021-11-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jun \u2013 Aug, 2021 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2021-06-01",
+                    "2021-08-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mar \u2013 May, 2021 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2021-03-01",
+                    "2021-05-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dec \u2013 Feb, 2021 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2020-12-01",
+                    "2021-02-28T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Sep \u2013 Nov, 2020 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2020-09-01",
+                    "2020-11-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jun \u2013 Aug, 2020 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2020-06-01",
+                    "2020-08-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mar \u2013 May, 2020 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2020-03-01",
+                    "2020-05-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dec \u2013 Feb, 2020 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2019-12-01",
+                    "2020-02-28T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Sep \u2013 Nov, 2019 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2019-09-01",
+                    "2019-11-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jun \u2013 Aug, 2019 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2019-06-01",
+                    "2019-08-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mar \u2013 May, 2019 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2019-03-01",
+                    "2019-05-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dec \u2013 Feb, 2019 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-12-01",
+                    "2019-02-28T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Sep \u2013 Nov, 2018 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-09-01",
+                    "2018-11-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jun \u2013 Aug, 2018 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-06-01",
+                    "2018-08-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mar \u2013 May, 2018 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-03-01",
+                    "2018-05-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dec \u2013 Feb, 2018 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2017-12-01",
+                    "2018-02-28T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Natural color",
+          "description": "True color composite of visible bands (SR_B4, SR_B3, SR_B2)",
+          "options": "assets=SR_B4&assets=SR_B3&assets=SR_B2&nodata=0&color_formula=gamma RGB 2.7, saturation 1.5, sigmoidal RGB 15 0.55",
+          "minZoom": 8
+        },
+        {
+          "name": "Color infrared",
+          "description": "Highlights healthy (red) and unhealthy (blue/gray) vegetation (SR_B5, SR_B4, SR_B3).",
+          "options": "assets=SR_B5&assets=SR_B4&assets=SR_B3&nodata=0&color_formula=gamma RGB 2.7, saturation 1.5, sigmoidal RGB 15 0.55",
+          "minZoom": 8
+        },
+        {
+          "name": "Short wave infrared",
+          "description": "Darker shades of green indicate denser vegetation. Brown is indicative of bare soil and built-up areas (SR_B7, SR_B6, SR_B4).",
+          "options": "assets=SR_B7&assets=SR_B6&assets=SR_B4&nodata=0",
+          "minZoom": 8
+        },
+        {
+          "name": "Agriculture",
+          "description": "Darker shades of green indicate denser vegetation (SR_B6, SR_B5, SR_B2).",
+          "options": "assets=SR_B6&assets=SR_B5&assets=SR_B2&nodata=0",
+          "minZoom": 8
+        },
+        {
+          "name": "Normalized Difference Veg. Index (NDVI)",
+          "description": "Normalized Difference Vegetation Index (SR_B5-SR_B4)/(SR_B5+SR_B4), darker green indicates healthier vegetation.",
+          "options": "nodata=0&expression=(SR_B5-SR_B4)/(SR_B5+SR_B4)&rescale=-1,1&colormap_name=rdylgn",
+          "minZoom": 8
+        },
+        {
+          "name": "Moisture Index",
+          "description": "Moisture index indicating water stress in plants (SR_B5-SR_B6)/(SR_B5+SR_B6)",
+          "options": "nodata=0&expression=(SR_B5-SR_B6)/(SR_B5+SR_B6)&rescale=-1,1&colormap_name=rdbu",
+          "minZoom": 8
+        },
+        {
+          "name": "Atmospheric penetration",
+          "description": "False color rendering with non-visible bands to reduce effects of atmospheric particles (SR_B7, SR_B6, SR_B5).",
+          "options": "nodata=0&assets=SR_B7&assets=SR_B6&assets=SR_B5&color_formula=gamma RGB 2.7, saturation 1.5, sigmoidal RGB 15 0.55",
+          "minZoom": 8
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 11,
+        "coordinates": [
+          37.4069,
+          118.8188
+        ]
+      },
+      "defaultCustomQuery": {}
     }
   },
   "mobi": {
@@ -399,6 +3108,137 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent (2020)",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2020-04-14T00:00:00Z",
+                    "2020-04-14T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Species richness for all species",
+          "options": "assets=SpeciesRichness_All&colormap_name=magma&rescale=0,14&nodata=128",
+          "minZoom": 3
+        },
+        {
+          "name": "Species richness for vertebrates",
+          "options": "assets=SpeciesRichness_Vertebrates&colormap_name=magma&rescale=0,11",
+          "minZoom": 3
+        },
+        {
+          "name": "Species richness for aquatic invertebrates",
+          "options": "assets=SpeciesRichness_AquaticInverts&colormap_name=magma&rescale=0,19&nodata=128",
+          "minZoom": 3
+        },
+        {
+          "name": "Species richness for vascular plants",
+          "options": "assets=SpeciesRichness_Plants&colormap_name=magma&rescale=0,17",
+          "minZoom": 3
+        },
+        {
+          "name": "Species richness for pollinators",
+          "options": "assets=SpeciesRichness_PollinatorInverts&colormap_name=magma&rescale=0,4",
+          "minZoom": 3
+        },
+        {
+          "name": "Protection-weighted range-size rarity for all species",
+          "options": "assets=PWRSR_GAP12_SUM_All&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        },
+        {
+          "name": "Protection-weighted range-size rarity for vertebrates",
+          "options": "assets=PWRSR_GAP12_SUM_Vertebrates&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        },
+        {
+          "name": "Protection-weighted range-size rarity for aquatic invertebrates",
+          "options": "assets=PWRSR_GAP12_SUM_AquaticInverts&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        },
+        {
+          "name": "Protection-weighted range-size rarity for vascular plants",
+          "options": "assets=PWRSR_GAP12_SUM_PlantsInverts&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        },
+        {
+          "name": "Protection-weighted range-size rarity for pollinators",
+          "options": "assets=PWRSR_GAP12_SUM_PollinatorInverts&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        },
+        {
+          "name": "Range-size rarity for all species",
+          "description": "",
+          "options": "assets=RSR_All&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        },
+        {
+          "name": "Range-size rarity for vertebrates",
+          "description": "",
+          "options": "assets=RSR_Vertebrates&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        },
+        {
+          "name": "Range-size rarity for aquatic invertebrates",
+          "description": "",
+          "options": "assets=RSR_AquaticInverts&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        },
+        {
+          "name": "Range-size rarity for vascular plants",
+          "description": "",
+          "options": "assets=RSR_Plants&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        },
+        {
+          "name": "Range-size rarity for pollinators",
+          "options": "assets=RSR_PollinatorInverts&colormap_name=magma&rescale=0,.001",
+          "minZoom": 3
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 4,
+        "coordinates": [
+          37.3052,
+          -85.8457
+        ]
+      }
     }
   },
   "mtbs": {
@@ -420,6 +3260,765 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "All years",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1984-12-31",
+                    "2018-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Most recent (2018)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-01-01",
+                    "2018-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2017",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2017-01-01",
+                    "2017-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2016",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2016-01-01",
+                    "2016-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2015",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2015-01-01",
+                    "2015-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2014",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2014-01-01",
+                    "2014-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2013",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2013-01-01",
+                    "2013-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2012",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2012-01-01",
+                    "2012-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2011",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2011-01-01",
+                    "2011-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2010",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2010-01-01",
+                    "2010-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2009",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2009-01-01",
+                    "2009-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2008",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2008-01-01",
+                    "2008-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2007",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2007-01-01",
+                    "2007-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2006",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2006-01-01",
+                    "2006-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2005",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2005-01-01",
+                    "2005-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2004",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2004-01-01",
+                    "2004-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2003",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2003-01-01",
+                    "2003-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2002",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2002-01-01",
+                    "2002-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2001",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2001-01-01",
+                    "2001-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2000",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2000-01-01",
+                    "2000-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1999",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1999-01-01",
+                    "1999-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1998",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1998-01-01",
+                    "1998-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1997",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1997-01-01",
+                    "1997-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1996",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1996-01-01",
+                    "1996-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1995",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1995-01-01",
+                    "1995-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1994",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1994-01-01",
+                    "1994-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1993",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1993-01-01",
+                    "1993-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1992",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1992-01-01",
+                    "1992-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1991",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1991-01-01",
+                    "1991-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1990",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1990-01-01",
+                    "1990-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1989",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1989-01-01",
+                    "1989-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1988",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1988-01-01",
+                    "1988-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1987",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1987-01-01",
+                    "1987-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1986",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1986-01-01",
+                    "1986-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1985",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1985-01-01",
+                    "1985-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1984",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "1984-12-31",
+                    "1984-12-31"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Burn severity",
+          "description": "Classifies the burn severity and extent of large fires across all lands of the United States",
+          "options": "assets=burn-severity&exitwhenfull=False&skipcovered=True&colormap_name=mtbs-severity",
+          "minZoom": 3
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 9,
+        "coordinates": [
+          39.2234,
+          -122.6932
+        ]
+      }
     }
   },
   "naip": {
@@ -441,6 +4040,337 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "Queryables for Planetary Computer Landsat 8 C2 L2 STAC API",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        },
+        "naip:year": {
+          "title": "Year",
+          "type": "string",
+          "enum": [
+            "2019",
+            "2018",
+            "2017",
+            "2016",
+            "2015",
+            "2014",
+            "2013",
+            "2012",
+            "2011",
+            "2010"
+          ]
+        },
+        "naip:state": {
+          "title": "State",
+          "type": "string",
+          "enum": [
+            "al",
+            "ak",
+            "az",
+            "ar",
+            "ca",
+            "co",
+            "ct",
+            "de",
+            "fl",
+            "ga",
+            "hi",
+            "id",
+            "il",
+            "in",
+            "ia",
+            "ks",
+            "ky",
+            "la",
+            "me",
+            "md",
+            "ma",
+            "mi",
+            "mn",
+            "ms",
+            "mo",
+            "mt",
+            "ne",
+            "nv",
+            "nh",
+            "nj",
+            "nm",
+            "ny",
+            "nc",
+            "nd",
+            "oh",
+            "ok",
+            "or",
+            "pa",
+            "ri",
+            "sc",
+            "sd",
+            "tn",
+            "tx",
+            "ut",
+            "vt",
+            "va",
+            "wa",
+            "wv",
+            "wi",
+            "wy"
+          ]
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent available",
+          "description": "",
+          "cql": []
+        },
+        {
+          "name": "2019",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2019-01-01",
+                    "2019-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2018",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-01-01",
+                    "2018-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2017",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2017-01-01",
+                    "2017-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2016",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2016-01-01",
+                    "2016-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2015",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2015-01-01",
+                    "2015-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2014",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2014-01-01",
+                    "2014-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2013",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2013-01-01",
+                    "2013-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2012",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2012-01-01",
+                    "2012-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2011",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2011-01-01",
+                    "2011-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2010",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2010-01-01",
+                    "2010-12-31T23:59:59Z"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Natural color",
+          "description": "RGB from visual assets",
+          "options": "assets=image&asset_bidx=image|1,2,3",
+          "minZoom": 12
+        },
+        {
+          "name": "Color infrared",
+          "description": "Highlights healthy (red) and unhealthy (blue/gray) vegetation.",
+          "options": "assets=image&asset_bidx=image|4,1,2&color_formula=Sigmoidal RGB 15 0.35",
+          "minZoom": 12
+        },
+        {
+          "name": "Normalized Difference Veg. Index (NDVI)",
+          "description": "Normalized Difference Vegetation Index (NIR-Red)/(NIR+Red), darker green indicates healthier vegetation.",
+          "options": "assets=image&asset_expression=image|(B4-B1)/(B4+B1)&rescale=-1,1&colormap_name=rdylgn",
+          "minZoom": 12
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 13,
+        "coordinates": [
+          36.0891,
+          -111.8577
+        ]
+      },
+      "defaultCustomQuery": {
+        "op": "args"
+      }
     }
   },
   "nasadem": {
@@ -466,6 +4396,73 @@
       ],
       "requires_token": false,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "cql": [
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2000-02-20"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Elevation (terrain)",
+          "description": "Elevation data scaled -1000 to 4000 with terrain colormap",
+          "options": "assets=elevation&rescale=-1000,4000&colormap_name=terrain",
+          "minZoom": 7
+        },
+        {
+          "name": "Elevation (viridis)",
+          "description": "Elevation data scaled -1000 to 4000 with viridis colormap",
+          "options": "assets=elevation&rescale=-1000,4000&colormap_name=viridis",
+          "minZoom": 7
+        },
+        {
+          "name": "Elevation (gray)",
+          "description": "Elevation data scaled -1000 to 4000 with gray colormap",
+          "options": "assets=elevation&rescale=-1000,4000&colormap_name=gray_r",
+          "minZoom": 7
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 7,
+        "coordinates": [
+          -10.727,
+          -74.762
+        ]
+      }
     }
   },
   "nrcan-landcover": {
@@ -487,6 +4484,62 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent",
+          "description": "Most recent Land Use/Land Cover",
+          "cql": [
+            {
+              "op": ">=",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "timestamp": "2015-01-01"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Default",
+          "description": "Land cover classification using custom colormap",
+          "options": "assets=landcover&exitwhenfull=False&skipcovered=False&colormap_name=nrcan-lulc",
+          "minZoom": 4
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 7,
+        "coordinates": [
+          51.3913,
+          -124.5087
+        ]
+      }
     }
   },
   "sentinel-2-l2a": {
@@ -509,6 +4562,664 @@
       ],
       "requires_token": true,
       "hidden": false
+    },
+    "queryables": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "https://example.org/queryables",
+      "type": "object",
+      "title": "Queryables for PC Sentinel-2-l2a STAC API",
+      "description": "Queryable properties for the STAC API Item Search filter.",
+      "properties": {
+        "datetime": {
+          "description": "Datetime",
+          "type": "string",
+          "title": "Acquired",
+          "format": "date-time",
+          "pattern": "(\\+00:00|Z)$"
+        },
+        "id": {
+          "title": "Item ID",
+          "description": "Item identifier",
+          "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/core/allOf/2/properties/id"
+        },
+        "eo:cloud_cover": {
+          "$ref": "https://stac-extensions.github.io/eo/v1.0.0/schema.json#/definitions/fields/properties/eo:cloud_cover"
+        },
+        "sat:orbit_state": {
+          "title": "Orbit State",
+          "$ref": "https://stac-extensions.github.io/sat/v1.0.0/schema.json#/definitions/fields/properties/sat:orbit_state"
+        },
+        "sat:relative_orbit": {
+          "title": "Relative Orbit",
+          "$ref": "https://stac-extensions.github.io/sat/v1.0.0/schema.json#/definitions/fields/properties/sat:relative_orbit"
+        },
+        "s2:datatake_type": {
+          "title": "Datatake Type",
+          "type": "string",
+          "enum": [
+            "INS-NOBS",
+            "INS-EOBS",
+            "INS-DASC",
+            "INS-ABSR",
+            "INS-VIC",
+            "INS-RAW",
+            "INS-TST"
+          ]
+        },
+        "s2:mgrs_tile": {
+          "title": "MGRS Tile",
+          "type": "string"
+        },
+        "s2:granule_id": {
+          "title": "Granule ID",
+          "type": "string"
+        },
+        "s2:product_uri": {
+          "title": "Product URI",
+          "type": "string"
+        },
+        "s2:product_type": {
+          "title": "Product Type",
+          "type": "string",
+          "enum": [
+            "S2MSI2A"
+          ]
+        },
+        "s2:mean_solar_zenith": {
+          "title": "Mean Solar Zenith",
+          "type": "number"
+        },
+        "s2:mean_solar_azimuth": {
+          "title": "Mean Solar Azimuth",
+          "type": "number"
+        },
+        "s2:water_percentage": {
+          "title": "Water Pct.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "s2:snow_ice_percentage": {
+          "title": "Snow/Ice Pct.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "s2:vegetation_percentage": {
+          "title": "Vegetation Pct.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "s2:thin_cirrus_percentage": {
+          "title": "Thin Cirrus Pct.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "s2:cloud_shadow_percentage": {
+          "title": "Cloud Shadow Pct.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "s2:nodata_pixel_percentage": {
+          "title": "NoData Pct.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "s2:dark_features_percentage": {
+          "title": "Dark Features Pct.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "s2:not_vegetated_percentage": {
+          "title": "Not Vegetated Pct.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "mosaic_info": {
+      "mosaics": [
+        {
+          "name": "Most recent (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Most recent (any cloud cover)",
+          "description": "",
+          "cql": []
+        },
+        {
+          "name": "Sep \u2013 Nov, 2021 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2021-09-01",
+                    "2021-11-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jun \u2013 Aug, 2021 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2021-06-01",
+                    "2021-08-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mar \u2013 May, 2021 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2021-03-01",
+                    "2021-05-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dec \u2013 Feb, 2021 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2020-12-01",
+                    "2021-02-28T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Sep \u2013 Nov, 2020 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2020-09-01",
+                    "2020-11-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jun \u2013 Aug, 2020 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2020-06-01",
+                    "2020-08-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mar \u2013 May, 2020 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2020-03-01",
+                    "2020-05-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dec \u2013 Feb, 2020 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2019-12-01",
+                    "2020-02-28T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Sep \u2013 Nov, 2019 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2019-09-01",
+                    "2019-11-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jun \u2013 Aug, 2019 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                [
+                  "2019-06-01",
+                  "2019-08-31T23:59:59Z"
+                ]
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mar \u2013 May, 2019 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2019-03-01",
+                    "2019-05-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dec \u2013 Feb, 2019 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-12-01",
+                    "2019-02-28T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Sep \u2013 Nov, 2018 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-09-01",
+                    "2018-11-30T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Jun \u2013 Aug, 2018 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-06-01",
+                    "2018-08-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mar \u2013 May, 2018 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2018-03-01",
+                    "2018-05-31T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dec \u2013 Feb, 2018 (low cloud)",
+          "description": "",
+          "cql": [
+            {
+              "op": "anyinteracts",
+              "args": [
+                {
+                  "property": "datetime"
+                },
+                {
+                  "interval": [
+                    "2017-12-01",
+                    "2018-02-28T23:59:59Z"
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "<=",
+              "args": [
+                {
+                  "property": "eo:cloud_cover"
+                },
+                10
+              ]
+            }
+          ]
+        }
+      ],
+      "renderOptions": [
+        {
+          "name": "Natural color",
+          "description": "True color composite of visible bands (B04, B03, B02)",
+          "options": "assets=B04&assets=B03&assets=B02&nodata=0&color_formula=Gamma RGB 3.7 Saturation 1.5 Sigmoidal RGB 15 0.35",
+          "minZoom": 9
+        },
+        {
+          "name": "Color infrared",
+          "description": "Highlights healthy (red) and unhealthy (blue/gray) vegetation (B08, B04, B03).",
+          "options": "assets=B08&assets=B04&assets=B03&nodata=0&color_formula=Gamma RGB 3.7 Saturation 1.5 Sigmoidal RGB 15 0.35",
+          "minZoom": 9
+        },
+        {
+          "name": "Short wave infrared",
+          "description": "Darker shades of green indicate denser vegetation. Brown is indicative of bare soil and built-up areas (B12, B8A, B04).",
+          "options": "assets=B12&assets=B8A&assets=B04&nodata=0&color_formula=Gamma RGB 3.7 Saturation 1.5 Sigmoidal RGB 15 0.35",
+          "minZoom": 9
+        },
+        {
+          "name": "Agriculture",
+          "description": "Darker shades of green indicate denser vegetation (B11, B08, B02).",
+          "options": "assets=B11&assets=B08&assets=B02&nodata=0&color_formula=Gamma RGB 3.7 Saturation 1.5 Sigmoidal RGB 15 0.35",
+          "minZoom": 9
+        },
+        {
+          "name": "Normalized Difference Veg. Index (NDVI)",
+          "description": "Normalized Difference Vegetation Index (B08-B04)/(B08+B04), darker green indicates healthier vegetation.",
+          "options": "nodata=0&expression=(B08-B04)/(B08+B04)&rescale=-1,1&colormap_name=rdylgn",
+          "minZoom": 9
+        },
+        {
+          "name": "Moisture Index (NDWI)",
+          "description": "Index indicating water stress in plants (B8A-B11)/(B8A+B11)",
+          "options": "nodata=0&expression=(B8A-B11)/(B8A+B11)&rescale=-1,1&colormap_name=rdbu",
+          "minZoom": 9
+        },
+        {
+          "name": "Atmospheric penetration",
+          "description": "False color rendering with non-visible bands to reduce effects of atmospheric particles (B12, B11, B8A).",
+          "options": "nodata=0&assets=B12&assets=B11&assets=B8A&color_formula=Gamma RGB 3.7 Saturation 1.5 Sigmoidal RGB 15 0.35",
+          "minZoom": 9
+        }
+      ],
+      "defaultLocation": {
+        "zoom": 9,
+        "coordinates": [
+          -16.494,
+          124.0274
+        ]
+      },
+      "defaultCustomQuery": {}
     }
   }
 }

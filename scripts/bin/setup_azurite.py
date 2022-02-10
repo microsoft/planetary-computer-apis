@@ -20,6 +20,7 @@ from pccommon.config.containers import ContainerConfig, ContainerConfigTable
 TEST_DATA_DIR = Path(pccommon.__file__).parent.parent / "tests" / "data-files"
 COLLECTION_CONFIG_PATH = TEST_DATA_DIR / "collection_config.json"
 CONTAINER_CONFIG_PATH = TEST_DATA_DIR / "container_config.json"
+ADDITIONAL_CONFIG_PATH = TEST_DATA_DIR / "additional-config"
 
 AZURITE_CONNECT_STRING = (
     "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
@@ -49,6 +50,8 @@ def setup_azurite() -> None:
             print(f"~ ~ Creating table {table}...")
             table_service_client.create_table(table)
 
+    print("~ ~ Writing container configurations...")
+
     container_config_table = ContainerConfigTable(
         lambda: (
             None,
@@ -59,9 +62,9 @@ def setup_azurite() -> None:
         js = json.load(f)
     for container_path, config_dict in js.items():
         sa, container = container_path.split("/")
-        container_config_table.set_config(
-            sa, container, ContainerConfig(**config_dict)
-        )
+        container_config_table.set_config(sa, container, ContainerConfig(**config_dict))
+
+    print("~ ~ Writing collection configurations...")
 
     collection_config_table = CollectionConfigTable(
         lambda: (

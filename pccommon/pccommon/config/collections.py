@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
+from humps import camelize
 
 from pccommon.tables import ModelTableService
 from pccommon.utils import get_param_str
@@ -71,8 +72,49 @@ class DefaultRenderConfig(BaseModel):
         return self.create_links and (not self.hidden)
 
 
+class CamelModel(BaseModel):
+    class Config:
+        alias_generator = camelize
+        allow_population_by_field_name = True
+
+
+class Mosaics(CamelModel):
+    name: str
+    description: Optional[str] = None
+    cql: List[Dict[str, Any]]
+
+
+class LegendConfig(CamelModel):
+    type: Optional[str]
+    labels: Optional[List[str]]
+    trim_start: Optional[int]
+    trim_end: Optional[int]
+
+
+class RenderOptions(CamelModel):
+    name: str
+    description: Optional[str] = None
+    options: str
+    min_zoom: int
+    legend: Optional[LegendConfig] = None
+
+
+class DefaultLocation(CamelModel):
+    zoom: int
+    coordinates: List[float]
+
+
+class MosaicInfo(CamelModel):
+    mosaics: List[Mosaics]
+    render_options: List[RenderOptions]
+    default_location: DefaultLocation
+    default_custom_query: Optional[Dict[str, Any]] = None
+
+
 class CollectionConfig(BaseModel):
     render_config: DefaultRenderConfig
+    queryables: Dict[str, Any]
+    mosaic_info: MosaicInfo
 
 
 class CollectionConfigTable(ModelTableService[CollectionConfig]):
