@@ -85,4 +85,5 @@ locals {
   stack_id              = "pct-apis"
   location              = lower(replace(var.region, " ", ""))
   prefix                = "${local.stack_id}-${local.location}-${var.environment}"
+  nodash_prefix         = replace("${local.stack_id}${var.environment}", "-", "")
 }
