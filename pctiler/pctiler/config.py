@@ -21,9 +21,7 @@ class Settings(BaseSettings):
 
     title: str = "Preview of Tile Access Services"
     openapi_url: str = "/openapi.json"
-    ogc_endpoint_prefix: str = "/asset-tiles"
     item_endpoint_prefix: str = "/item"
-    collection_endpoint_prefix: str = "/collection"
     mosaic_endpoint_prefix: str = "/mosaic"
     legend_endpoint_prefix: str = "/legend"
     debug: bool = os.getenv("TILER_DEBUG", "False").lower() == "true"
