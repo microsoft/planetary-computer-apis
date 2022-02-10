@@ -6,11 +6,10 @@ from setuptools import find_packages, setup
 inst_reqs = [
     "geojson-pydantic==0.3.1",
     "jinja2==2.11.3",
-    "cachetools==4.2.1",
-    "pystac==1.0.0-rc.2",
-    "planetary-computer==0.3.0-rc.0",
+    "pystac==1.*",
+    "planetary-computer==0.4.*",
 
-    "rasterio==1.2.6",
+    "rasterio==1.2.*",
     "titiler.core==0.4.*",
     "titiler.mosaic==0.4.*",
 

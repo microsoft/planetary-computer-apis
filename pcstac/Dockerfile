@@ -7,23 +7,11 @@ ENV CURL_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 
 WORKDIR /opt/src
 
-# PCCommon
-COPY pccommon/requirements.txt requirements.txt
-RUN pip install -r requirements.txt
-RUN rm -rf requirements.txt
-
-# PCStac
-COPY pcstac/requirements.txt requirements.txt
-RUN pip install -r requirements.txt
-RUN rm -rf requirements.txt
-
-COPY .isort.cfg /opt/src/.isort.cfg
 COPY pcstac/gunicorn_conf.py gunicorn_conf.py
 
 COPY pcstac /opt/src/pcstac
 COPY pccommon /opt/src/pccommon
-# Use --no-deps flag because they were previously installed with requirement.txt
-RUN pip install -e ./pccommon -e ./pcstac --no-deps
+RUN pip install -e ./pccommon -e ./pcstac[server]
 
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=81

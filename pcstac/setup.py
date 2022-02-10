@@ -3,8 +3,16 @@
 from setuptools import find_packages, setup
 
 # Runtime requirements.
-with open("requirements.txt", "r") as f:
-    inst_reqs = f.read()
+inst_reqs = [
+    "stac-fastapi.types==2.3.0",
+    "stac-fastapi.api==2.3.0",
+    "stac-fastapi.extensions==2.3.0",
+    "stac-fastapi.pgstac==2.3.0",
+    "pystac==1.*",
+    "pccommon",
+    # TODO: remove, pypgstac is not really needed to run stac-fastapi application
+    "pypgstac==0.4.3",
+]
 
 extra_reqs = {
     "test": [

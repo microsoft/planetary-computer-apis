@@ -3,8 +3,18 @@
 from setuptools import find_packages, setup
 
 # Runtime requirements.
-with open("requirements.txt", "r") as f:
-    inst_reqs = f.readlines()
+inst_reqs = [
+    "fastapi==0.67.*",
+    "opencensus-ext-azure==1.0.8",
+    "opencensus-ext-logging==0.1.0",
+    "orjson==3.5.2",
+    "azure-identity==1.7.1",
+    "azure-data-tables==12.2.0",
+    "pydantic==1.9.0",
+    "cachetools==5.0.0",
+    "types-cachetools==4.2.9",
+    "pyhumps==3.5.3",
+]
 
 extra_reqs = {
     "test": [
