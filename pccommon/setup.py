@@ -36,4 +36,7 @@ setup(
     zip_safe=False,
     install_requires=inst_reqs,
     extras_require=extra_reqs,
+    entry_points={
+        'console_scripts': ['pcapis=pccommon.cli:cli']
+    }
 )
