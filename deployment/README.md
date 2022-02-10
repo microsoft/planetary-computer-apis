@@ -41,3 +41,11 @@ Container Registry repo where you published your local images:
 - `IMAGE_TAG`
 
 __Note:__ Remember to bring down your resources after testing with `terraform destroy`!
+
+## Loading configuration data
+
+Configuration data is stored in Azure Storage Tables. Use the `pcapis` command line interface that is installed with the `pccommon` package to load data. For example:
+
+```
+>  pcapis load -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table collectionconfig --file pccommon/tests/data-files/collection_config.json
+```
