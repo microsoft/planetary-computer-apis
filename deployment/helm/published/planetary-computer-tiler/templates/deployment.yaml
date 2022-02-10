@@ -79,6 +79,18 @@ spec:
               value: "{{ .Values.tiler.stac_api_href}}"
             - name: PC_SDK_SAS_URL
               value: "{{ .Values.tiler.pc_sdk_sas_url}}"
+            - name: "PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME"
+              value: "{{ .Values.tiler.storage.account_name }}"
+            - name: "PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY"
+              value: "{{ .Values.tiler.storage.account_key }}"
+            - name: "PCAPIS_COLLECTION_CONFIG__TABLE_NAME"
+              value: "{{ .Values.tiler.storage.collection_config_table_name }}"
+            - name: "PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME"
+              value: "{{ .Values.tiler.storage.account_name }}"
+            - name: "PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY"
+              value: "{{ .Values.tiler.storage.account_key }}"
+            - name: "PCAPIS_CONTAINER_CONFIG__TABLE_NAME"
+              value: "{{ .Values.tiler.storage.container_config_table_name }}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
 
