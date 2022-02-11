@@ -1,7 +1,6 @@
-from typing import Callable, Optional, Tuple
+from typing import Optional
 
 import orjson
-from azure.data.tables import TableClient, TableServiceClient
 from pydantic import BaseModel
 
 from pccommon.tables import ModelTableService
@@ -18,12 +17,6 @@ class ContainerConfig(BaseModel):
 
 class ContainerConfigTable(ModelTableService[ContainerConfig]):
     _model = ContainerConfig
-
-    def __init__(
-        self,
-        get_clients: Callable[[], Tuple[Optional[TableServiceClient], TableClient]],
-    ) -> None:
-        super().__init__(get_clients)
 
     def get_config(
         self, storage_account: str, container: str
