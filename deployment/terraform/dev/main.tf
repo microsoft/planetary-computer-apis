@@ -2,16 +2,6 @@ variable "username" {
   type = string
 }
 
-variable "cluster_cert_issuer" {
-  type    = string
-  default = "letsencrypt-staging"
-}
-
-variable "cluster_cert_server" {
-  type    = string
-  default = "https://acme-staging-v02.api.letsencrypt.org/directory"
-}
-
 module "resources" {
   source = "../resources"
 
