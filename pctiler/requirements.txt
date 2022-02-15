@@ -9,7 +9,7 @@ psycopg[binary,pool]
 rasterio==1.2.6
 titiler.core==0.4.*
 titiler.mosaic==0.4.*
-titiler.pgstac==0.1.0a3
+titiler.pgstac==0.1.0a4
 matplotlib==3.4.*
 
 uvicorn[standard]==0.13.3
