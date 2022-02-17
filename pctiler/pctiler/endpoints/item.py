@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
 from titiler.core.factory import MultiBaseTilerFactory
 
-from pccommon.render import COLLECTION_RENDER_CONFIG
+from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.reader import ItemSTACReader
@@ -53,7 +53,7 @@ def map(
     collection: str = Query(..., description="STAC Collection ID"),
     item: str = Query(..., description="STAC Item ID"),
 ) -> Response:
-    render_config = COLLECTION_RENDER_CONFIG.get(collection)
+    render_config = get_render_config(collection)
     if render_config is None:
         return Response(
             status_code=404,

@@ -12,6 +12,12 @@ stac:
     maxWorkers: "1"
     poolSize: "1"
 
+  storage:
+    account_name: {{ tf.storage_account_name }}
+    account_key: {{ tf.storage_account_key }}
+    collection_config_table_name: {{ tf.collection_config_table_name }}
+    container_config_table_name: {{ tf.container_config_table_name }}
+
   deploy:
     replicaCount: {{ tf.stac_replica_count }}
     podAnnotations:
@@ -38,6 +44,12 @@ tiler:
   tiler:
     workersPerCore: "1"
     webConcurrency: "1"
+
+  storage:
+    account_name: {{ tf.storage_account_name }}
+    account_key: {{ tf.storage_account_key }}
+    collection_config_table_name: {{ tf.collection_config_table_name }}
+    container_config_table_name: {{ tf.container_config_table_name }}
 
   deploy:
     replicaCount: {{ tf.tiler_replica_count }}

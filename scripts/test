@@ -19,6 +19,8 @@ Options
         Only test pcstac
     --tiler
         Only test pctiler
+    --common
+        Only test pccommon
 "
 }
 
@@ -30,6 +32,10 @@ while [[ $# -gt 0 ]]; do case $1 in
         ;;
     --tiler)
         TILER_ONLY="1"
+        shift
+        ;;
+    --common)
+        COMMON_ONLY="1"
         shift
         ;;
     --help)
@@ -44,7 +50,17 @@ while [[ $# -gt 0 ]]; do case $1 in
     esac done
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-    if [ -z ${STAC_ONLY} ]; then
+
+    if [ -z "${TILER_ONLY}${STAC_ONLY}" ]; then
+
+        docker-compose \
+            -f docker-compose.yml \
+            -f docker-compose.dev.yml \
+            run --rm \
+            stac-dev scripts/bin/test-common
+    fi
+
+    if [ -z "${STAC_ONLY}${COMMON_ONLY}" ]; then
         docker-compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
@@ -52,7 +68,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             tiler-dev scripts/bin/test-tiler
     fi
 
-    if [ -z ${TILER_ONLY} ]; then
+    if [ -z "${TILER_ONLY}${COMMON_ONLY}" ]; then
 
         docker-compose \
             -f docker-compose.yml \

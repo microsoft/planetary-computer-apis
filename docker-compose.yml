@@ -10,8 +10,19 @@ services:
       - APP_PORT=8081
       - FORWARDED_ALLOW_IPS=*
       - ENVIRONMENT=local
-      - DEBUG=TRUE
+      - PCAPIS_DEBUG=TRUE
       - TILER_HREF=http://localhost:8080/data/
+
+      # Azure Storage
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_COLLECTION_CONFIG__TABLE_NAME=collectionconfig
+
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
 
       # Used by pgstac backend
       - POSTGRES_USER=username
@@ -76,6 +87,17 @@ services:
       - WEB_CONCURRENCY=1
       - WORKERS_PER_CORE=1
 
+      # Azure Storage
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_COLLECTION_CONFIG__TABLE_NAME=collectionconfig
+
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
+
       # Used for logging and metrics
       - APP_INSIGHTS_INSTRUMENTATION_KEY
     depends_on:
@@ -111,8 +133,22 @@ services:
       - "5432:5432"
     volumes:
       - pc-apis-pgdata:/var/lib/postgresql/data
+  azurite:
+    container_name: pcapis-azurite
+    image: mcr.microsoft.com/azure-storage/azurite
+    hostname: azurite
+    command: "azurite --silent --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost
+      0.0.0.0 -l /workspace"
+    ports:
+      - "10000:10000" # Blob
+      - "10001:10001" # Queue
+      - "10002:10002" # Table
+    volumes:
+      - pc-apis-azurite-data:/workspace
+
 volumes:
   pc-apis-pgdata:
+  pc-apis-azurite-data:
 networks:
   default:
     name: pc-apis-dev-network

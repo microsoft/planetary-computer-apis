@@ -1,9 +1,9 @@
 output "environment" {
-    value = var.environment
+  value = var.environment
 }
 
 output "location" {
-    value = local.location
+  value = local.location
 }
 
 output "cluster_name" {
@@ -33,8 +33,8 @@ output "pg_database" {
 }
 
 output "pg_password" {
-    value = data.azurerm_key_vault_secret.db_admin_password.value
-    sensitive = true
+  value     = data.azurerm_key_vault_secret.db_admin_password.value
+  sensitive = true
 }
 
 # Helm pass-through vars
@@ -72,4 +72,22 @@ output "tiler_replica_count" {
 ## Application Insights
 output "instrumentation_key" {
   value = azurerm_application_insights.pc_application_insights.instrumentation_key
+}
+
+## Storage
+
+output "storage_account_name" {
+  value = azurerm_storage_account.pc.name
+}
+
+output "storage_account_key" {
+  value = azurerm_storage_account.pc.primary_access_key
+}
+
+output "collection_config_table_name" {
+  value = azurerm_storage_table.collectionconfig.name
+}
+
+output "container_config_table_name" {
+  value = azurerm_storage_table.containerconfig.name
 }

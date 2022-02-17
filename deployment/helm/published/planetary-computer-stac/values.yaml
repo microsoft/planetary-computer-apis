@@ -17,6 +17,12 @@ stac:
     port: 80
     annotations: {}
 
+  storage:
+    account_name: ""
+    account_key: ""
+    collection_config_table_name: ""
+    container_config_table_name: ""
+
   deploy:
     replicaCount: 1
     podAnnotations: {}

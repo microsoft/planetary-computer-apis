@@ -3,7 +3,7 @@ resource "azurerm_kubernetes_cluster" "pc" {
   location            = azurerm_resource_group.pc.location
   resource_group_name = azurerm_resource_group.pc.name
   dns_prefix          = "${local.prefix}-cluster"
-  kubernetes_version  = "1.20.7"
+  kubernetes_version  = var.k8s_version
 
   addon_profile {
     kube_dashboard {

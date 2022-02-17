@@ -1,0 +1,7 @@
+#!/bin/bash
+
+PACKAGE_DIRS=(
+    "pccommon"
+    "pcstac"
+    "pctiler"
+)

@@ -20,23 +20,11 @@ RUN pip install --upgrade pip setuptools wheel
 
 WORKDIR /opt/src
 
-COPY .isort.cfg /opt/src/.isort.cfg
 COPY pctiler/gunicorn_conf.py gunicorn_conf.py
-
-# PCCommon
-COPY pccommon/requirements.txt requirements.txt
-RUN pip install -r requirements.txt
-RUN rm -rf requirements.txt
-
-# PCTiler
-COPY pctiler/requirements.txt requirements.txt
-RUN pip install -r requirements.txt
-RUN rm -rf requirements.txt
 
 COPY pccommon /opt/src/pccommon
 COPY pctiler /opt/src/pctiler
-# Use --no-deps flag because they were previously installed with requirement.txt
-RUN pip install -e ./pccommon -e ./pctiler --no-deps
+RUN pip install -e ./pccommon -e ./pctiler[server]
 
 # GDAL config
 ENV GDAL_CACHEMAX 200

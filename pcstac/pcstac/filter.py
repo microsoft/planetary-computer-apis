@@ -1,20 +1,15 @@
 import asyncio
-import json
 from typing import Any, Dict, List, Optional, Set
 
-import requests
 from fastapi import HTTPException, Request
 from stac_fastapi.types.core import AsyncBaseFiltersClient
 
+from pccommon.config import get_collection_config
 from pcstac.cache import queryables_endpoint_cache
 
 
 class MSPCFiltersClient(AsyncBaseFiltersClient):
     """Defines a pattern for implementing the STAC filter extension."""
-
-    queryable_url_template = (
-        "https://planetarycomputer.microsoft.com/stac/{cid}/queryables.json"
-    )
 
     async def get_queryable_intersection(self, request: Request) -> dict:
         """Generate json schema with intersecting properties of all collections.
@@ -53,6 +48,7 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
             property_name_intersection: List[str] = list(
                 set.intersection(*all_property_keys)
             )
+            maybe_match: Optional[str] = None
             for name in property_name_intersection:
                 for idx, properties in enumerate(all_properties):
                     if idx == 0:
@@ -82,21 +78,17 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
         under OGC CQL but it is allowed by the STAC API Filter Extension
         https://github.com/radiantearth/stac-api-spec/tree/master/fragments/filter#queryables
         """
+        queryable_resp: Dict[str, Any]
         if not collection_id:
             try:
                 queryable_resp = queryables_endpoint_cache["/queryables"]
             except KeyError:
-                request = kwargs["request"]
-                if isinstance(request, Request):
-                    queryable_resp = await self.get_queryable_intersection(request)
-                    queryables_endpoint_cache["/queryables"] = queryable_resp
+                request: Request = kwargs["request"]  # type: ignore
+                queryable_resp = await self.get_queryable_intersection(request)
+                queryables_endpoint_cache["/queryables"] = queryable_resp
         else:
-            r = requests.get(self.queryable_url_template.format(cid=collection_id))
-            if r.status_code == 404:
+            collection_config = get_collection_config(collection_id)
+            if not collection_config or not collection_config.queryables:
                 raise HTTPException(status_code=404)
-            elif r.status_code == 200:
-                try:
-                    queryable_resp = r.json()
-                except json.decoder.JSONDecodeError:
-                    raise HTTPException(status_code=404)
+            queryable_resp = collection_config.queryables
         return queryable_resp

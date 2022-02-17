@@ -19,10 +19,17 @@ from rio_tiler.mosaic import mosaic_reader
 from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
 
-from pccommon.render import COLLECTION_RENDER_CONFIG, BlobCDN
+from pccommon.cdn import BlobCDN
+from pccommon.config import get_render_config
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
 cache_config = CacheSettings()
+
+
+def get_cache_key(
+    backend: "PGSTACBackend", geom: Union[Point, Polygon], **kwargs: Any
+) -> Any:
+    return hashkey(backend.input, str(geom), **kwargs)
 
 
 @attr.s
@@ -35,7 +42,7 @@ class ItemSTACReader(STACReader):
         asset_url = BlobCDN.transform_if_available(super()._get_asset_url(asset))
 
         if self.item.collection_id:
-            render_config = COLLECTION_RENDER_CONFIG.get(self.item.collection_id)
+            render_config = get_render_config(self.item.collection_id)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
@@ -99,7 +106,7 @@ class CustomSTACReader(MultiBaseReader):
 
         collection = self.input.get("collection", None)
         if collection:
-            render_config = COLLECTION_RENDER_CONFIG.get(collection)
+            render_config = get_render_config(collection)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
@@ -124,7 +131,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
             )
 
         # Check that the zoom isn't lower than minZoom
-        render_config = COLLECTION_RENDER_CONFIG.get(collection)
+        render_config = get_render_config(collection)
         if render_config and render_config.minzoom and render_config.minzoom > z:
             return []
 
@@ -132,8 +139,8 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
         return self.get_assets(Polygon.from_bounds(*bbox), **kwargs)
 
     @cached(
-        TTLCache(maxsize=cache_config.maxsize, ttl=cache_config.ttl),
-        key=lambda self, geom, **kwargs: hashkey(self.input, str(geom), **kwargs),
+        cache=TTLCache(maxsize=cache_config.maxsize, ttl=cache_config.ttl),
+        key=get_cache_key,
     )
     def get_assets(
         self,

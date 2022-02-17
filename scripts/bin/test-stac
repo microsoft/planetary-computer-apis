@@ -11,8 +11,6 @@ function usage() {
         "Usage: $(basename "$0")
 Runs tests for the STAC service project.
 
-Also checks formatting and runs mypy for the common code.
-
 This scripts is meant to be run inside the stac-dev container.
 
 "
@@ -20,17 +18,11 @@ This scripts is meant to be run inside the stac-dev container.
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
-    echo "Running  mypy for stac..."
+    echo "Running mypy for stac..."
     mypy pcstac/pcstac
-
-    echo "Running  mypy for common..."
-    mypy pccommon
 
     echo "Running black for stac..."
     black --check pcstac/pcstac pcstac/tests
-
-    echo "Running black for common..."
-    black --check pccommon
 
     echo "Running flake8 for stac..."
     flake8 pcstac/pcstac pcstac/tests
@@ -38,6 +30,4 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Running unit tests for stac..."
     python -m pytest pcstac/tests
 
-    echo "Running unit tests for common..."
-    python -m pytest pccommon/tests
 fi

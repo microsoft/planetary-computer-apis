@@ -1,9 +1,11 @@
 from dataclasses import dataclass
+from functools import partial
 from typing import Any, Dict, Set
 from urllib.parse import urljoin
 
 import requests
-from cachetools import TTLCache, cached
+from cachetools import Cache, TTLCache, cachedmethod
+from cachetools.keys import hashkey
 from fastapi.exceptions import HTTPException
 
 from pccommon.backoff import with_backoff
@@ -54,8 +56,10 @@ class Collections:
     TODO: Make this async
     """
 
+    _cache: Cache = TTLCache(maxsize=1, ttl=600)
+
     @classmethod
-    @cached(cache=TTLCache(maxsize=1, ttl=600))
+    @cachedmethod(cache=lambda self: self._cache, key=partial(hashkey, "collections"))
     def get_collections(cls) -> Dict[str, CollectionInfo]:
         href = urljoin(get_settings().stac_api_url, "collections")
         collections = with_backoff(lambda: requests.get(href).json()["collections"])
@@ -68,7 +72,7 @@ class Collections:
         }
 
     @classmethod
-    @cached(cache=TTLCache(maxsize=1, ttl=600))
+    @cachedmethod(cache=lambda self: self._cache, key=partial(hashkey, "storage"))
     def get_storage_set(cls) -> Dict[str, Set[str]]:
         """Returns information about what storage accounts and
         containers are available.

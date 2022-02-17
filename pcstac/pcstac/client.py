@@ -13,7 +13,7 @@ from stac_fastapi.types.stac import (
     LandingPage,
 )
 
-from pccommon.render import COLLECTION_RENDER_CONFIG
+from pccommon.config import get_render_config
 from pcstac.cache import collections_endpoint_cache
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
 from pcstac.search import PCSearch
@@ -46,7 +46,7 @@ class PCClient(CoreCrudClient):
     def inject_collection_links(self, collection: Collection) -> Collection:
         """Add extra/non-mandatory links to a Collection"""
         collection_id = collection.get("id", "")
-        render_config = COLLECTION_RENDER_CONFIG.get(collection_id)
+        render_config = get_render_config(collection_id)
         if render_config and render_config.should_add_collection_links:
             TileInfo(collection_id, render_config).inject_collection(collection)
 
@@ -55,7 +55,7 @@ class PCClient(CoreCrudClient):
                 "rel": "describedby",
                 "href": urljoin(
                     "https://planetarycomputer.microsoft.com/dataset/",
-                    collection["id"],
+                    collection_id,
                 ),
                 "title": "Human readable dataset overview and reference",
                 "type": "text/html",
@@ -68,7 +68,7 @@ class PCClient(CoreCrudClient):
         """Add extra/non-mandatory links to an Item"""
         collection_id = item.get("collection", "")
         if collection_id:
-            render_config = COLLECTION_RENDER_CONFIG.get(collection_id)
+            render_config = get_render_config(collection_id)
             if render_config and render_config.should_add_item_links:
                 TileInfo(collection_id, render_config).inject_item(item)
 
@@ -90,7 +90,8 @@ class PCClient(CoreCrudClient):
             collections = await super().all_collections(**kwargs)
             modified_collections = []
             for col in collections.get("collections", []):
-                render_config = COLLECTION_RENDER_CONFIG.get(col.get("id", ""))
+                collection_id = col.get("id", "")
+                render_config = get_render_config(collection_id)
                 if render_config and render_config.hidden:
                     pass
                 else:
@@ -114,7 +115,7 @@ class PCClient(CoreCrudClient):
             Collection.
         """
         try:
-            render_config = COLLECTION_RENDER_CONFIG.get(collection_id)
+            render_config = get_render_config(collection_id)
 
             # If there's a configuration and it's set to hidden,
             # pretend we never found it.
