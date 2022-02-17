@@ -49,3 +49,16 @@ Configuration data is stored in Azure Storage Tables. Use the `pcapis` command l
 ```
 >  pcapis load -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table collectionconfig --file pccommon/tests/data-files/collection_config.json
 ```
+To dump a single collection config, use:
+
+```
+>  pcapis dump -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table collectionconfig --id naip
+```
+
+For container configs, you must also specify the container account name used as the Partition Key:
+
+```
+>  pcapis dump -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table containerconfig --id naip --container-account naipeuwest
+```
+
+Using the `load` command on a single dump file for either config will update the single row.

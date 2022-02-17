@@ -40,22 +40,35 @@ def load(sas: str, account: str, table: str, type: str, file: str) -> int:
 def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
     output = kwargs.get("output")
     account_url = f"https://{account}.table.core.windows.net"
+    id = kwargs.get("id")
     result: Dict[str, Dict[str, Any]] = {}
     if type == "collection":
         col_config_table = CollectionConfigTable.from_sas_token(
             account_url=account_url, sas_token=sas, table_name=table
         )
 
-        for (_, collection_id, col_config) in col_config_table.get_all():
-            assert collection_id
-            result[collection_id] = col_config.dict()
+        if id:
+            col_config = col_config_table.get_config(id)
+            assert col_config
+            result[id] = col_config.dict()
+        else:
+            for (_, collection_id, col_config) in col_config_table.get_all():
+                assert collection_id
+                result[collection_id] = col_config.dict()
 
     elif type == "container":
         con_config_table = ContainerConfigTable.from_sas_token(
             account_url=account_url, sas_token=sas, table_name=table
         )
-        for (storage_account, container, con_config) in con_config_table.get_all():
-            result[f"{storage_account}/{container}"] = con_config.dict()
+        if id:
+            con_account = kwargs.get("container_account")
+            assert con_account
+            con_config = con_config_table.get_config(con_account, id)
+            assert con_config
+            result[f"{con_account}/{id}"] = con_config.dict()
+        else:
+            for (storage_account, container, con_config) in con_config_table.get_all():
+                result[f"{storage_account}/{container}"] = con_config.dict()
     else:
         print(f"Unknown type: {type}")
         return 1
@@ -122,6 +135,16 @@ def parse_args(args: List[str]) -> Optional[Dict[str, Any]]:
     parser.add_argument(
         "--output", help="Filename to save collections to", default=None
     )
+
+    parser.add_argument(
+        "--id", help="Single collection or container id to dump", default=None
+    )
+    parser.add_argument(
+        "--container-account",
+        help="Storage account of the specified container config id (PartitionKey)",
+        default=None,
+    )
+
     add_common_opts(parser)
 
     parsed_args = {
