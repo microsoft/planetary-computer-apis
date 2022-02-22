@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 # Runtime requirements.
 inst_reqs = [
     "geojson-pydantic==0.3.1",
-    "jinja2==2.11.3",
+    "jinja2==3.0.3",
     "pystac==1.*",
     "planetary-computer==0.4.*",
 
