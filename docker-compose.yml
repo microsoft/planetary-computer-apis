@@ -30,6 +30,13 @@ services:
       - PCAPIS_REDIS_PORT=6380
       - PCAPIS_REDIS_SSL=FALSE
 
+      # Rate limit
+      - PCAPIS_RATE_LIMITS__COLLECTIONS=10
+      - PCAPIS_RATE_LIMITS__COLLECTION=10
+      - PCAPIS_RATE_LIMITS__ITEMS=10
+      - PCAPIS_RATE_LIMITS__ITEM=10
+      - PCAPIS_RATE_LIMITS__SEARCH=10
+
       # Used by pgstac backend
       - POSTGRES_USER=username
       - POSTGRES_PASS=password
