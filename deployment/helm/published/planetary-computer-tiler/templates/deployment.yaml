@@ -91,6 +91,14 @@ spec:
               value: "{{ .Values.tiler.storage.account_key }}"
             - name: "PCAPIS_CONTAINER_CONFIG__TABLE_NAME"
               value: "{{ .Values.tiler.storage.container_config_table_name }}"
+            - name: "PCAPIS_REDIS_HOSTNAME"
+              value: "{{ .Values.stac.redis.host }}"
+            - name: "PCAPIS_REDIS_PASSWORD"
+              value: "{{ .Values.stac.redis.password }}"
+            - name: "PCAPIS_REDIS_PORT"
+              value: "{{ .Values.stac.redis.port }}"
+            - name: "PCAPIS_REDIS_SSL"
+              value: "{{ .Values.stac.redis.ssl }}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
 

@@ -18,6 +18,19 @@ stac:
     collection_config_table_name: {{ tf.collection_config_table_name }}
     container_config_table_name: {{ tf.container_config_table_name }}
 
+  redis:
+    host: {{ tf.redis_host }}
+    password: {{ tf.redis_password }}
+    port: {{ tf.redis_port }}
+    ssl: true
+
+  rate_limit:
+    collections: 100
+    collection: 100
+    items: 50
+    item: 50
+    search: 50
+
   deploy:
     replicaCount: {{ tf.stac_replica_count }}
     podAnnotations:
@@ -50,6 +63,12 @@ tiler:
     account_key: {{ tf.storage_account_key }}
     collection_config_table_name: {{ tf.collection_config_table_name }}
     container_config_table_name: {{ tf.container_config_table_name }}
+
+  redis:
+    host: {{ tf.redis_host }}
+    password: {{ tf.redis_password }}
+    port: {{ tf.redis_port }}
+    ssl: true
 
   deploy:
     replicaCount: {{ tf.tiler_replica_count }}

@@ -23,6 +23,19 @@ stac:
     collection_config_table_name: ""
     container_config_table_name: ""
 
+  redis:
+    host: ""
+    password: ""
+    port: 6380
+    ssl: true
+
+  rate_limit:
+    collections: 100
+    collection: 100
+    items: 50
+    item: 50
+    search: 50
+
   deploy:
     replicaCount: 1
     podAnnotations: {}

@@ -26,6 +26,12 @@ tiler:
     collection_config_table_name: ""
     container_config_table_name: ""
 
+  redis:
+    host: ""
+    password: ""
+    port: 6380
+    ssl: true
+
   deploy:
     replicaCount: 10
     podAnnotations: {}
