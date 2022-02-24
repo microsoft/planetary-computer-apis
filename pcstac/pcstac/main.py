@@ -3,7 +3,7 @@ import logging
 import os
 from typing import Any, Awaitable, Callable, Dict
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
@@ -17,6 +17,7 @@ from starlette.responses import PlainTextResponse
 from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import RequestTracingMiddleware, handle_exceptions
 from pccommon.openapi import fixup_schema
+from pccommon.redis import connect_to_redis
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import (
@@ -88,6 +89,7 @@ async def _handle_exceptions(
 async def startup_event() -> None:
     """Connect to database on startup."""
     await connect_to_db(app)
+    await connect_to_redis(app)
 
 
 @app.on_event("shutdown")
@@ -96,8 +98,17 @@ async def shutdown_event() -> None:
     await close_db_connection(app)
 
 
-@app.exception_handler(StarletteHTTPException)
+@app.exception_handler(HTTPException)
 async def http_exception_handler(
+    request: Request, exc: HTTPException
+) -> PlainTextResponse:
+    return PlainTextResponse(
+        str(exc.detail), status_code=exc.status_code, headers=exc.headers
+    )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def base_http_exception_handler(
     request: Request, exc: StarletteHTTPException
 ) -> PlainTextResponse:
     return PlainTextResponse(str(exc.detail), status_code=exc.status_code)

@@ -5,13 +5,14 @@ from fastapi import HTTPException, Request
 from stac_fastapi.types.core import AsyncBaseFiltersClient
 
 from pccommon.config import get_collection_config
-from pcstac.cache import queryables_endpoint_cache
+from pccommon.redis import cached_result
+from pcstac.contants import CACHE_KEY_QUERYABLES
 
 
 class MSPCFiltersClient(AsyncBaseFiltersClient):
     """Defines a pattern for implementing the STAC filter extension."""
 
-    async def get_queryable_intersection(self, request: Request) -> dict:
+    async def get_queryable_intersection(self, request: Request) -> Dict[str, Any]:
         """Generate json schema with intersecting properties of all collections.
         When queryables are requested without specifying a collection (/queryable
         from the root), a json schema encapsulating only the properties shared by all
@@ -69,7 +70,7 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
         return intersection_schema
 
     async def get_queryables(
-        self, collection_id: Optional[str] = None, **kwargs: Dict[str, Any]
+        self, collection_id: Optional[str] = None, **kwargs: Any
     ) -> Dict[str, Any]:
         """Get the queryables available for the given collection_id.
         If collection_id is None, returns the intersection of all
@@ -80,12 +81,14 @@ class MSPCFiltersClient(AsyncBaseFiltersClient):
         """
         queryable_resp: Dict[str, Any]
         if not collection_id:
-            try:
-                queryable_resp = queryables_endpoint_cache["/queryables"]
-            except KeyError:
+
+            async def _fetch_queryables() -> Dict[str, Any]:
                 request: Request = kwargs["request"]  # type: ignore
-                queryable_resp = await self.get_queryable_intersection(request)
-                queryables_endpoint_cache["/queryables"] = queryable_resp
+                return await self.get_queryable_intersection(request)
+
+            return await cached_result(
+                _fetch_queryables, CACHE_KEY_QUERYABLES, kwargs["request"]
+            )
         else:
             collection_config = get_collection_config(collection_id)
             if not collection_config or not collection_config.queryables:
