@@ -86,12 +86,45 @@ class CamelModel(BaseModel):
 
 
 class Mosaics(CamelModel):
+    """
+    A single predefined CQL2-JSON query representing a named mosaic.
+
+    Attributes
+    ----------
+    name:
+        A short name for this mosaic that describes its content, ideally less
+        than 30 chars (e.g. "Sept - March, 2021 (low cloud)").
+    description:
+        A longer description of the mosaic that can be used to explain its content,
+        if name is not sufficient.
+    cql:
+        A valid CQL2-JSON query
+    """
+
     name: str
     description: Optional[str] = None
     cql: List[Dict[str, Any]]
 
 
 class LegendConfig(CamelModel):
+    """
+    Defines overrides for dynamic legend generation.
+
+    Attributes
+    ----------
+    type:
+        Legend type to make, one of: `continuous`, `classmap`, `none` (note,
+        `none` is a string literal).
+    labels:
+        List of string labels, ideally fewer than 3 items. Will be flex
+        spaced-between under the lagend image.
+    trim_start:
+        The number of items to trim from the start of the legend definition. Used if there are
+        values important for rendering (e.g. nodata) that aren't desirable in the legend.
+    trim_end:
+        Same as trim_start, but for the end of the legend definition.
+    """
+
     type: Optional[str]
     labels: Optional[List[str]]
     trim_start: Optional[int]
@@ -99,6 +132,25 @@ class LegendConfig(CamelModel):
 
 
 class RenderOptions(CamelModel):
+    """
+    Defines a set of map-tile render options for a collection.
+
+    Attributes
+    ----------
+    name:
+        A short name for this render option that describes its content, ideally less
+        than 30 chars (e.g. `True Color`).
+    description:
+        A longer description of the render option that can be used to explain its content.
+    options:
+        A URL query-string encoded string of TiTiler rendering options. See "Query Parameters":
+        https://developmentseed.org/titiler/endpoints/cog/#description
+    min_zoom:
+        Zoom level at which to start rendering the layer.
+    legend:
+        An optional legend configuration.
+    """
+
     name: str
     description: Optional[str] = None
     options: str
@@ -107,6 +159,17 @@ class RenderOptions(CamelModel):
 
 
 class DefaultLocation(CamelModel):
+    """
+    Defines a default location for showcasing a collection.
+
+    Attributes
+    ----------
+    zoom:
+        Zoom level at which to center the map.
+    coordinates:
+        Coordinates at which to center the map, [latitude, longitude]
+    """
+
     zoom: int
     coordinates: List[float]
 
