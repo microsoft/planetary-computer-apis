@@ -45,11 +45,24 @@ EXTENSIONS = [
 
 
 class RateLimits(BaseModel):
-    collections: int = 100
-    collection: int = 100
-    item: int = 100
-    items: int = 50
-    search: int = 50
+    collections: int = 500
+    collection: int = 500
+    item: int = 500
+    items: int = 100
+    search: int = 100
+
+
+class BackPressureConfig(BaseModel):
+    req_per_sec: int = 50
+    inc_ms: int = 10
+
+
+class BackPressures(BaseSettings):
+    collections: BackPressureConfig
+    collection: BackPressureConfig
+    item: BackPressureConfig
+    items: BackPressureConfig
+    search: BackPressureConfig
 
 
 class Settings(BaseSettings):
@@ -75,7 +88,8 @@ class Settings(BaseSettings):
     openapi_url: str = "/openapi.json"
     debug: bool = False
     api_version: str = f"v{API_VERSION}"
-    rate_limits: RateLimits = RateLimits()
+    rate_limits: RateLimits
+    back_pressures: BackPressures
 
     class Config:
         env_prefix = ENV_VAR_PCAPIS_PREFIX
