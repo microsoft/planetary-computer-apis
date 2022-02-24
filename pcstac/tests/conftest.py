@@ -14,6 +14,7 @@ from stac_fastapi.api.models import create_get_request_model, create_post_reques
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 
+from pccommon.redis import connect_to_redis
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import EXTENSIONS
@@ -82,6 +83,7 @@ async def app(api_client):
     time.time()
     app = api_client.app
     await connect_to_db(app)
+    await connect_to_redis(app)
 
     yield app
 
