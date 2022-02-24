@@ -91,3 +91,17 @@ output "collection_config_table_name" {
 output "container_config_table_name" {
   value = azurerm_storage_table.containerconfig.name
 }
+
+## Redis
+
+output "redis_host" {
+  value = azurerm_redis_cache.pc.hostname
+}
+
+output "redis_password" {
+  value = azurerm_redis_cache.pc.primary_access_key
+}
+
+output "redis_port" {
+  value = azurerm_redis_cache.pc.ssl_port
+}
