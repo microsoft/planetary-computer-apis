@@ -73,7 +73,7 @@ class Settings(BaseSettings):
 
     tiler_href: str = Field(env="TILER_HREF_ENV_VAR", default="")
     openapi_url: str = "/openapi.json"
-    debug: bool = Field(env="PQE_DEBUG", default=False)
+    debug: bool = False
     api_version: str = f"v{API_VERSION}"
     rate_limits: RateLimits = RateLimits()
 
