@@ -13,6 +13,7 @@ services:
       - POSTGRES_HOST_READER=database
       - POSTGRES_HOST_WRITER=database
       - POSTGRES_PORT=5432
+      - PCAPIS_DEBUG=TRUE
 
       # Azure Storage
       - PCAPIS_COLLECTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
@@ -32,11 +33,11 @@ services:
       - PCAPIS_REDIS_SSL=FALSE
 
       # Rate limit
-      - PCAPIS_RATE_LIMITS__COLLECTIONS=10
-      - PCAPIS_RATE_LIMITS__COLLECTION=10
-      - PCAPIS_RATE_LIMITS__ITEMS=10
-      - PCAPIS_RATE_LIMITS__ITEM=10
-      - PCAPIS_RATE_LIMITS__SEARCH=10
+      - PCAPIS_RATE_LIMITS__COLLECTIONS=1000
+      - PCAPIS_RATE_LIMITS__COLLECTION=1000
+      - PCAPIS_RATE_LIMITS__ITEMS=1000
+      - PCAPIS_RATE_LIMITS__ITEM=1000
+      - PCAPIS_RATE_LIMITS__SEARCH=1000
     volumes:
       - .:/opt/src
     command: >
@@ -56,6 +57,7 @@ services:
       - FF_VRT="yes"
       - STAC_API_URL=http://stac:8081
       - STAC_API_HREF=http://localhost:8080/stac/
+      - PCAPIS_DEBUG=TRUE
 
       # titiler.pgstac
       - POSTGRES_USER=username
