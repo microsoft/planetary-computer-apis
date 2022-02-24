@@ -17,7 +17,7 @@ from azure.data.tables import TableClient, TableServiceClient
 from cachetools import Cache, TTLCache, cachedmethod
 from pydantic import BaseModel
 
-from pccommon.constants import DEFAULT_TABLE_TTL
+from pccommon.constants import DEFAULT_TTL
 
 T = TypeVar("T", bound="TableService")
 M = TypeVar("M", bound=BaseModel)
@@ -51,7 +51,7 @@ class TableService:
         self._get_clients = get_clients
         self._service_client: Optional[TableServiceClient] = None
         self._table_client: Optional[TableClient] = None
-        self._cache: Cache = TTLCache(maxsize=1024, ttl=ttl or DEFAULT_TABLE_TTL)
+        self._cache: Cache = TTLCache(maxsize=1024, ttl=ttl or DEFAULT_TTL)
 
     def _ensure_table_client(self) -> None:
         if not self._table_client:

@@ -8,7 +8,7 @@ from pydantic import BaseModel, BaseSettings, Field, PrivateAttr
 
 from pccommon.config.collections import CollectionConfigTable
 from pccommon.config.containers import ContainerConfigTable
-from pccommon.constants import DEFAULT_TABLE_TTL
+from pccommon.constants import DEFAULT_TTL
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,8 @@ class PCAPIsConfig(BaseSettings):
     collection_config: TableConfig
     container_config: TableConfig
 
-    table_value_ttl: int = Field(default=DEFAULT_TABLE_TTL)
+    table_value_ttl: int = Field(default=DEFAULT_TTL)
+
 
     debug: bool = False
 
