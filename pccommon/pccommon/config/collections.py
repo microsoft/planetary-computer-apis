@@ -119,8 +119,9 @@ class LegendConfig(CamelModel):
         List of string labels, ideally fewer than 3 items. Will be flex
         spaced-between under the lagend image.
     trim_start:
-        The number of items to trim from the start of the legend definition. Used if there are
-        values important for rendering (e.g. nodata) that aren't desirable in the legend.
+        The number of items to trim from the start of the legend definition.
+        Used if there are values important for rendering (e.g. nodata) that
+        aren't desirable in the legend.
     trim_end:
         Same as trim_start, but for the end of the legend definition.
     """
@@ -138,12 +139,14 @@ class RenderOptions(CamelModel):
     Attributes
     ----------
     name:
-        A short name for this render option that describes its content, ideally less
-        than 30 chars (e.g. `True Color`).
+        A short name for this render option that describes its content, ideally
+        less than 30 chars (e.g. `True Color`).
     description:
-        A longer description of the render option that can be used to explain its content.
+        A longer description of the render option that can be used to explain
+        its content.
     options:
-        A URL query-string encoded string of TiTiler rendering options. See "Query Parameters":
+        A URL query-string encoded string of TiTiler rendering options. See
+        "Query Parameters":
         https://developmentseed.org/titiler/endpoints/cog/#description
     min_zoom:
         Zoom level at which to start rendering the layer.
