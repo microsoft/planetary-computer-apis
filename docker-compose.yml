@@ -145,10 +145,18 @@ services:
       - "10002:10002" # Table
     volumes:
       - pc-apis-azurite-data:/workspace
+  redis:
+    image: redis:6.2.6-buster
+    command: redis-server --port 6380 --requirepass devcache
+    ports:
+     - "6380:6380"
+    volumes:
+      - pc-apis-redis-data:/data
 
 volumes:
   pc-apis-pgdata:
   pc-apis-azurite-data:
+  pc-apis-redis-data:
 networks:
   default:
     name: pc-apis-dev-network
