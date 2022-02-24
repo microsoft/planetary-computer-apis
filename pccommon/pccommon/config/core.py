@@ -36,6 +36,11 @@ class PCAPIsConfig(BaseSettings):
 
     table_value_ttl: int = Field(default=DEFAULT_TTL)
 
+    redis_hostname: str
+    redis_password: str
+    redis_port: int
+    redis_ssl: bool = True
+    redis_ttl: int = Field(default=DEFAULT_TTL)
 
     debug: bool = False
 

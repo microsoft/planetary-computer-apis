@@ -24,6 +24,13 @@ services:
       - PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME=devstoreaccount1
       - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
       - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
+
+      # Redis
+      - PCAPIS_REDIS_HOSTNAME=redis
+      - PCAPIS_REDIS_PASSWORD=devcache
+      - PCAPIS_REDIS_PORT=6380
+      - PCAPIS_REDIS_SSL=FALSE
+
     volumes:
       - .:/opt/src
     command: >
@@ -65,6 +72,12 @@ services:
       - PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME=devstoreaccount1
       - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
       - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
+
+      # Redis
+      - PCAPIS_REDIS_HOSTNAME=redis
+      - PCAPIS_REDIS_PASSWORD=devcache
+      - PCAPIS_REDIS_PORT=6380
+      - PCAPIS_REDIS_SSL=FALSE
     volumes:
       - .:/opt/src
     command: >
