@@ -50,13 +50,12 @@ def init_logging(service_name: str) -> None:
     config = get_apis_config()
 
     # Setup logging
-    log_level = logging.DEBUG if config.debug else logging.INFO
     logger = logging.getLogger()
-    logger.setLevel(log_level)
+    logger.setLevel(logging.INFO)
 
     # Console log handler
     consoleHandler = logging.StreamHandler(sys.stdout)
-    consoleHandler.setLevel(log_level)
+    consoleHandler.setLevel(logging.DEBUG)
     formatter = OptionalCustomDimensionsFilter(
         "[%(levelname)s] %(asctime)s - %(message)s %(custom_dimensions)s",
         None,
@@ -64,6 +63,10 @@ def init_logging(service_name: str) -> None:
     )
     consoleHandler.setFormatter(formatter)
     logger.addHandler(consoleHandler)
+
+    if logging.DEBUG:
+        for package in ["pcstac", "pctiler", "pccommon"]:
+            logging.getLogger(package).setLevel(logging.DEBUG)
 
     # Azure log handler
     instrumentation_key = config.app_insights_instrumentation_key
