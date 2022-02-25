@@ -2,7 +2,7 @@ import asyncio
 import json
 import os
 import time
-from typing import Callable, Dict
+from typing import AsyncGenerator, Callable, Dict
 
 import asyncpg
 import pytest
@@ -79,9 +79,9 @@ def api_client(pqe_pg):
 
 @pytest.mark.asyncio
 @pytest.fixture(scope="session")
-async def app(api_client):
+async def app(api_client) -> AsyncGenerator[FastAPI, None]:
     time.time()
-    app = api_client.app
+    app: FastAPI = api_client.app
     await connect_to_db(app)
     await connect_to_redis(app)
 
@@ -92,8 +92,10 @@ async def app(api_client):
 
 @pytest.mark.asyncio
 @pytest.fixture(scope="session")
-async def app_client(app):
-    async with AsyncClient(app=app, base_url="http://test") as c:
+async def app_client(app) -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(
+        app=app, base_url="http://test", headers={"X-Forwarded-For": "127.0.0.1"}
+    ) as c:
         yield c
 
 

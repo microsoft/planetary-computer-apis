@@ -4,6 +4,7 @@ from typing import Optional
 from cachetools import Cache, LRUCache, cachedmethod
 from cachetools.func import lru_cache
 from cachetools.keys import hashkey
+from pccommon.tables import IPExceptionListTable
 from pydantic import BaseModel, BaseSettings, Field, PrivateAttr
 
 from pccommon.config.collections import CollectionConfigTable
@@ -33,6 +34,7 @@ class PCAPIsConfig(BaseSettings):
     )
     collection_config: TableConfig
     container_config: TableConfig
+    ip_exception_config: TableConfig
 
     table_value_ttl: int = Field(default=DEFAULT_TTL)
 
@@ -61,6 +63,16 @@ class PCAPIsConfig(BaseSettings):
             account_name=self.container_config.account_name,
             account_key=self.container_config.account_key,
             table_name=self.container_config.table_name,
+            ttl=self.table_value_ttl,
+        )
+
+    @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("ip_whitelist"))
+    def get_ip_exception_list_table(self) -> IPExceptionListTable:
+        return IPExceptionListTable.from_account_key(
+            account_url=self.ip_exception_config.account_url,
+            account_name=self.ip_exception_config.account_name,
+            account_key=self.ip_exception_config.account_key,
+            table_name=self.ip_exception_config.table_name,
             ttl=self.table_value_ttl,
         )
 

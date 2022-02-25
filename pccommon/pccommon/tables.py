@@ -5,6 +5,7 @@ from typing import (
     Generic,
     Iterable,
     Optional,
+    Set,
     Tuple,
     Type,
     TypeVar,
@@ -13,15 +14,20 @@ from typing import (
 import orjson
 from azure.core.credentials import AzureNamedKeyCredential, AzureSasCredential
 from azure.core.exceptions import ResourceNotFoundError
-from azure.data.tables import TableClient, TableServiceClient
+from azure.data.tables import TableClient, TableServiceClient, TableEntity
 from cachetools import Cache, TTLCache, cachedmethod
+from cachetools.keys import hashkey
 from pydantic import BaseModel
 
-from pccommon.constants import DEFAULT_TTL
+from pccommon.constants import (
+    DEFAULT_IP_EXCEPTIONS_TTL,
+    DEFAULT_TTL,
+    IP_EXCEPTION_PARTITION_KEY,
+)
 
 T = TypeVar("T", bound="TableService")
 M = TypeVar("M", bound=BaseModel)
-V = TypeVar("V")
+V = TypeVar("V", int, str, bool, float)
 
 
 class TableConfig(BaseModel):
@@ -204,3 +210,93 @@ class ModelTableService(Generic[M], TableService):
                     row_key,
                     self._parse_model(entity, partition_key, row_key),
                 )
+
+
+class ValueTableService(Generic[V], TableService):
+    _type: Type[V]
+
+    def _parse_value(self, entity: TableEntity) -> V:
+        partition_key = entity.get("PartitionKey")
+        row_key = entity.get("RowKey")
+        value = entity.get("Value")
+        if value is None:
+            raise TableError(
+                "Value column expected but not found. "
+                f"partition_key={partition_key} row_key={row_key}"
+            )
+
+        return self._type(value)
+
+    def insert(self, partition_key: str, row_key: str, value: V) -> None:
+        self._ensure_table_client()
+        assert self._table_client
+        self._table_client.create_entity(
+            {
+                "PartitionKey": partition_key,
+                "RowKey": row_key,
+                "Value": value,
+            }
+        )
+
+    def upsert(self, partition_key: str, row_key: str, value: V) -> None:
+        self._ensure_table_client()
+        assert self._table_client
+        self._table_client.upsert_entity(
+            {
+                "PartitionKey": partition_key,
+                "RowKey": row_key,
+                "Value": value,
+            }
+        )
+
+    def update(self, partition_key: str, row_key: str, value: V) -> None:
+        self._ensure_table_client()
+        assert self._table_client
+        self._table_client.update_entity(
+            {
+                "PartitionKey": partition_key,
+                "RowKey": row_key,
+                "Value": value,
+            }
+        )
+
+    def get(self, partition_key: str, row_key: str) -> Optional[V]:
+        self._ensure_table_client()
+        assert self._table_client
+        try:
+            entity = self._table_client.get_entity(
+                partition_key=partition_key, row_key=row_key
+            )
+
+            return self._parse_value(entity)
+        except ResourceNotFoundError:
+            return None
+
+    def get_all_values(self) -> Iterable[V]:
+        self._ensure_table_client()
+        assert self._table_client
+        for entity in self._table_client.list_entities():
+            yield self._parse_value(entity)
+
+
+class IPExceptionListTable(ValueTableService[str]):
+    _type = str
+    _cache: Cache
+
+    def __init__(
+        self,
+        get_clients: Callable[[], Tuple[Optional[TableServiceClient], TableClient]],
+        ttl: Optional[int] = None,
+    ) -> None:
+        self._cache = TTLCache(maxsize=10, ttl=ttl or DEFAULT_IP_EXCEPTIONS_TTL)
+        super().__init__(get_clients, ttl)
+
+    def add_exception(self, ip: str) -> None:
+        with self:
+            self.upsert(partition_key=IP_EXCEPTION_PARTITION_KEY, row_key=ip, value=ip)
+
+    @cachedmethod(lambda self: self._cache, key=lambda _: hashkey("ip_exceptions"))
+    def get_exceptions(self) -> Set[str]:
+        """Returns a set of IP addresses that are not subject to rate limiting."""
+        with self:
+            return set(self.get_all_values())

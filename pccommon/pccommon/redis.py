@@ -132,6 +132,11 @@ async def apply_rate_limit(
     try:
         ip = get_request_ip(request)
         r: Redis = request.app.state.redis
+
+        # Check if this ip excluded from rate limiting
+        if ip in settings.get_ip_exception_list_table().get_exceptions():
+            return
+
         script_hash = request.app.state.redis_rate_limit_script_hash
 
         key = f"{RATE_LIMIT_KEY_PREFIX}:{route_key}:{ip}"
@@ -210,6 +215,11 @@ async def apply_back_pressure(
     try:
         ip = get_request_ip(request)
         r: Redis = request.app.state.redis
+
+        # Check if this ip excluded from rate limiting
+        if ip in settings.get_ip_exception_list_table().get_exceptions():
+            return
+
         script_hash = request.app.state.redis_back_pressure_script_hash
 
         key = f"{BACKPRESSURE_KEY_PREFIX}:{route_key}:{ip}"
