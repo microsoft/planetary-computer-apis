@@ -14,7 +14,11 @@ from stac_fastapi.types.stac import (
 )
 
 from pccommon.config import get_render_config
-from pccommon.redis import apply_back_pressure, cached_result, rate_limit
+from pccommon.redis import (
+    back_pressure,
+    cached_result,
+    rate_limit,
+)
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
 from pcstac.contants import (
     CACHE_KEY_COLLECTION,
@@ -82,6 +86,12 @@ class PCClient(CoreCrudClient):
 
         return item
 
+    @rate_limit(CACHE_KEY_COLLECTIONS, settings.rate_limits.collections)
+    @back_pressure(
+        CACHE_KEY_COLLECTIONS,
+        settings.back_pressures.collections.req_per_sec,
+        settings.back_pressures.collections.inc_ms,
+    )
     async def all_collections(self, **kwargs: Any) -> Collections:
         """Read collections from the database and inject PQE links.
         Called with `GET /collections`.
@@ -92,17 +102,6 @@ class PCClient(CoreCrudClient):
         Returns:
             Collections.
         """
-        await rate_limit(
-            kwargs["request"], CACHE_KEY_COLLECTIONS, settings.rate_limits.collections
-        )
-
-        await apply_back_pressure(
-            kwargs["request"],
-            CACHE_KEY_COLLECTIONS,
-            settings.back_pressures.collections.req_per_sec,
-            settings.back_pressures.collections.inc_ms,
-        )
-
         _super: CoreCrudClient = super()
 
         async def _fetch() -> Collections:
@@ -120,6 +119,12 @@ class PCClient(CoreCrudClient):
 
         return await cached_result(_fetch, CACHE_KEY_COLLECTIONS, kwargs["request"])
 
+    @rate_limit(CACHE_KEY_COLLECTION, settings.rate_limits.collection)
+    @back_pressure(
+        CACHE_KEY_COLLECTION,
+        settings.back_pressures.collection.req_per_sec,
+        settings.back_pressures.collection.inc_ms,
+    )
     async def get_collection(self, collection_id: str, **kwargs: Any) -> Collection:
         """Get collection by id and inject PQE links.
         Called with `GET /collections/{collection_id}`.
@@ -132,17 +137,6 @@ class PCClient(CoreCrudClient):
         Returns:
             Collection.
         """
-        await rate_limit(
-            kwargs["request"], CACHE_KEY_COLLECTION, settings.rate_limits.collection
-        )
-
-        await apply_back_pressure(
-            kwargs["request"],
-            CACHE_KEY_COLLECTION,
-            settings.back_pressures.collection.req_per_sec,
-            settings.back_pressures.collection.inc_ms,
-        )
-
         _super: CoreCrudClient = super()
 
         async def _fetch() -> Collection:
@@ -162,6 +156,12 @@ class PCClient(CoreCrudClient):
         cache_key = f"{CACHE_KEY_COLLECTION}:{collection_id}"
         return await cached_result(_fetch, cache_key, kwargs["request"])
 
+    @rate_limit(CACHE_KEY_SEARCH, settings.rate_limits.search)
+    @back_pressure(
+        CACHE_KEY_SEARCH,
+        settings.back_pressures.search.req_per_sec,
+        settings.back_pressures.search.inc_ms,
+    )
     async def _search_base(
         self, search_request: PCSearch, **kwargs: Any
     ) -> ItemCollection:
@@ -172,17 +172,6 @@ class PCClient(CoreCrudClient):
         Returns:
             ItemCollection containing items which match the search criteria.
         """
-        await rate_limit(
-            kwargs["request"], CACHE_KEY_SEARCH, settings.rate_limits.search
-        )
-
-        await apply_back_pressure(
-            kwargs["request"],
-            CACHE_KEY_SEARCH,
-            settings.back_pressures.search.req_per_sec,
-            settings.back_pressures.search.inc_ms,
-        )
-
         _super: CoreCrudClient = super()
 
         async def _fetch() -> ItemCollection:
@@ -216,6 +205,12 @@ class PCClient(CoreCrudClient):
 
         return await cached_result(_fetch, CACHE_KEY_LANDING_PAGE, kwargs["request"])
 
+    @rate_limit(CACHE_KEY_ITEMS, settings.rate_limits.items)
+    @back_pressure(
+        CACHE_KEY_ITEMS,
+        settings.back_pressures.items.req_per_sec,
+        settings.back_pressures.items.inc_ms,
+    )
     async def item_collection(
         self,
         collection_id: str,
@@ -223,15 +218,6 @@ class PCClient(CoreCrudClient):
         token: Optional[str] = None,
         **kwargs: Any,
     ) -> ItemCollection:
-        await rate_limit(kwargs["request"], CACHE_KEY_ITEMS, settings.rate_limits.items)
-
-        await apply_back_pressure(
-            kwargs["request"],
-            CACHE_KEY_ITEMS,
-            settings.back_pressures.items.req_per_sec,
-            settings.back_pressures.items.inc_ms,
-        )
-
         _super: CoreCrudClient = super()
 
         async def _fetch() -> ItemCollection:
@@ -240,16 +226,13 @@ class PCClient(CoreCrudClient):
         cache_key = f"{CACHE_KEY_ITEMS}:{collection_id}:limit:{limit}:token:{token}"
         return await cached_result(_fetch, cache_key, kwargs["request"])
 
+    @rate_limit(CACHE_KEY_ITEM, settings.rate_limits.item)
+    @back_pressure(
+        CACHE_KEY_ITEM,
+        settings.back_pressures.item.req_per_sec,
+        settings.back_pressures.item.inc_ms,
+    )
     async def get_item(self, item_id: str, collection_id: str, **kwargs: Any) -> Item:
-        await rate_limit(kwargs["request"], CACHE_KEY_ITEM, settings.rate_limits.items)
-
-        await apply_back_pressure(
-            kwargs["request"],
-            CACHE_KEY_ITEM,
-            settings.back_pressures.item.req_per_sec,
-            settings.back_pressures.item.inc_ms,
-        )
-
         _super: CoreCrudClient = super()
 
         async def _fetch() -> Item:

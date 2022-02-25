@@ -57,6 +57,7 @@ end
 
 
 async def connect_to_redis(app: FastAPI) -> None:
+    """Connect to redis and store instance and script hashes in app state."""
     settings = PCAPIsConfig.from_environment()
     r = Redis(
         host=settings.redis_hostname,
@@ -76,6 +77,7 @@ async def connect_to_redis(app: FastAPI) -> None:
 async def cached_result(
     fn: Callable[[], Coroutine[Any, Any, T]], cache_key: str, request: Request
 ) -> T:
+    """Either get the result from redis or run the function and cache the result."""
     settings = PCAPIsConfig.from_environment()
     r: Optional[Redis] = None
     try:
@@ -109,7 +111,23 @@ async def cached_result(
     return result
 
 
-async def rate_limit(request: Request, route_key: str, max_req_per_sec: int) -> None:
+async def apply_rate_limit(
+    request: Request, route_key: str, max_req_per_sec: int
+) -> None:
+    """
+    Apply a rate limit.
+
+    Attributes
+    ----------
+    request:
+        The request to rate limit. The IP address from the request is
+        used in the cache key.
+    route_key:
+        The key representing the route to rate limit, used in the cache key.
+    max_req_per_sec:
+        The maximum requests per second. If this rate is exceeded,
+        a 429 Too Many Requests error is raised.
+    """
     settings = PCAPIsConfig.from_environment()
     try:
         ip = get_request_ip(request)
@@ -131,9 +149,63 @@ async def rate_limit(request: Request, route_key: str, max_req_per_sec: int) -> 
             raise
 
 
+def rate_limit(
+    route_key: str, max_req_per_sec: int
+) -> Callable[
+    [Callable[..., Coroutine[Any, Any, T]]], Callable[..., Coroutine[Any, Any, T]]
+]:
+    """
+    Decorator that applies a rate limit to a function.
+
+    apply_rate_limit will be called before the function is executed.
+
+    Attributes
+    ----------
+    route_key:
+        The key representing the route to rate limit, used in the cache key.
+    max_req_per_sec:
+        The maximum requests per second. If this rate is exceeded,
+        a 429 Too Many Requests error is raised.
+    """
+
+    def _decorator(
+        fn: Callable[..., Coroutine[Any, Any, T]]
+    ) -> Callable[..., Coroutine[Any, Any, T]]:
+        async def _wrapper(*args: Any, **kwargs: Any) -> T:
+            request: Optional[Request] = kwargs.get("request")
+            if request:
+                await apply_rate_limit(request, route_key, max_req_per_sec)
+            else:
+                raise ValueError(f"Missing request in {fn.__name__}")
+            return await fn(*args, **kwargs)
+
+        return _wrapper
+
+    return _decorator
+
+
 async def apply_back_pressure(
-    request: Request, route_key: str, min_req_per_sec: int, inc_ms: int
+    request: Request, route_key: str, req_per_sec: int, inc_ms: int
 ) -> None:
+    """
+    Apply back pressure.
+
+    Once the rate limit exceeds req_per_sec, slow down responses
+    by sleeping inc_ms milliseconds for each request over the limit.
+
+    Attributes
+    ----------
+    request:
+        The request to apply back pressure to. The IP address from the request is
+        used in the cache key.
+    route_key:
+        The key representing the route to rate limit, used in the cache key.
+    req_per_sec:
+        After this amount of requests are detected over a second the back pressure
+        wil be applied.
+    inc_ms:
+        The amount of milliseconds to sleep for each request over req_per_sec.
+    """
     settings = PCAPIsConfig.from_environment()
     try:
         ip = get_request_ip(request)
@@ -141,9 +213,7 @@ async def apply_back_pressure(
         script_hash = request.app.state.redis_back_pressure_script_hash
 
         key = f"{BACKPRESSURE_KEY_PREFIX}:{route_key}:{ip}"
-        overage: int = await r.evalsha(
-            script_hash, 1, key, str(min_req_per_sec), "1000"
-        )
+        overage: int = await r.evalsha(script_hash, 1, key, str(req_per_sec), "1000")
         print(f"overage: {overage}")
         if overage > 0:
             await asyncio.sleep((overage * inc_ms) / 1000)
@@ -152,3 +222,38 @@ async def apply_back_pressure(
     except Exception:
         if settings.debug:
             raise
+
+
+def back_pressure(
+    route_key: str, req_per_sec: int, inc_ms: int
+) -> Callable[
+    [Callable[..., Coroutine[Any, Any, T]]], Callable[..., Coroutine[Any, Any, T]]
+]:
+    """
+    Decorator that applies back pressure to a function.
+
+    Attributes
+    ----------
+    route_key:
+        The key representing the route to rate limit, used in the cache key.
+    req_per_sec:
+        After this amount of requests are detected over a second the back pressure
+        wil be applied.
+    inc_ms:
+        The amount of milliseconds to sleep for each request over req_per_sec.
+    """
+
+    def _decorator(
+        fn: Callable[..., Coroutine[Any, Any, T]]
+    ) -> Callable[..., Coroutine[Any, Any, T]]:
+        async def _wrapper(*args: Any, **kwargs: Any) -> T:
+            request: Optional[Request] = kwargs.get("request")
+            if request:
+                await apply_back_pressure(request, route_key, req_per_sec, inc_ms)
+            else:
+                raise ValueError(f"Missing request in {fn.__name__}")
+            return await fn(*args, **kwargs)
+
+        return _wrapper
+
+    return _decorator
