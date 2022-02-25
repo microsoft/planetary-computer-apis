@@ -61,7 +61,8 @@ tiler:
 
   stac_api_url: http://planetary-computer-stac.pc.svc.cluster.local
   stac_api_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/stac/
-  pc_sdk_sas_url: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/sas/
+  # PCT sas needs to be accessed through api management
+  pc_sdk_sas_url: https://pct-sas-westeurope-staging-apim.azure-api.net/sas/token
 
 metrics:
   instrumentationKey: "{{ tf.instrumentation_key }}"
