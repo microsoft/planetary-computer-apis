@@ -129,6 +129,7 @@ pcingress:
     tlsHost: "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
     hosts:
       - "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
+      - "planetarycomputer-test.microsoft.com"
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: "{{ tf.cluster_cert_issuer }}-pcingress"
