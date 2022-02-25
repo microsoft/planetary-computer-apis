@@ -30,11 +30,28 @@ stac:
     ssl: true
 
   rate_limit:
-    collections: 100
-    collection: 100
-    items: 50
-    item: 50
-    search: 50
+    collections: 500
+    collection: 500
+    items: 100
+    item: 500
+    search: 500
+
+  back_pressure:
+    collections:
+      req_per_sec: 100
+      inc_ms: 10
+    collection:
+      req_per_sec: 100
+      inc_ms: 10
+    items:
+      req_per_sec: 100
+      inc_ms: 10
+    item:
+      req_per_sec: 100
+      inc_ms: 10
+    search:
+      req_per_sec: 100
+      inc_ms: 10
 
   deploy:
     replicaCount: 1
