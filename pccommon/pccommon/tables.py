@@ -14,7 +14,7 @@ from typing import (
 import orjson
 from azure.core.credentials import AzureNamedKeyCredential, AzureSasCredential
 from azure.core.exceptions import ResourceNotFoundError
-from azure.data.tables import TableClient, TableServiceClient, TableEntity
+from azure.data.tables import TableClient, TableEntity, TableServiceClient
 from cachetools import Cache, TTLCache, cachedmethod
 from cachetools.keys import hashkey
 from pydantic import BaseModel

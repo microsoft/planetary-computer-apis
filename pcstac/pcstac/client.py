@@ -14,11 +14,7 @@ from stac_fastapi.types.stac import (
 )
 
 from pccommon.config import get_render_config
-from pccommon.redis import (
-    back_pressure,
-    cached_result,
-    rate_limit,
-)
+from pccommon.redis import back_pressure, cached_result, rate_limit
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
 from pcstac.contants import (
     CACHE_KEY_COLLECTION,

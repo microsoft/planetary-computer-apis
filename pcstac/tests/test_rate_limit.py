@@ -1,8 +1,8 @@
 import time
-from fastapi import FastAPI
 
-from httpx import AsyncClient
 import pytest
+from fastapi import FastAPI
+from httpx import AsyncClient
 
 from pccommon.constants import HTTP_429_TOO_MANY_REQUESTS
 

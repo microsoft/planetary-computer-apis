@@ -5,7 +5,11 @@ from typing import Any, Dict, List, Optional
 
 from pccommon.config.collections import CollectionConfig, CollectionConfigTable
 from pccommon.config.containers import ContainerConfig, ContainerConfigTable
-from pccommon.constants import DEFAULT_COLLECTION_CONFIG_TABLE_NAME, DEFAULT_CONTAINER_CONFIG_TABLE_NAME, DEFAULT_IP_EXCEPTION_CONFIG_TABLE_NAME
+from pccommon.constants import (
+    DEFAULT_COLLECTION_CONFIG_TABLE_NAME,
+    DEFAULT_CONTAINER_CONFIG_TABLE_NAME,
+    DEFAULT_IP_EXCEPTION_CONFIG_TABLE_NAME,
+)
 from pccommon.tables import IPExceptionListTable
 from pccommon.version import __version__
 
@@ -131,9 +135,7 @@ def parse_args(args: List[str]) -> Optional[Dict[str, Any]]:
             required=True,
         )
         p.add_argument("--account", help="Storage account name.", required=True)
-        p.add_argument(
-            "--table", help="Table name.", default=default_table
-        )
+        p.add_argument("--table", help="Table name.", default=default_table)
         p.add_argument(
             "--account-url",
             help="Storage account endpoint for table access.",
