@@ -44,5 +44,5 @@ def get_request_ip(request: Request) -> str:
         or request.headers.get(X_FORWARDED_FOR)
     )
 
-    # If multiple IPs, take the first one
-    return ip_header.split(",")[0] if ip_header else ""
+    # If multiple IPs, take the last one
+    return ip_header.split(",")[-1] if ip_header else ""
