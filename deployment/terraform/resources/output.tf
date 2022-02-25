@@ -92,6 +92,10 @@ output "container_config_table_name" {
   value = azurerm_storage_table.containerconfig.name
 }
 
+output "ip_exception_config_table_name" {
+  value = azurerm_storage_table.ipconfig.name
+}
+
 ## Redis
 
 output "redis_host" {

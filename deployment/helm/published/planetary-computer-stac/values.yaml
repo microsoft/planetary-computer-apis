@@ -22,6 +22,7 @@ stac:
     account_key: ""
     collection_config_table_name: ""
     container_config_table_name: ""
+    ip_exception_config_table_name: ""
 
   redis:
     host: ""

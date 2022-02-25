@@ -17,3 +17,8 @@ resource "azurerm_storage_table" "containerconfig" {
   name                 = "containerconfig"
   storage_account_name = azurerm_storage_account.pc.name
 }
+
+resource "azurerm_storage_table" "ipexceptionlist" {
+  name                 = "ipexceptionlist"
+  storage_account_name = azurerm_storage_account.pc.name
+}
