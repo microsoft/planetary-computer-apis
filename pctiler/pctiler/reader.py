@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 import attr
 import morecantile
@@ -7,8 +7,9 @@ import planetary_computer as pc
 from cachetools import TTLCache, cached
 from cachetools.keys import hashkey
 from cogeo_mosaic.errors import NoAssetFoundError
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from geojson_pydantic import Point, Polygon
+import pystac
 from rio_tiler.constants import WEB_MERCATOR_TMS, WGS84_CRS
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
 from rio_tiler.io.base import BaseReader, MultiBaseReader
@@ -16,8 +17,11 @@ from rio_tiler.io.cogeo import COGReader
 from rio_tiler.io.stac import STACReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
+from rio_tiler.types import Indexes
 from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
+from psycopg.rows import dict_row
+from psycopg_pool.pool import ConnectionPool
 
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
@@ -35,8 +39,27 @@ def get_cache_key(
 @attr.s
 class ItemSTACReader(STACReader):
 
+    # default to None as URL of STAC item isn't used any longer
+    input: str = attr.ib(default=None)
+
+    collection_id: str = attr.ib(kw_only=True)
+    item_id: str = attr.ib(kw_only=True)
+    pool: ConnectionPool = attr.ib(kw_only=True)
+
     # TODO: remove CustomCOGReader once moved to rasterio 1.3
     reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
+
+    def __attrs_post_init__(self):
+        """Fetch STAC Item and get list of valid assets."""
+        with self.pool.connection() as conn:
+            with conn.cursor(row_factory=dict_row) as cursor:
+                cursor.execute(
+                    "SELECT * FROM pgstac.items WHERE collection_id=%s AND id=%s LIMIT 1;",
+                    (self.collection_id, self.item_id,),
+                )
+                resp = cursor.fetchone()
+        self.item = pystac.Item.from_dict(resp["content"])
+        super().__attrs_post_init__()
 
     def _get_asset_url(self, asset: str) -> str:
         asset_url = BlobCDN.transform_if_available(super()._get_asset_url(asset))

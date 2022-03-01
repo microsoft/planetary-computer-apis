@@ -1,15 +1,18 @@
 from dataclasses import dataclass
 from urllib.parse import urljoin
+from typing import Dict
 
 from fastapi import Query, Request, Response
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
-from titiler.core.factory import MultiBaseTilerFactory
+from fastapi import Query
 
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
+from pctiler.factory import PGMultiBaseTilerFactory
 from pctiler.reader import ItemSTACReader
+
 
 try:
     from importlib.resources import files as resources_files  # type: ignore
@@ -24,13 +27,11 @@ templates = Jinja2Templates(
 )  # type: ignore
 
 
-def ItemPathParams(
+def ItemIdParams(
     collection: str = Query(..., description="STAC Collection ID"),
     item: str = Query(..., description="STAC Item ID"),
-) -> str:
-    return urljoin(
-        get_settings().stac_api_url, f"collections/{collection}/items/{item}"
-    )
+) -> Dict[str, str]:
+    return { "collection": collection, "item": item }
 
 
 @dataclass
@@ -39,9 +40,9 @@ class MapParams:
     item: str = Query(..., description="STAC Item ID")
 
 
-pc_tile_factory = MultiBaseTilerFactory(
+pc_tile_factory = PGMultiBaseTilerFactory(
     reader=ItemSTACReader,
-    path_dependency=ItemPathParams,
+    path_dependency=ItemIdParams,
     colormap_dependency=PCColorMapParams,
     router_prefix=get_settings().item_endpoint_prefix,
 )
