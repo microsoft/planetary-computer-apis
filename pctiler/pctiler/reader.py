@@ -49,7 +49,7 @@ class ItemSTACReader(STACReader):
     # TODO: remove CustomCOGReader once moved to rasterio 1.3
     reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
 
-    def __attrs_post_init__(self):
+    def __attrs_post_init__(self) -> None:
         """Fetch STAC Item and get list of valid assets."""
         with self.pool.connection() as conn:
             with conn.cursor(row_factory=dict_row) as cursor:
