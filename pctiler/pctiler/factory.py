@@ -1,7 +1,7 @@
-# type: ignore
-
+# mypy: ignore-errors
 from dataclasses import dataclass
 from typing import Dict, Optional, Union
+from urllib.parse import urlencode
 
 import rasterio
 from fastapi import Body, Depends, Path, Query, Request, Response
@@ -10,8 +10,7 @@ from geojson_pydantic.geometries import Polygon
 from morecantile import TileMatrixSet
 from rio_tiler.models import BandStatistics, Bounds, Info
 from rio_tiler.utils import get_array_statistics
-from starlette.requests import Request
-from starlette.responses import Response
+from starlette.templating import Jinja2Templates
 from titiler.core.factory import MultiBaseTilerFactory, img_endpoint_params
 from titiler.core.models.mapbox import TileJSON
 from titiler.core.models.responses import (
@@ -24,6 +23,17 @@ from titiler.core.resources.enums import ImageType, MediaType, OptionalHeader
 from titiler.core.resources.responses import GeoJSONResponse, JSONResponse, XMLResponse
 from titiler.core.utils import Timer
 
+try:
+    from importlib.resources import files as resources_files  # type: ignore
+except ImportError:
+    # Try backported to PY<39 `importlib_resources`.
+    from importlib_resources import files as resources_files  # type: ignore
+
+# TODO: mypy fails in python 3.9, we need to find a proper way to do this
+templates = Jinja2Templates(
+    directory=str(resources_files(__package__) / "templates")
+)  # type: ignore
+
 
 @dataclass
 class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
@@ -31,7 +41,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
     ############################################################################
     # /bounds
     ############################################################################
-    def bounds(self):
+    def bounds(self) -> None:
         """Register /bounds endpoint."""
 
         @self.router.get(
@@ -39,7 +49,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             response_model=Bounds,
             responses={200: {"description": "Return dataset's bounds."}},
         )
-        def bounds(request: Request, src_path=Depends(self.path_dependency)):
+        def bounds(request: Request, src_path=Depends(self.path_dependency)) -> dict:
             """Return the bounds of the COG."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
@@ -53,7 +63,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
     ############################################################################
     # /info
     ############################################################################
-    def info(self):
+    def info(self) -> None:
         """Register /info endpoint."""
 
         @self.router.get(
@@ -63,7 +73,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             response_class=JSONResponse,
             responses={200: {"description": "Return dataset's basic info."}},
         )
-        def info(request: Request, src_path=Depends(self.path_dependency)):
+        def info(request: Request, src_path=Depends(self.path_dependency)) -> dict:
             """Return dataset's basic info."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
@@ -86,7 +96,9 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
                 }
             },
         )
-        def info_geojson(request: Request, src_path=Depends(self.path_dependency)):
+        def info_geojson(
+            request: Request, src_path=Depends(self.path_dependency)
+        ) -> dict:
             """Return dataset's basic info as a GeoJSON feature."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
@@ -103,7 +115,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
     ############################################################################
     # /statistics
     ############################################################################
-    def statistics(self):
+    def statistics(self) -> None:
         """add statistics endpoints."""
 
         # GET endpoint
@@ -126,7 +138,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             image_params=Depends(self.img_dependency),
             stats_params=Depends(self.stats_dependency),
             histogram_params=Depends(self.histogram_dependency),
-        ):
+        ) -> dict:
             """Create image from a geojson feature."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
@@ -167,7 +179,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             image_params=Depends(self.img_dependency),
             stats_params=Depends(self.stats_dependency),
             histogram_params=Depends(self.histogram_dependency),
-        ):
+        ) -> dict:
             """Get Statistics from a geojson feature or featureCollection."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
@@ -233,7 +245,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
     ############################################################################
     # /tiles
     ############################################################################
-    def tile(self):  # noqa: C901
+    def tile(self) -> None:  # noqa: C901
         """Register /tiles endpoint."""
 
         @self.router.get(r"/tiles/{z}/{x}/{y}", **img_endpoint_params)
@@ -274,9 +286,14 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
                 gt=0,
                 alias="buffer",
                 title="Tile buffer.",
-                description="Buffer on each side of the given tile. It must be a multiple of `0.5`. Output **tilesize** will be expanded to `tilesize + 2 * tile_buffer` (e.g 0.5 = 257x257, 1.0 = 258x258).",
+                description=(
+                    "Buffer on each side of the given tile. It must be a "
+                    "multiple of `0.5`. Output **tilesize** will be expanded "
+                    "to `tilesize + 2 * tile_buffer` (e.g 0.5 = 257x257, 1.0 "
+                    "= 258x258)."
+                ),
             ),
-        ):
+        ) -> Response:
             """Create map tile from a dataset."""
             timings = []
             headers: Dict[str, str] = {}
@@ -327,7 +344,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
 
             return Response(content, media_type=format.mediatype, headers=headers)
 
-    def tilejson(self):  # noqa: C901
+    def tilejson(self) -> None:  # noqa: C901
         """Register /tilejson.json endpoint."""
 
         @self.router.get(
@@ -368,9 +385,14 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
                 gt=0,
                 alias="buffer",
                 title="Tile buffer.",
-                description="Buffer on each side of the given tile. It must be a multiple of `0.5`. Output **tilesize** will be expanded to `tilesize + 2 * tile_buffer` (e.g 0.5 = 257x257, 1.0 = 258x258).",
+                description=(
+                    "Buffer on each side of the given tile. It must be a "
+                    "multiple of `0.5`. Output **tilesize** will be expanded "
+                    "to `tilesize + 2 * tile_buffer` (e.g 0.5 = 257x257, 1.0 = "
+                    "258x258)."
+                ),
             ),
-        ):
+        ) -> dict:
             """Return TileJSON document for a dataset."""
             route_params = {
                 "z": "{z}",
@@ -413,7 +435,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
                         "tiles": [tiles_url],
                     }
 
-    def wmts(self):  # noqa: C901
+    def wmts(self) -> None:  # noqa: C901
         """Register /wmts endpoint."""
 
         @self.router.get("/WMTSCapabilities.xml", response_class=XMLResponse)
@@ -441,7 +463,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             postprocess_params=Depends(self.process_dependency),  # noqa
             colormap=Depends(self.colormap_dependency),  # noqa
             render_params=Depends(self.render_dependency),  # noqa
-        ):
+        ) -> str:
             """OGC WMTS endpoint."""
             route_params = {
                 "z": "{TileMatrix}",
@@ -485,16 +507,19 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             tileMatrix = []
             for zoom in range(minzoom, maxzoom + 1):
                 matrix = tms.matrix(zoom)
-                tm = f"""
+                tm = (
+                    f"""
                         <TileMatrix>
                             <ows:Identifier>{matrix.identifier}</ows:Identifier>
                             <ScaleDenominator>{matrix.scaleDenominator}</ScaleDenominator>
-                            <TopLeftCorner>{matrix.topLeftCorner[0]} {matrix.topLeftCorner[1]}</TopLeftCorner>
+                            <TopLeftCorner>{matrix.topLeftCorner[0]}"""
+                    f"""{matrix.topLeftCorner[1]}</TopLeftCorner>
                             <TileWidth>{matrix.tileWidth}</TileWidth>
                             <TileHeight>{matrix.tileHeight}</TileHeight>
                             <MatrixWidth>{matrix.matrixWidth}</MatrixWidth>
                             <MatrixHeight>{matrix.matrixHeight}</MatrixHeight>
                         </TileMatrix>"""
+                )
                 tileMatrix.append(tm)
 
             return templates.TemplateResponse(
@@ -515,7 +540,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
     ############################################################################
     # /point
     ############################################################################
-    def point(self):
+    def point(self) -> None:
         """Register /point endpoints."""
 
         @self.router.get(
@@ -525,13 +550,14 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             responses={200: {"description": "Return a value for a point"}},
         )
         def point(
+            request: Request,
             response: Response,
             lon: float = Path(..., description="Longitude"),
             lat: float = Path(..., description="Latitude"),
             src_path=Depends(self.path_dependency),
             layer_params=Depends(self.layer_dependency),
             dataset_params=Depends(self.dataset_dependency),
-        ):
+        ) -> dict:
             """Get Point value for a dataset."""
             timings = []
 
@@ -561,12 +587,13 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
     ############################################################################
     # /preview (Optional)
     ############################################################################
-    def preview(self):
+    def preview(self) -> None:
         """Register /preview endpoint."""
 
         @self.router.get(r"/preview", **img_endpoint_params)
         @self.router.get(r"/preview.{format}", **img_endpoint_params)
         def preview(
+            request: Request,
             format: ImageType = Query(
                 None, description="Output image type. Default is auto."
             ),
@@ -577,7 +604,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             postprocess_params=Depends(self.process_dependency),
             colormap=Depends(self.colormap_dependency),
             render_params=Depends(self.render_dependency),
-        ):
+        ) -> Response:
             """Create preview of a dataset."""
             timings = []
             headers: Dict[str, str] = {}
@@ -624,7 +651,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
     ############################################################################
     # /crop (Optional)
     ############################################################################
-    def part(self):
+    def part(self) -> None:
         """Register /crop endpoint."""
 
         # GET endpoints
@@ -650,7 +677,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             postprocess_params=Depends(self.process_dependency),
             colormap=Depends(self.colormap_dependency),
             render_params=Depends(self.render_dependency),
-        ):
+        ) -> Response:
             """Create image from part of a dataset."""
             timings = []
             headers: Dict[str, str] = {}
@@ -718,7 +745,7 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             postprocess_params=Depends(self.process_dependency),
             colormap=Depends(self.colormap_dependency),
             render_params=Depends(self.render_dependency),
-        ):
+        ) -> Response:
             """Create image from a geojson feature."""
             timings = []
             headers: Dict[str, str] = {}

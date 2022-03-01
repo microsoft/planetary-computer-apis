@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import attr
 import morecantile
@@ -19,7 +19,6 @@ from rio_tiler.io.cogeo import COGReader
 from rio_tiler.io.stac import STACReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
-from rio_tiler.types import Indexes
 from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
 
@@ -54,15 +53,30 @@ class ItemSTACReader(STACReader):
         with self.pool.connection() as conn:
             with conn.cursor(row_factory=dict_row) as cursor:
                 cursor.execute(
-                    "SELECT * FROM pgstac.items WHERE collection_id=%s AND id=%s LIMIT 1;",
+                    (
+                        "SELECT * FROM pgstac.items WHERE "
+                        "collection_id=%s AND id=%s LIMIT 1;"
+                    ),
                     (
                         self.collection_id,
                         self.item_id,
                     ),
                 )
                 resp = cursor.fetchone()
-        self.item = pystac.Item.from_dict(resp["content"])
-        super().__attrs_post_init__()
+        try:
+            if resp is not None:
+                self.item = pystac.Item.from_dict(
+                    resp["content"]
+                )  # mypy: ignore-errors
+            super().__attrs_post_init__()
+        except TypeError:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Item not found for collection id "
+                    f"'{self.collection_id}' and item id '{self.item_id}'"
+                ),
+            )
 
     def _get_asset_url(self, asset: str) -> str:
         asset_url = BlobCDN.transform_if_available(super()._get_asset_url(asset))
