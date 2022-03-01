@@ -4,12 +4,14 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 import attr
 import morecantile
 import planetary_computer as pc
+import pystac
 from cachetools import TTLCache, cached
 from cachetools.keys import hashkey
 from cogeo_mosaic.errors import NoAssetFoundError
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 from geojson_pydantic import Point, Polygon
-import pystac
+from psycopg.rows import dict_row
+from psycopg_pool.pool import ConnectionPool
 from rio_tiler.constants import WEB_MERCATOR_TMS, WGS84_CRS
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
 from rio_tiler.io.base import BaseReader, MultiBaseReader
@@ -20,8 +22,6 @@ from rio_tiler.mosaic import mosaic_reader
 from rio_tiler.types import Indexes
 from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
-from psycopg.rows import dict_row
-from psycopg_pool.pool import ConnectionPool
 
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
@@ -55,7 +55,10 @@ class ItemSTACReader(STACReader):
             with conn.cursor(row_factory=dict_row) as cursor:
                 cursor.execute(
                     "SELECT * FROM pgstac.items WHERE collection_id=%s AND id=%s LIMIT 1;",
-                    (self.collection_id, self.item_id,),
+                    (
+                        self.collection_id,
+                        self.item_id,
+                    ),
                 )
                 resp = cursor.fetchone()
         self.item = pystac.Item.from_dict(resp["content"])

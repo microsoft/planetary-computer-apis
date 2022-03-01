@@ -1,21 +1,16 @@
 from dataclasses import dataclass
 from typing import Dict, Optional, Union
 
-from fastapi import Query, Request, Response
-from morecantile import TileMatrixSet
 import rasterio
-from titiler.core.factory import MultiBaseTilerFactory, img_endpoint_params
-from titiler.core.resources.enums import ImageType, OptionalHeader
-from titiler.core.utils import Timer
-from fastapi import Depends, Path, Query
-
-import rasterio
+from fastapi import Body, Depends, Path, Query, Request, Response
 from geojson_pydantic.features import Feature, FeatureCollection
 from geojson_pydantic.geometries import Polygon
 from morecantile import TileMatrixSet
 from rio_tiler.models import BandStatistics, Bounds, Info
 from rio_tiler.utils import get_array_statistics
-
+from starlette.requests import Request
+from starlette.responses import Response
+from titiler.core.factory import MultiBaseTilerFactory, img_endpoint_params
 from titiler.core.models.mapbox import TileJSON
 from titiler.core.models.responses import (
     InfoGeoJSON,
@@ -27,10 +22,6 @@ from titiler.core.resources.enums import ImageType, MediaType, OptionalHeader
 from titiler.core.resources.responses import GeoJSONResponse, JSONResponse, XMLResponse
 from titiler.core.utils import Timer
 
-from fastapi import Body, Depends, Path, Query
-
-from starlette.requests import Request
-from starlette.responses import Response
 
 @dataclass
 class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
@@ -50,7 +41,11 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             """Return the bounds of the COG."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
-                with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], pool=pool) as src_dst:
+                with self.reader(
+                    item_id=src_path["item"],
+                    collection_id=src_path["collection"],
+                    pool=pool,
+                ) as src_dst:
                     return {"bounds": src_dst.geographic_bounds}
 
     ############################################################################
@@ -70,7 +65,11 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             """Return dataset's basic info."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
-                with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], pool=pool) as src_dst:
+                with self.reader(
+                    item_id=src_path["item"],
+                    collection_id=src_path["collection"],
+                    pool=pool,
+                ) as src_dst:
                     return src_dst.info()
 
         @self.router.get(
@@ -89,7 +88,11 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             """Return dataset's basic info as a GeoJSON feature."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
-                with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], pool=pool) as src_dst:
+                with self.reader(
+                    item_id=src_path["item"],
+                    collection_id=src_path["collection"],
+                    pool=pool,
+                ) as src_dst:
                     return Feature(
                         geometry=Polygon.from_bounds(*src_dst.geographic_bounds),
                         properties=src_dst.info(),
@@ -125,7 +128,11 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             """Create image from a geojson feature."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
-                with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], pool=pool) as src_dst:
+                with self.reader(
+                    item_id=src_path["item"],
+                    collection_id=src_path["collection"],
+                    pool=pool,
+                ) as src_dst:
                     return src_dst.statistics(
                         **layer_params,
                         **image_params,
@@ -162,7 +169,11 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             """Get Statistics from a geojson feature or featureCollection."""
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
-                with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], pool=pool) as src_dst:
+                with self.reader(
+                    item_id=src_path["item"],
+                    collection_id=src_path["collection"],
+                    pool=pool,
+                ) as src_dst:
                     # TODO: stream features for FeatureCollection
                     if isinstance(geojson, FeatureCollection):
                         for feature in geojson:
@@ -273,7 +284,12 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             pool = request.app.state.dbpool
             with Timer() as t:
                 with rasterio.Env(**self.gdal_config):
-                    with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], tms=tms, pool=pool) as src_dst:
+                    with self.reader(
+                        item_id=src_path["item"],
+                        collection_id=src_path["collection"],
+                        tms=tms,
+                        pool=pool,
+                    ) as src_dst:
                         data = src_dst.tile(
                             x,
                             y,
@@ -380,10 +396,14 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             if qs:
                 tiles_url += f"?{urlencode(qs)}"
 
-
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
-                with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], tms=tms, pool=pool) as src_dst:
+                with self.reader(
+                    item_id=src_path["item"],
+                    collection_id=src_path["collection"],
+                    tms=tms,
+                    pool=pool,
+                ) as src_dst:
                     return {
                         "bounds": src_dst.geographic_bounds,
                         "minzoom": minzoom if minzoom is not None else src_dst.minzoom,
@@ -450,7 +470,12 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
 
             pool = request.app.state.dbpool
             with rasterio.Env(**self.gdal_config):
-                with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], tms=tms, pool=pool) as src_dst:
+                with self.reader(
+                    item_id=src_path["item"],
+                    collection_id=src_path["collection"],
+                    tms=tms,
+                    pool=pool,
+                ) as src_dst:
                     bounds = src_dst.geographic_bounds
                     minzoom = minzoom if minzoom is not None else src_dst.minzoom
                     maxzoom = maxzoom if maxzoom is not None else src_dst.maxzoom
@@ -511,7 +536,11 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             pool = request.app.state.dbpool
             with Timer() as t:
                 with rasterio.Env(**self.gdal_config):
-                    with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], pool=pool) as src_dst:
+                    with self.reader(
+                        item_id=src_path["item"],
+                        collection_id=src_path["collection"],
+                        pool=pool,
+                    ) as src_dst:
                         values = src_dst.point(
                             lon,
                             lat,
@@ -554,7 +583,11 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             pool = request.app.state.dbpool
             with Timer() as t:
                 with rasterio.Env(**self.gdal_config):
-                    with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], pool=pool) as src_dst:
+                    with self.reader(
+                        item_id=src_path["item"],
+                        collection_id=src_path["collection"],
+                        pool=pool,
+                    ) as src_dst:
                         data = src_dst.preview(
                             **layer_params,
                             **img_params,
@@ -623,7 +656,11 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             pool = request.app.state.dbpool
             with Timer() as t:
                 with rasterio.Env(**self.gdal_config):
-                    with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], pool=pool) as src_dst:
+                    with self.reader(
+                        item_id=src_path["item"],
+                        collection_id=src_path["collection"],
+                        pool=pool,
+                    ) as src_dst:
                         data = src_dst.part(
                             [minx, miny, maxx, maxy],
                             **layer_params,
@@ -687,7 +724,11 @@ class PGMultiBaseTilerFactory(MultiBaseTilerFactory):
             pool = request.app.state.dbpool
             with Timer() as t:
                 with rasterio.Env(**self.gdal_config):
-                    with self.reader(item_id=src_path["item"], collection_id=src_path["collection"], pool=pool) as src_dst:
+                    with self.reader(
+                        item_id=src_path["item"],
+                        collection_id=src_path["collection"],
+                        pool=pool,
+                    ) as src_dst:
                         data = src_dst.feature(
                             geojson.dict(exclude_none=True),
                             **layer_params,
