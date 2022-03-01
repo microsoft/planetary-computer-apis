@@ -8,14 +8,10 @@ import pystac
 from cachetools import TTLCache, cached
 from cachetools.keys import hashkey
 from cogeo_mosaic.errors import NoAssetFoundError
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 from geojson_pydantic import Point, Polygon
-<<<<<<< HEAD
 from psycopg.rows import dict_row
 from psycopg_pool.pool import ConnectionPool
-=======
-import pystac
->>>>>>> af43c6d (Use DB to look up items instead of STAC url)
 from rio_tiler.constants import WEB_MERCATOR_TMS, WGS84_CRS
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
 from rio_tiler.io.base import BaseReader, MultiBaseReader
@@ -26,8 +22,6 @@ from rio_tiler.mosaic import mosaic_reader
 from rio_tiler.types import Indexes
 from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
-from psycopg.rows import dict_row
-from psycopg_pool.pool import ConnectionPool
 
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config

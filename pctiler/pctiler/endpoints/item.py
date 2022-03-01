@@ -1,19 +1,16 @@
 from dataclasses import dataclass
 from typing import Dict
 from urllib.parse import urljoin
-from typing import Dict
 
 from fastapi import Query, Request, Response
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
-from fastapi import Query
 
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.factory import PGMultiBaseTilerFactory
 from pctiler.reader import ItemSTACReader
-
 
 try:
     from importlib.resources import files as resources_files  # type: ignore
@@ -32,7 +29,7 @@ def ItemIdParams(
     collection: str = Query(..., description="STAC Collection ID"),
     item: str = Query(..., description="STAC Item ID"),
 ) -> Dict[str, str]:
-    return { "collection": collection, "item": item }
+    return {"collection": collection, "item": item}
 
 
 @dataclass
