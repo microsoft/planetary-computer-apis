@@ -13,16 +13,16 @@ stac:
     poolSize: "1"
 
   storage:
-    account_name: {{ tf.storage_account_name }}
-    account_key: {{ tf.storage_account_key }}
-    collection_config_table_name: {{ tf.collection_config_table_name }}
-    container_config_table_name: {{ tf.container_config_table_name }}
-    ip_exception_config_table_name: {{ tf.ip_config_table_name }}
+    account_name: "{{ tf.storage_account_name }}"
+    account_key: "{{ tf.storage_account_key }}"
+    collection_config_table_name: "{{ tf.collection_config_table_name }}"
+    container_config_table_name: "{{ tf.container_config_table_name }}"
+    ip_exception_config_table_name: "{{ tf.ip_config_table_name }}"
 
   redis:
-    host: {{ tf.redis_host }}
-    password: {{ tf.redis_password }}
-    port: {{ tf.redis_port }}
+    host: "{{ tf.redis_host }}"
+    password: "{{ tf.redis_password }}"
+    port: "{{ tf.redis_port }}"
     ssl: true
 
   rate_limit:
@@ -50,7 +50,7 @@ stac:
       inc_ms: 10
 
   deploy:
-    replicaCount: {{ tf.stac_replica_count }}
+    replicaCount: "{{ tf.stac_replica_count }}"
     podAnnotations:
       "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
@@ -77,10 +77,10 @@ tiler:
     webConcurrency: "1"
 
   storage:
-    account_name: {{ tf.storage_account_name }}
-    account_key: {{ tf.storage_account_key }}
-    collection_config_table_name: {{ tf.collection_config_table_name }}
-    container_config_table_name: {{ tf.container_config_table_name }}
+    account_name: "{{ tf.storage_account_name }}"
+    account_key: "{{ tf.storage_account_key }}"
+    collection_config_table_name: "{{ tf.collection_config_table_name }}"
+    container_config_table_name: "{{ tf.container_config_table_name }}"
 
   redis:
     host: {{ tf.redis_host }}
@@ -89,7 +89,7 @@ tiler:
     ssl: true
 
   deploy:
-    replicaCount: {{ tf.tiler_replica_count }}
+    replicaCount: "{{ tf.tiler_replica_count }}"
     podAnnotations:
       "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
@@ -98,7 +98,8 @@ tiler:
 
   stac_api_url: http://planetary-computer-stac.pc.svc.cluster.local
   stac_api_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/stac/
-  pc_sdk_sas_url: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/sas/
+  # PCT sas needs to be accessed through api management
+  pc_sdk_sas_url: https://pct-sas-westeurope-staging-apim.azure-api.net/sas/token
 
 metrics:
   instrumentationKey: "{{ tf.instrumentation_key }}"
