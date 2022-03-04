@@ -13,9 +13,11 @@ import pccommon
 from pccommon.constants import (
     DEFAULT_CONTAINER_CONFIG_TABLE_NAME,
     DEFAULT_COLLECTION_CONFIG_TABLE_NAME,
+    DEFAULT_IP_EXCEPTION_CONFIG_TABLE_NAME
 )
 from pccommon.config.collections import CollectionConfig, CollectionConfigTable
 from pccommon.config.containers import ContainerConfig, ContainerConfigTable
+from pccommon.tables import IPExceptionListTable
 
 TEST_DATA_DIR = Path(pccommon.__file__).parent.parent / "tests" / "data-files"
 COLLECTION_CONFIG_PATH = TEST_DATA_DIR / "collection_config.json"
@@ -45,6 +47,7 @@ def setup_azurite() -> None:
     for table in [
         DEFAULT_CONTAINER_CONFIG_TABLE_NAME,
         DEFAULT_COLLECTION_CONFIG_TABLE_NAME,
+        DEFAULT_IP_EXCEPTION_CONFIG_TABLE_NAME
     ]:
         if table not in tables:
             print(f"~ ~ Creating table {table}...")
@@ -77,6 +80,16 @@ def setup_azurite() -> None:
     for collection_id, config_dict in js.items():
         config = CollectionConfig(**config_dict)
         collection_config_table.set_config(collection_id, config)
+
+    print("~ ~ Writing ip exceptions...")
+
+    ip_config_table = IPExceptionListTable(
+        lambda: (
+            None,
+            table_service_client.get_table_client(DEFAULT_IP_EXCEPTION_CONFIG_TABLE_NAME),
+        )
+    )
+    ip_config_table.add_exception("127.0.0.1")
 
     print("~ Done Azurite setup.")
 

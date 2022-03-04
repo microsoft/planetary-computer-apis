@@ -24,6 +24,36 @@ services:
       - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
       - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
 
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME=ipexceptionlist
+
+      # Redis
+      - PCAPIS_REDIS_HOSTNAME=redis
+      - PCAPIS_REDIS_PASSWORD=devcache
+      - PCAPIS_REDIS_PORT=6380
+      - PCAPIS_REDIS_SSL=FALSE
+
+      # Rate limit
+      - PCAPIS_RATE_LIMITS__COLLECTIONS=10
+      - PCAPIS_RATE_LIMITS__COLLECTION=10
+      - PCAPIS_RATE_LIMITS__ITEMS=10
+      - PCAPIS_RATE_LIMITS__ITEM=10
+      - PCAPIS_RATE_LIMITS__SEARCH=10
+
+      # Backpressure
+      - PCAPIS_BACK_PRESSURES__COLLECTIONS__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__COLLECTIONS__INC_MS=10
+      - PCAPIS_BACK_PRESSURES__COLLECTION__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__COLLECTION__INC_MS=10
+      - PCAPIS_BACK_PRESSURES__ITEMS__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__ITEMS__INC_MS=10
+      - PCAPIS_BACK_PRESSURES__ITEM__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__ITEM__INC_MS=10
+      - PCAPIS_BACK_PRESSURES__SEARCH__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__SEARCH__INC_MS=10
+
       # Used by pgstac backend
       - POSTGRES_USER=username
       - POSTGRES_PASS=password
@@ -98,6 +128,17 @@ services:
       - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
       - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
 
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME=ipexceptionlist
+
+      # Redis
+      - PCAPIS_REDIS_HOSTNAME=redis
+      - PCAPIS_REDIS_PASSWORD=devcache
+      - PCAPIS_REDIS_PORT=6380
+      - PCAPIS_REDIS_SSL=FALSE
+
       # Used for logging and metrics
       - APP_INSIGHTS_INSTRUMENTATION_KEY
     depends_on:
@@ -145,10 +186,18 @@ services:
       - "10002:10002" # Table
     volumes:
       - pc-apis-azurite-data:/workspace
+  redis:
+    image: redis:6.2.6-buster
+    command: redis-server --port 6380 --requirepass devcache
+    ports:
+     - "6380:6380"
+    volumes:
+      - pc-apis-redis-data:/data
 
 volumes:
   pc-apis-pgdata:
   pc-apis-azurite-data:
+  pc-apis-redis-data:
 networks:
   default:
     name: pc-apis-dev-network

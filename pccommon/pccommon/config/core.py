@@ -8,7 +8,8 @@ from pydantic import BaseModel, BaseSettings, Field, PrivateAttr
 
 from pccommon.config.collections import CollectionConfigTable
 from pccommon.config.containers import ContainerConfigTable
-from pccommon.constants import DEFAULT_TABLE_TTL
+from pccommon.constants import DEFAULT_TTL
+from pccommon.tables import IPExceptionListTable
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +34,15 @@ class PCAPIsConfig(BaseSettings):
     )
     collection_config: TableConfig
     container_config: TableConfig
+    ip_exception_config: TableConfig
 
-    table_value_ttl: int = Field(default=DEFAULT_TABLE_TTL)
+    table_value_ttl: int = Field(default=DEFAULT_TTL)
+
+    redis_hostname: str
+    redis_password: str
+    redis_port: int
+    redis_ssl: bool = True
+    redis_ttl: int = Field(default=DEFAULT_TTL)
 
     debug: bool = False
 
@@ -55,6 +63,16 @@ class PCAPIsConfig(BaseSettings):
             account_name=self.container_config.account_name,
             account_key=self.container_config.account_key,
             table_name=self.container_config.table_name,
+            ttl=self.table_value_ttl,
+        )
+
+    @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("ip_whitelist"))
+    def get_ip_exception_list_table(self) -> IPExceptionListTable:
+        return IPExceptionListTable.from_account_key(
+            account_url=self.ip_exception_config.account_url,
+            account_name=self.ip_exception_config.account_name,
+            account_key=self.ip_exception_config.account_key,
+            table_name=self.ip_exception_config.table_name,
             ttl=self.table_value_ttl,
         )
 

@@ -1,7 +1,6 @@
-import os
 from functools import lru_cache
 
-from pydantic import BaseSettings
+from pydantic import BaseModel, BaseSettings, Field
 from stac_fastapi.extensions.core import (
     FieldsExtension,
     FilterExtension,
@@ -11,6 +10,7 @@ from stac_fastapi.extensions.core import (
 )
 from stac_fastapi.extensions.core.filter.filter import FilterConformanceClasses
 
+from pccommon.config.core import ENV_VAR_PCAPIS_PREFIX, PCAPIsConfig
 from pcstac.filter import MSPCFiltersClient
 
 API_VERSION = "1.2"
@@ -44,6 +44,27 @@ EXTENSIONS = [
 ]
 
 
+class RateLimits(BaseModel):
+    collections: int = 500
+    collection: int = 500
+    item: int = 500
+    items: int = 100
+    search: int = 100
+
+
+class BackPressureConfig(BaseModel):
+    req_per_sec: int = 50
+    inc_ms: int = 10
+
+
+class BackPressures(BaseSettings):
+    collections: BackPressureConfig
+    collection: BackPressureConfig
+    item: BackPressureConfig
+    items: BackPressureConfig
+    search: BackPressureConfig
+
+
 class Settings(BaseSettings):
     """Class for specifying application parameters
 
@@ -61,10 +82,19 @@ class Settings(BaseSettings):
         version of application
     """
 
-    tiler_href: str = os.environ.get("TILER_HREF_ENV_VAR", "")
+    api = PCAPIsConfig.from_environment()
+
+    tiler_href: str = Field(env="TILER_HREF_ENV_VAR", default="")
     openapi_url: str = "/openapi.json"
-    debug: bool = os.getenv("PQE_DEBUG", "False").lower() == "true"
+    debug: bool = False
     api_version: str = f"v{API_VERSION}"
+    rate_limits: RateLimits
+    back_pressures: BackPressures
+
+    class Config:
+        env_prefix = ENV_VAR_PCAPIS_PREFIX
+        extra = "ignore"
+        env_nested_delimiter = "__"
 
 
 @lru_cache

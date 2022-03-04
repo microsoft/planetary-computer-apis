@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added support for /queryables endpoint [#44](https://github.com/microsoft/planetary-computer-apis/pull/44)
-- Addd `/mosaic/info` endpoint [#48](https://github.com/microsoft/planetary-computer-apis/pull/48)
+- Added `/mosaic/info` endpoint [#48](https://github.com/microsoft/planetary-computer-apis/pull/48)
+- Added caching and rate limiting to STAC API [#52](https://github.com/microsoft/planetary-computer-apis/pull/52)
 
 ### Fixed
 

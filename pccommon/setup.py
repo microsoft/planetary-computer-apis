@@ -14,6 +14,7 @@ inst_reqs = [
     "cachetools==5.0.0",
     "types-cachetools==4.2.9",
     "pyhumps==3.5.3",
+    "redis==4.2.0-rc1",
 ]
 
 extra_reqs = {

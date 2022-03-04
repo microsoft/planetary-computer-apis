@@ -12,6 +12,7 @@ from opencensus.trace.tracer import Tracer
 
 from pccommon.config import get_apis_config
 from pccommon.logging import request_to_path
+from pccommon.utils import get_request_ip
 
 _config = get_apis_config()
 logger = logging.getLogger(__name__)
@@ -21,12 +22,6 @@ HTTP_PATH = COMMON_ATTRIBUTES["HTTP_PATH"]
 HTTP_URL = COMMON_ATTRIBUTES["HTTP_URL"]
 HTTP_STATUS_CODE = COMMON_ATTRIBUTES["HTTP_STATUS_CODE"]
 HTTP_METHOD = COMMON_ATTRIBUTES["HTTP_METHOD"]
-
-# Headers containing information about the requester's
-# IP address. Checked in the order listed here.
-X_AZURE_CLIENTIP = "X-Azure-ClientIP"
-X_ORIGINAL_FORWARDED_FOR = "X-Original-Forwarded-For"
-X_FORWARDED_FOR = "X-Forwarded-For"
 
 exporter = (
     AzureExporter(
@@ -239,16 +234,3 @@ def _iter_cql(cql: dict, property_name: str) -> Optional[Union[str, List[str]]]:
                             return result
     # No collection was found
     return None
-
-
-def get_request_ip(request: Request) -> str:
-    """Gets the IP address of the request."""
-
-    ip_header = (
-        request.headers.get(X_AZURE_CLIENTIP)  # set by Front Door
-        or request.headers.get(X_ORIGINAL_FORWARDED_FOR)
-        or request.headers.get(X_FORWARDED_FOR)
-    )
-
-    # If multiple IPs, take the first one
-    return ip_header.split(",")[0] if ip_header else ""

@@ -5,12 +5,23 @@ from typing import Any, Dict, List, Optional
 
 from pccommon.config.collections import CollectionConfig, CollectionConfigTable
 from pccommon.config.containers import ContainerConfig, ContainerConfigTable
-from pccommon.constants import DEFAULT_COLLECTION_CONFIG_TABLE_NAME
+from pccommon.constants import (
+    DEFAULT_COLLECTION_CONFIG_TABLE_NAME,
+    DEFAULT_CONTAINER_CONFIG_TABLE_NAME,
+    DEFAULT_IP_EXCEPTION_CONFIG_TABLE_NAME,
+)
+from pccommon.tables import IPExceptionListTable
 from pccommon.version import __version__
 
 
-def load(sas: str, account: str, table: str, type: str, file: str) -> int:
-    account_url = f"https://{account}.table.core.windows.net"
+def get_account_url(account: str, account_url: Optional[str]) -> str:
+    return account_url or f"https://{account}.table.core.windows.net"
+
+
+def load(
+    sas: str, account: str, table: str, type: str, file: str, **kwargs: Any
+) -> int:
+    account_url = get_account_url(account, kwargs.get("account_url"))
     with open(file) as f:
         rows = json.load(f)
 
@@ -39,7 +50,7 @@ def load(sas: str, account: str, table: str, type: str, file: str) -> int:
 
 def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
     output = kwargs.get("output")
-    account_url = f"https://{account}.table.core.windows.net"
+    account_url = get_account_url(account, kwargs.get("account_url"))
     id = kwargs.get("id")
     result: Dict[str, Dict[str, Any]] = {}
     if type == "collection":
@@ -82,6 +93,27 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
     return 0
 
 
+def add_ip_exception(sas: str, account: str, table: str, **kwargs: Any) -> int:
+    ip_file = kwargs.get("file")
+    ip = kwargs.get("ip")
+    account_url = get_account_url(account, kwargs.get("account_url"))
+    ip_table = IPExceptionListTable.from_sas_token(
+        account_url=account_url, sas_token=sas, table_name=table
+    )
+    if ip:
+        print(f"Adding exception for IP {ip}...")
+        ip_table.add_exception(ip)
+    if ip_file:
+        print("Adding exceptions to the following ips...")
+        with open(ip_file) as f:
+            for ip_to_add in f:
+                if ip_to_add:
+                    ip_to_add = ip_to_add.strip()
+                    print(f" {ip_to_add}")
+                    ip_table.add_exception(ip_to_add)
+    return 0
+
+
 def parse_args(args: List[str]) -> Optional[Dict[str, Any]]:
     desc = "pcapis CLI"
     dhf = argparse.ArgumentDefaultsHelpFormatter
@@ -96,22 +128,18 @@ def parse_args(args: List[str]) -> Optional[Dict[str, Any]]:
     parent = argparse.ArgumentParser(add_help=False)
     subparsers = parser0.add_subparsers(dest="command")
 
-    def add_common_opts(p: argparse.ArgumentParser) -> None:
+    def add_common_opts(p: argparse.ArgumentParser, default_table: str) -> None:
         p.add_argument(
             "--sas",
             help="SAS Token for the storage account.",
             required=True,
         )
         p.add_argument("--account", help="Storage account name.", required=True)
+        p.add_argument("--table", help="Table name.", default=default_table)
         p.add_argument(
-            "--table", help="Table name.", default=DEFAULT_COLLECTION_CONFIG_TABLE_NAME
-        )
-        p.add_argument(
-            "-t",
-            "--type",
-            help="Type of configuration.",
-            choices=["collection", "container"],
-            required=True,
+            "--account-url",
+            help="Storage account endpoint for table access.",
+            default=None,
         )
 
     # collection config commands
@@ -124,7 +152,14 @@ def parse_args(args: List[str]) -> Optional[Dict[str, Any]]:
     parser.add_argument(
         "--file", help="Filename to load collection configuration from.", required=True
     )
-    add_common_opts(parser)
+    parser.add_argument(
+        "-t",
+        "--type",
+        help="Type of configuration.",
+        choices=["collection", "container"],
+        required=True,
+    )
+    add_common_opts(parser, DEFAULT_COLLECTION_CONFIG_TABLE_NAME)
 
     parser = subparsers.add_parser(
         "dump",
@@ -144,8 +179,26 @@ def parse_args(args: List[str]) -> Optional[Dict[str, Any]]:
         help="Storage account of the specified container config id (PartitionKey)",
         default=None,
     )
+    parser.add_argument(
+        "-t",
+        "--type",
+        help="Type of configuration.",
+        choices=["collection", "container"],
+        required=True,
+    )
+    add_common_opts(parser, DEFAULT_CONTAINER_CONFIG_TABLE_NAME)
 
-    add_common_opts(parser)
+    parser = subparsers.add_parser(
+        "add-ip-exception",
+        help="Add an exception to the ip table. This IP will not be rate limited.",
+        parents=[parent],
+        formatter_class=dhf,
+    )
+    parser.add_argument(
+        "--file", help="File that lists IPs, one per line", default=None
+    )
+    parser.add_argument("--ip", help="IP to add as an exception", default=None)
+    add_common_opts(parser, DEFAULT_IP_EXCEPTION_CONFIG_TABLE_NAME)
 
     parsed_args = {
         k: v for k, v in vars(parser0.parse_args(args)).items() if v is not None
@@ -168,6 +221,8 @@ def cli() -> int:
         return load(**args)
     elif cmd == "dump":
         return dump(**args)
+    elif cmd == "add-ip-exception":
+        return add_ip_exception(**args)
 
     return 2
 

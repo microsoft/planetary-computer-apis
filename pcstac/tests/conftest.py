@@ -2,7 +2,7 @@ import asyncio
 import json
 import os
 import time
-from typing import Callable, Dict
+from typing import AsyncGenerator, Callable, Dict
 
 import asyncpg
 import pytest
@@ -14,6 +14,7 @@ from stac_fastapi.api.models import create_get_request_model, create_post_reques
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 
+from pccommon.redis import connect_to_redis
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import EXTENSIONS
@@ -78,10 +79,11 @@ def api_client(pqe_pg):
 
 @pytest.mark.asyncio
 @pytest.fixture(scope="session")
-async def app(api_client):
+async def app(api_client) -> AsyncGenerator[FastAPI, None]:
     time.time()
-    app = api_client.app
+    app: FastAPI = api_client.app
     await connect_to_db(app)
+    await connect_to_redis(app)
 
     yield app
 
@@ -90,8 +92,10 @@ async def app(api_client):
 
 @pytest.mark.asyncio
 @pytest.fixture(scope="session")
-async def app_client(app):
-    async with AsyncClient(app=app, base_url="http://test") as c:
+async def app_client(app) -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(
+        app=app, base_url="http://test", headers={"X-Forwarded-For": "127.0.0.1"}
+    ) as c:
         yield c
 
 
