@@ -17,7 +17,7 @@ stac:
     account_key: "{{ tf.storage_account_key }}"
     collection_config_table_name: "{{ tf.collection_config_table_name }}"
     container_config_table_name: "{{ tf.container_config_table_name }}"
-    ip_exception_config_table_name: "{{ tf.ip_config_table_name }}"
+    ip_exception_config_table_name: "{{ tf.ip_exception_config_table_name }}"
 
   redis:
     host: "{{ tf.redis_host }}"

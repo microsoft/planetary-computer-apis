@@ -93,7 +93,7 @@ output "container_config_table_name" {
 }
 
 output "ip_exception_config_table_name" {
-  value = azurerm_storage_table.ipconfig.name
+  value = azurerm_storage_table.ipexceptionlist.name
 }
 
 ## Redis
