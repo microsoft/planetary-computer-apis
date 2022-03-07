@@ -6,6 +6,7 @@ from rio_tiler.colormap import cmap
 from titiler.core.dependencies import ColorMapParams
 
 from .jrc import jrc_colormaps
+from .lidarusgs import lidar_colormaps
 from .lulc import lulc_colormaps
 from .mtbs import mtbs_colormaps
 
@@ -19,6 +20,7 @@ custom_colormaps: Dict[str, Dict[int, List[int]]] = {
     **jrc_colormaps,
     **lulc_colormaps,
     **mtbs_colormaps,
+    **lidar_colormaps,
 }
 
 for k, v in custom_colormaps.items():

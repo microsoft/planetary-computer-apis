@@ -54,6 +54,62 @@ class DefaultRenderConfig:
 
 
 COLLECTION_RENDER_CONFIG = {
+    "3dep-lidar-dsm": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "terrain", "nodata": -9999},
+        requires_token=True,
+        mosaic_preview_zoom=4,
+        mosaic_preview_coords=[39.0902, -94.2871],
+        minzoom=8,
+    ),
+    "3dep-lidar-dtm": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "terrain", "nodata": -9999},
+        requires_token=True,
+        mosaic_preview_zoom=8,
+        mosaic_preview_coords=[39.0902, -94.2871],
+        minzoom=8,
+    ),
+    "3dep-lidar-dtm-native": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "terrain", "nodata": -9999},
+        requires_token=True,
+        mosaic_preview_zoom=8,
+        mosaic_preview_coords=[39.0902, -94.2871],
+        minzoom=8,
+    ),
+    "3dep-lidar-classification": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "lidar-classification", "nodata": -9999},
+        requires_token=True,
+        mosaic_preview_zoom=8,
+        mosaic_preview_coords=[39.0902, -94.2871],
+        minzoom=8,
+    ),
+    "3dep-lidar-returns": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "lidar-returns", "nodata": -9999},
+        requires_token=True,
+        mosaic_preview_zoom=8,
+        mosaic_preview_coords=[39.0902, -94.2871],
+        minzoom=8,
+    ),
+    "3dep-lidar-hag": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "lidar-hag", "nodata": -9999},
+        requires_token=True,
+        mosaic_preview_zoom=8,
+        mosaic_preview_coords=[39.0902, -94.2871],
+        minzoom=8,
+    ),
+    "3dep-lidar-hag": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "lidar-intensity", "nodata": -9999},
+        requires_token=True,
+        mosaic_preview_zoom=8,
+        mosaic_preview_coords=[39.0902, -94.2871],
+        minzoom=8,
+    ),
     "3dep-seamless": DefaultRenderConfig(
         assets=["data"],
         render_params={"colormap_name": "terrain", "rescale": [-1000, 4000]},

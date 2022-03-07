@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-lidarclass_colormaps: Dict[str, Dict[int, List[int]]] = {
+lidar_colormaps: Dict[str, Dict[int, List[int]]] = {
     "lidar-classification": {
         0: [211, 211, 211, 255],
         2: [139, 51, 38, 255],
@@ -25,10 +25,7 @@ lidarclass_colormaps: Dict[str, Dict[int, List[int]]] = {
         22: [76, 46, 58, 255],
         23: [20, 76, 38, 255],
         26: [78, 92, 32, 255],
-    }
-}
-
-lidarreturns_colormaps: Dict[str, Dict[int, List[int]]] = {
+    },
     "lidar-returns": {
         0: [0, 0, 0, 255],
         1: [196, 73, 230, 255],
@@ -38,24 +35,17 @@ lidarreturns_colormaps: Dict[str, Dict[int, List[int]]] = {
         5: [84, 218, 138, 255],
         6: [245, 130, 48, 255],
         7: [51, 141, 75, 255],
-    }
-}
-
-
-lidarhag_colormaps: Dict[str, Dict[float, List[int]]] = {
+    },
     "lidar-hag": {
-        -900.0: [0, 0, 0, 255],
-        1.0: [0, 0, 0, 255],
-        1.001: [0, 0, 128, 255],
-        3.0: [0, 128, 0, 255],
-        5.0: [255, 255, 255, 255],
-        8.0: [255, 165, 0, 255],
-        16.0: [255, 0, 0, 255],
-        48.0: [255, 255, 255, 255],
-    }
-}
-
-lidarintensity_colormaps: Dict[str, Dict[float, List[int]]] = {
+        -900: [0, 0, 0, 255],
+        0: [0, 0, 0, 255],
+        1: [0, 0, 128, 255],
+        3: [0, 128, 0, 255],
+        5: [255, 255, 255, 255],
+        8: [255, 165, 0, 255],
+        16: [255, 0, 0, 255],
+        48: [255, 255, 255, 255],
+    },
     "lidar-intensity": {
         0: [255, 255, 255, 255],
         1: [238, 238, 238, 255],
@@ -73,7 +63,7 @@ lidarintensity_colormaps: Dict[str, Dict[float, List[int]]] = {
         13: [33, 33, 33, 255],
         14: [16, 16, 16, 255],
         15: [0, 0, 0, 255],
-    }
+    },
 }
 
 """
