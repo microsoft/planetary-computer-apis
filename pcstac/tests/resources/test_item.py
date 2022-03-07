@@ -30,7 +30,6 @@ async def test_fetches_valid_item(app_client):
     item_id = first_item["id"]
 
     item_resp = await app_client.get(f"/collections/{coll_id}/items/{item_id}")
-    print("WHAT IS THIS", f"/collections/{coll_id}/items/{item_id}", item_resp.json())
     assert item_resp.status_code == 200
     item_dict = item_resp.json()
     # Mock root to allow validation
@@ -38,7 +37,6 @@ async def test_fetches_valid_item(app_client):
         id="test", description="test desc", href="https://example.com"
     )
     item = pystac.Item.from_dict(item_dict, preserve_dict=False, root=mock_root)
-    print("ITEM DICT", item_dict)
     item.validate()
 
 
