@@ -39,12 +39,17 @@ class PCClient(CoreCrudClient):
 
     extra_conformance_classes: List[str] = attr.ib(factory=list)
 
-    def absolute_asset_links(self, item: Item, base_url: str):
+    def absolute_asset_links(self, item: Item, base_url: str) -> Item:
         """Convert relative asset links to absolute links"""
         for asset_key, asset in item["assets"].items():
             if asset_key == "tilejson" or asset_key == "rendered_preview":
-                item["assets"][asset_key]["href"] = base_url.replace("/stac/", "/data/") + asset["href"]
-            if not(asset["href"].startswith("http://") or asset["href"].startswith("https://")):
+                item["assets"][asset_key]["href"] = (
+                    base_url.replace("/stac/", "/data/") + asset["href"]
+                )
+            if not (
+                asset["href"].startswith("http://")
+                or asset["href"].startswith("https://")
+            ):
                 item["assets"][asset_key]["href"] = base_url + asset["href"]
         return item
 
@@ -191,7 +196,8 @@ class PCClient(CoreCrudClient):
                 **{
                     **result,
                     "features": [
-                        self.inject_item_links(i, base_url) for i in result.get("features", [])
+                        self.inject_item_links(i, base_url)
+                        for i in result.get("features", [])
                     ],
                 }
             )
