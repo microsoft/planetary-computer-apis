@@ -20,19 +20,6 @@ tiler:
     port: 80
     annotations: {}
 
-  storage:
-    account_name: ""
-    account_key: ""
-    collection_config_table_name: ""
-    container_config_table_name: ""
-    ip_exception_config_table_name: ""
-
-  redis:
-    host: ""
-    password: ""
-    port: 6380
-    ssl: true
-
   deploy:
     replicaCount: 10
     podAnnotations: {}
@@ -53,6 +40,19 @@ tiler:
   host: "0.0.0.0"
   port: "80"
   appRootPath: ""
+
+storage:
+  account_name: ""
+  account_key: ""
+  collection_config_table_name: ""
+  container_config_table_name: ""
+  ip_exception_config_table_name: ""
+
+redis:
+  host: ""
+  password: ""
+  port: 6380
+  ssl: true
 
 postgres:
   serverName: ""
