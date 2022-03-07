@@ -17,19 +17,6 @@ stac:
     port: 80
     annotations: {}
 
-  storage:
-    account_name: ""
-    account_key: ""
-    collection_config_table_name: ""
-    container_config_table_name: ""
-    ip_exception_config_table_name: ""
-
-  redis:
-    host: ""
-    password: ""
-    port: 6380
-    ssl: true
-
   rate_limit:
     collections: 500
     collection: 500
@@ -83,6 +70,19 @@ stac:
   port: "80"
   appRootPath: ""
   debug: "FALSE"
+
+storage:
+  account_name: ""
+  account_key: ""
+  collection_config_table_name: ""
+  container_config_table_name: ""
+  ip_exception_config_table_name: ""
+
+redis:
+  host: ""
+  password: ""
+  port: 6380
+  ssl: true
 
 metrics:
   instrumentationKey: ""
