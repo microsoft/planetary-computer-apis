@@ -39,6 +39,15 @@ class PCClient(CoreCrudClient):
 
     extra_conformance_classes: List[str] = attr.ib(factory=list)
 
+    def absolute_asset_links(self, item: Item, base_url: str):
+        """Convert relative asset links to absolute links"""
+        for asset_key, asset in item["assets"].items():
+            if asset_key == "tilejson" or asset_key == "rendered_preview":
+                item["assets"][asset_key]["href"] = base_url.replace("/stac/", "/data/") + asset["href"]
+            if not(asset["href"].startswith("http://") or asset["href"].startswith("https://")):
+                item["assets"][asset_key]["href"] = base_url + asset["href"]
+        return item
+
     def conformance_classes(self) -> List[str]:
         """Generate conformance classes list."""
         base_conformance_classes = self.base_conformance_classes.copy()
@@ -72,13 +81,14 @@ class PCClient(CoreCrudClient):
 
         return collection
 
-    def inject_item_links(self, item: Item) -> Item:
+    def inject_item_links(self, item: Item, base_url: str) -> Item:
         """Add extra/non-mandatory links to an Item"""
         collection_id = item.get("collection", "")
         if collection_id:
             render_config = get_render_config(collection_id)
             if render_config and render_config.should_add_item_links:
                 TileInfo(collection_id, render_config).inject_item(item)
+        item = self.absolute_asset_links(item, base_url)
 
         return item
 
@@ -176,11 +186,12 @@ class PCClient(CoreCrudClient):
             # Remove context extension until we fully support it.
             result.pop("context", None)
 
+            base_url = str(kwargs["request"].base_url)
             return ItemCollection(
                 **{
                     **result,
                     "features": [
-                        self.inject_item_links(i) for i in result.get("features", [])
+                        self.inject_item_links(i, base_url) for i in result.get("features", [])
                     ],
                 }
             )
@@ -232,7 +243,10 @@ class PCClient(CoreCrudClient):
         _super: CoreCrudClient = super()
 
         async def _fetch() -> Item:
-            return await _super.get_item(item_id, collection_id, **kwargs)
+            base_url = str(kwargs["request"])
+            item = await _super.get_item(item_id, collection_id, **kwargs)
+            item = self.absolute_asset_links(item, base_url)
+            return item
 
         cache_key = f"{CACHE_KEY_ITEM}:{collection_id}:{item_id}"
         return await cached_result(_fetch, cache_key, kwargs["request"])
