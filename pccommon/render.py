@@ -78,6 +78,14 @@ COLLECTION_RENDER_CONFIG = {
         mosaic_preview_coords=[39.0902, -94.2871],
         minzoom=8,
     ),
+    "3dep-lidar-pointsourceid": DefaultRenderConfig(
+        assets=["data"],
+        render_params={"colormap_name": "terrain", "nodata": -9999},
+        requires_token=True,
+        mosaic_preview_zoom=8,
+        mosaic_preview_coords=[39.0902, -94.2871],
+        minzoom=8,
+    ),
     "3dep-lidar-classification": DefaultRenderConfig(
         assets=["data"],
         render_params={"colormap_name": "lidar-classification", "nodata": -9999},
@@ -102,7 +110,7 @@ COLLECTION_RENDER_CONFIG = {
         mosaic_preview_coords=[39.0902, -94.2871],
         minzoom=8,
     ),
-    "3dep-lidar-hag": DefaultRenderConfig(
+    "3dep-lidar-intensity": DefaultRenderConfig(
         assets=["data"],
         render_params={"colormap_name": "lidar-intensity", "nodata": -9999},
         requires_token=True,
