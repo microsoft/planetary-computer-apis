@@ -17,13 +17,13 @@ from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from pccommon.redis import connect_to_redis
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
-from pcstac.config import EXTENSIONS
+from pcstac.config import EXTENSIONS, TILER_HREF_ENV_VAR
 from pcstac.search import PCSearch, PCSearchGetRequest
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
 # Setting this environment variable to ensure links are properly constructed
-os.environ["TILER_HREF_ENV_VAR"] = "http://localhost:8080/stac/dqe"
+os.environ[TILER_HREF_ENV_VAR] = "http://localhost:8080/data/"
 
 # Testing is set to false because creating/updating via the API is not desirable
 #  thus, we actually want to use the migrations and data loaded in via the setup

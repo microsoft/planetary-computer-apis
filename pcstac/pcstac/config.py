@@ -84,7 +84,7 @@ class Settings(BaseSettings):
 
     api = PCAPIsConfig.from_environment()
 
-    tiler_href: str = Field(env="TILER_HREF_ENV_VAR", default="")
+    tiler_href: str = Field(env=TILER_HREF_ENV_VAR, default="")
     openapi_url: str = "/openapi.json"
     debug: bool = False
     api_version: str = f"v{API_VERSION}"

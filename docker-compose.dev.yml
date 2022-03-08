@@ -14,6 +14,7 @@ services:
       - POSTGRES_HOST_WRITER=database
       - POSTGRES_PORT=5432
       - PCAPIS_DEBUG=TRUE
+      - TILER_HREF=http://localhost:8080/data/
 
       # Azure Storage
       - PCAPIS_COLLECTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
