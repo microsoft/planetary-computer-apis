@@ -41,16 +41,18 @@ class PCClient(CoreCrudClient):
 
     def absolute_asset_links(self, item: Item, base_url: str) -> Item:
         """Convert relative asset links to absolute links"""
-        for asset_key, asset in item["assets"].items():
-            if asset_key == "tilejson" or asset_key == "rendered_preview":
-                item["assets"][asset_key]["href"] = (
-                    base_url.replace("/stac/", "/data/") + asset["href"]
-                )
-            if not (
-                asset["href"].startswith("http://")
-                or asset["href"].startswith("https://")
-            ):
-                item["assets"][asset_key]["href"] = base_url + asset["href"]
+        # Supporting the fields extension means skipping if assets aren't here
+        if "assets" in item:
+            for asset_key, asset in item["assets"].items():
+                if asset_key == "tilejson" or asset_key == "rendered_preview":
+                    item["assets"][asset_key]["href"] = (
+                        base_url.replace("/stac/", "/data/") + asset["href"]
+                    )
+                if not (
+                    asset["href"].startswith("http://")
+                    or asset["href"].startswith("https://")
+                ):
+                    item["assets"][asset_key]["href"] = base_url + asset["href"]
         return item
 
     def conformance_classes(self) -> List[str]:
