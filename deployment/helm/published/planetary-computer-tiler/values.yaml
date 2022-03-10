@@ -47,12 +47,14 @@ storage:
   collection_config_table_name: ""
   container_config_table_name: ""
   ip_exception_config_table_name: ""
+  table_value_ttl: 600
 
 redis:
   host: ""
   password: ""
   port: 6380
   ssl: true
+  ttl: 600
 
 postgres:
   serverName: ""
