@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 # Runtime requirements.
 inst_reqs = [
-    "fastapi==0.67.*",
+    "fastapi==0.73.*",
     "opencensus-ext-azure==1.0.8",
     "opencensus-ext-logging==0.1.0",
     "orjson==3.5.2",
