@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update titiler-pgstac version to `0.1.0.a4` in `pctiler` [#46](https://github.com/microsoft/planetary-computer-apis/pull/46)
 - Move render config, queryables and mosaic info into Azure Storage Tables [#48](https://github.com/microsoft/planetary-computer-apis/pull/48)
+- Upgrades fastapi, stac-fastapi, and pgstac to 0.4.5 [#61](https://github.com/microsoft/planetary-computer-apis/pull/61)
 
 ### Added
 

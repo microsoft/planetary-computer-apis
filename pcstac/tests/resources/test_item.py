@@ -457,9 +457,6 @@ async def test_pagination_post(app_client):
         if idx > 20:
             assert False
 
-    # limit is 1; we expect the matched number of requests before we run out of pages
-    assert idx == len(items_resp.json()["features"])
-
     # Confirm we have paginated through all items
     assert not set(item_ids) - set(ids)
 
@@ -468,13 +465,12 @@ async def test_pagination_post(app_client):
 async def test_pagination_token_idempotent(app_client):
     """Test that pagination tokens are idempotent (paging extension)"""
 
-    # Set limit well above actual number of records
-    items_resp = await app_client.get("/collections/naip/items?limit=500")
-    assert items_resp.status_code == 200
-
-    ids = [item["id"] for item in items_resp.json()["features"]]
-
-    page = await app_client.get("/search", params={"ids": ",".join(ids), "limit": 3})
+    # Construct a search that should return all items, but limit to a few
+    # so that a "next" link is returned
+    page = await app_client.get(
+        "/search", params={"datetime": "1900-01-01/2030-01-01", "limit": 3}
+    )
+    # Get the next link
     page_data = page.json()
     next_link = list(filter(lambda l: l["rel"] == "next", page_data["links"]))
 

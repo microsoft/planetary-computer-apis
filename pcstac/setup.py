@@ -4,14 +4,18 @@ from setuptools import find_packages, setup
 
 # Runtime requirements.
 inst_reqs = [
-    "stac-fastapi.types==2.3.0",
-    "stac-fastapi.api==2.3.0",
-    "stac-fastapi.extensions==2.3.0",
-    "stac-fastapi.pgstac==2.3.0",
+    # "stac-fastapi.api==2.3.0",
+    # "stac-fastapi.extensions==2.3.0",
+    # "stac-fastapi.pgstac==2.3.0",
+    # "stac-fastapi.types==2.3.0",
+    "stac-fastapi.api @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.api&subdirectory=stac_fastapi/api",
+    "stac-fastapi.extensions @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.extensions&subdirectory=stac_fastapi/extensions",
+    "stac-fastapi.pgstac @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.pgstac&subdirectory=stac_fastapi/pgstac",
+    "stac-fastapi.types @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.types&subdirectory=stac_fastapi/types",
     "pystac==1.*",
     "pccommon",
     # TODO: remove, pypgstac is not really needed to run stac-fastapi application
-    "pypgstac==0.4.3",
+    "pypgstac==0.4.5",
 ]
 
 extra_reqs = {
