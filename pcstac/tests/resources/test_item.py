@@ -1,7 +1,8 @@
 import json
 from datetime import datetime, timedelta
-from typing import Callable
+from typing import Callable, Dict
 from urllib.parse import parse_qs, urlparse
+from pcstac.config import get_settings
 
 import pystac
 import pytest
@@ -546,6 +547,34 @@ async def test_relative_link_construction():
     )
     links = CollectionLinks(collection_id="naip", request=req)
     assert links.link_items()["href"] == "http://test/stac/collections/naip/items"
+
+
+@pytest.mark.asyncio
+async def test_tiler_link_construction(app_client):
+    """Test that tiler links are constructed correctly"""
+    id = "al_m_3008506_nw_16_060_20191118_20200114"
+
+    resp = await app_client.get(f"/collections/naip/items/{id}")
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    links: Dict = resp_json["links"]
+    assets: Dict = resp_json["assets"]
+
+    # Get all the links and assets that are expected to have a tiler link
+    tile_links = list(filter(lambda link: link["rel"] == "preview", links))
+    tile_keys = ["tiles", "overview"]
+    tile_assets = list(
+        filter(
+            lambda asset: (any(key in asset["roles"] for key in tile_keys)),
+            assets.values(),
+        )
+    )
+
+    # Confirm that the tiler based links have the correct base url as the href
+    tiler_href = get_settings().tiler_href
+    tiler_links = tile_links + tile_assets
+    assert len(tiler_links) > 0
+    assert all([link["href"].startswith(tiler_href) for link in tiler_links])
 
 
 @pytest.mark.asyncio
