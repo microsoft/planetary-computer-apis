@@ -97,6 +97,8 @@ spec:
               value: "{{ .Values.storage.account_key }}"
             - name: "PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME"
               value: "{{ .Values.storage.ip_exception_config_table_name }}"
+            - name: "PCAPIS_TABLE_VALUE_TTL"
+              value: "{{ .Values.storage.table_value_ttl }}"
             - name: "PCAPIS_REDIS_HOSTNAME"
               value: "{{ .Values.redis.host }}"
             - name: "PCAPIS_REDIS_PASSWORD"
@@ -105,6 +107,8 @@ spec:
               value: "{{ .Values.redis.port }}"
             - name: "PCAPIS_REDIS_SSL"
               value: "{{ .Values.redis.ssl }}"
+            - name: "PCAPIS_REDIS_TTL"
+              value: "{{ .Values.redis.ttl }}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
 

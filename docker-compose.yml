@@ -29,6 +29,10 @@ services:
       - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
       - PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME=ipexceptionlist
 
+      # Disable config and stac caching in development by setting TTL to 1 second
+      - PCAPIS_TABLE_VALUE_TTL=1
+      - PCAPIS_REDIS_TTL=1
+
       # Redis
       - PCAPIS_REDIS_HOSTNAME=redis
       - PCAPIS_REDIS_PASSWORD=devcache
@@ -132,6 +136,10 @@ services:
       - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
       - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
       - PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME=ipexceptionlist
+
+      # Disable config and stac caching in development by setting TTL to 1 second
+      - PCAPIS_TABLE_VALUE_TTL=1
+      - PCAPIS_REDIS_TTL=1
 
       # Redis
       - PCAPIS_REDIS_HOSTNAME=redis
