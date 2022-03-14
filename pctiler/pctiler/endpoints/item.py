@@ -1,15 +1,19 @@
+import json
 from dataclasses import dataclass
 from typing import Dict
 from urllib.parse import urljoin
 
-from fastapi import Query, Request, Response
+from cachetools import LRUCache, cached
+from cachetools.keys import hashkey
+from fastapi import HTTPException, Query, Request, Response
 from fastapi.templating import Jinja2Templates
+from psycopg_pool import ConnectionPool
 from starlette.responses import HTMLResponse
+from titiler.core.factory import MultiBaseTilerFactory
 
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
-from pctiler.factory import PGMultiBaseTilerFactory
 from pctiler.reader import ItemSTACReader
 
 try:
@@ -25,11 +29,61 @@ templates = Jinja2Templates(
 )  # type: ignore
 
 
-def ItemIdParams(
+def ItemPathParams(
+    request: Request,
     collection: str = Query(..., description="STAC Collection ID"),
     item: str = Query(..., description="STAC Item ID"),
-) -> Dict[str, str]:
-    return {"collection": collection, "item": item}
+) -> Dict:
+    the_item = get_item(request.app.state.dbpool, collection, item)
+    return the_item
+
+
+@cached(  # type: ignore
+    LRUCache(maxsize=512),
+    key=lambda pool, collection, item: hashkey(collection, item),
+)
+def get_item(pool: ConnectionPool, collection: str, item: str) -> Dict:
+    """Get STAC Item from PGStac."""
+    req = dict(
+        filter={
+            "op": "and",
+            "args": [
+                {
+                    "op": "eq",
+                    "args": [{"property": "collection"}, collection],
+                },
+                {"op": "eq", "args": [{"property": "id"}, item]},
+            ],
+        },
+    )
+    with pool.connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM search(%s);",
+                (json.dumps(req),),
+            )
+            resp = cursor.fetchone()
+            if resp is not None:
+                resp = resp[0]
+            else:
+                raise HTTPException(
+                    status_code=404,
+                    detail=(
+                        f"Item not found for collection id "
+                        f"'{collection}' and item id '{item}'"
+                    ),
+                )
+            features = resp.get("features", [])
+            if not len(features):
+                raise HTTPException(
+                    status_code=404,
+                    detail=(
+                        f"Item not found for collection id "
+                        f"'{collection}' and item id '{item}'"
+                    ),
+                )
+
+            return features[0]
 
 
 @dataclass
@@ -38,9 +92,9 @@ class MapParams:
     item: str = Query(..., description="STAC Item ID")
 
 
-pc_tile_factory = PGMultiBaseTilerFactory(
+pc_tile_factory = MultiBaseTilerFactory(
     reader=ItemSTACReader,
-    path_dependency=ItemIdParams,
+    path_dependency=ItemPathParams,
     colormap_dependency=PCColorMapParams,
     router_prefix=get_settings().item_endpoint_prefix,
 )

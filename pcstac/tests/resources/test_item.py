@@ -2,7 +2,6 @@ import json
 from datetime import datetime, timedelta
 from typing import Callable, Dict
 from urllib.parse import parse_qs, urlparse
-from pcstac.config import get_settings
 
 import pystac
 import pytest
@@ -10,6 +9,8 @@ from geojson_pydantic.geometries import Polygon
 from stac_fastapi.pgstac.models.links import CollectionLinks
 from stac_pydantic.shared import DATETIME_RFC339
 from starlette.requests import Request
+
+from pcstac.config import get_settings
 
 
 @pytest.mark.asyncio

@@ -109,3 +109,4 @@ venv.bak/
 override.tf
 
 .DS_Store
+.metals/

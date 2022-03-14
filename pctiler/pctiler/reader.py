@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
 import attr
 import morecantile
@@ -10,13 +10,12 @@ from cachetools.keys import hashkey
 from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
 from geojson_pydantic import Point, Polygon
-from psycopg.rows import dict_row
-from psycopg_pool.pool import ConnectionPool
+from rasterio.crs import CRS
 from rio_tiler.constants import WEB_MERCATOR_TMS, WGS84_CRS
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
 from rio_tiler.io.base import BaseReader, MultiBaseReader
 from rio_tiler.io.cogeo import COGReader
-from rio_tiler.io.stac import STACReader
+from rio_tiler.io.stac import DEFAULT_VALID_TYPE, STACReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
 from titiler.pgstac import mosaic as pgstac_mosaic
@@ -24,7 +23,6 @@ from titiler.pgstac.settings import CacheSettings
 
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
-from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
 cache_config = CacheSettings()
 
@@ -37,46 +35,48 @@ def get_cache_key(
 
 @attr.s
 class ItemSTACReader(STACReader):
+    """Custom, Item-based STAC Reader."""
 
-    # default to None as URL of STAC item isn't used any longer
-    input: str = attr.ib(default=None)
+    input: Dict = attr.ib()  # type: ignore
+    item: pystac.Item = attr.ib(init=False)
 
-    collection_id: str = attr.ib(kw_only=True)
-    item_id: str = attr.ib(kw_only=True)
-    pool: ConnectionPool = attr.ib(kw_only=True)
+    tms: morecantile.TileMatrixSet = attr.ib(default=WEB_MERCATOR_TMS)
+    minzoom: int = attr.ib(default=None)
+    maxzoom: int = attr.ib(default=None)
 
-    # TODO: remove CustomCOGReader once moved to rasterio 1.3
-    reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
+    geographic_crs: CRS = attr.ib(default=WGS84_CRS)
+
+    include_assets: Optional[Set[str]] = attr.ib(default=None)
+    exclude_assets: Optional[Set[str]] = attr.ib(default=None)
+
+    include_asset_types: Set[str] = attr.ib(default=DEFAULT_VALID_TYPE)
+    exclude_asset_types: Optional[Set[str]] = attr.ib(default=None)
+
+    reader: Type[BaseReader] = attr.ib(default=COGReader)
+    reader_options: Dict = attr.ib(factory=dict)
+
+    fetch_options: Dict = attr.ib(factory=dict)
 
     def __attrs_post_init__(self) -> None:
         """Fetch STAC Item and get list of valid assets."""
-        with self.pool.connection() as conn:
-            with conn.cursor(row_factory=dict_row) as cursor:
-                cursor.execute(
-                    (
-                        "SELECT * FROM pgstac.items WHERE "
-                        "collection_id=%s AND id=%s LIMIT 1;"
-                    ),
-                    (
-                        self.collection_id,
-                        self.item_id,
-                    ),
-                )
-                resp = cursor.fetchone()
-        try:
-            if resp is not None:
-                self.item = pystac.Item.from_dict(
-                    resp["content"]
-                )  # mypy: ignore-errors
-            super().__attrs_post_init__()
-        except TypeError:
-            raise HTTPException(
-                status_code=404,
-                detail=(
-                    f"Item not found for collection id "
-                    f"'{self.collection_id}' and item id '{self.item_id}'"
-                ),
-            )
+        self.item = pystac.Item.from_dict(self.input)
+
+        # TODO: get bounds/crs using PROJ extension if available
+        self.bounds = self.item.bbox  # type: ignore
+        self.crs = WGS84_CRS
+
+        self.assets = list(self.input["assets"])
+
+        if not self.assets:
+            raise MissingAssets("No valid asset found")
+
+        if self.minzoom is None:
+            # TODO get minzoom from PROJ extension
+            self.minzoom = self.tms.minzoom
+
+        if self.maxzoom is None:
+            # TODO get maxzoom from PROJ extension
+            self.maxzoom = self.tms.maxzoom
 
     def _get_asset_url(self, asset: str) -> str:
         asset_url = BlobCDN.transform_if_available(super()._get_asset_url(asset))
