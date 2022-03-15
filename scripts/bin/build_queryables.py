@@ -6,6 +6,8 @@ import requests
 
 STAC_API_ROOT = "https://planetarycomputer.microsoft.com/api/stac/v1"
 
+QUERYABLES_URL_TEMPLATE = "https://planetarycomputer-staging.microsoft.com/api/stac/v1/collections/{collection}/queryables"
+
 QUERYABLE_TEMPLATE = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://example.org/queryables",
@@ -37,6 +39,13 @@ QUERYABLE_TEMPLATE = {
     }
 }
 
+def get_current_queryables(collection):
+    """Get already existing queryables if available"""
+    try:
+        return requests.get(QUERYABLES_URL_TEMPLATE.format(collection=collection)).json()
+    except json.decoder.JSONDecodeError:
+        return None
+
 def collection_list():
     """Collect a list of collection IDs"""
     resp = requests.get(STAC_API_ROOT + "/collections")
@@ -54,14 +63,14 @@ def example_properties(collection_id: str):
         properties = {}
     return properties
 
-def construct_schema(example_properties: dict):
+def construct_schema(collection: str, example_properties: dict):
     """Construct a schema for provided properties, using the queryable template"""
-    template = QUERYABLE_TEMPLATE.copy()
+    template = get_current_queryables(collection) or QUERYABLE_TEMPLATE.copy()
     for key, value in example_properties.items():
         # pass over fields that are already included or are known to be useless in querying
-        if key in ["datetime", "description", "title"]:
+        if key in ["datetime", "description", "title"] or key in template["properties"].keys():
             continue
-        if isinstance(value, str):
+        elif isinstance(value, str):
             schema_type = "string"
         elif isinstance(value, (int, float)):
             schema_type = "number"
@@ -81,12 +90,12 @@ def construct_schema(example_properties: dict):
 
     return template
 
-if not(os.path.exists("/tmp/schemas")):
-    os.mkdir("/tmp/schemas")
+if not(os.path.exists("/opt/src/queryable_schemas")):
+    os.mkdir("/opt/src/queryable_schemas")
 for collection in collection_list():
     print(f"Constructing schema for {collection}")
     example_props = example_properties(collection)
-    schema = construct_schema(example_props)
+    schema = construct_schema(collection, example_props)
     
-    with open(f"/tmp/schemas/{collection}_schema.json", 'w') as f:
+    with open(f"/opt/src/queryable_schemas/{collection}_schema.json", 'w') as f:
         json.dump(schema, f, indent=4, sort_keys=True)
