@@ -4,18 +4,18 @@ from setuptools import find_packages, setup
 
 # Runtime requirements.
 inst_reqs = [
-    "geojson-pydantic==0.3.1",
+    "geojson-pydantic==0.3.3",
     "jinja2==3.0.3",
     "pystac==1.*",
     "planetary-computer==0.4.*",
 
     "rasterio==1.2.*",
-    "titiler.core==0.4.*",
-    "titiler.mosaic==0.4.*",
+    "titiler.core==0.5.*",
+    "titiler.mosaic==0.5.*",
 
     # titiler-pgstac
     "psycopg[binary,pool]",
-    "titiler.pgstac==0.1.0a4",
+    "titiler.pgstac==0.1.0a6",
 
     # colormap dependencies
     "matplotlib==3.4.*",

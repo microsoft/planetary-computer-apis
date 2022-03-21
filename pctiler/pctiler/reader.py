@@ -13,12 +13,11 @@ from rio_tiler.constants import WEB_MERCATOR_TMS, WGS84_CRS
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
 from rio_tiler.io.base import BaseReader, MultiBaseReader
 from rio_tiler.io.cogeo import COGReader
-from rio_tiler.io.stac import STACReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
 from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.settings import CacheSettings
-
+from titiler.pgstac.reader import PgSTACReader
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
@@ -33,7 +32,7 @@ def get_cache_key(
 
 
 @attr.s
-class ItemSTACReader(STACReader):
+class ItemSTACReader(PgSTACReader):
 
     # TODO: remove CustomCOGReader once moved to rasterio 1.3
     reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
@@ -50,13 +49,13 @@ class ItemSTACReader(STACReader):
 
 
 @attr.s
-class CustomSTACReader(MultiBaseReader):
+class MosaicSTACReader(MultiBaseReader):
     """Simplified STAC Reader.
 
     Items should be in form of:
     {
         "id": "IAMASTACITEM",
-        "collection_id": "collection",
+        "collection": "collection",
         "bbox": (0, 0, 10, 10),
         "assets": {
             "COG": {
@@ -117,7 +116,7 @@ class CustomSTACReader(MultiBaseReader):
 class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
     """PgSTAC Mosaic Backend."""
 
-    reader: Type[CustomSTACReader] = attr.ib(init=False, default=CustomSTACReader)
+    reader: Type[MosaicSTACReader] = attr.ib(init=False, default=MosaicSTACReader)
 
     # Override from PGSTACBackend to use collection
     def assets_for_tile(
