@@ -1,5 +1,4 @@
 from enum import Enum
-from socket import ALG_OP_SIGN
 from typing import Dict, Optional
 
 from fastapi import Query
