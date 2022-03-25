@@ -40,8 +40,8 @@ class ItemSTACReader(PgSTACReader):
     def _get_asset_url(self, asset: str) -> str:
         asset_url = BlobCDN.transform_if_available(super()._get_asset_url(asset))
 
-        if self.item.collection_id:
-            render_config = get_render_config(self.item.collection_id)
+        if self.input.collection_id:
+            render_config = get_render_config(self.input.collection_id)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
