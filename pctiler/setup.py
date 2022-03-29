@@ -28,6 +28,7 @@ extra_reqs = {
     "test": [
         "pytest",
         "pytest-asyncio",
+        "httpx",
     ],
     "dev": [
         "pytest",
