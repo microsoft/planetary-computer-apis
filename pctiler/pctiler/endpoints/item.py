@@ -1,10 +1,10 @@
-from dataclasses import dataclass
 from urllib.parse import urljoin
 
 from fastapi import Query, Request, Response
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
 from titiler.core.factory import MultiBaseTilerFactory
+from titiler.pgstac.dependencies import ItemPathParams
 
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
@@ -22,21 +22,6 @@ except ImportError:
 templates = Jinja2Templates(
     directory=str(resources_files(__package__) / "templates")
 )  # type: ignore
-
-
-def ItemPathParams(
-    collection: str = Query(..., description="STAC Collection ID"),
-    item: str = Query(..., description="STAC Item ID"),
-) -> str:
-    return urljoin(
-        get_settings().stac_api_url, f"collections/{collection}/items/{item}"
-    )
-
-
-@dataclass
-class MapParams:
-    collection: str = Query(..., description="STAC Collection ID")
-    item: str = Query(..., description="STAC Item ID")
 
 
 pc_tile_factory = MultiBaseTilerFactory(
