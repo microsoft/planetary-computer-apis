@@ -73,6 +73,11 @@ def example_properties(collection_id: str):
 def construct_schema(collection: str, example_properties: dict):
     """Construct a schema for provided properties, using the queryable template"""
     template = get_current_queryables(collection) or QUERYABLE_TEMPLATE.copy()
+    if not template["title"]:
+        template[
+            "title"
+        ] = f"Queryable attributes for Planetary Computer {collection} collection"
+
     for key, value in example_properties.items():
         # pass over fields that are already included or are known to be useless in querying
         if (
@@ -93,7 +98,11 @@ def construct_schema(collection: str, example_properties: dict):
         else:
             continue
 
-        template["properties"][key] = {"title": key, "type": schema_type}
+        formatted_key = key.replace("_", " ").replace("-", " ")
+        if key.contains(":"):
+            formatted_key = formatted_key.split(":", 1)[1]
+        formatted_key = formatted_key.title()
+        template["properties"][key] = {"title": formatted_key, "type": schema_type}
 
     return template
 
