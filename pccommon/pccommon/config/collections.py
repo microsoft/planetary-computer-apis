@@ -113,8 +113,8 @@ class LegendConfig(CamelModel):
     Attributes
     ----------
     type:
-        Legend type to make, one of: `continuous`, `classmap`, `none` (note,
-        `none` is a string literal).
+        Legend type to make, one of: `continuous`, `classmap`, `interval` or
+        `none` (note, `none` is a string literal).
     labels:
         List of string labels, ideally fewer than 3 items. Will be flex
         spaced-between under the lagend image.
@@ -124,12 +124,17 @@ class LegendConfig(CamelModel):
         aren't desirable in the legend.
     trim_end:
         Same as trim_start, but for the end of the legend definition.
+    scale_factor:
+        A factor to multiply interval legend labels by. Useful for scaled
+        reasters whose colormap definitions map to unscaled values, effectively
+        showing legend labels as scaled values.
     """
 
     type: Optional[str]
     labels: Optional[List[str]]
     trim_start: Optional[int]
     trim_end: Optional[int]
+    scale_factor: Optional[float]
 
 
 class RenderOptions(CamelModel):
