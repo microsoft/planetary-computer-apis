@@ -79,6 +79,7 @@ def test_parse_with_legend() -> None:
                     "labels": [">0%", "100%"],
                     "trimStart": 1,
                     "trimEnd": 2,
+                    "scaleFactor": 0.01,
                 },
             },
             {
