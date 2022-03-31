@@ -1,4 +1,4 @@
-FROM python:3.8.7-buster
+FROM python:3.9-slim
 
 # The devops Personal Access Token for accessing
 # Azure Artifacts. Note: This will be visible as
@@ -11,49 +11,29 @@ ARG DEVOPS_PAT
 
 EXPOSE 8000
 
-RUN apt-get update && \
-    apt-get install -y build-essential libgeos++-dev libproj-dev
-
-ENV CURL_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
-
-RUN pip install --upgrade pip setuptools wheel
-
-RUN mkdir -p /opt/src/pctiler
-
-COPY .isort.cfg /opt/src/.isort.cfg
-COPY pctiler/requirements.txt /opt/src/
-COPY pctiler/requirements.txt /opt/src/requirements.txt
-
-RUN pip install -r /opt/src/requirements.txt
-
-ENV PYTHONPATH=/opt/src/pctiler:$PYTHONPATH
-
 WORKDIR /opt/src
 
-COPY pctiler/templates /opt/src/templates
+COPY pccommon /opt/src/pccommon
+COPY pctiler /opt/src/pctiler
+RUN pip install -e ./pccommon -e ./pctiler[server]
 
 # GDAL config
 ENV GDAL_CACHEMAX 200
-ENV GDAL_INGESTED_BYTES_AT_OPEN 16383
+ENV GDAL_INGESTED_BYTES_AT_OPEN 32768
 ENV GDAL_DISABLE_READDIR_ON_OPEN EMPTY_DIR
 ENV GDAL_HTTP_MERGE_CONSECUTIVE_RANGES YES
 ENV GDAL_HTTP_MULTIPLEX YES
 ENV GDAL_HTTP_VERSION 2
+# Avoid segfault in rasterio 1.2.10 when reading compound CRS.
+# https://github.com/rasterio/rasterio/issues/2415
+ENV GTIFF_REPORT_COMPD_CS=0
 ENV VSI_CACHE TRUE
-ENV VSI_CACHE_SIZE 5000000
+ENV VSI_CACHE_SIZE 50000000
+ENV CPL_VSIL_CURL_CACHE_SIZE 200000000
 
 # TiTiler mosaic config
 ENV MOSAIC_CONCURRENCY 1
 
-RUN mkdir -p /opt/conf
-COPY pctiler/gunicorn_conf.py /opt/src/pctiler/gunicorn_conf.py
-
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=80
-
-COPY pccommon /opt/src/pccommon
-COPY pctiler/pctiler /opt/src/pctiler/pctiler
-
-# Do not use --preload, because it doesn't work correctly with OpenCensus
-CMD gunicorn pctiler.main:app -k uvicorn.workers.UvicornWorker \
-    -c /opt/src/pctiler/gunicorn_conf.py --bind ${APP_HOST}:${APP_PORT} --log-level info
+CMD uvicorn pctiler.main:app --host ${HOST} --port ${PORT} --log-level info

@@ -16,6 +16,11 @@ variable "pc_test_resources_kv" {
   default = "pc-test-deploy-secrets"
 }
 
+variable "pc_test_resources_acr" {
+  type    = string
+  default = "pccomponentstest"
+}
+
 variable "aks_node_count" {
   type = number
 }
@@ -39,6 +44,10 @@ variable "stac_replica_count" {
 
 variable "tiler_replica_count" {
   type = number
+}
+
+variable "k8s_version" {
+  type = string
 }
 
 # -- Postgres
@@ -76,4 +85,5 @@ locals {
   stack_id              = "pct-apis"
   location              = lower(replace(var.region, " ", ""))
   prefix                = "${local.stack_id}-${local.location}-${var.environment}"
+  nodash_prefix         = replace("${local.stack_id}${var.environment}", "-", "")
 }

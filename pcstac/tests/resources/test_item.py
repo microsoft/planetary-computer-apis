@@ -1,11 +1,12 @@
 import json
 from datetime import datetime, timedelta
-from typing import Callable
+from typing import Callable, Dict
 from urllib.parse import parse_qs, urlparse
+from pcstac.config import get_settings
 
 import pystac
 import pytest
-from shapely.geometry import Polygon
+from geojson_pydantic.geometries import Polygon
 from stac_fastapi.pgstac.models.links import CollectionLinks
 from stac_pydantic.shared import DATETIME_RFC339
 from starlette.requests import Request
@@ -243,6 +244,33 @@ async def test_item_search_temporal_window_get(app_client):
 
 
 @pytest.mark.asyncio
+async def test_item_search_temporal_window_get_date_only(app_client):
+    """Test GET search with spatio-temporal query (core)"""
+    items_resp = await app_client.get("/collections/naip/items")
+    assert items_resp.status_code == 200
+
+    first_item = items_resp.json()["features"][0]
+    item_date = datetime.strptime(first_item["properties"]["datetime"], DATETIME_RFC339)
+    item_date_before = item_date - timedelta(days=1)
+    item_date_after = item_date + timedelta(days=1)
+
+    params = {
+        "collections": first_item["collection"],
+        "bbox": ",".join([str(coord) for coord in first_item["bbox"]]),
+        "datetime": f"{item_date_before.strftime('%Y-%m-%d')}/"
+        f"{item_date_after.strftime('%Y-%m-%d')}",
+    }
+    resp = await app_client.get("/search", params=params)
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    import json
+
+    print(json.dumps(resp_json, indent=2))
+
+    assert resp_json["features"][0]["id"] == first_item["id"]
+
+
+@pytest.mark.asyncio
 async def test_item_search_post_without_collection(app_client):
     """Test POST search without specifying a collection"""
     items_resp = await app_client.get("/collections/naip/items")
@@ -300,7 +328,7 @@ async def test_item_search_get_query_extension(app_client):
     )
     resp = await app_client.get("/search", params=params)
     resp_json = resp.json()
-    assert len(resp_json["features"]) == 10
+    assert len(resp_json["features"]) == 12
     assert (
         resp_json["features"][0]["properties"]["proj:epsg"]
         == first_item["properties"]["proj:epsg"]
@@ -429,9 +457,6 @@ async def test_pagination_post(app_client):
         if idx > 20:
             assert False
 
-    # limit is 1; we expect the matched number of requests before we run out of pages
-    assert idx == len(items_resp.json()["features"])
-
     # Confirm we have paginated through all items
     assert not set(item_ids) - set(ids)
 
@@ -440,13 +465,12 @@ async def test_pagination_post(app_client):
 async def test_pagination_token_idempotent(app_client):
     """Test that pagination tokens are idempotent (paging extension)"""
 
-    # Set limit well above actual number of records
-    items_resp = await app_client.get("/collections/naip/items?limit=500")
-    assert items_resp.status_code == 200
-
-    ids = [item["id"] for item in items_resp.json()["features"]]
-
-    page = await app_client.get("/search", params={"ids": ",".join(ids), "limit": 3})
+    # Construct a search that should return all items, but limit to a few
+    # so that a "next" link is returned
+    page = await app_client.get(
+        "/search", params={"datetime": "1900-01-01/2030-01-01", "limit": 3}
+    )
+    # Get the next link
     page_data = page.json()
     next_link = list(filter(lambda l: l["rel"] == "next", page_data["links"]))
 
@@ -490,7 +514,7 @@ async def test_field_extension_exclude_default_includes(app_client):
 async def test_search_intersects_and_bbox(app_client):
     """Test POST search intersects and bbox are mutually exclusive (core)"""
     bbox = [-118, 34, -117, 35]
-    geoj = Polygon.from_bounds(*bbox).__geo_interface__
+    geoj = Polygon.from_bounds(*bbox).dict(exclude_none=True)
     params = {"bbox": bbox, "intersects": geoj}
     resp = await app_client.post("/search", json=params)
     assert resp.status_code == 400
@@ -522,6 +546,34 @@ async def test_relative_link_construction():
 
 
 @pytest.mark.asyncio
+async def test_tiler_link_construction(app_client):
+    """Test that tiler links are constructed correctly"""
+    id = "al_m_3008506_nw_16_060_20191118_20200114"
+
+    resp = await app_client.get(f"/collections/naip/items/{id}")
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    links: Dict = resp_json["links"]
+    assets: Dict = resp_json["assets"]
+
+    # Get all the links and assets that are expected to have a tiler link
+    tile_links = list(filter(lambda link: link["rel"] == "preview", links))
+    tile_keys = ["tiles", "overview"]
+    tile_assets = list(
+        filter(
+            lambda asset: (any(key in asset["roles"] for key in tile_keys)),
+            assets.values(),
+        )
+    )
+
+    # Confirm that the tiler based links have the correct base url as the href
+    tiler_href = get_settings().tiler_href
+    tiler_links = tile_links + tile_assets
+    assert len(tiler_links) > 0
+    assert all([link["href"].startswith(tiler_href) for link in tiler_links])
+
+
+@pytest.mark.asyncio
 async def test_search_bbox_errors(app_client):
     body = {"query": {"bbox": [0]}}
     resp = await app_client.post("/search", json=body)
@@ -534,3 +586,52 @@ async def test_search_bbox_errors(app_client):
     params = {"bbox": "100.0,0.0,0.0,105.0"}
     resp = await app_client.get("/search", params=params)
     assert resp.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_items_page_limits(app_client):
+    resp = await app_client.get("/collections/naip/items")
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    assert len(resp_json["features"]) == 10
+
+
+@pytest.mark.asyncio
+async def test_search_get_page_limits(app_client):
+    resp = await app_client.get("/search?collection=naip")
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    assert len(resp_json["features"]) == 12
+
+
+@pytest.mark.asyncio
+async def test_search_post_page_limits(app_client):
+    params = {"op": "=", "args": [{"property": "collection"}, "naip"]}
+
+    resp = await app_client.post("/search", json=params)
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    assert len(resp_json["features"]) == 12
+
+
+@pytest.mark.asyncio
+async def test_item_search_geometry_collection(app_client):
+    """Test POST search by item id (core)"""
+    aoi = {
+        "type": "GeometryCollection",
+        "geometries": [
+            {"type": "Point", "coordinates": [-67.67578124999999, 4.390228926463396]},
+            {"type": "Point", "coordinates": [-74.619140625, 4.302591077119676]},
+            {
+                "type": "LineString",
+                "coordinates": [
+                    [-59.765625, 6.227933930268672],
+                    [-63.984375, -2.108898659243126],
+                ],
+            },
+        ],
+    }
+
+    params = {"collections": ["naip"], "intersects": aoi}
+    resp = await app_client.post("/search", json=params)
+    assert resp.status_code == 200

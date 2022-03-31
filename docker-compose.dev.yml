@@ -13,6 +13,49 @@ services:
       - POSTGRES_HOST_READER=database
       - POSTGRES_HOST_WRITER=database
       - POSTGRES_PORT=5432
+      - PCAPIS_DEBUG=TRUE
+      - TILER_HREF=http://localhost:8080/data/
+
+      # Azure Storage
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_COLLECTION_CONFIG__TABLE_NAME=collectionconfig
+
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
+
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME=ipexceptionlist
+
+      # Redis
+      - PCAPIS_REDIS_HOSTNAME=redis
+      - PCAPIS_REDIS_PASSWORD=devcache
+      - PCAPIS_REDIS_PORT=6380
+      - PCAPIS_REDIS_SSL=FALSE
+
+      # Rate limit
+      - PCAPIS_RATE_LIMITS__COLLECTIONS=1000
+      - PCAPIS_RATE_LIMITS__COLLECTION=100
+      - PCAPIS_RATE_LIMITS__ITEMS=1000
+      - PCAPIS_RATE_LIMITS__ITEM=1000
+      - PCAPIS_RATE_LIMITS__SEARCH=1000
+
+      # Backpressure
+      - PCAPIS_BACK_PRESSURES__COLLECTIONS__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__COLLECTIONS__INC_MS=10
+      - PCAPIS_BACK_PRESSURES__COLLECTION__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__COLLECTION__INC_MS=10
+      - PCAPIS_BACK_PRESSURES__ITEMS__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__ITEMS__INC_MS=10
+      - PCAPIS_BACK_PRESSURES__ITEM__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__ITEM__INC_MS=10
+      - PCAPIS_BACK_PRESSURES__SEARCH__REQ_PER_SEC=100
+      - PCAPIS_BACK_PRESSURES__SEARCH__INC_MS=10
     volumes:
       - .:/opt/src
     command: >
@@ -21,6 +64,9 @@ services:
       - stac
   tiler-dev:
     image: pc-apis-tiler-dev
+    # For Mac OS M1 user, you'll need to add `platform: linux/amd64`.
+    # see https://github.com/developmentseed/titiler/discussions/387#discussioncomment-1643110
+    # platform: linux/amd64
     build:
       context: .
       dockerfile: pctiler/Dockerfile.dev
@@ -29,6 +75,7 @@ services:
       - FF_VRT="yes"
       - STAC_API_URL=http://stac:8081
       - STAC_API_HREF=http://localhost:8080/stac/
+      - PCAPIS_DEBUG=TRUE
 
       # titiler.pgstac
       - POSTGRES_USER=username
@@ -40,6 +87,28 @@ services:
       - POSTGRES_PORT=5432
       - WEB_CONCURRENCY=1
       - WORKERS_PER_CORE=1
+
+      # Azure Storage
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_COLLECTION_CONFIG__TABLE_NAME=collectionconfig
+
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
+
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
+      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+      - PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME=ipexceptionlist
+
+      # Redis
+      - PCAPIS_REDIS_HOSTNAME=redis
+      - PCAPIS_REDIS_PASSWORD=devcache
+      - PCAPIS_REDIS_PORT=6380
+      - PCAPIS_REDIS_SSL=FALSE
     volumes:
       - .:/opt/src
     command: >

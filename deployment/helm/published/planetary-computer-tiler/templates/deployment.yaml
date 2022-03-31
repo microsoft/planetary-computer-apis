@@ -77,16 +77,48 @@ spec:
               value: "{{ .Values.tiler.stac_api_url}}"
             - name: STAC_API_HREF
               value: "{{ .Values.tiler.stac_api_href}}"
+            - name: PC_SDK_SAS_URL
+              value: "{{ .Values.tiler.pc_sdk_sas_url}}"
+            - name: "PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME"
+              value: "{{ .Values.storage.account_name }}"
+            - name: "PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY"
+              value: "{{ .Values.storage.account_key }}"
+            - name: "PCAPIS_COLLECTION_CONFIG__TABLE_NAME"
+              value: "{{ .Values.storage.collection_config_table_name }}"
+            - name: "PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME"
+              value: "{{ .Values.storage.account_name }}"
+            - name: "PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY"
+              value: "{{ .Values.storage.account_key }}"
+            - name: "PCAPIS_CONTAINER_CONFIG__TABLE_NAME"
+              value: "{{ .Values.storage.container_config_table_name }}"
+            - name: "PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_NAME"
+              value: "{{ .Values.storage.account_name }}"
+            - name: "PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY"
+              value: "{{ .Values.storage.account_key }}"
+            - name: "PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME"
+              value: "{{ .Values.storage.ip_exception_config_table_name }}"
+            - name: "PCAPIS_TABLE_VALUE_TTL"
+              value: "{{ .Values.storage.table_value_ttl }}"
+            - name: "PCAPIS_REDIS_HOSTNAME"
+              value: "{{ .Values.redis.host }}"
+            - name: "PCAPIS_REDIS_PASSWORD"
+              value: "{{ .Values.redis.password }}"
+            - name: "PCAPIS_REDIS_PORT"
+              value: "{{ .Values.redis.port }}"
+            - name: "PCAPIS_REDIS_SSL"
+              value: "{{ .Values.redis.ssl }}"
+            - name: "PCAPIS_REDIS_TTL"
+              value: "{{ .Values.redis.ttl }}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
 
           livenessProbe:
             httpGet:
-              path: /
+              path: "/_mgmt/ping"
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: "/_mgmt/ping"
               port: http
           resources:
             {{- toYaml .Values.tiler.deploy.resources | nindent 12 }}

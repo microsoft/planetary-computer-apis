@@ -3,30 +3,28 @@ import logging
 import os
 from typing import Awaitable, Callable, Dict, List
 
-from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import FastAPI, Request, Response
 from fastapi.openapi.utils import get_openapi
 from morecantile.defaults import tms as defaultTileMatrices
 from morecantile.models import TileMatrixSet
-from starlette import status
 from starlette.middleware.cors import CORSMiddleware
-from titiler.application.middleware import (
+from titiler.core.errors import DEFAULT_STATUS_CODES, add_exception_handlers
+from titiler.core.middleware import (
     CacheControlMiddleware,
     LoggerMiddleware,
     TotalTimeMiddleware,
 )
-from titiler.core.errors import DEFAULT_STATUS_CODES, add_exception_handlers
+from titiler.mosaic.errors import MOSAIC_STATUS_CODES
+from titiler.pgstac.db import close_db_connection, connect_to_db
 
-from pccommon.logging import init_logging
-from pccommon.middleware import handle_exceptions
+from pccommon.logging import ServiceName, init_logging
+from pccommon.middleware import RequestTracingMiddleware, handle_exceptions
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
-from pctiler.db import close_db_connection, connect_to_db
-from pctiler.endpoints import item, legend, pg_mosaic
-from pctiler.middleware import trace_request
+from pctiler.endpoints import health, item, legend, pg_mosaic
 
 # Initialize logging
-init_logging("tiler")
+init_logging(ServiceName.TILER)
 logger = logging.getLogger(__name__)
 
 # Get the root path if set in the environment
@@ -58,24 +56,20 @@ app.include_router(
     tags=["Legend endpoints"],
 )
 
+app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 
-@app.middleware("http")
-async def _trace_requests(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    return await trace_request(request, call_next)
+app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.TILER)
 
 
 @app.middleware("http")
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await handle_exceptions(request, call_next)
+    return await handle_exceptions(ServiceName.TILER, request, call_next)
 
 
-add_exception_handlers(
-    app, {**DEFAULT_STATUS_CODES, NoAssetFoundError: status.HTTP_404_NOT_FOUND}
-)  # type: ignore
+add_exception_handlers(app, DEFAULT_STATUS_CODES)
+add_exception_handlers(app, MOSAIC_STATUS_CODES)
 
 app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
 app.add_middleware(TotalTimeMiddleware)
@@ -135,7 +129,7 @@ def custom_openapi() -> Dict:
             routes=app.routes,
         )
         app.openapi_schema = fixup_schema(app.root_path, schema)
-    return app.openapi_schema
+    return app.openapi_schema  # type: ignore
 
 
 app.openapi = custom_openapi  # type: ignore

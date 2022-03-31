@@ -4,7 +4,7 @@ namespace: "pc"
 stac:
   enabled: true
   image:
-    repository: "mcr.microsoft.com/planetary-computer-apis/stac"
+    repository: "{{ env.ACR_STAC_REPO }}"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -12,8 +12,32 @@ stac:
     maxWorkers: "1"
     poolSize: "1"
 
+  rate_limit:
+    collections: 500
+    collection: 500
+    items: 100
+    item: 500
+    search: 100
+
+  back_pressure:
+    collections:
+      req_per_sec: 100
+      inc_ms: 10
+    collection:
+      req_per_sec: 100
+      inc_ms: 10
+    items:
+      req_per_sec: 100
+      inc_ms: 10
+    item:
+      req_per_sec: 100
+      inc_ms: 10
+    search:
+      req_per_sec: 100
+      inc_ms: 10
+
   deploy:
-    replicaCount: {{ tf.stac_replica_count }}
+    replicaCount: "{{ tf.stac_replica_count }}"
     podAnnotations:
       "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
@@ -26,7 +50,7 @@ stac:
 tiler:
   enabled: true
   image:
-    repository: "mcr.microsoft.com/planetary-computer-apis/tiler"
+    repository: "{{ env.ACR_TILER_REPO }}"
     tag: "{{ env.IMAGE_TAG }}"
     pullPolicy: Always
 
@@ -40,7 +64,7 @@ tiler:
     webConcurrency: "1"
 
   deploy:
-    replicaCount: {{ tf.tiler_replica_count }}
+    replicaCount: "{{ tf.tiler_replica_count }}"
     podAnnotations:
       "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
@@ -49,6 +73,23 @@ tiler:
 
   stac_api_url: http://planetary-computer-stac.pc.svc.cluster.local
   stac_api_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/stac/
+  # PCT sas needs to be accessed through api management
+  pc_sdk_sas_url: https://pct-sas-westeurope-staging-apim.azure-api.net/sas/token
+
+storage:
+  account_name: "{{ tf.storage_account_name }}"
+  account_key: "{{ tf.storage_account_key }}"
+  collection_config_table_name: "{{ tf.collection_config_table_name }}"
+  container_config_table_name: "{{ tf.container_config_table_name }}"
+  ip_exception_config_table_name: "{{ tf.ip_exception_config_table_name }}"
+  table_value_ttl: 1
+
+redis:
+  host: "{{ tf.redis_host }}"
+  password: "{{ tf.redis_password }}"
+  port: "{{ tf.redis_port }}"
+  ttl: 60
+  ssl: true
 
 metrics:
   instrumentationKey: "{{ tf.instrumentation_key }}"
@@ -79,6 +120,7 @@ pcingress:
     tlsHost: "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
     hosts:
       - "{{ tf.dns_label }}.{{ tf.location }}.cloudapp.azure.com"
+      - "planetarycomputer-test.microsoft.com"
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: "{{ tf.cluster_cert_issuer }}-pcingress"

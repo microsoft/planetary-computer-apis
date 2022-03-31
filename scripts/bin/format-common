@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Runs formatting for the common project.
+
+This scripts is meant to be run inside the stac-dev container.
+
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    echo "Formatting common..."
+    isort --overwrite-in-place pccommon/pccommon
+    isort --overwrite-in-place pccommon/tests
+    black pccommon/pccommon
+    black pccommon/tests
+fi

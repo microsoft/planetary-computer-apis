@@ -35,10 +35,26 @@ tiler:
 
   stac_api_url: ""
   stac_api_href: ""
+  pc_sdk_sas_url: ""
 
   host: "0.0.0.0"
   port: "80"
   appRootPath: ""
+
+storage:
+  account_name: ""
+  account_key: ""
+  collection_config_table_name: ""
+  container_config_table_name: ""
+  ip_exception_config_table_name: ""
+  table_value_ttl: 600
+
+redis:
+  host: ""
+  password: ""
+  port: 6380
+  ssl: true
+  ttl: 600
 
 postgres:
   serverName: ""

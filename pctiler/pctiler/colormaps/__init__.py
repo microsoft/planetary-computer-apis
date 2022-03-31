@@ -1,14 +1,17 @@
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from fastapi import Query
 from rio_tiler.colormap import cmap
+from rio_tiler.types import ColorMapType
 from titiler.core.dependencies import ColorMapParams
 
+from .chloris import chloris_colormaps
 from .jrc import jrc_colormaps
 from .lidarusgs import lidar_colormaps
 from .lulc import lulc_colormaps
 from .mtbs import mtbs_colormaps
+from .noaa_c_cap import noaa_c_cap_colormaps
 
 ################################################################################
 # Custom ColorMap Query Parameter Support
@@ -16,11 +19,13 @@ from .mtbs import mtbs_colormaps
 # if we want documentation on par with the default RenderParams class
 ################################################################################
 registered_cmaps = cmap
-custom_colormaps: Dict[str, Dict[int, List[int]]] = {
+custom_colormaps: Dict[str, ColorMapType] = {
     **jrc_colormaps,
     **lulc_colormaps,
     **mtbs_colormaps,
     **lidar_colormaps,
+    **chloris_colormaps,
+    **noaa_c_cap_colormaps,
 }
 
 for k, v in custom_colormaps.items():
@@ -34,7 +39,7 @@ PCColorMapNames = Enum(  # type: ignore
 def PCColorMapParams(
     colormap_name: PCColorMapNames = Query(None, description="Colormap name"),
     colormap: str = Query(None, description="JSON encoded custom Colormap"),
-) -> Optional[Dict]:
+) -> Optional[ColorMapType]:
     if colormap_name:
         cm = custom_colormaps.get(colormap_name.value)
         if cm:

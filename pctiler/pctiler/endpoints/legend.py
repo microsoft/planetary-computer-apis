@@ -1,18 +1,19 @@
 from io import BytesIO
+from typing import Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse, Response
 from matplotlib.colors import ListedColormap
 from rio_tiler.colormap import make_lut
-from starlette.responses import JSONResponse, Response
 
 from ..colormaps import custom_colormaps, registered_cmaps
 
 legend_router = APIRouter()
 
 
-@legend_router.get("/classmap/{classmap_name}")
+@legend_router.get("/classmap/{classmap_name}", response_class=JSONResponse)
 async def get_classmap_legend(classmap_name: str) -> JSONResponse:
     """Generate values and color swatches mapping for a given classmap."""
     classmap = custom_colormaps.get(classmap_name)
@@ -95,7 +96,18 @@ def make_colormap_image(
 
 def make_colormap(name: str, trim_start: int, length: int) -> ListedColormap:
     """Use registered rio-tiler colormaps to create matplotlib colormap"""
-    colors = make_lut(registered_cmaps.get(name))
+    cm = registered_cmaps.get(name)
+
+    # Make sure we can use `make_lut`
+    # see: https://github.com/cogeotiff/rio-tiler/blob/master/rio_tiler/colormap.py#L98-L108  # noqa
+    if isinstance(cm, Sequence):
+        raise Exception("Cannot make a colormap from Intervals colormap")
+
+    if len(cm) > 256 or max(cm) >= 256:
+        raise Exception("Cannot make a colormap for discrete colormap")
+
+    colors = make_lut(cm)
+
     colors = colors[trim_start : length + 1]
     # rescale to 0-1
     return ListedColormap(colors / 256, name=name, N=length)

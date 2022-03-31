@@ -32,5 +32,33 @@ to deploy to your subscription:
 - `servicePrincipalId`
 - `servicePrincipalKey`
 
+If you want to deploy local code changes, instead of the published images, be
+sure to set the following environment variables with the correct public Azure
+Container Registry repo where you published your local images:
+
+- `ACR_STAC_REPO`
+- `ACR_TILER_REPO`
+- `IMAGE_TAG`
 
 __Note:__ Remember to bring down your resources after testing with `terraform destroy`!
+
+## Loading configuration data
+
+Configuration data is stored in Azure Storage Tables. Use the `pcapis` command line interface that is installed with the `pccommon` package to load data. For example:
+
+```
+>  pcapis load -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table collectionconfig --file pccommon/tests/data-files/collection_config.json
+```
+To dump a single collection config, use:
+
+```
+>  pcapis dump -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table collectionconfig --id naip
+```
+
+For container configs, you must also specify the container account name used as the Partition Key:
+
+```
+>  pcapis dump -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table containerconfig --id naip --container-account naipeuwest
+```
+
+Using the `load` command on a single dump file for either config will update the single row.
