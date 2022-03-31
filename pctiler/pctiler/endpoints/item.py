@@ -20,8 +20,8 @@ except ImportError:
 
 # TODO: mypy fails in python 3.9, we need to find a proper way to do this
 templates = Jinja2Templates(
-    directory=str(resources_files(__package__) / "templates")
-)  # type: ignore
+    directory=str(resources_files(__package__) / "templates")  # type: ignore
+)
 
 
 pc_tile_factory = MultiBaseTilerFactory(
