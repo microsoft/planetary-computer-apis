@@ -11,7 +11,11 @@ The frontend loads these tables and turns them into the Python objects defined i
 
 ## Tutorial
 
-This section walks through adding a collection configuration for a new dataset. We'll use [ALSO-PALSAR] as an example.
+This section walks through adding a collection configuration for a new dataset. We'll use [ALSO-PALSAR] as an example. This will add data to the Planetary Computer Test deployment, which uses the following values
+
+* Catalog: https://planetarycomputer-test.microsoft.com/catalog
+* Storage Account: `pctapisstagingsa`
+* Collection config Table: `collectionconfig`
 
 ### Prerequisites
 
@@ -86,7 +90,7 @@ You might also want to specify `max_size`, `rescale`, and `colormap_name`.
 
 For example, https://pct-apis-staging.westeurope.cloudapp.azure.com/data/item/preview?collection=alos-palsar-mosaic&item=N01E009_17_MOS&assets=HH
 
-After you've found a good set of rendering options, add it to the configuration file. This goes under the `mosaic_info.render_options` key.
+After you've found a good set of rendering options, add it to the configuration file. This goes under the `mosaic_info.render_options` key. Make sure to remove `collection`, `item`, and `max_size` from the `options`. These will be set by the frontend.
 
 ```json
 {
@@ -154,7 +158,10 @@ possible configuration is the following, which relies on the default behavior of
 }
 ```
 
-You have a lot of flexibility here. Look at the existing examples for inspiration.
+You have a lot of flexibility here. Look at the existing examples for inspiration. Other common mosaic strategies include:
+
+* Some form of "low cloud cover"
+* Various time intervals (quarters, years for annual mosaics, ...)
 
 ### Queryables
 
@@ -197,6 +204,8 @@ The `queryables` object is used by the frontend to generate controls for advance
 #### Custom Colormaps
 
 Some assets will require custom colormaps to display properly (e.g. QA bands or landcover maps). We can use TiTiler's `colormap` parameter while developing the colormap, providing it the JSON-encoded colormap. Eventually, we'll make a Pull Request to planetary-computer-apis adding that as a proper colormap, allowing us to just use `colormap_name`.
+
+Note that the *legend* is generated from the [`classification`](https://github.com/stac-extensions/classification) extension. 
 
 In this case, we'll define the colormap mapping from integers to hex colors. Substitute your assets, collection, item ID, and colormap.
 
