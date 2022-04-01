@@ -1,10 +1,13 @@
 import asyncio
 import logging
+import threading
 from typing import Any, Callable, Coroutine, Optional, TypeVar
 
 import orjson
 from fastapi import FastAPI, HTTPException, Request
 from redis.asyncio import Redis
+from redis.exceptions import NoScriptError
+from starlette.datastructures import State
 
 from pccommon.config.core import PCAPIsConfig
 from pccommon.constants import (
@@ -15,6 +18,8 @@ from pccommon.constants import (
 from pccommon.utils import get_request_ip
 
 logger = logging.getLogger(__name__)
+
+redis_script_lock = threading.Lock()
 
 T = TypeVar("T")
 
@@ -72,6 +77,25 @@ async def connect_to_redis(app: FastAPI) -> None:
     app.state.redis = r
     app.state.redis_rate_limit_script_hash = rate_limit_script_hash
     app.state.redis_back_pressure_script_hash = back_pressure_script_hash
+
+
+async def reregister_scripts(request: Request) -> None:
+    """Attempt to reregister lua scripts if raised as missing."""
+
+    # Avoid multiple threads trying to reregister scripts at once
+    with redis_script_lock:
+        state: State = request.app.state
+        r: Redis = state.redis
+
+        scripts = [
+            (state.redis_rate_limit_script_hash, rate_limit_lua_script),
+            (state.redis_back_pressure_script_hash, back_pressure_lua_script),
+        ]
+
+        exists = await r.script_exists(*[s[0] for s in scripts])
+        for script_exists, idx in enumerate(exists):
+            if not script_exists:
+                await r.script_load(scripts[idx][1])
 
 
 async def cached_result(
@@ -147,6 +171,11 @@ async def apply_rate_limit(
                 detail="Too Many Requests",
                 headers={"Retry-After": str(1)},  # 1 second
             )
+    except NoScriptError:
+        logger.error(
+            "Rate limit script not registered in redis, re-registering",
+        )
+        await reregister_scripts(request)
     except HTTPException:
         raise
     except Exception:
@@ -227,6 +256,12 @@ async def apply_back_pressure(
         print(f"overage: {overage}")
         if overage > 0:
             await asyncio.sleep((overage * inc_ms) / 1000)
+
+    except NoScriptError:
+        logger.error(
+            "Back pressure script not registered in redis, re-registering",
+        )
+        await reregister_scripts(request)
     except HTTPException:
         raise
     except Exception:
