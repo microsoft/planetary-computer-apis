@@ -12,8 +12,8 @@ alos_palsar_mosaic_colormaps: Dict[str, ColorMapType] = {
         255: (168, 153, 135, 255),
     },
     "alos-fnf": {
-        1: (57, 125, 73, 255),    # forest
+        1: (57, 125, 73, 255),  # forest
         2: (227, 226, 195, 255),  # non-forest
-        3: (65, 155, 223, 255),   # water
-    }
+        3: (65, 155, 223, 255),  # water
+    },
 }
