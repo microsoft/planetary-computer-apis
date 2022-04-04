@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+import textwrap
 from typing import Any, Dict, List, Optional
 
 from pccommon.config.collections import CollectionConfig, CollectionConfigTable
@@ -150,7 +151,17 @@ def parse_args(args: List[str]) -> Optional[Dict[str, Any]]:
         formatter_class=dhf,
     )
     parser.add_argument(
-        "--file", help="Filename to load collection configuration from.", required=True
+        "--file",
+        help=textwrap.dedent(
+            """\
+            Filename to load collection configuration from.
+
+            Keys in this file are merged with existing records. Use
+            just a single item if you want to update a single record
+            in the table.
+        """
+        ),
+        required=True,
     )
     parser.add_argument(
         "-t",
