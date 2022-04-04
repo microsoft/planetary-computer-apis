@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import logging
 import threading
 from typing import Any, Callable, Coroutine, Optional, TypeVar
@@ -41,6 +42,9 @@ else
     return 0
 end
 """
+rate_limit_lua_script_hash = hashlib.sha1(
+    rate_limit_lua_script.encode("utf-8")
+).hexdigest()
 
 back_pressure_lua_script = """
 local key = KEYS[1]
@@ -59,6 +63,9 @@ else
     return 0
 end
 """
+back_pressure_lua_script_hash = hashlib.sha1(
+    back_pressure_lua_script.encode("utf-8")
+).hexdigest()
 
 
 async def connect_to_redis(app: FastAPI) -> None:
@@ -71,31 +78,27 @@ async def connect_to_redis(app: FastAPI) -> None:
         ssl=settings.redis_ssl,
         decode_responses=True,
     )
-    rate_limit_script_hash = await r.script_load(rate_limit_lua_script)
-    back_pressure_script_hash = await r.script_load(back_pressure_lua_script)
 
     app.state.redis = r
-    app.state.redis_rate_limit_script_hash = rate_limit_script_hash
-    app.state.redis_back_pressure_script_hash = back_pressure_script_hash
+    await register_scripts(app.state)
 
 
-async def reregister_scripts(request: Request) -> None:
-    """Attempt to reregister lua scripts if raised as missing."""
+async def register_scripts(state: State) -> None:
+    """Register or re-register lua scripts if they have not been previously registered
+    with redis from this instance."""
+    r: Redis = state.redis
 
     # Avoid multiple threads trying to reregister scripts at once
     with redis_script_lock:
-        state: State = request.app.state
-        r: Redis = state.redis
+        hashes = [rate_limit_lua_script_hash, back_pressure_lua_script_hash]
+        exists = await r.script_exists(*hashes)
 
-        scripts = [
-            (state.redis_rate_limit_script_hash, rate_limit_lua_script),
-            (state.redis_back_pressure_script_hash, back_pressure_lua_script),
-        ]
-
-        exists = await r.script_exists(*[s[0] for s in scripts])
-        for script_exists, idx in enumerate(exists):
-            if not script_exists:
-                await r.script_load(scripts[idx][1])
+        state.redis_rate_limit_script_hash = (
+            hashes[0] if exists[0] else await r.script_load(rate_limit_lua_script)
+        )
+        state.redis_back_pressure_script_hash = (
+            hashes[1] if exists[1] else await r.script_load(back_pressure_lua_script)
+        )
 
 
 async def cached_result(
@@ -175,7 +178,7 @@ async def apply_rate_limit(
         logger.error(
             "Rate limit script not registered in redis, re-registering",
         )
-        await reregister_scripts(request)
+        await register_scripts(request.app.state)
     except HTTPException:
         raise
     except Exception:
@@ -261,7 +264,7 @@ async def apply_back_pressure(
         logger.error(
             "Back pressure script not registered in redis, re-registering",
         )
-        await reregister_scripts(request)
+        await register_scripts(request.app.state)
     except HTTPException:
         raise
     except Exception:
