@@ -1,18 +1,13 @@
-import json
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 import attr
 import morecantile
 import planetary_computer as pc
-from cachetools import TTLCache, cached
-from cachetools.keys import hashkey
 from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
-from geojson_pydantic import Point, Polygon
-from rio_tiler.constants import WEB_MERCATOR_TMS, WGS84_CRS
+from geojson_pydantic import Polygon
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
-from rio_tiler.io.base import BaseReader, MultiBaseReader
-from rio_tiler.io.cogeo import COGReader
+from rio_tiler.io.base import BaseReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
 from titiler.pgstac import mosaic as pgstac_mosaic
@@ -23,12 +18,6 @@ from pccommon.config import get_render_config
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
 cache_config = CacheSettings()
-
-
-def get_cache_key(
-    backend: "PGSTACBackend", geom: Union[Point, Polygon], **kwargs: Any
-) -> Any:
-    return hashkey(backend.input, str(geom), **kwargs)
 
 
 @attr.s
@@ -49,44 +38,8 @@ class ItemSTACReader(PgSTACReader):
 
 
 @attr.s
-class MosaicSTACReader(MultiBaseReader):
-    """Simplified STAC Reader.
-
-    Items should be in form of:
-    {
-        "id": "IAMASTACITEM",
-        "collection": "collection",
-        "bbox": (0, 0, 10, 10),
-        "assets": {
-            "COG": {
-                "href": "https://somewhereovertherainbow.io/cog.tif"
-            }
-        }
-    }
-
-    """
-
-    input: Dict[str, Any] = attr.ib()
-    tms: morecantile.TileMatrixSet = attr.ib(default=WEB_MERCATOR_TMS)
-    reader_options: Dict = attr.ib(factory=dict)
-
-    reader: Type[BaseReader] = attr.ib(default=COGReader)
-
-    minzoom: int = attr.ib(default=None)
-    maxzoom: int = attr.ib(default=None)
-
-    def __attrs_post_init__(self) -> None:
-        """Set reader spatial infos and list of valid assets."""
-        self.bounds = self.input["bbox"]
-        self.crs = WGS84_CRS  # Per specification STAC items are in WGS84
-
-        self.assets = list(self.input["assets"])
-
-        if self.minzoom is None:
-            self.minzoom = self.tms.minzoom
-
-        if self.maxzoom is None:
-            self.maxzoom = self.tms.maxzoom
+class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
+    """Custom version of titiler.pgstac.mosaic.CustomSTACReader)."""
 
     def _get_asset_url(self, asset: str) -> str:
         """Validate asset names and return asset's url.
@@ -137,50 +90,6 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
         bbox = self.tms.bounds(morecantile.Tile(x, y, z))
         return self.get_assets(Polygon.from_bounds(*bbox), **kwargs)
 
-    @cached(
-        cache=TTLCache(maxsize=cache_config.maxsize, ttl=cache_config.ttl),
-        key=get_cache_key,
-    )
-    def get_assets(
-        self,
-        geom: Union[Point, Polygon],
-        fields: Optional[Dict[str, Any]] = None,
-        scan_limit: Optional[int] = None,
-        items_limit: Optional[int] = None,
-        time_limit: Optional[int] = None,
-        exitwhenfull: Optional[bool] = None,
-        skipcovered: Optional[bool] = None,
-    ) -> List[Dict]:
-        """Find assets."""
-        fields = fields or {
-            "include": ["assets", "id", "bbox", "collection"],
-        }
-
-        scan_limit = scan_limit or 10000
-        items_limit = items_limit or 100
-        time_limit = time_limit or 10
-        exitwhenfull = True if exitwhenfull is None else exitwhenfull
-        skipcovered = True if skipcovered is None else skipcovered
-
-        with self.pool.connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(
-                    "SELECT * FROM geojsonsearch(%s, %s, %s, %s, %s, %s, %s, %s);",
-                    (
-                        geom.json(exclude_none=True),
-                        self.input,
-                        json.dumps(fields),
-                        scan_limit,
-                        items_limit,
-                        f"{time_limit} seconds",
-                        exitwhenfull,
-                        skipcovered,
-                    ),
-                )
-                resp = cursor.fetchone()[0]
-
-        return resp.get("features", [])
-
     # override from PGSTACBackend to pass through collection
     def tile(
         self,
@@ -220,7 +129,9 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
         def _reader(
             item: Dict[str, Any], x: int, y: int, z: int, **kwargs: Any
         ) -> ImageData:
-            with self.reader(item, tms=self.tms, **self.reader_options) as src_dst:
+            with self.reader(
+                item, tms=self.tms, **self.reader_options  # type: ignore
+            ) as src_dst:
                 return src_dst.tile(x, y, z, **kwargs)
 
         return mosaic_reader(
