@@ -15,7 +15,7 @@ inst_reqs = [
 
     # titiler-pgstac
     "psycopg[binary,pool]",
-    "titiler.pgstac==0.1.0a8",
+    "titiler.pgstac==0.1.0a7",
 
     # colormap dependencies
     "matplotlib==3.4.*",
