@@ -129,7 +129,9 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
         def _reader(
             item: Dict[str, Any], x: int, y: int, z: int, **kwargs: Any
         ) -> ImageData:
-            with self.reader(item, tms=self.tms, **self.reader_options) as src_dst:
+            with self.reader(
+                item, tms=self.tms, **self.reader_options  # type: ignore
+            ) as src_dst:
                 return src_dst.tile(x, y, z, **kwargs)
 
         return mosaic_reader(
