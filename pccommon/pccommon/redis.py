@@ -1,10 +1,14 @@
 import asyncio
+import hashlib
 import logging
+import threading
 from typing import Any, Callable, Coroutine, Optional, TypeVar
 
 import orjson
 from fastapi import FastAPI, HTTPException, Request
 from redis.asyncio import Redis
+from redis.exceptions import NoScriptError
+from starlette.datastructures import State
 
 from pccommon.config.core import PCAPIsConfig
 from pccommon.constants import (
@@ -15,6 +19,8 @@ from pccommon.constants import (
 from pccommon.utils import get_request_ip
 
 logger = logging.getLogger(__name__)
+
+redis_script_lock = threading.Lock()
 
 T = TypeVar("T")
 
@@ -36,6 +42,9 @@ else
     return 0
 end
 """
+rate_limit_lua_script_hash = hashlib.sha1(
+    rate_limit_lua_script.encode("utf-8")
+).hexdigest()
 
 back_pressure_lua_script = """
 local key = KEYS[1]
@@ -54,6 +63,9 @@ else
     return 0
 end
 """
+back_pressure_lua_script_hash = hashlib.sha1(
+    back_pressure_lua_script.encode("utf-8")
+).hexdigest()
 
 
 async def connect_to_redis(app: FastAPI) -> None:
@@ -66,12 +78,27 @@ async def connect_to_redis(app: FastAPI) -> None:
         ssl=settings.redis_ssl,
         decode_responses=True,
     )
-    rate_limit_script_hash = await r.script_load(rate_limit_lua_script)
-    back_pressure_script_hash = await r.script_load(back_pressure_lua_script)
 
     app.state.redis = r
-    app.state.redis_rate_limit_script_hash = rate_limit_script_hash
-    app.state.redis_back_pressure_script_hash = back_pressure_script_hash
+    await register_scripts(app.state)
+
+
+async def register_scripts(state: State) -> None:
+    """Register or re-register lua scripts if they have not been previously registered
+    with redis from this instance."""
+    r: Redis = state.redis
+
+    # Avoid multiple threads trying to reregister scripts at once
+    with redis_script_lock:
+        hashes = [rate_limit_lua_script_hash, back_pressure_lua_script_hash]
+        exists = await r.script_exists(*hashes)
+
+        state.redis_rate_limit_script_hash = (
+            hashes[0] if exists[0] else await r.script_load(rate_limit_lua_script)
+        )
+        state.redis_back_pressure_script_hash = (
+            hashes[1] if exists[1] else await r.script_load(back_pressure_lua_script)
+        )
 
 
 async def cached_result(
@@ -147,6 +174,11 @@ async def apply_rate_limit(
                 detail="Too Many Requests",
                 headers={"Retry-After": str(1)},  # 1 second
             )
+    except NoScriptError:
+        logger.error(
+            "Rate limit script not registered in redis, re-registering",
+        )
+        await register_scripts(request.app.state)
     except HTTPException:
         raise
     except Exception:
@@ -227,6 +259,12 @@ async def apply_back_pressure(
         print(f"overage: {overage}")
         if overage > 0:
             await asyncio.sleep((overage * inc_ms) / 1000)
+
+    except NoScriptError:
+        logger.error(
+            "Back pressure script not registered in redis, re-registering",
+        )
+        await register_scripts(request.app.state)
     except HTTPException:
         raise
     except Exception:
