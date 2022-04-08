@@ -72,7 +72,7 @@ class PCClient(CoreCrudClient):
 
         return collection
 
-    def inject_item_links(self, item: Item, base_url: str) -> Item:
+    def inject_item_links(self, item: Item) -> Item:
         """Add extra/non-mandatory links to an Item"""
         collection_id = item.get("collection", "")
         if collection_id:
@@ -176,13 +176,11 @@ class PCClient(CoreCrudClient):
             # Remove context extension until we fully support it.
             result.pop("context", None)
 
-            base_url = str(kwargs["request"].base_url)
             return ItemCollection(
                 **{
                     **result,
                     "features": [
-                        self.inject_item_links(i, base_url)
-                        for i in result.get("features", [])
+                        self.inject_item_links(i) for i in result.get("features", [])
                     ],
                 }
             )
