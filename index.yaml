@@ -43,9 +43,9 @@ entries:
     version: 2022.1.0
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2022-04-08T14:51:04.855981906Z"
+    created: "2022-04-08T21:04:30.365233564Z"
     description: A Helm chart for the Planetary Computer STAC API
-    digest: 93bc30386376a50262a2ec28db2aca0f9457ac6279b9b3850462b5c42ced561e
+    digest: 91fecd7e569f00b2bd7812026034f6da750346203c82fa5ef7f72f4ee65d6dc4
     name: planetary-computer-stac
     type: application
     urls:
@@ -94,12 +94,12 @@ entries:
     version: 2022.1.0
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2022-04-08T14:51:04.856521515Z"
+    created: "2022-04-08T21:04:30.365799067Z"
     description: A Helm chart for the Planetary Computer tiler
-    digest: 94e36829e35b85de449988076ba5ef7886658fc4f7808df8bed2165ac770ec3a
+    digest: e358ce4ef3f81902db93737c2ef4e11f614bafefcf3070d055b0a1f427e5f667
     name: planetary-computer-tiler
     type: application
     urls:
     - https://microsoft.github.io/planetary-computer-apis/planetary-computer-tiler-2021.4.0-dev.tgz
     version: 2021.4.0-dev
-generated: "2022-04-08T14:51:04.855021791Z"
+generated: "2022-04-08T21:04:30.364360958Z"
