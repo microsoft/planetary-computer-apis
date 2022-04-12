@@ -9,6 +9,9 @@ stac:
     pullPolicy: Always
 
   server:
+    minDbConnections: "1"
+    maxDbConnections: "1"
+    webConcurrency: "1"
 
   rate_limit:
     collections: 500

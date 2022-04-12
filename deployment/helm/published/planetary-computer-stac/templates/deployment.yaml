@@ -47,6 +47,12 @@ spec:
               value: "{{ .Values.stac.port }}"
             - name: FORWARDED_ALLOW_IPS
               value: "*"
+            - name: "WEB_CONCURRENCY"
+              value: "{{ .Values.stac.server.webConcurrency }}"
+            - name: DB_MIN_CONN_SIZE
+              value: "{{ .Values.stac.server.minDbConnections }}"
+            - name: DB_MAX_CONN_SIZE
+              value: "{{ .Values.stac.server.maxDbConnections }}"
             - name: TILER_HREF
               value: "{{ .Values.stac.tiler_href }}"
             - name: POSTGRES_USER
