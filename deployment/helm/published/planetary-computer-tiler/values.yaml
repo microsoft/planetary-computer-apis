@@ -9,10 +9,8 @@ tiler:
     tag: "latest"
 
   server:
-    maxWorkers: "1"
     minDbConnections: "1"
     maxDbConnections: "1"
-    workersPerCore: "1"
     webConcurrency: "1"
 
   service:
