@@ -24,8 +24,8 @@ API_DESCRIPTION = (
 )
 
 TILER_HREF_ENV_VAR = "TILER_HREF"
-DB_MIN_CONN = "DB_MIN_CONN_SIZE"
-DB_MAX_CONN = "DB_MAX_CONN_SIZE"
+DB_MIN_CONN_ENV_VAR = "DB_MIN_CONN_SIZE"
+DB_MAX_CONN_ENV_VAR = "DB_MAX_CONN_SIZE"
 
 EXTENSIONS = [
     # STAC API Extensions
@@ -89,8 +89,8 @@ class Settings(BaseSettings):
 
     debug: bool = False
     tiler_href: str = Field(env=TILER_HREF_ENV_VAR, default="")
-    db_max_conn_size: int = Field(env=DB_MAX_CONN, default=1)
-    db_min_conn_size: int = Field(env=DB_MIN_CONN, default=1)
+    db_max_conn_size: int = Field(env=DB_MAX_CONN_ENV_VAR, default=1)
+    db_min_conn_size: int = Field(env=DB_MIN_CONN_ENV_VAR, default=1)
     openapi_url: str = "/openapi.json"
     api_version: str = f"v{API_VERSION}"
     rate_limits: RateLimits
