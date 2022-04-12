@@ -56,7 +56,8 @@ api = PCStacApi(
     settings=Settings(
         db_max_conn_size=app_settings.db_max_conn_size,
         db_min_conn_size=app_settings.db_min_conn_size,
-        debug=DEBUG),
+        debug=DEBUG,
+    ),
     client=PCClient.create(post_request_model=search_post_request_model),
     extensions=EXTENSIONS,
     app=FastAPI(root_path=APP_ROOT_PATH, default_response_class=ORJSONResponse),

@@ -2,7 +2,6 @@ from typing import Dict
 
 from rio_tiler.types import ColorMapType
 
-
 alos_palsar_mosaic_colormaps: Dict[str, ColorMapType] = {
     "alos-palsar-mask": {
         0: (0, 0, 0, 0),
