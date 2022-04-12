@@ -47,12 +47,8 @@ spec:
               value: "{{ .Values.tiler.port }}"
             - name: FORWARDED_ALLOW_IPS
               value: "*"
-            - name: "MAX_WORKERS"
-              value: "{{ .Values.tiler.server.maxWorkers }}"
             - name: "WEB_CONCURRENCY"
               value: "{{ .Values.tiler.server.webConcurrency }}"
-            - name: "WORKERS_PER_CORE"
-              value: "{{ .Values.tiler.server.workersPerCore }}"
             - name: ENVIRONMENT
               value: "{{ .Values.environment }}"
             - name: POSTGRES_USER

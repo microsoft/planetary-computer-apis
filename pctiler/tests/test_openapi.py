@@ -1,10 +1,7 @@
 import pytest
-
 from httpx import AsyncClient
-
 from openapi_spec_validator import validate_spec
 from requests.models import Response
-
 
 VALIDATING_SCHEMA = False
 

@@ -11,8 +11,9 @@ from rio_tiler.io.base import BaseReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
 from titiler.pgstac import mosaic as pgstac_mosaic
-from titiler.pgstac.settings import CacheSettings
 from titiler.pgstac.reader import PgSTACReader
+from titiler.pgstac.settings import CacheSettings
+
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
 from pctiler.reader_cog import CustomCOGReader  # type:ignore

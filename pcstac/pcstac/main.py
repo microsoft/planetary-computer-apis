@@ -42,10 +42,7 @@ logger.info(f"APP_ROOT_PATH: {APP_ROOT_PATH}")
 INCLUDE_TRANSACTIONS = os.environ.get("INCLUDE_TRANSACTIONS", "") == "yes"
 logger.info(f"INCLUDE_TRANSACTIONS: {INCLUDE_TRANSACTIONS}")
 
-# Allow setting of SQLAlchemy connection pools
-POOL_SIZE = int(os.environ.get("POOL_SIZE", "1"))
-logger.info(f"POOL_SIZE: {POOL_SIZE}")
-
+app_settings = get_settings()
 
 search_get_request_model = create_get_request_model(
     EXTENSIONS, base_model=PCSearchGetRequest
@@ -56,7 +53,11 @@ api = PCStacApi(
     title=API_TITLE,
     description=API_DESCRIPTION,
     api_version=API_VERSION,
-    settings=Settings(debug=DEBUG),
+    settings=Settings(
+        db_max_conn_size=app_settings.db_max_conn_size,
+        db_min_conn_size=app_settings.db_min_conn_size,
+        debug=DEBUG,
+    ),
     client=PCClient.create(post_request_model=search_post_request_model),
     extensions=EXTENSIONS,
     app=FastAPI(root_path=APP_ROOT_PATH, default_response_class=ORJSONResponse),
@@ -127,7 +128,7 @@ def custom_openapi() -> Dict[str, Any]:
     else:
         schema = get_openapi(
             title="Planetary Computer STAC API",
-            version=get_settings().api_version,
+            version=app_settings.api_version,
             routes=app.routes,
         )
         app.openapi_schema = fixup_schema(app.root_path, schema)

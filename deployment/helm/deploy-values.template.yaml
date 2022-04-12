@@ -9,8 +9,9 @@ stac:
     pullPolicy: Always
 
   server:
-    maxWorkers: "1"
-    poolSize: "1"
+    minDbConnections: "1"
+    maxDbConnections: "1"
+    webConcurrency: "1"
 
   rate_limit:
     collections: 500
@@ -55,12 +56,8 @@ tiler:
     pullPolicy: Always
 
   server:
-    maxWorkers: "1"
     minDbConnections: "1"
     maxDbConnections: "1"
-
-  tiler:
-    workersPerCore: "1"
     webConcurrency: "1"
 
   deploy:
