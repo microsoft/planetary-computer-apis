@@ -94,3 +94,11 @@ Images following images are hosted in the [Microsoft Container Registry](https:/
 ### Charts
 
 See the [Helm chart repository](https://microsoft.github.io/planetary-computer-apis) published to GitHub pages for the published charts.
+
+### Building /queryable schemas
+
+Schemas can be built/updated with
+
+```
+./scripts/build_queryables
+```

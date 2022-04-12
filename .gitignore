@@ -109,4 +109,8 @@ venv.bak/
 override.tf
 
 .DS_Store
+
+# Generated queryable schemas
+queryable_schemas/
+
 .metals/
