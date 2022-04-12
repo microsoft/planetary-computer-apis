@@ -15,7 +15,7 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
             $.ajax({
-                url: '{{ tileJson }}',
+                url: '{{ tileJson|safe }}',
                 success: function (tileJson) {
                     //show the jsonData in the page
                     console.log(tileJson)
