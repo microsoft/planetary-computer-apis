@@ -232,7 +232,8 @@ class PCClient(CoreCrudClient):
         _super: CoreCrudClient = super()
 
         async def _fetch() -> Item:
-            return await _super.get_item(item_id, collection_id, **kwargs)
+            item = await _super.get_item(item_id, collection_id, **kwargs)
+            return item
 
         cache_key = f"{CACHE_KEY_ITEM}:{collection_id}:{item_id}"
         return await cached_result(_fetch, cache_key, kwargs["request"])

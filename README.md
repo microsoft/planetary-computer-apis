@@ -11,6 +11,10 @@ This repository contains two components of the Planetary Computer APIs: the STAC
 The `pcstac` project provides a STAC API which indexes Microsoft's publicly available [geospatial data](https://planetarycomputer.microsoft.com/catalog) and an API for searching through this large collection.
 The `pctiler` provides visualization and data access capabilities for the data in the Planetary Computer.
 
+## Collection configuration
+
+See [collection config](./docs/collection-config.md) for more on developing collection configurations.
+
 ## Deployment
 
 This repository hosts the code that is deployed in the Planetary Computer. It contains deployment code for hosting these services in Azure through running the published docker images and Helm charts in [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service/), which we used to stand up a development version of the services. The production deployment code is not contained in this repository.

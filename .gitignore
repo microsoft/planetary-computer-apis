@@ -112,3 +112,5 @@ override.tf
 
 # Generated queryable schemas
 queryable_schemas/
+
+.metals/

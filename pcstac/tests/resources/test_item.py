@@ -402,7 +402,7 @@ async def test_pagination_item_collection(app_client):
 
     ids = [item["id"] for item in items_resp.json()["features"]]
 
-    # Paginate through all 12 items with a limit of 1 (expecting 12 requests)
+    # Paginate through all 13 items with a limit of 1 (expecting 13 requests)
     page = await app_client.get("/collections/naip/items", params={"limit": 1})
     idx = 0
     item_ids = []
@@ -636,3 +636,16 @@ async def test_item_search_geometry_collection(app_client):
     params = {"collections": ["naip"], "intersects": aoi}
     resp = await app_client.post("/search", json=params)
     assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_relative_to_absolute_asset_paths(app_client):
+    resp = await app_client.get(
+        "/collections/naip/items/al_m_3008501_nw_16_060_20191109_20200114"
+    )
+    assert resp.status_code == 200
+    hrefs = [
+        link["href"] for link in resp.json()["links"] if link["rel"] == "related-item"
+    ]
+    assert len(hrefs) > 0
+    assert hrefs[0].startswith("http")
