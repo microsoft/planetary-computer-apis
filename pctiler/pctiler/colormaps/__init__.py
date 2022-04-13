@@ -9,6 +9,7 @@ from titiler.core.dependencies import ColorMapParams
 from .alos_palsar_mosaic import alos_palsar_mosaic_colormaps
 from .chloris import chloris_colormaps
 from .jrc import jrc_colormaps
+from .lidarusgs import lidar_colormaps
 from .lulc import lulc_colormaps
 from .mtbs import mtbs_colormaps
 from .noaa_c_cap import noaa_c_cap_colormaps
@@ -23,6 +24,7 @@ custom_colormaps: Dict[str, ColorMapType] = {
     **jrc_colormaps,
     **lulc_colormaps,
     **mtbs_colormaps,
+    **lidar_colormaps,
     **chloris_colormaps,
     **noaa_c_cap_colormaps,
     **alos_palsar_mosaic_colormaps,
