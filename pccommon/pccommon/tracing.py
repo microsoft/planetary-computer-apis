@@ -5,23 +5,18 @@ from typing import Awaitable, Callable, List, Optional, Tuple, Union
 
 from fastapi import Request, Response
 from opencensus.ext.azure.trace_exporter import AzureExporter
-from opencensus.trace.attributes_helper import COMMON_ATTRIBUTES
 from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
 
 from pccommon.config import get_apis_config
+from pccommon.constants import HTTP_METHOD, HTTP_PATH, HTTP_STATUS_CODE, HTTP_URL
 from pccommon.logging import request_to_path
 from pccommon.utils import get_request_ip
 
 _config = get_apis_config()
 logger = logging.getLogger(__name__)
 
-
-HTTP_PATH = COMMON_ATTRIBUTES["HTTP_PATH"]
-HTTP_URL = COMMON_ATTRIBUTES["HTTP_URL"]
-HTTP_STATUS_CODE = COMMON_ATTRIBUTES["HTTP_STATUS_CODE"]
-HTTP_METHOD = COMMON_ATTRIBUTES["HTTP_METHOD"]
 
 exporter = (
     AzureExporter(
@@ -62,6 +57,10 @@ async def trace_request(
 
             response = await call_next(request)
 
+            tracer.add_attribute_to_current_span(
+                attribute_key="ref_id",
+                attribute_value=request.headers.get("X-Azure-Ref"),
+            )
             tracer.add_attribute_to_current_span(
                 attribute_key="request_ip",
                 attribute_value=get_request_ip(request),

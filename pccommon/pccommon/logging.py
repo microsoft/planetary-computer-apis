@@ -11,11 +11,18 @@ from fastapi import Request
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 
 from pccommon.config import get_apis_config
+from pccommon.constants import HTTP_METHOD, HTTP_PATH, HTTP_URL
 
 
 class ServiceName:
     STAC = "stac"
     TILER = "tiler"
+
+
+PACKAGES = {
+    ServiceName.STAC: "pcstac",
+    ServiceName.TILER: "pctiler",
+}
 
 
 # Custom filter that outputs custom_dimensions, only if present
@@ -49,37 +56,52 @@ class CustomDimensionsFilter(logging.Filter):
 def init_logging(service_name: str) -> None:
     config = get_apis_config()
 
-    # Setup logging
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    # Setup logging for current package and pccommon
+    for package in [PACKAGES[service_name], "pccommon"]:
+        logger = logging.getLogger(package)
+        logger.setLevel(logging.INFO)
 
-    # Console log handler
-    consoleHandler = logging.StreamHandler(sys.stdout)
-    consoleHandler.setLevel(logging.DEBUG)
-    formatter = OptionalCustomDimensionsFilter(
-        "[%(levelname)s] %(asctime)s - %(message)s %(custom_dimensions)s",
-        None,
-        service_name,
-    )
-    consoleHandler.setFormatter(formatter)
-    logger.addHandler(consoleHandler)
-
-    if logging.DEBUG:
-        for package in ["pcstac", "pctiler", "pccommon"]:
-            logging.getLogger(package).setLevel(logging.DEBUG)
-
-    # Azure log handler
-    instrumentation_key = config.app_insights_instrumentation_key
-    if instrumentation_key:
-        azure_handler = AzureLogHandler(
-            connection_string=f"InstrumentationKey={instrumentation_key}"
+        # Console log handler that includes custom dimensions
+        consoleHandler = logging.StreamHandler(sys.stdout)
+        consoleHandler.setLevel(logging.DEBUG)
+        formatter = OptionalCustomDimensionsFilter(
+            "[%(levelname)s] %(asctime)s - %(message)s %(custom_dimensions)s",
+            None,
+            service_name,
         )
-        azure_handler.addFilter(CustomDimensionsFilter())
-        logger.addHandler(azure_handler)
-    else:
-        logger.info("Not adding Azure log handler since no instrumentation key defined")
+        consoleHandler.setFormatter(formatter)
+        logger.addHandler(consoleHandler)
+
+        if config.debug:
+            logger.setLevel(logging.DEBUG)
+
+        # Azure log handler
+        instrumentation_key = config.app_insights_instrumentation_key
+        if instrumentation_key:
+            azure_handler = AzureLogHandler(
+                connection_string=f"InstrumentationKey={instrumentation_key}"
+            )
+            azure_handler.addFilter(CustomDimensionsFilter())
+
+            logger.addHandler(azure_handler)
+        else:
+            logger.info(f"Azure log handler not attached: {package} (missing key)")
 
 
 def request_to_path(request: Request) -> str:
     parsed_url = urlparse(f"{request.url}")
     return parsed_url.path
+
+
+def get_custom_dimensions(dimensions: dict, request: Request) -> dict:
+    """Merge the base dimensions with the given dimensions."""
+
+    base_dimensions = {
+        "ref_id": request.headers.get("X-Azure-Ref"),
+        "service": request.app.state.service_name,
+        HTTP_URL: str(request.url),
+        HTTP_METHOD: str(request.method),
+        HTTP_PATH: request_to_path(request),
+    }
+    base_dimensions.update(dimensions)
+    return {"custom_dimensions": base_dimensions}

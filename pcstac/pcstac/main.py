@@ -39,8 +39,6 @@ logger = logging.getLogger(__name__)
 # Get the root path if set in the environment
 APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 logger.info(f"APP_ROOT_PATH: {APP_ROOT_PATH}")
-INCLUDE_TRANSACTIONS = os.environ.get("INCLUDE_TRANSACTIONS", "") == "yes"
-logger.info(f"INCLUDE_TRANSACTIONS: {INCLUDE_TRANSACTIONS}")
 
 app_settings = get_settings()
 
@@ -69,6 +67,8 @@ api = PCStacApi(
 
 app: FastAPI = api.app
 
+app.state.service_name = ServiceName.STAC
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins="*",
@@ -83,7 +83,7 @@ app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.STAC)
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await handle_exceptions(ServiceName.STAC, request, call_next)
+    return await handle_exceptions(request, call_next)
 
 
 @app.on_event("startup")
