@@ -2,7 +2,7 @@ from typing import Dict
 
 from rio_tiler.types import ColorMapType
 
-lulc_colormaps: Dict[str, ColorMapType] = {
+modis_colormaps: Dict[str, ColorMapType] = {
     "modis-10A1": [
         [[0,25],[43, 140, 190, 255]],
         [[25,50],[116, 169, 207, 255]],
