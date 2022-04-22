@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import Any, List, Optional, Type
 from urllib.parse import urljoin
 
@@ -14,6 +15,7 @@ from stac_fastapi.types.stac import (
 )
 
 from pccommon.config import get_render_config
+from pccommon.logging import get_custom_dimensions
 from pccommon.redis import back_pressure, cached_result, rate_limit
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
 from pcstac.contants import (
@@ -169,6 +171,7 @@ class PCClient(CoreCrudClient):
             ItemCollection containing items which match the search criteria.
         """
         _super: CoreCrudClient = super()
+        request = kwargs["request"]
 
         async def _fetch() -> ItemCollection:
             result = await _super._search_base(search_request, **kwargs)
@@ -176,7 +179,8 @@ class PCClient(CoreCrudClient):
             # Remove context extension until we fully support it.
             result.pop("context", None)
 
-            return ItemCollection(
+            ts = time.perf_counter()
+            item_collection = ItemCollection(
                 **{
                     **result,
                     "features": [
@@ -184,8 +188,20 @@ class PCClient(CoreCrudClient):
                     ],
                 }
             )
+            te = time.perf_counter()
+            logger.info(
+                "Perf: item search result post processing",
+                extra=get_custom_dimensions({"duration": f"{te - ts:0.4f}"}, request),
+            )
+            return item_collection
 
-        hashed_search = hash(search_request.json())
+        search_json = search_request.json()
+        logger.info(
+            "STAC: Item search body",
+            extra=get_custom_dimensions({"search_body": search_json}, request),
+        )
+
+        hashed_search = hash(search_json)
         cache_key = f"{CACHE_KEY_SEARCH}:{hashed_search}"
         return await cached_result(_fetch, cache_key, kwargs["request"])
 

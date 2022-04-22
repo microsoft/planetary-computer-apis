@@ -38,6 +38,8 @@ app = FastAPI(
     root_path=APP_ROOT_PATH,
 )
 
+app.state.service_name = ServiceName.TILER
+
 app.include_router(
     item.pc_tile_factory.router,
     prefix=get_settings().item_endpoint_prefix,
@@ -65,7 +67,7 @@ app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.TILER)
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await handle_exceptions(ServiceName.TILER, request, call_next)
+    return await handle_exceptions(request, call_next)
 
 
 add_exception_handlers(app, DEFAULT_STATUS_CODES)
