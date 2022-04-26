@@ -19,7 +19,7 @@ See [collection config](./docs/collection-config.md) for more on developing coll
 
 This repository hosts the code that is deployed in the Planetary Computer. It contains deployment code for hosting these services in Azure through running the published docker images and Helm charts in [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service/), which we used to stand up a development version of the services. The production deployment code is not contained in this repository.
 
-For documentation of how you can deploy your own test version of these services, refer to [docs/0x-deployment.md](./docs/0x-deployment.md).
+For documentation of how you can deploy your own test version of these services, refer to [docs/01-deployment.md](./docs/01-deployment.md).
 
 ## Development URLs
 
