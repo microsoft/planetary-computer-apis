@@ -28,7 +28,7 @@ from pcstac.config import (
     get_settings,
 )
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.search import PCSearch, PCSearchGetRequest
+from pcstac.search import PCSearch, PCSearchContent, PCSearchGetRequest
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 
@@ -54,6 +54,7 @@ api = PCStacApi(
     settings=Settings(
         db_max_conn_size=app_settings.db_max_conn_size,
         db_min_conn_size=app_settings.db_min_conn_size,
+        search_content_class=PCSearchContent,
         debug=DEBUG,
     ),
     client=PCClient.create(post_request_model=search_post_request_model),

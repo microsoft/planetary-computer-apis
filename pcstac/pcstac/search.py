@@ -1,4 +1,5 @@
-from typing import List, Optional, Union
+import logging
+from typing import Any, Dict, List, Optional, Union
 
 import attr
 from geojson_pydantic.geometries import (
@@ -10,13 +11,17 @@ from geojson_pydantic.geometries import (
     Point,
     Polygon,
 )
+from pccommon.redis import cached_result
+from pcstac.contants import CACHE_KEY_BASE_ITEM
 from pydantic import validator
 from pydantic.types import conint
 from pystac.utils import str_to_datetime
 from stac_fastapi.api.models import BaseSearchGetRequest, ItemCollectionUri
-from stac_fastapi.pgstac.types.search import PgstacSearch
+from stac_fastapi.pgstac.types.search import PgstacSearch, PgstacSearchContent
 
 DEFAULT_LIMIT = 250
+
+logger = logging.getLogger(__name__)
 
 
 class PCSearch(PgstacSearch):
@@ -66,6 +71,26 @@ class PCSearch(PgstacSearch):
                 )
 
         return v
+
+
+class PCSearchContent(PgstacSearchContent):
+    async def _get_base_item(self, collection_id: str) -> Dict[str, Any]:
+        """Return the base item for the collection and cache by collection id."""
+        # First check if the instance has a local cache of the base item, then
+        # try redis, and finally fetch from the database.
+        async def _fetch() -> Dict[str, Any]:
+            return await self.client.get_base_item(
+                collection_id,
+                request=self.request,
+            )
+
+        if collection_id not in self.base_items:
+            cache_key = f"{CACHE_KEY_BASE_ITEM}:{collection_id}"
+            self.base_items[collection_id] = await cached_result(
+                _fetch, cache_key, self.request
+            )
+
+        return self.base_items[collection_id]
 
 
 @attr.s

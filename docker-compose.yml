@@ -36,6 +36,8 @@ services:
       - PCAPIS_TABLE_VALUE_TTL=1
       - PCAPIS_REDIS_TTL=1
 
+      - USE_API_HYDRATE=true
+
       # Redis
       - PCAPIS_REDIS_HOSTNAME=redis
       - PCAPIS_REDIS_PASSWORD=devcache
