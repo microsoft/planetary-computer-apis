@@ -28,7 +28,7 @@ from pcstac.config import (
     get_settings,
 )
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.search import PCSearch, PCSearchContent, PCSearchGetRequest
+from pcstac.search import PCSearch, PCSearchGetRequest, RedisBaseItemCache
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 
@@ -39,6 +39,9 @@ logger = logging.getLogger(__name__)
 # Get the root path if set in the environment
 APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 logger.info(f"APP_ROOT_PATH: {APP_ROOT_PATH}")
+
+hydrate_mode_label = os.environ.get("USE_API_HYDRATE", "False")
+logger.info(f"API Hydrate mode enabled: {hydrate_mode_label}")
 
 app_settings = get_settings()
 
@@ -54,7 +57,7 @@ api = PCStacApi(
     settings=Settings(
         db_max_conn_size=app_settings.db_max_conn_size,
         db_min_conn_size=app_settings.db_min_conn_size,
-        search_content_class=PCSearchContent,
+        base_item_cache=RedisBaseItemCache,
         debug=DEBUG,
     ),
     client=PCClient.create(post_request_model=search_post_request_model),

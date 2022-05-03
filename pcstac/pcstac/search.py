@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
 import attr
 from geojson_pydantic.geometries import (
@@ -17,7 +17,9 @@ from pydantic import validator
 from pydantic.types import conint
 from pystac.utils import str_to_datetime
 from stac_fastapi.api.models import BaseSearchGetRequest, ItemCollectionUri
-from stac_fastapi.pgstac.types.search import PgstacSearch, PgstacSearchContent
+from stac_fastapi.pgstac.types.search import PgstacSearch
+from stac_fastapi.pgstac.types.base_item_cache import BaseItemCache
+from starlette.requests import Request
 
 DEFAULT_LIMIT = 250
 
@@ -73,24 +75,32 @@ class PCSearch(PgstacSearch):
         return v
 
 
-class PCSearchContent(PgstacSearchContent):
-    async def _get_base_item(self, collection_id: str) -> Dict[str, Any]:
-        """Return the base item for the collection and cache by collection id."""
-        # First check if the instance has a local cache of the base item, then
-        # try redis, and finally fetch from the database.
+class RedisBaseItemCache(BaseItemCache):
+    """
+    Return the base item for the collection and cache by collection id.
+    First check if the instance has a local cache of the base item, then
+    try redis, and finally fetch from the database.
+    """
+
+    def __init__(
+        self,
+        fetch_base_item: Callable[[str], Coroutine[Any, Any, Dict[str, Any]]],
+        request: Request,
+    ):
+        self._base_items: dict = {}
+        super().__init__(fetch_base_item, request)
+
+    async def get(self, collection_id: str) -> Dict[str, Any]:
         async def _fetch() -> Dict[str, Any]:
-            return await self.client.get_base_item(
-                collection_id,
-                request=self.request,
-            )
+            return await self._fetch_base_item(collection_id)
 
-        if collection_id not in self.base_items:
+        if collection_id not in self._base_items:
             cache_key = f"{CACHE_KEY_BASE_ITEM}:{collection_id}"
-            self.base_items[collection_id] = await cached_result(
-                _fetch, cache_key, self.request
+            self._base_items[collection_id] = await cached_result(
+                _fetch, cache_key, self._request
             )
 
-        return self.base_items[collection_id]
+        return self._base_items[collection_id]
 
 
 @attr.s
