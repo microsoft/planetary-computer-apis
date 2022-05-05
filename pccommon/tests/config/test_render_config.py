@@ -5,13 +5,13 @@ from pccommon.config.collections import DefaultRenderConfig
 
 multi_assets = DefaultRenderConfig(
     assets=["data1", "data2"],
-    render_params={"colormap_name": "terrain", "rescale": "-1000,4000"},
+    render_params={"colormap_name": "terrain", "rescale": ["-1000,4000"]},
     minzoom=8,
 )
 
 single_asset = DefaultRenderConfig(
     assets=["data1"],
-    render_params={"colormap_name": "terrain", "rescale": "-1000,4000"},
+    render_params={"colormap_name": "terrain", "rescale": ["-1000,4000"]},
     minzoom=8,
 )
 
