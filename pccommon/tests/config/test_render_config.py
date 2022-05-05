@@ -19,7 +19,7 @@ no_assets = DefaultRenderConfig(
     render_params={
         "expression": ("asset1," "0.45*asset2," "asset3/asset1"),
         "colormap_name": "terrain",
-        "rescale": [-1000, 4000],
+        "rescale": ["-1000,4000"],
     },
     minzoom=8,
 )
