@@ -15,12 +15,15 @@ U = TypeVar("U")
 
 
 def get_param_str(params: Dict[str, Any]) -> str:
-    def transform(v: Any) -> str:
+    parts = []
+    for k, v in params.items():
         if isinstance(v, list):
-            return ",".join([urllib.parse.quote_plus(str(x)) for x in v])
-        return urllib.parse.quote_plus(str(v))
+            for v2 in v:
+                parts.append(f"{k}={urllib.parse.quote_plus(str(v2))}")
+        else:
+            parts.append(f"{k}={urllib.parse.quote_plus(str(v))}")
 
-    return "&".join([f"{k}={transform(v)}" for k, v in params.items()])
+    return "&".join(parts)
 
 
 def map_opt(fn: Callable[[T], U], v: Optional[T]) -> Optional[U]:

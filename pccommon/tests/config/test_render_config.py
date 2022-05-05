@@ -66,3 +66,16 @@ def test_get_render_config() -> None:
         config.get_full_render_qs("naip")
         == f"collection=naip&assets=image&asset_bidx={encoded_params}"
     )
+
+
+def test_listlike_rescale() -> None:
+    config = DefaultRenderConfig(
+        render_params={"expression": "HH,HV,HH/HV",
+                       "rescale": ["0,9000", "0,1000", "0,1"]},
+            minzoom=12
+    )
+    result = config.get_full_render_qs("test")
+    assert result == (
+        "collection=test&expression=HH%2CHV%2CHH%2FHV&"
+        "rescale=0%2C9000&rescale=0%2C1000&rescale=0%2C1"
+    )
