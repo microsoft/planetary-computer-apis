@@ -1,4 +1,5 @@
 from typing import Dict
+
 from rio_tiler.types import ColorMapType
 
 lidar_colormaps: Dict[str, ColorMapType] = {
