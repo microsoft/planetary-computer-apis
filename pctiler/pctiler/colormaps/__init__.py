@@ -23,6 +23,7 @@ registered_cmaps = cmap
 custom_colormaps: Dict[str, ColorMapType] = {
     **jrc_colormaps,
     **lulc_colormaps,
+    **modis_colormaps,
     **mtbs_colormaps,
     **lidar_colormaps,
     **chloris_colormaps,
