@@ -11,6 +11,7 @@ from .chloris import chloris_colormaps
 from .jrc import jrc_colormaps
 from .lidarusgs import lidar_colormaps
 from .lulc import lulc_colormaps
+from .modis import modis_colormaps
 from .mtbs import mtbs_colormaps
 from .noaa_c_cap import noaa_c_cap_colormaps
 
