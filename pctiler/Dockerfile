@@ -29,8 +29,8 @@ ENV GDAL_HTTP_RETRY_DELAY 0.2
 # Avoid segfault in rasterio 1.2.10 when reading compound CRS.
 # https://github.com/rasterio/rasterio/issues/2415
 ENV GTIFF_REPORT_COMPD_CS=0
-ENV VSI_CACHE TRUE
-ENV VSI_CACHE_SIZE 50000000
+ENV VSI_CACHE FALSE
+ENV VSI_CACHE_SIZE 0
 ENV CPL_VSIL_CURL_CACHE_SIZE 200000000
 
 # TiTiler mosaic config
