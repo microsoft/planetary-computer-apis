@@ -80,6 +80,17 @@ To format code, use
 ./scripts/format
 ```
 
+## Changing environments
+
+By default, the `stac` and `tiler` services will run against the development containers brought up by `scripts/server`.
+It can sometimes be convenient to test against other services, e.g. a test database deployed on Azure.
+To do that, you can create a new environment file for the services based on `./pc-stac.dev.env` and `./pc-tiler.dev.env`.
+Any environment file named similarly will be .gitignore'd, so you can leave them in your local clone and avoid
+committing (e.g. `./pc-stac.testing.env`). You then need to set the `PC_STAC_ENV_FILE` and `PC_TILER_ENV_FILE` to the
+environment files you want to use before running `scripts/server`. __Note__: Be careful not to run migrations
+with a non-dev database set - avoid `scripts/setup`, or ensure the migration connection is still using the local
+dev database even if using a remote test db.
+
 ## Published images and charts
 
 This project publishes images and helm charts, which are used in the deployment of the Planetary Computer.

@@ -4,79 +4,7 @@ services:
     build:
       context: .
       dockerfile: pcstac/Dockerfile
-    environment:
-      - APP_ROOT_PATH=/stac
-      - APP_HOST=0.0.0.0
-      - APP_PORT=8081
-      - FORWARDED_ALLOW_IPS=*
-      - ENVIRONMENT=local
-      - PCAPIS_DEBUG=TRUE
-      - TILER_HREF=http://localhost:8080/data/
-      - DB_MIN_CONN_SIZE=1
-      - DB_MAX_CONN_SIZE=1
-      - WEB_CONCURRENCY=1
-
-      # Azure Storage
-      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
-      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
-      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
-      - PCAPIS_COLLECTION_CONFIG__TABLE_NAME=collectionconfig
-
-      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
-      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME=devstoreaccount1
-      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
-      - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
-
-      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
-      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
-      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
-      - PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME=ipexceptionlist
-
-      # Disable config and stac caching in development by setting TTL to 1 second
-      - PCAPIS_TABLE_VALUE_TTL=1
-      - PCAPIS_REDIS_TTL=1
-
-      # Redis
-      - PCAPIS_REDIS_HOSTNAME=redis
-      - PCAPIS_REDIS_PASSWORD=devcache
-      - PCAPIS_REDIS_PORT=6380
-      - PCAPIS_REDIS_SSL=FALSE
-
-      # Rate limit
-      - PCAPIS_RATE_LIMITS__COLLECTIONS=10
-      - PCAPIS_RATE_LIMITS__COLLECTION=10
-      - PCAPIS_RATE_LIMITS__ITEMS=10
-      - PCAPIS_RATE_LIMITS__ITEM=10
-      - PCAPIS_RATE_LIMITS__SEARCH=10
-
-      # Backpressure
-      - PCAPIS_BACK_PRESSURES__COLLECTIONS__REQ_PER_SEC=100
-      - PCAPIS_BACK_PRESSURES__COLLECTIONS__INC_MS=10
-      - PCAPIS_BACK_PRESSURES__COLLECTION__REQ_PER_SEC=100
-      - PCAPIS_BACK_PRESSURES__COLLECTION__INC_MS=10
-      - PCAPIS_BACK_PRESSURES__ITEMS__REQ_PER_SEC=100
-      - PCAPIS_BACK_PRESSURES__ITEMS__INC_MS=10
-      - PCAPIS_BACK_PRESSURES__ITEM__REQ_PER_SEC=100
-      - PCAPIS_BACK_PRESSURES__ITEM__INC_MS=10
-      - PCAPIS_BACK_PRESSURES__SEARCH__REQ_PER_SEC=100
-      - PCAPIS_BACK_PRESSURES__SEARCH__INC_MS=10
-
-      # Used by pgstac backend
-      - POSTGRES_USER=username
-      - POSTGRES_PASS=password
-      - POSTGRES_DBNAME=postgis
-      - POSTGRES_HOST_READER=database
-      - POSTGRES_HOST_WRITER=database
-      - POSTGRES_PORT=5432
-
-      # Used by pypgstac migrate
-      - PGUSER=username
-      - PGPASSWORD=password
-      - PGHOST=database
-      - PGDATABASE=postgis
-
-      # Used for logging and metrics
-      - APP_INSIGHTS_INSTRUMENTATION_KEY
+    env_file: ${PC_STAC_ENV_FILE:-./pc-stac.dev.env}
     ports:
       - "8081:8081"
     volumes:
@@ -94,63 +22,13 @@ services:
     build:
       context: .
       dockerfile: pctiler/Dockerfile
+    env_file: ${PC_TILER_ENV_FILE:-./pc-tiler.dev.env}
     ports:
       - "8082:8082"
     volumes:
       - ./pctiler:/opt/src/pctiler
       - ./pctiler/templates:/opt/src/templates
       - ./pccommon:/opt/src/pccommon
-    environment:
-      - APP_ROOT_PATH=/data
-      - APP_HOST=0.0.0.0
-      - APP_PORT=8082
-      - CPL_DEBUG=ON
-      - FORWARDED_ALLOW_IPS=*
-      - FF_VRT="yes"
-      - STAC_API_URL=http://stac:8081
-      - STAC_API_HREF=http://localhost:8080/stac/
-      - PC_SDK_SAS_URL=https://planetarycomputer-staging.microsoft.com/api/sas/v1/token
-
-      # titiler.pgstac
-      - POSTGRES_USER=username
-      - POSTGRES_PASS=password
-      - POSTGRES_DBNAME=postgis
-      - POSTGRES_HOST=database
-      - POSTGRES_HOST_READER=database
-      - POSTGRES_HOST_WRITER=database
-      - POSTGRES_PORT=5432
-      - DB_MIN_CONN_SIZE=1
-      - DB_MAX_CONN_SIZE=1
-      - WEB_CONCURRENCY=1
-
-      # Azure Storage
-      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
-      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
-      - PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
-      - PCAPIS_COLLECTION_CONFIG__TABLE_NAME=collectionconfig
-
-      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
-      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME=devstoreaccount1
-      - PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
-      - PCAPIS_CONTAINER_CONFIG__TABLE_NAME=containerconfig
-
-      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_URL=http://azurite:10002/devstoreaccount1
-      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_NAME=devstoreaccount1
-      - PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
-      - PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME=ipexceptionlist
-
-      # Disable config and stac caching in development by setting TTL to 1 second
-      - PCAPIS_TABLE_VALUE_TTL=1
-      - PCAPIS_REDIS_TTL=1
-
-      # Redis
-      - PCAPIS_REDIS_HOSTNAME=redis
-      - PCAPIS_REDIS_PASSWORD=devcache
-      - PCAPIS_REDIS_PORT=6380
-      - PCAPIS_REDIS_SSL=FALSE
-
-      # Used for logging and metrics
-      - APP_INSIGHTS_INSTRUMENTATION_KEY
     depends_on:
       - database
     command: [ "uvicorn", "pctiler.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers" ]
