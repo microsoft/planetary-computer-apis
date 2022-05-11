@@ -1,10 +1,9 @@
-from typing import Any, Dict, List, Optional, Tuple, Type
 import logging
 import time
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 import attr
 import morecantile
-from pccommon.constants import DEFAULT_MAX_ITEMS_PER_TILE
 import planetary_computer as pc
 from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
@@ -19,6 +18,7 @@ from titiler.pgstac.settings import CacheSettings
 
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
+from pccommon.constants import DEFAULT_MAX_ITEMS_PER_TILE
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
 logger = logging.getLogger(__name__)
