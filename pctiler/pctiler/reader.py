@@ -108,7 +108,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
 
         te = time.perf_counter()
         logger.info(
-            f"Perf: Mosaic get assets for tile.",
+            "Perf: Mosaic get assets for tile.",
             extra={
                 "custom_dimensions": {
                     "duration": f"{te - ts:0.4f}",
@@ -178,7 +178,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
         te = time.perf_counter()
 
         logger.info(
-            f"Perf: Mosaic read tile.",
+            "Perf: Mosaic read tile.",
             extra={
                 "custom_dimensions": {
                     "duration": f"{te - ts:0.4f}",
