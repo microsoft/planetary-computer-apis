@@ -24,7 +24,7 @@ exporter = (
             f"InstrumentationKey={_config.app_insights_instrumentation_key}"
         )
     )
-    if _config.app_insights_instrumentation_key is not None
+    if _config.app_insights_instrumentation_key
     else None
 )
 
