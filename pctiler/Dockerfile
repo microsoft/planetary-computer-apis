@@ -33,7 +33,7 @@ ENV VSI_CACHE FALSE
 ENV VSI_CACHE_SIZE 0
 ENV CPL_VSIL_CURL_CACHE_SIZE 200000000
 
-# Experimental
+# Experimental flag to deallocate process memory quickly
 ENV MALLOC_TRIM_THRESHOLD_=0
 
 # TiTiler mosaic config
