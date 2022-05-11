@@ -29,6 +29,7 @@ class DefaultRenderConfig(BaseModel):
     mosaic_preview_zoom: Optional[int] = None
     mosaic_preview_coords: Optional[List[float]] = None
     requires_token: bool = False
+    max_items_per_tile: Optional[int] = None
     hidden: bool = False  # Hide from API
 
     def get_full_render_qs(self, collection: str, item: Optional[str] = None) -> str:

@@ -68,6 +68,17 @@ def test_get_render_config() -> None:
     )
 
 
+def test_render_config_parse_max_items() -> None:
+    config = {
+        "render_params": [],
+        "minzoom": 8,
+        "max_items_per_tile": 10,
+    }
+
+    parsed = DefaultRenderConfig.parse_obj(config)
+    assert parsed.max_items_per_tile == config["max_items_per_tile"]
+
+
 def test_listlike_rescale() -> None:
     config = DefaultRenderConfig(
         render_params={

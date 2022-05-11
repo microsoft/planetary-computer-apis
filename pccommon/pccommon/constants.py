@@ -12,6 +12,8 @@ BACKPRESSURE_KEY_PREFIX = "backp:"
 
 IP_EXCEPTION_PARTITION_KEY = "ipexception"
 
+DEFAULT_MAX_ITEMS_PER_TILE = 5
+
 # Headers containing information about the requester's
 # IP address. Checked in the order listed here.
 X_AZURE_CLIENTIP = "X-Azure-ClientIP"
