@@ -65,6 +65,7 @@ tiler:
     podAnnotations:
       "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
+  default_max_items_per_tile: 5
   appRootPath: "/data"
   port: "80"
 

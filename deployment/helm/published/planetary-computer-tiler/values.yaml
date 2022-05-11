@@ -36,6 +36,7 @@ tiler:
   pc_sdk_sas_url: ""
   pc_sdk_subscription_key: ""
 
+  default_max_items_per_tile: 5
   host: "0.0.0.0"
   port: "80"
   appRootPath: ""

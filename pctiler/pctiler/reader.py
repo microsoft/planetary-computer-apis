@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type
 
 import attr
 import morecantile
+from pctiler.config import get_settings
 import planetary_computer as pc
 from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
@@ -18,7 +19,6 @@ from titiler.pgstac.settings import CacheSettings
 
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
-from pccommon.constants import DEFAULT_MAX_ITEMS_PER_TILE
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
 logger = logging.getLogger(__name__)
@@ -81,6 +81,8 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
     def assets_for_tile(
         self, x: int, y: int, z: int, collection: Optional[str] = None, **kwargs: Any
     ) -> List[Dict]:
+        settings = get_settings()
+
         # Require a collection
         if not collection:
             raise HTTPException(
@@ -100,7 +102,9 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
             return []
 
         # Override items_limit via render config for collection
-        max_items = render_config.max_items_per_tile or DEFAULT_MAX_ITEMS_PER_TILE
+        max_items = (
+            render_config.max_items_per_tile or settings.default_max_items_per_tile
+        )
         asset_kwargs = {**kwargs, "items_limit": max_items}
 
         bbox = self.tms.bounds(morecantile.Tile(x, y, z))
