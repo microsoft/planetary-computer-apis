@@ -1,7 +1,10 @@
+import logging
+import time
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 import attr
 import morecantile
+from pctiler.config import get_settings
 import planetary_computer as pc
 from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
@@ -17,6 +20,8 @@ from titiler.pgstac.settings import CacheSettings
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
+
+logger = logging.getLogger(__name__)
 
 cache_config = CacheSettings()
 
@@ -76,6 +81,8 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
     def assets_for_tile(
         self, x: int, y: int, z: int, collection: Optional[str] = None, **kwargs: Any
     ) -> List[Dict]:
+        settings = get_settings()
+
         # Require a collection
         if not collection:
             raise HTTPException(
@@ -83,13 +90,39 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
                 detail="Tile request must contain a collection parameter.",
             )
 
-        # Check that the zoom isn't lower than minZoom
+        ts = time.perf_counter()
         render_config = get_render_config(collection)
-        if render_config and render_config.minzoom and render_config.minzoom > z:
+
+        # Don't render if this collection is unconfigured
+        if not render_config:
             return []
 
+        # Check that the zoom isn't lower than minZoom
+        if render_config.minzoom and render_config.minzoom > z:
+            return []
+
+        # Override items_limit via render config for collection
+        max_items = (
+            render_config.max_items_per_tile or settings.default_max_items_per_tile
+        )
+        asset_kwargs = {**kwargs, "items_limit": max_items}
+
         bbox = self.tms.bounds(morecantile.Tile(x, y, z))
-        return self.get_assets(Polygon.from_bounds(*bbox), **kwargs)
+        assets = self.get_assets(Polygon.from_bounds(*bbox), **asset_kwargs)
+
+        te = time.perf_counter()
+        logger.info(
+            "Perf: Mosaic get assets for tile.",
+            extra={
+                "custom_dimensions": {
+                    "duration": f"{te - ts:0.4f}",
+                    "collection": collection,
+                    "zxy": f"{z}/{x}/{y}",
+                    "count": len(assets),
+                },
+            },
+        )
+        return assets
 
     # override from PGSTACBackend to pass through collection
     def tile(
@@ -124,6 +157,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
                 f"No assets found for tile {tile_z}-{tile_x}-{tile_y}"
             )
 
+        ts = time.perf_counter()
         if reverse:
             mosaic_assets = list(reversed(mosaic_assets))
 
@@ -135,7 +169,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
             ) as src_dst:
                 return src_dst.tile(x, y, z, **kwargs)
 
-        return mosaic_reader(
+        tile = mosaic_reader(
             mosaic_assets,
             _reader,
             tile_x,
@@ -144,3 +178,19 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
             allowed_exceptions=(TileOutsideBounds, MissingAssets, InvalidAssetName),
             **kwargs,
         )
+
+        te = time.perf_counter()
+
+        logger.info(
+            "Perf: Mosaic read tile.",
+            extra={
+                "custom_dimensions": {
+                    "duration": f"{te - ts:0.4f}",
+                    "collection": collection,
+                    "zxy": f"{tile_z}/{tile_x}/{tile_y}",
+                    "count": len(mosaic_assets),
+                }
+            },
+        )
+
+        return tile

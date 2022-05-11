@@ -65,6 +65,7 @@ tiler:
     podAnnotations:
       "pc/gitsha": "{{ env.GIT_COMMIT }}"
 
+  default_max_items_per_tile: 5
   appRootPath: "/data"
   port: "80"
 
@@ -72,6 +73,7 @@ tiler:
   stac_api_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/stac/
   # PCT sas needs to be accessed through api management
   pc_sdk_sas_url: https://pct-sas-westeurope-staging-apim.azure-api.net/sas/token
+  pc_sdk_subscription_key: "{{ tf.pc_sdk_subscription_key }}"
 
 storage:
   account_name: "{{ tf.storage_account_name }}"
