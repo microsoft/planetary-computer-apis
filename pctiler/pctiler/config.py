@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     debug: bool = os.getenv("TILER_DEBUG", "False").lower() == "true"
     api_version: str = "1.0"
     default_max_items_per_tile: int = Field(
-        env=DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR, default=5
+        env=DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR, default=10
     )
 
     feature_flags: FeatureFlags = FeatureFlags()
