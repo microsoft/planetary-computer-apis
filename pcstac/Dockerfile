@@ -14,7 +14,4 @@ RUN pip install -e ./pccommon -e ./pcstac[server]
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=81
 
-#TEMP
-ENV USE_API_HYDRATE=true
-
 CMD uvicorn pcstac.main:app --host ${APP_HOST} --port ${APP_PORT} --log-level info
