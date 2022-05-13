@@ -69,6 +69,10 @@ output "tiler_replica_count" {
   value = var.tiler_replica_count
 }
 
+output "pc_sdk_subscription_key" {
+  value = data.azurerm_key_vault_secret.pc_sdk_subscription_key.value
+}
+
 ## Application Insights
 output "instrumentation_key" {
   value = azurerm_application_insights.pc_application_insights.instrumentation_key
