@@ -168,7 +168,7 @@ class CustomCOGReader(COGReader):
     """
 
     # dataset is not a input option.
-    dataset: WarpedVRT = attr.ib(init=False)
+    dataset: Union[DatasetReader, DatasetWriter, WarpedVRT] = attr.ib(init=False)
 
     def __attrs_post_init__(self):
         """Define _kwargs, open dataset and get info."""
