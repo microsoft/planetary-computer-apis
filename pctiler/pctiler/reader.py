@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional, Tuple, Type
 
 import attr
 import morecantile
-from pctiler.config import get_settings
 import planetary_computer as pc
 from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
@@ -19,6 +18,7 @@ from titiler.pgstac.settings import CacheSettings
 
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
+from pctiler.config import get_settings
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
 logger = logging.getLogger(__name__)
@@ -46,6 +46,8 @@ class ItemSTACReader(PgSTACReader):
 @attr.s
 class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
     """Custom version of titiler.pgstac.mosaic.CustomSTACReader)."""
+
+    reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
 
     def _get_asset_url(self, asset: str) -> str:
         """Validate asset names and return asset's url.

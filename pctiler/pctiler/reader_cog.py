@@ -16,8 +16,10 @@ import math
 import warnings
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
+import attr
 import numpy
-from rasterio import windows
+import rasterio
+from rasterio import transform, windows
 from rasterio.enums import Resampling
 from rasterio.io import DatasetReader, DatasetWriter
 from rasterio.vrt import WarpedVRT
@@ -154,12 +156,32 @@ def goes_thumbnail_preview(
 
 
 class CustomCOGReader(COGReader):
-    """Custom COG reader to work around an issue with GOES projection.
+    """Custom COG reader.
 
-    A hack to get GOES thumbnails to appear, which fail with a "tolerance error"
+    A couple of workarounds:
+
+    GOES projection: A hack to get GOES thumbnails to appear, which fail with a "tolerance error"
     when using the default logic. For the GOES case this doesn't use a WarpedVRT,
     which avoids that error.
+
+    Sentinel 1 GRD: These use GCPs, which are not supported by default in the COGReader.
     """
+
+    # dataset is not a input option.
+    dataset: WarpedVRT = attr.ib(init=False)
+
+    def __attrs_post_init__(self):
+        """Define _kwargs, open dataset and get info."""
+        if "sentinel1euwest.blob.core.windows.net" in self.input:
+            self.src_dataset = self._ctx_stack.enter_context(rasterio.open(self.input))
+            self.dataset = self._ctx_stack.enter_context(
+                WarpedVRT(
+                    self.src_dataset,
+                    src_crs=self.src_dataset.gcps[1],
+                    src_transform=transform.from_gcps(self.src_dataset.gcps[0]),
+                )
+            )
+        super().__attrs_post_init__()
 
     def preview_goes(
         self,
