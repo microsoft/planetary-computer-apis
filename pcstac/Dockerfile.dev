@@ -1,5 +1,3 @@
 FROM pc-apis-stac
 
-COPY requirements-dev.txt /opt/src/requirements-dev.txt
-
-RUN pip install -r /opt/src/requirements-dev.txt
+RUN pip install -e ./pccommon -e ./pcstac[dev,test]

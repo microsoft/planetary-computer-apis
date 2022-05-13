@@ -9,7 +9,8 @@ import pytest
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from httpx import AsyncClient
-from pypgstac import pypgstac
+from pypgstac.db import PgstacDB
+from pypgstac.migrate import Migrate
 from stac_fastapi.api.models import create_get_request_model, create_post_request_model
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
@@ -45,7 +46,11 @@ async def pqe_pg():
     val = await conn.fetchval("SELECT true;")
     print(val)
     await conn.close()
-    version = await pypgstac.run_migration(dsn=settings.reader_connection_string)
+
+    db = PgstacDB(dsn=settings.reader_connection_string)
+    migrator = Migrate(db)
+    version = migrator.run_migration()
+    db.close()
     print(f"PGStac Migrated to {version}")
 
     yield settings.reader_connection_string
