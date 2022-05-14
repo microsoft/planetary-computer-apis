@@ -53,6 +53,8 @@ spec:
               value: "{{ .Values.stac.server.minDbConnections }}"
             - name: DB_MAX_CONN_SIZE
               value: "{{ .Values.stac.server.maxDbConnections }}"
+            - name: USE_API_HYDRATE
+              value: "{{ .Values.stac.server.useApiHydrate }}"
             - name: TILER_HREF
               value: "{{ .Values.stac.tiler_href }}"
             - name: POSTGRES_USER

@@ -4,30 +4,28 @@ from setuptools import find_packages, setup
 
 # Runtime requirements.
 inst_reqs = [
-    # "stac-fastapi.api==2.3.0",
-    # "stac-fastapi.extensions==2.3.0",
-    # "stac-fastapi.pgstac==2.3.0",
-    # "stac-fastapi.types==2.3.0",
-    "stac-fastapi.api @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.api&subdirectory=stac_fastapi/api",
-    "stac-fastapi.extensions @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.extensions&subdirectory=stac_fastapi/extensions",
-    "stac-fastapi.pgstac @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.pgstac&subdirectory=stac_fastapi/pgstac",
-    "stac-fastapi.types @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.types&subdirectory=stac_fastapi/types",
-    "pystac==1.*",
+    "stac-fastapi.api @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.api&subdirectory=stac_fastapi/api",
+    "stac-fastapi.extensions @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.extensions&subdirectory=stac_fastapi/extensions",
+    "stac-fastapi.pgstac @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.pgstac&subdirectory=stac_fastapi/pgstac",
+    "stac-fastapi.types @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.types&subdirectory=stac_fastapi/types",
     "pccommon",
-    # TODO: remove, pypgstac is not really needed to run stac-fastapi application
-    "pypgstac==0.4.5",
+    # Required due to some imports related to pypgstac CLI usage in startup script
+    "pypgstac[psycopg]==0.6.2",
+    "pystac==1.*",
 ]
 
 extra_reqs = {
     "test": [
         "pytest",
         "pytest-asyncio",
-        # for now pypgstac is in requirement.txt
-        # "pypgstac==0.4.2",
     ],
     "dev": [
-        "pytest",
-        "pytest-asyncio",
+        "black==22.3.0",
+        "flake8==3.8.4",
+        "httpx==0.19.0",
+        "isort==5.9.2",
+        "mypy==0.800",
+        "openapi-spec-validator==0.3.0",
     ],
     # server deps
     "server": [
