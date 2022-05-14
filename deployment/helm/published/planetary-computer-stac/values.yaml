@@ -12,7 +12,7 @@ stac:
     minDbConnections: "1"
     maxDbConnections: "1"
     webConcurrency: "1"
-    useApiHydration: true
+    useApiHydrate: true
 
   service:
     type: ClusterIP
