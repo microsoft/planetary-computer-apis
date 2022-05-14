@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed bug in legend/colormap endpoint [#53](https://github.com/microsoft/planetary-computer-apis/pull/53)
+- Fixed tiler for Ground Control Point datasets, implemented for Sentinel 1 GRD [#90](https://github.com/microsoft/planetary-computer-apis/pull/90)
 
 
 ## [2022.1.3]

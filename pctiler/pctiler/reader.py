@@ -47,6 +47,8 @@ class ItemSTACReader(PgSTACReader):
 class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
     """Custom version of titiler.pgstac.mosaic.CustomSTACReader)."""
 
+    reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
+
     def _get_asset_url(self, asset: str) -> str:
         """Validate asset names and return asset's url.
 
