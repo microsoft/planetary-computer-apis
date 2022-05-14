@@ -4,24 +4,14 @@ from setuptools import find_packages, setup
 
 # Runtime requirements.
 inst_reqs = [
-    # "stac-fastapi.api==2.3.0",
-    # "stac-fastapi.extensions==2.3.0",
-    # "stac-fastapi.pgstac==2.3.0",
-    # "stac-fastapi.types==2.3.0",
-    # "stac-fastapi.api @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.api&subdirectory=stac_fastapi/api",
-    # "stac-fastapi.extensions @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.extensions&subdirectory=stac_fastapi/extensions",
-    # "stac-fastapi.pgstac @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.pgstac&subdirectory=stac_fastapi/pgstac",
-    # "stac-fastapi.types @ git+https://github.com/stac-utils/stac-fastapi/@81015a153c1d9f36d8e12f17a1bf67370396f472#egg=stac-fastapi.types&subdirectory=stac_fastapi/types",
-    "stac-fastapi.api @ git+https://github.com/mmcfarland/stac-fastapi/@f6da7b13eb31f8ea466ddee07e2bbfed69b1ec26#egg=stac-fastapi.api&subdirectory=stac_fastapi/api",
-    "stac-fastapi.extensions @ git+https://github.com/mmcfarland/stac-fastapi/@f6da7b13eb31f8ea466ddee07e2bbfed69b1ec26#egg=stac-fastapi.extensions&subdirectory=stac_fastapi/extensions",
-    "stac-fastapi.pgstac @ git+https://github.com/mmcfarland/stac-fastapi/@f6da7b13eb31f8ea466ddee07e2bbfed69b1ec26#egg=stac-fastapi.pgstac&subdirectory=stac_fastapi/pgstac",
-    "stac-fastapi.types @ git+https://github.com/mmcfarland/stac-fastapi/@f6da7b13eb31f8ea466ddee07e2bbfed69b1ec26#egg=stac-fastapi.types&subdirectory=stac_fastapi/types",
-    "pystac==1.*",
+    "stac-fastapi.api @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.api&subdirectory=stac_fastapi/api",
+    "stac-fastapi.extensions @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.extensions&subdirectory=stac_fastapi/extensions",
+    "stac-fastapi.pgstac @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.pgstac&subdirectory=stac_fastapi/pgstac",
+    "stac-fastapi.types @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.types&subdirectory=stac_fastapi/types",
     "pccommon",
-    # "pypgstac[psycopg]==0.6.1",
-    "pypgstac @ git+https://github.com/stac-utils/pgstac@18b738be8ab4eee1b355d1df9a023ef9e2a0e2bc#egg=pypgstac&subdirectory=pypgstac",
-    "psycopg[binary]==3.0.*",
-    "psycopg-pool==3.1.*",
+    # Required due to some imports related to pypgstac CLI usage in startup script
+    "pypgstac[psycopg]==0.6.2",
+    "pystac==1.*",
 ]
 
 extra_reqs = {
