@@ -14,8 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move render config, queryables and mosaic info into Azure Storage Tables [#48](https://github.com/microsoft/planetary-computer-apis/pull/48)
 - Upgrades fastapi, stac-fastapi, and pgstac to 0.4.5 [#61](https://github.com/microsoft/planetary-computer-apis/pull/61)
 - pcstac moves to Python 3.9, uvicorn, and min/max database connections limited to 1 [#73](https://github.com/microsoft/planetary-computer-apis/pull/73)
-- Upgrades fastapi to 0.75.2 and fixes SwaggerUI vulnerability [82](https://github.com/microsoft/planetary-computer-apis/pull/82)
+- Upgrades fastapi to 0.75.2 and fixes SwaggerUI vulnerability [#82](https://github.com/microsoft/planetary-computer-apis/pull/82)
 - Render config generates correct querystrings when `render_options` contains list-like values [#85](https://github.com/microsoft/planetary-computer-apis/pull/85)
+- Upgrade to pgstac 0.6.2 and corresponding stac-fastapi version. Supports more effecient hydration of STAC items and improved search performance. [#81](https://github.com/microsoft/planetary-computer-apis/pull/81)
 
 ### Added
 
