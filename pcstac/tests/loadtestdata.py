@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import orjson
-from pypgstac.load import PgstacDB, Loader, Methods
+from pypgstac.load import Loader, Methods, PgstacDB
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data-files")
 collection = os.path.join(DATA_DIR, "naip/collection.json")
