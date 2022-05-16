@@ -10,8 +10,8 @@ inst_reqs = [
     "planetary-computer==0.4.*",
 
     "rasterio==1.2.*",
-    "titiler.core==0.6.0a2",
-    "titiler.mosaic==0.6.0a2",
+    "titiler.core==0.6.0",
+    "titiler.mosaic==0.6.0",
 
     # titiler-pgstac
     "psycopg[binary,pool]",
