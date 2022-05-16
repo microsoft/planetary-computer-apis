@@ -9,7 +9,7 @@ from pccommon.config import get_collection_config
 from pccommon.config.collections import MosaicInfo
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
-from pctiler.reader import PGSTACBackend
+from pctiler.reader import PGSTACBackend, ReaderParams
 
 
 @dataclass
@@ -22,6 +22,7 @@ pgstac_mosaic_factory = MosaicTilerFactory(
     reader=PGSTACBackend,
     colormap_dependency=PCColorMapParams,
     layer_dependency=AssetsBidxExprParams,
+    reader_dependency=ReaderParams,
     router_prefix=get_settings().mosaic_endpoint_prefix,
 )
 
