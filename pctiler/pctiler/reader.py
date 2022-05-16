@@ -9,7 +9,6 @@ import planetary_computer as pc
 from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
 from geojson_pydantic import Polygon
-from psycopg_pool import ConnectionPool
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
 from rio_tiler.io.base import BaseReader
 from rio_tiler.models import ImageData
@@ -47,7 +46,8 @@ class ItemSTACReader(PgSTACReader):
     # TODO: remove CustomCOGReader once moved to rasterio 1.3
     reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
 
-    # We make request an optional attribute to avoid re-writing the whole list of attribute
+    # We make request an optional attribute to avoid re-writing
+    # the whole list of attribute
     request: Optional[Request] = attr.ib(default=None)
 
     def _get_asset_url(self, asset: str) -> str:
@@ -67,7 +67,8 @@ class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
 
     reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
 
-    # We make request an optional attribute to avoid re-writing the whole list of attribute
+    # We make request an optional attribute to avoid re-writing
+    # the whole list of attribute
     request: Optional[Request] = attr.ib(default=None)
 
     def _get_asset_url(self, asset: str) -> str:
