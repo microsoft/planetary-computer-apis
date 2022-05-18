@@ -36,6 +36,7 @@ extra_reqs = {
     ],
     # server deps
     "server": [
+        "uvicorn[standard]>=0.12.0,<0.16.0",
         "hypercorn>=0.13,<0.14",
     ],
 }
