@@ -6,13 +6,14 @@ from rio_tiler.colormap import cmap
 from rio_tiler.types import ColorMapType
 from titiler.core.dependencies import ColorMapParams
 
+from .alos_palsar_mosaic import alos_palsar_mosaic_colormaps
 from .chloris import chloris_colormaps
 from .jrc import jrc_colormaps
 from .lidarusgs import lidar_colormaps
 from .lulc import lulc_colormaps
+from .modis import modis_colormaps
 from .mtbs import mtbs_colormaps
 from .noaa_c_cap import noaa_c_cap_colormaps
-from .alos_palsar_mosaic import alos_palsar_mosaic_colormaps
 
 ################################################################################
 # Custom ColorMap Query Parameter Support
@@ -23,6 +24,7 @@ registered_cmaps = cmap
 custom_colormaps: Dict[str, ColorMapType] = {
     **jrc_colormaps,
     **lulc_colormaps,
+    **modis_colormaps,
     **mtbs_colormaps,
     **lidar_colormaps,
     **chloris_colormaps,

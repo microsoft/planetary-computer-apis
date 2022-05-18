@@ -47,12 +47,8 @@ spec:
               value: "{{ .Values.tiler.port }}"
             - name: FORWARDED_ALLOW_IPS
               value: "*"
-            - name: "MAX_WORKERS"
-              value: "{{ .Values.tiler.server.maxWorkers }}"
             - name: "WEB_CONCURRENCY"
               value: "{{ .Values.tiler.server.webConcurrency }}"
-            - name: "WORKERS_PER_CORE"
-              value: "{{ .Values.tiler.server.workersPerCore }}"
             - name: ENVIRONMENT
               value: "{{ .Values.environment }}"
             - name: POSTGRES_USER
@@ -79,6 +75,10 @@ spec:
               value: "{{ .Values.tiler.stac_api_href}}"
             - name: PC_SDK_SAS_URL
               value: "{{ .Values.tiler.pc_sdk_sas_url}}"
+            - name: PC_SDK_SUBSCRIPTION_KEY
+              value: "{{ .Values.tiler.pc_sdk_subscription_key}}"
+            - name: DEFAULT_MAX_ITEMS_PER_TILE
+              value: "{{ .Values.tiler.default_max_items_per_tile}}"
             - name: "PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME"
               value: "{{ .Values.storage.account_name }}"
             - name: "PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY"

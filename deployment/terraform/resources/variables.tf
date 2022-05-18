@@ -78,6 +78,12 @@ variable "pg_password_secret_name" {
   default = "pct-db-password"
 }
 
+variable "pc_sdk_subscription_key_secret_name" {
+  type = string
+  description = "The secret name in the KeyVault that holds the PC subscription key used by the tiler"
+  default = "pct-tiler-sdk-subscription-key"
+}
+
 # -----------------
 # Local variables
 

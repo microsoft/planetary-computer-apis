@@ -13,9 +13,18 @@ from ..colormaps import custom_colormaps, registered_cmaps
 legend_router = APIRouter()
 
 
-@legend_router.get("/classmap/{classmap_name}", response_class=JSONResponse)
-async def get_classmap_legend(classmap_name: str) -> JSONResponse:
-    """Generate values and color swatches mapping for a given classmap."""
+@legend_router.get("/interval/{classmap_name}", response_class=JSONResponse)
+async def get_interval_legend(
+    classmap_name: str,
+    trim_start: int = 0,
+    trim_end: int = 0,
+) -> JSONResponse:
+    """Generate values and color swatches mapping for a given interval classmap.
+
+    Args:
+        trim_start (int, optional): Number of items to trim from the start of the cmap
+        trim_end (int, optional): Number of items to trim from the end of the cmap
+    """
     classmap = custom_colormaps.get(classmap_name)
 
     if classmap is None:
@@ -23,7 +32,45 @@ async def get_classmap_legend(classmap_name: str) -> JSONResponse:
             status_code=404, detail=f"Classmap {classmap_name} not found"
         )
 
-    return JSONResponse(content=classmap)
+    if type(classmap) is not list:
+        raise HTTPException(
+            status_code=400, detail=f"Classmap {classmap_name} is not an interval type"
+        )
+
+    trimmed_map = classmap[trim_start : len(classmap) - trim_end]  # type: ignore
+
+    return JSONResponse(content=trimmed_map)
+
+
+@legend_router.get("/classmap/{classmap_name}", response_class=JSONResponse)
+async def get_classmap_legend(
+    classmap_name: str,
+    trim_start: int = 0,
+    trim_end: int = 0,
+) -> JSONResponse:
+    """Generate values and color swatches mapping for a given classmap.
+
+    Args:
+        trim_start (int, optional): Number of items to trim from the start of the cmap
+        trim_end (int, optional): Number of items to trim from the end of the cmap
+    """
+    classmap = custom_colormaps.get(classmap_name)
+
+    if classmap is None:
+        raise HTTPException(
+            status_code=404, detail=f"Classmap {classmap_name} not found"
+        )
+
+    if type(classmap) is not dict:
+        raise HTTPException(
+            status_code=400, detail=f"Classmap {classmap_name} is not a classmap type"
+        )
+
+    keys = list(classmap.keys())  # type: ignore
+    trimmed_keys = keys[trim_start : len(keys) - trim_end]
+    trimmed_map = {k: classmap[k] for k in trimmed_keys}
+
+    return JSONResponse(content=trimmed_map)
 
 
 @legend_router.get("/colormap/{cmap_name}", response_class=Response)

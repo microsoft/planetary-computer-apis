@@ -1,3 +1,6 @@
+pc-stac.*.env
+pc-tiler.*.env
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -109,4 +112,8 @@ venv.bak/
 override.tf
 
 .DS_Store
+
+# Generated queryable schemas
+queryable_schemas/
+
 .metals/

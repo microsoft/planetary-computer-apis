@@ -28,7 +28,7 @@ from pcstac.config import (
     get_settings,
 )
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.search import PCSearch, PCSearchGetRequest
+from pcstac.search import PCSearch, PCSearchGetRequest, RedisBaseItemCache
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 
@@ -39,13 +39,11 @@ logger = logging.getLogger(__name__)
 # Get the root path if set in the environment
 APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 logger.info(f"APP_ROOT_PATH: {APP_ROOT_PATH}")
-INCLUDE_TRANSACTIONS = os.environ.get("INCLUDE_TRANSACTIONS", "") == "yes"
-logger.info(f"INCLUDE_TRANSACTIONS: {INCLUDE_TRANSACTIONS}")
 
-# Allow setting of SQLAlchemy connection pools
-POOL_SIZE = int(os.environ.get("POOL_SIZE", "1"))
-logger.info(f"POOL_SIZE: {POOL_SIZE}")
+hydrate_mode_label = os.environ.get("USE_API_HYDRATE", "False")
+logger.info(f"API Hydrate mode enabled: {hydrate_mode_label}")
 
+app_settings = get_settings()
 
 search_get_request_model = create_get_request_model(
     EXTENSIONS, base_model=PCSearchGetRequest
@@ -56,7 +54,12 @@ api = PCStacApi(
     title=API_TITLE,
     description=API_DESCRIPTION,
     api_version=API_VERSION,
-    settings=Settings(debug=DEBUG),
+    settings=Settings(
+        db_max_conn_size=app_settings.db_max_conn_size,
+        db_min_conn_size=app_settings.db_min_conn_size,
+        base_item_cache=RedisBaseItemCache,
+        debug=DEBUG,
+    ),
     client=PCClient.create(post_request_model=search_post_request_model),
     extensions=EXTENSIONS,
     app=FastAPI(root_path=APP_ROOT_PATH, default_response_class=ORJSONResponse),
@@ -67,6 +70,8 @@ api = PCStacApi(
 )
 
 app: FastAPI = api.app
+
+app.state.service_name = ServiceName.STAC
 
 app.add_middleware(
     CORSMiddleware,
@@ -82,7 +87,7 @@ app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.STAC)
 async def _handle_exceptions(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    return await handle_exceptions(ServiceName.STAC, request, call_next)
+    return await handle_exceptions(request, call_next)
 
 
 @app.on_event("startup")
@@ -127,7 +132,7 @@ def custom_openapi() -> Dict[str, Any]:
     else:
         schema = get_openapi(
             title="Planetary Computer STAC API",
-            version=get_settings().api_version,
+            version=app_settings.api_version,
             routes=app.routes,
         )
         app.openapi_schema = fixup_schema(app.root_path, schema)

@@ -13,16 +13,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update titiler-pgstac version to `0.1.0.a4` in `pctiler` [#46](https://github.com/microsoft/planetary-computer-apis/pull/46)
 - Move render config, queryables and mosaic info into Azure Storage Tables [#48](https://github.com/microsoft/planetary-computer-apis/pull/48)
 - Upgrades fastapi, stac-fastapi, and pgstac to 0.4.5 [#61](https://github.com/microsoft/planetary-computer-apis/pull/61)
+- pcstac moves to Python 3.9, uvicorn, and min/max database connections limited to 1 [#73](https://github.com/microsoft/planetary-computer-apis/pull/73)
+- Upgrades fastapi to 0.75.2 and fixes SwaggerUI vulnerability [#82](https://github.com/microsoft/planetary-computer-apis/pull/82)
+- Render config generates correct querystrings when `render_options` contains list-like values [#85](https://github.com/microsoft/planetary-computer-apis/pull/85)
+- Upgrade to pgstac 0.6.2 and corresponding stac-fastapi version. Supports more effecient hydration of STAC items and improved search performance. [#81](https://github.com/microsoft/planetary-computer-apis/pull/81)
 
 ### Added
 
 - Added support for /queryables endpoint [#44](https://github.com/microsoft/planetary-computer-apis/pull/44)
 - Added `/mosaic/info` endpoint [#48](https://github.com/microsoft/planetary-computer-apis/pull/48)
 - Added caching and rate limiting to STAC API [#52](https://github.com/microsoft/planetary-computer-apis/pull/52)
+- Added endpoint for interval legend classmap [#83](https://github.com/microsoft/planetary-computer-apis/pull/83)
 
 ### Fixed
 
 - Fixed bug in legend/colormap endpoint [#53](https://github.com/microsoft/planetary-computer-apis/pull/53)
+- Fixed tiler for Ground Control Point datasets, implemented for Sentinel 1 GRD [#90](https://github.com/microsoft/planetary-computer-apis/pull/90)
 
 
 ## [2022.1.3]

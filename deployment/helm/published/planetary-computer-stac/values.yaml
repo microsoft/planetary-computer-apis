@@ -9,8 +9,10 @@ stac:
     tag: "latest"
 
   server:
-    maxWorkers: "1"
-    poolSize: "1"
+    minDbConnections: "1"
+    maxDbConnections: "1"
+    webConcurrency: "1"
+    useApiHydrate: true
 
   service:
     type: ClusterIP

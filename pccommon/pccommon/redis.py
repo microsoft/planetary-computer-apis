@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import logging
 import threading
+import time
 from typing import Any, Callable, Coroutine, Optional, TypeVar
 
 import orjson
@@ -16,6 +17,7 @@ from pccommon.constants import (
     HTTP_429_TOO_MANY_REQUESTS,
     RATE_LIMIT_KEY_PREFIX,
 )
+from pccommon.logging import get_custom_dimensions
 from pccommon.utils import get_request_ip
 
 logger = logging.getLogger(__name__)
@@ -112,17 +114,29 @@ async def cached_result(
         if r:
             cached: str = await r.get(cache_key)
             if cached:
+                logger.info(
+                    "Cache result hit",
+                    extra=get_custom_dimensions({"cache_key": cache_key}, request),
+                )
                 return orjson.loads(cached)
     except Exception as e:
         # Don't fail on redis failure
         logger.error(
             f"Error in cache: {e}",
-            extra={"custom_dimensions": {"route_key": cache_key}},
+            extra=get_custom_dimensions({"cache_key": cache_key}, request),
         )
         if settings.debug:
             raise
 
+    ts = time.perf_counter()
     result = await fn()
+    te = time.perf_counter()
+    logger.info(
+        "Perf: cacheable resource fetch time",
+        extra=get_custom_dimensions(
+            {"cache_key": cache_key, "duration": f"{te - ts:0.4f}"}, request
+        ),
+    )
     try:
         if r:
             await r.set(cache_key, orjson.dumps(result), settings.redis_ttl)
@@ -130,7 +144,7 @@ async def cached_result(
         # Don't fail on redis failure
         logger.error(
             f"Error in cache: {e}",
-            extra={"custom_dimensions": {"route_key": cache_key}},
+            extra=get_custom_dimensions({"cache_key": cache_key}, request),
         )
         if settings.debug:
             raise
