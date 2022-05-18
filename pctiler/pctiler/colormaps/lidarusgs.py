@@ -1,4 +1,5 @@
 from typing import Dict
+
 from rio_tiler.types import ColorMapType
 
 lidar_colormaps: Dict[str, ColorMapType] = {
@@ -80,7 +81,7 @@ lidar_colormaps: Dict[str, ColorMapType] = {
         ((49152, 53248), (205, 205, 205, 255)),
         ((53248, 57344), (222, 222, 222, 255)),
         ((57344, 61440), (239, 239, 239, 255)),
-        ((61440, 65536), (255, 255, 255, 255))
+        ((61440, 65536), (255, 255, 255, 255)),
     ],
     "lidar-hag-alternative": [
         ((-900, 0), (0, 0, 0, 0)),
