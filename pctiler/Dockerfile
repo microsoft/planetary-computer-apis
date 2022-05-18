@@ -41,4 +41,4 @@ ENV MOSAIC_CONCURRENCY 1
 
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=80
-CMD uvicorn pctiler.main:app --host ${APP_HOST} --port ${APP_PORT} --log-level info
+CMD hypercorn pctiler.main:app --bind ${APP_HOST}:${APP_PORT} --log-level info

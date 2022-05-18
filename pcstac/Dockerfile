@@ -13,5 +13,4 @@ RUN pip install -e ./pccommon -e ./pcstac[server]
 
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=81
-
-CMD uvicorn pcstac.main:app --host ${APP_HOST} --port ${APP_PORT} --log-level info
+CMD hypercorn pcstac.main:app --bind ${APP_HOST}:${APP_PORT} --log-level info
