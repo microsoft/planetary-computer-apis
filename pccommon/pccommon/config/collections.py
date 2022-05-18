@@ -138,6 +138,22 @@ class LegendConfig(CamelModel):
     scale_factor: Optional[float]
 
 
+class RenderOptionCondition(CamelModel):
+    """
+    Defines a property/value condition for a render config to be enabled
+
+    Attributes
+    ----------
+    property:
+        The property to check.
+    value:
+        The value to check against.
+    """
+
+    property: str
+    value: Any
+
+
 class RenderOptions(CamelModel):
     """
     Defines a set of map-tile render options for a collection.
@@ -158,6 +174,9 @@ class RenderOptions(CamelModel):
         Zoom level at which to start rendering the layer.
     legend:
         An optional legend configuration.
+    conditions:
+        A list of property/value conditions that must be in the active mosaic
+        CQL for this render option to be enabled
     """
 
     name: str
@@ -165,6 +184,7 @@ class RenderOptions(CamelModel):
     options: str
     min_zoom: int
     legend: Optional[LegendConfig] = None
+    conditions: Optional[List[RenderOptionCondition]] = None
 
 
 class DefaultLocation(CamelModel):

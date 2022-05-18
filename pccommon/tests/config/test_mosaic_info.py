@@ -21,6 +21,7 @@ def test_parse() -> None:
                 "description": "Elevation...",
                 "options": "assets=data&rescale=-1000,4000&colormap_name=terrain",
                 "minZoom": 8,
+                "conditions": [{"property": "mode", "value": "Q"}],
             },
             {
                 "name": "Elevation (viridis)",
