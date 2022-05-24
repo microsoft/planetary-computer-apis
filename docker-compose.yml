@@ -12,6 +12,8 @@ services:
       - ./pcstac:/opt/src/pcstac
     depends_on:
       - database
+      - azurite
+      - redis
     command: >
       bash -c "pypgstac pgready && uvicorn pcstac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
   tiler:
@@ -39,11 +41,13 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
     links:
-      - stac
-      - tiler
+      - database
+      - azurite
+      - redis
     depends_on:
-      - tiler
-      - stac
+      - database
+      - azurite
+      - redis
     volumes:
       - ./nginx/etc/nginx:/etc/nginx
     ports:
