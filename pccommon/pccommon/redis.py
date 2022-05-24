@@ -107,23 +107,25 @@ async def cached_result(
     fn: Callable[[], Coroutine[Any, Any, T]], cache_key: str, request: Request
 ) -> T:
     """Either get the result from redis or run the function and cache the result."""
+    host = request.url.hostname
+    host_cache_key = f"{cache_key}:{host}"
     settings = PCAPIsConfig.from_environment()
     r: Optional[Redis] = None
     try:
         r = request.app.state.redis
         if r:
-            cached: str = await r.get(cache_key)
+            cached: str = await r.get(host_cache_key)
             if cached:
                 logger.info(
                     "Cache result hit",
-                    extra=get_custom_dimensions({"cache_key": cache_key}, request),
+                    extra=get_custom_dimensions({"cache_key": host_cache_key}, request),
                 )
                 return orjson.loads(cached)
     except Exception as e:
         # Don't fail on redis failure
         logger.error(
             f"Error in cache: {e}",
-            extra=get_custom_dimensions({"cache_key": cache_key}, request),
+            extra=get_custom_dimensions({"cache_key": host_cache_key}, request),
         )
         if settings.debug:
             raise
@@ -134,17 +136,17 @@ async def cached_result(
     logger.info(
         "Perf: cacheable resource fetch time",
         extra=get_custom_dimensions(
-            {"cache_key": cache_key, "duration": f"{te - ts:0.4f}"}, request
+            {"cache_key": host_cache_key, "duration": f"{te - ts:0.4f}"}, request
         ),
     )
     try:
         if r:
-            await r.set(cache_key, orjson.dumps(result), settings.redis_ttl)
+            await r.set(host_cache_key, orjson.dumps(result), settings.redis_ttl)
     except Exception as e:
         # Don't fail on redis failure
         logger.error(
             f"Error in cache: {e}",
-            extra=get_custom_dimensions({"cache_key": cache_key}, request),
+            extra=get_custom_dimensions({"cache_key": host_cache_key}, request),
         )
         if settings.debug:
             raise

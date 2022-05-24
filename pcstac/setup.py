@@ -17,12 +17,12 @@ inst_reqs = [
 extra_reqs = {
     "test": [
         "pytest",
-        "pytest-asyncio",
+        "pytest-asyncio==0.18.*",
+        "httpx==0.19.0",
     ],
     "dev": [
         "black==22.3.0",
         "flake8==3.8.4",
-        "httpx==0.19.0",
         "isort==5.9.2",
         "mypy==0.800",
         "openapi-spec-validator==0.3.0",
