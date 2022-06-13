@@ -45,7 +45,7 @@ This project uses a variation on [scripts to rule them all](https://github.com/g
 To set up a local environment, use
 
 ```
-> ./scripts/update
+> ./scripts/setup
 ```
 
 This will build containers, apply database migrations, and load the development data.
