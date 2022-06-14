@@ -6,7 +6,7 @@ That said, feel free to crib any code that is useful!
 
 ## STAC API + Tiler
 
-This repository contains two components of the Planetary Computer APIs: the STAC API and the Tiler. These are implementations of the open source [stac-fastapi](https://github.com/stac-utils/stac-fastapi) and [titiler](https://github.com/developmentseed/titiler) projects.
+This repository contains two components of the Planetary Computer APIs: the STAC API and the Tiler. These are implementations of the open source [stac-fastapi](https://github.com/stac-utils/stac-fastapi) and [titiler](https://github.com/developmentseed/titiler) projects. It uses [titiler-pgstac](https://github.com/stac-utils/titiler-pgstac) to connect the tiler and database.
 
 The `pcstac` project provides a STAC API which indexes Microsoft's publicly available [geospatial data](https://planetarycomputer.microsoft.com/catalog) and an API for searching through this large collection.
 The `pctiler` provides visualization and data access capabilities for the data in the Planetary Computer.
