@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from fastapi import Query, Request
 from fastapi.responses import ORJSONResponse
+from psycopg_pool import ConnectionPool
 from titiler.core import dependencies
 from titiler.pgstac.factory import MosaicTilerFactory
 
@@ -10,7 +11,6 @@ from pccommon.config.collections import MosaicInfo
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.reader import PGSTACBackend
-from psycopg_pool import ConnectionPool
 
 
 @dataclass
