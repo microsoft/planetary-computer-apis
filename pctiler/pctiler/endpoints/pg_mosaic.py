@@ -10,7 +10,7 @@ from pccommon.config import get_collection_config
 from pccommon.config.collections import MosaicInfo
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
-from pctiler.reader import PGSTACBackend
+from pctiler.reader import PGSTACBackend, ReaderParams
 
 
 @dataclass
@@ -29,17 +29,6 @@ class BackendParams(dependencies.DefaultDependency):
     def __init__(self, request: Request):
         """Initialize BackendParams"""
         self.pool = request.app.state.dbpool
-        self.request = request
-
-
-@dataclass(init=False)
-class ReaderParams(dependencies.DefaultDependency):
-    """reader parameters."""
-
-    request: Request = field(init=False)
-
-    def __init__(self, request: Request):
-        """Initialize ReaderParams"""
         self.request = request
 
 

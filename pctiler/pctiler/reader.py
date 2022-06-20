@@ -1,5 +1,6 @@
 import logging
 import time
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 import attr
@@ -13,6 +14,7 @@ from rio_tiler.io.base import BaseReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
 from starlette.requests import Request
+from titiler.core.dependencies import DefaultDependency
 from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.reader import PgSTACReader
 from titiler.pgstac.settings import CacheSettings
@@ -25,6 +27,17 @@ from pctiler.reader_cog import CustomCOGReader  # type:ignore
 logger = logging.getLogger(__name__)
 
 cache_config = CacheSettings()
+
+
+@dataclass(init=False)
+class ReaderParams(DefaultDependency):
+    """reader parameters."""
+
+    request: Request = field(init=False)
+
+    def __init__(self, request: Request):
+        """Initialize ReaderParams"""
+        self.request = request
 
 
 @attr.s
