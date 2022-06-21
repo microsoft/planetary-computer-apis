@@ -21,6 +21,7 @@ from titiler.pgstac.settings import CacheSettings
 
 from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
+from pccommon.logging import get_custom_dimensions
 from pctiler.config import get_settings
 from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
@@ -138,17 +139,17 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
         bbox = self.tms.bounds(morecantile.Tile(x, y, z))
         assets = self.get_assets(Polygon.from_bounds(*bbox), **asset_kwargs)
 
-        te = time.perf_counter()
         logger.info(
             "Perf: Mosaic get assets for tile.",
-            extra={
-                "custom_dimensions": {
-                    "duration": f"{te - ts:0.4f}",
+            extra=get_custom_dimensions(
+                {
+                    "duration": f"{time.perf_counter() - ts:0.4f}",
                     "collection": collection,
                     "zxy": f"{z}/{x}/{y}",
                     "count": len(assets),
                 },
-            },
+                self.request,
+            ),
         )
         return assets
 
@@ -207,18 +208,17 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
             **kwargs,
         )
 
-        te = time.perf_counter()
-
         logger.info(
             "Perf: Mosaic read tile.",
-            extra={
-                "custom_dimensions": {
-                    "duration": f"{te - ts:0.4f}",
+            extra=get_custom_dimensions(
+                {
+                    "duration": f"{time.perf_counter() - ts:0.4f}",
                     "collection": collection,
                     "zxy": f"{tile_z}/{tile_x}/{tile_y}",
                     "count": len(mosaic_assets),
-                }
-            },
+                },
+                self.request,
+            ),
         )
 
         return tile
