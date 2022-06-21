@@ -1,5 +1,6 @@
 import logging
 import time
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 import attr
@@ -12,6 +13,8 @@ from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
 from rio_tiler.io.base import BaseReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
+from starlette.requests import Request
+from titiler.core.dependencies import DefaultDependency
 from titiler.pgstac import mosaic as pgstac_mosaic
 from titiler.pgstac.reader import PgSTACReader
 from titiler.pgstac.settings import CacheSettings
@@ -26,11 +29,26 @@ logger = logging.getLogger(__name__)
 cache_config = CacheSettings()
 
 
+@dataclass(init=False)
+class ReaderParams(DefaultDependency):
+    """reader parameters."""
+
+    request: Request = field(init=False)
+
+    def __init__(self, request: Request):
+        """Initialize ReaderParams"""
+        self.request = request
+
+
 @attr.s
 class ItemSTACReader(PgSTACReader):
 
     # TODO: remove CustomCOGReader once moved to rasterio 1.3
     reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
+
+    # We make request an optional attribute to avoid re-writing
+    # the whole list of attribute
+    request: Optional[Request] = attr.ib(default=None)
 
     def _get_asset_url(self, asset: str) -> str:
         asset_url = BlobCDN.transform_if_available(super()._get_asset_url(asset))
@@ -48,6 +66,10 @@ class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
     """Custom version of titiler.pgstac.mosaic.CustomSTACReader)."""
 
     reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
+
+    # We make request an optional attribute to avoid re-writing
+    # the whole list of attribute
+    request: Optional[Request] = attr.ib(default=None)
 
     def _get_asset_url(self, asset: str) -> str:
         """Validate asset names and return asset's url.
@@ -78,6 +100,10 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
     """PgSTAC Mosaic Backend."""
 
     reader: Type[MosaicSTACReader] = attr.ib(init=False, default=MosaicSTACReader)
+
+    # We make request an optional attribute to avoid re-writing
+    # the whole list of attribute
+    request: Optional[Request] = attr.ib(default=None)
 
     # Override from PGSTACBackend to use collection
     def assets_for_tile(

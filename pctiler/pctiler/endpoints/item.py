@@ -9,7 +9,7 @@ from titiler.pgstac.dependencies import ItemPathParams
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
-from pctiler.reader import ItemSTACReader
+from pctiler.reader import ItemSTACReader, ReaderParams
 
 try:
     from importlib.resources import files as resources_files  # type: ignore
@@ -28,6 +28,7 @@ pc_tile_factory = MultiBaseTilerFactory(
     reader=ItemSTACReader,
     path_dependency=ItemPathParams,
     colormap_dependency=PCColorMapParams,
+    reader_dependency=ReaderParams,
     router_prefix=get_settings().item_endpoint_prefix,
 )
 
