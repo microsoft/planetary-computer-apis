@@ -68,7 +68,7 @@ services:
       - pc-apis-pgdata:/var/lib/postgresql/data
   azurite:
     container_name: pcapis-azurite
-    image: mcr.microsoft.com/azure-storage/azurite
+    image: mcr.microsoft.com/azure-storage/azurite:3.17.1
     hostname: azurite
     command: "azurite --silent --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost
       0.0.0.0 -l /workspace"

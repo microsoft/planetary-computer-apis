@@ -10,7 +10,7 @@ inst_reqs = [
     "stac-fastapi.types @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.types&subdirectory=stac_fastapi/types",
     "pccommon",
     # Required due to some imports related to pypgstac CLI usage in startup script
-    "pypgstac[psycopg]==0.6.2",
+    "pypgstac[psycopg]==0.6.6",
     "pystac==1.*",
 ]
 
@@ -29,7 +29,7 @@ extra_reqs = {
     ],
     # server deps
     "server": [
-        "uvicorn[standard]>=0.12.0,<0.16.0",
+        "uvicorn[standard]>=0.17.0,<0.18.0",
     ],
 }
 
