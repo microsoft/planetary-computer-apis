@@ -30,6 +30,7 @@ custom_colormaps: Dict[str, ColorMapType] = {
     **chloris_colormaps,
     **noaa_c_cap_colormaps,
     **alos_palsar_mosaic_colormaps,
+    **viirs_colormaps,
 }
 
 for k, v in custom_colormaps.items():
