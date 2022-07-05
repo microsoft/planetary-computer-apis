@@ -14,6 +14,7 @@ from .lulc import lulc_colormaps
 from .modis import modis_colormaps
 from .mtbs import mtbs_colormaps
 from .noaa_c_cap import noaa_c_cap_colormaps
+from .viirs import viirs_colormaps
 
 ################################################################################
 # Custom ColorMap Query Parameter Support
