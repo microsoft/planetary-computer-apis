@@ -23,12 +23,25 @@ For documentation of how you can deploy your own test version of these services,
 
 ## Development URLs
 
-|          |                              |
-| -------- | ---------------------------- |
-| Nginx    | <http://localhost:8080/>     |
-| STAC API | <http://localhost:8081/stac> |
-| Tiler    | <http://localhost:8082/data> |
+After building the project locally using the instructions below, you can access the development version of the services by pointing your browser to the following URLs:
 
+|                      |                              |
+|----------------------|------------------------------|
+| STAC API (via nginx) | <http://localhost:8080/stac> |
+| Tiler (via nginx)    | <http://localhost:8080/data> |
+| STAC API (direct)    | <http://localhost:8081>      |
+| Tiler (direct)       | <http://localhost:8082>      |
+
+To see the HTTP endpoints availble, visit the OpenAPI documentation for each service:
+
+|           |                                   |
+|-----------|-----------------------------------|
+| STAC API  | <http://localhost:8080/stac/docs> |
+| Tiler API | <http://localhost:8080/data/docs> |
+
+The development data only includes a single collection `naip`, with a few items in it. You can verify the data is loaded correctly by visiting the following URL:
+
+<http://localhost:8080/stac/collections/naip>
 
 ## Building and Testing Locally
 
@@ -44,15 +57,15 @@ This project uses a variation on [scripts to rule them all](https://github.com/g
 
 To set up a local environment, use
 
-```
+```console
 > ./scripts/setup
 ```
 
 This will build containers, apply database migrations, and load the development data.
 
-After migrations and development database loading are in place, you can just rebuild the docker images with
+After migrations and development database loading are in place, you can rebuild the docker images with
 
-```
+```console
 > ./scripts/update
 ```
 
@@ -60,7 +73,7 @@ After migrations and development database loading are in place, you can just reb
 
 To run the servers, use
 
-```
+```console
 > ./scripts/server
 ```
 
@@ -70,13 +83,13 @@ This will bring up the development database, STAC API, and Tiler.
 
 To run tests, use
 
-```
+```console
 ./scripts/test
 ```
 
 To format code, use
 
-```
+```console
 ./scripts/format
 ```
 
@@ -110,6 +123,6 @@ See the [Helm chart repository](https://microsoft.github.io/planetary-computer-a
 
 Schemas can be built/updated with
 
-```
+```console
 ./scripts/build_queryables
 ```
