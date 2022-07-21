@@ -57,7 +57,19 @@ function cluster_login() {
     az aks get-credentials \
         --resource-group ${RESOURCE_GROUP} \
         --name ${CLUSTER_NAME} \
-        --subscription ${ARM_SUBSCRIPTION_ID}
+        --subscription ${ARM_SUBSCRIPTION_ID} \
+        --file=kubeconfig
+
+    # kubelogin mutates every entry in the kubeconfig
+    # https://github.com/Azure/kubelogin/issues/87.
+    # So we export to a kubeconfig file
+    echo "Converting kubeconfig..."
+    kubelogin convert-kubeconfig \
+        --login spn \
+        --client-id ${ARM_CLIENT_ID} \
+        --client-secret ${ARM_CLIENT_SECRET} \
+        --file=kubeconfig
+    export KUBECONFIG=kubeconfig
 }
 
 function setup_helm() {

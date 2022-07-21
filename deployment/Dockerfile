@@ -26,6 +26,12 @@ RUN echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/
 RUN apt-get update
 RUN apt-get install helm=3.5.0-1
 
+# Install kubelogin
+
+RUN curl -sL https://github.com/Azure/kubelogin/releases/download/v0.0.18/kubelogin-linux-amd64.zip --output kubelogin.zip \
+    && unzip -j kubelogin.zip bin/linux_amd64/kubelogin -d /usr/local/bin/ \
+    && rm -rf kubelogin.zip
+
 # Install azure client
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
