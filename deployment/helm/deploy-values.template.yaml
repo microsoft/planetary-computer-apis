@@ -46,7 +46,7 @@ stac:
   port: "80"
   debug: "TRUE"
 
-  tiler_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/data/
+  tiler_href: data/
 
 tiler:
   enabled: true
@@ -70,7 +70,7 @@ tiler:
   port: "80"
 
   stac_api_url: http://planetary-computer-stac.pc.svc.cluster.local
-  stac_api_href: https://{{ tf.dns_label }}.westeurope.cloudapp.azure.com/stac/
+  stac_api_href: stac/
   # PCT sas needs to be accessed through api management
   pc_sdk_sas_url: https://pct-sas-westeurope-staging-apim.azure-api.net/sas/token
   pc_sdk_subscription_key: "{{ tf.pc_sdk_subscription_key }}"
