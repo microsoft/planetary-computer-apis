@@ -1,6 +1,8 @@
 import os
 from dataclasses import dataclass
 from functools import lru_cache
+from urllib.parse import urljoin
+from fastapi import Request
 
 from pydantic import BaseSettings, Field
 
@@ -19,7 +21,14 @@ class FeatureFlags:
 
 class Settings(BaseSettings):
     stac_api_url: str = os.environ[STAC_API_URL_ENV_VAR]
+    """Internal URL to access the STAC API"""
+
     stac_api_href: str = os.environ[STAC_API_HREF_ENV_VAR]
+    """Public URL to access the STAC API.
+
+    If relative, will use the request's base URL to generate the
+    full HREF.
+    """
 
     title: str = "Preview of Tile Access Services"
     openapi_url: str = "/openapi.json"
@@ -33,6 +42,19 @@ class Settings(BaseSettings):
     )
 
     feature_flags: FeatureFlags = FeatureFlags()
+
+    def get_stac_api_href(self, request: Request) -> str:
+        """Generates the STAC API HREF.
+
+        If the setting for the stac_api_href
+        is relative, then use the request's base URL to generate the
+        absolute URL.
+        """
+        if request:
+            base_hostname = f"{request.url.scheme}://{request.url.netloc}/"
+            return urljoin(base_hostname, self.stac_api_href)
+        else:
+            return self.stac_api_href
 
 
 @lru_cache

@@ -2,12 +2,11 @@ from typing import Any, Dict
 from urllib.parse import urljoin
 
 import pystac
+from fastapi import Request
 from stac_fastapi.types.stac import Collection, Item
 
 from pccommon.config.collections import DefaultRenderConfig
 from pcstac.config import get_settings
-
-TILER_HREF = get_settings().tiler_href
 
 
 class TileInfo:
@@ -28,10 +27,15 @@ class TileInfo:
         parameters for rendering those assets
     """
 
-    def __init__(self, collection_id: str, render_config: DefaultRenderConfig) -> None:
+    def __init__(
+        self,
+        collection_id: str,
+        render_config: DefaultRenderConfig,
+        request: Request,
+    ) -> None:
         self.collection_id = collection_id
         self.render_config = render_config
-        self.tiler_href = get_settings().tiler_href
+        self.tiler_href = get_settings().get_tiler_href(request)
 
     def inject_collection(self, collection: Collection) -> None:
         """Inject rendering links to a collection"""
