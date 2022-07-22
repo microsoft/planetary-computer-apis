@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2022.3.0]
+
+### Changed
+
 - Include hostname in redis cache keys  [#98](https://github.com/microsoft/planetary-computer-apis/pull/98)
+- Update titiler-pgstac version and forward Request in reader [#91](https://github.com/microsoft/planetary-computer-apis/pull/91)
+- Upgrade uvicorn [#106](https://github.com/microsoft/planetary-computer-apis/pull/106)
 
 ## [2022.2.0]
 
