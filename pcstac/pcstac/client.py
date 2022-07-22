@@ -4,6 +4,7 @@ from typing import Any, List, Optional, Type
 from urllib.parse import urljoin
 
 import attr
+from fastapi import Request
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.types.errors import NotFoundError
 from stac_fastapi.types.stac import (
@@ -53,12 +54,16 @@ class PCClient(CoreCrudClient):
 
         return sorted(list(set(base_conformance_classes)))
 
-    def inject_collection_links(self, collection: Collection) -> Collection:
+    def inject_collection_links(
+        self, collection: Collection, request: Request
+    ) -> Collection:
         """Add extra/non-mandatory links to a Collection"""
         collection_id = collection.get("id", "")
         render_config = get_render_config(collection_id)
         if render_config and render_config.should_add_collection_links:
-            TileInfo(collection_id, render_config).inject_collection(collection)
+            TileInfo(collection_id, render_config, request).inject_collection(
+                collection
+            )
 
         collection.get("links", []).append(
             {
@@ -74,13 +79,13 @@ class PCClient(CoreCrudClient):
 
         return collection
 
-    def inject_item_links(self, item: Item) -> Item:
+    def inject_item_links(self, item: Item, request: Request) -> Item:
         """Add extra/non-mandatory links to an Item"""
         collection_id = item.get("collection", "")
         if collection_id:
             render_config = get_render_config(collection_id)
             if render_config and render_config.should_add_item_links:
-                TileInfo(collection_id, render_config).inject_item(item)
+                TileInfo(collection_id, render_config, request).inject_item(item)
 
         return item
 
@@ -101,6 +106,7 @@ class PCClient(CoreCrudClient):
             Collections.
         """
         _super: CoreCrudClient = super()
+        _request = kwargs["request"]
 
         async def _fetch() -> Collections:
             collections = await _super.all_collections(**kwargs)
@@ -111,7 +117,9 @@ class PCClient(CoreCrudClient):
                 if render_config and render_config.hidden:
                     pass
                 else:
-                    modified_collections.append(self.inject_collection_links(col))
+                    modified_collections.append(
+                        self.inject_collection_links(col, _request)
+                    )
             collections["collections"] = modified_collections
             return collections
 
@@ -136,6 +144,7 @@ class PCClient(CoreCrudClient):
             Collection.
         """
         _super: CoreCrudClient = super()
+        _request = kwargs["request"]
 
         async def _fetch() -> Collection:
             try:
@@ -149,7 +158,7 @@ class PCClient(CoreCrudClient):
                 result = await _super.get_collection(collection_id, **kwargs)
             except NotFoundError:
                 raise NotFoundError(f"No collection with id '{collection_id}' found!")
-            return self.inject_collection_links(result)
+            return self.inject_collection_links(result, _request)
 
         cache_key = f"{CACHE_KEY_COLLECTION}:{collection_id}"
         return await cached_result(_fetch, cache_key, kwargs["request"])
@@ -184,7 +193,8 @@ class PCClient(CoreCrudClient):
                 **{
                     **result,
                     "features": [
-                        self.inject_item_links(i) for i in result.get("features", [])
+                        self.inject_item_links(i, request)
+                        for i in result.get("features", [])
                     ],
                 }
             )
