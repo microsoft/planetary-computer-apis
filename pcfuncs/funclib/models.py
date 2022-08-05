@@ -8,7 +8,7 @@ class RenderOptions(BaseModel):
     """Titiler render options.
 
     See the "Query Parameters" section of
-    https://developmentseed.org/titiler/endpoints/cog/#description
+    https://developmentseed.org/titiler/endpoints/stac/
     """
 
     collection: str
