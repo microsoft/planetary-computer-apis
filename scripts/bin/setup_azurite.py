@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 from azure.data.tables import TableServiceClient
+from azure.storage.blob import BlobServiceClient
 
 import pccommon
 from pccommon.config.collections import CollectionConfig, CollectionConfigTable
@@ -92,6 +93,17 @@ def setup_azurite() -> None:
         )
     )
     ip_config_table.add_exception("127.0.0.1")
+
+    # Blob
+
+    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
+        AZURITE_CONNECT_STRING
+    )
+    containers = [c.name for c in blob_service_client.list_containers()]
+    for container in ["output"]:
+        if container not in containers:
+            print(f"~ ~ Creating container {container}...")
+            blob_service_client.create_container(container)
 
     print("~ Done Azurite setup.")
 
