@@ -1,3 +1,6 @@
 FROM pc-apis-tiler
 
-RUN pip install -e ./pccommon -e ./pctiler[dev,test]
+COPY requirements-dev.txt requirements-dev.txt
+RUN pip install -r requirements-dev.txt
+
+RUN pip install -e ./pccommon -e ./pctiler
