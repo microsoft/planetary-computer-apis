@@ -1,5 +1,6 @@
 pc-stac.*.env
 pc-tiler.*.env
+pc-funcs.*.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

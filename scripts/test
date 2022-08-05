@@ -21,6 +21,8 @@ Options
         Only test pctiler
     --common
         Only test pccommon
+    --funcs
+        Only test funcs
 "
 }
 
@@ -38,6 +40,10 @@ while [[ $# -gt 0 ]]; do case $1 in
         COMMON_ONLY="1"
         shift
         ;;
+    --funcs)
+        FUNCS_ONLY="1"
+        shift
+        ;;
     --help)
         usage
         exit 0
@@ -51,7 +57,7 @@ while [[ $# -gt 0 ]]; do case $1 in
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
-    if [ -z "${TILER_ONLY}${STAC_ONLY}" ]; then
+    if [ -z "${TILER_ONLY}${STAC_ONLY}${FUNCS_ONLY}" ]; then
 
         docker-compose \
             -f docker-compose.yml \
@@ -60,7 +66,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             stac-dev scripts/bin/test-common
     fi
 
-    if [ -z "${STAC_ONLY}${COMMON_ONLY}" ]; then
+    if [ -z "${STAC_ONLY}${COMMON_ONLY}${FUNCS_ONLY}" ]; then
         docker-compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
@@ -68,13 +74,21 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             tiler-dev scripts/bin/test-tiler
     fi
 
-    if [ -z "${TILER_ONLY}${COMMON_ONLY}" ]; then
+    if [ -z "${TILER_ONLY}${COMMON_ONLY}${FUNCS_ONLY}" ]; then
 
         docker-compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             run --rm \
             stac-dev scripts/bin/test-stac
+    fi
+
+    if [ -z "${STAC_ONLY}${TILER_ONLY}${COMMON_ONLY}" ]; then
+
+        docker-compose \
+            -f docker-compose.yml \
+            run --rm \
+            funcs /bin/bash -c "cd /opt/src && scripts/bin/test-funcs"
     fi
 
 fi

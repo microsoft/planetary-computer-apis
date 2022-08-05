@@ -38,6 +38,12 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         -f docker-compose.yml \
         -f docker-compose.dev.yml \
         run --rm \
+        funcs /bin/bash -c "cd /opt/src && scripts/bin/format-funcs";
+
+    docker-compose  \
+        -f docker-compose.yml \
+        -f docker-compose.dev.yml \
+        run --rm \
         stac-dev scripts/bin/format-scripts;
 
 fi
