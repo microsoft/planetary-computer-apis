@@ -1,0 +1,7 @@
+ANIMATION_SETTINGS_PREFIX = "ANIMATION_"
+
+DEFAULT_ANIMATION_CONTAINER_URL = "https://pcexplorer.blob.core.windows.net/animations"
+MAX_TILE_COUNT = 16
+
+MAX_FRAMES = 24
+MAX_CONCURRENCY = 10
