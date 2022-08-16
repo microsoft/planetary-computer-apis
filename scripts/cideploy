@@ -30,7 +30,7 @@ function require_env() {
 require_env "IMAGE_TAG"
 require_env "ENVIRONMENT"
 
-while [[ "$#" > 0 ]]; do case $1 in
+while [[ "$#" -gt 0 ]]; do case $1 in
     --dev)
         DEV_DEPLOY=1
         shift
@@ -51,13 +51,13 @@ DOCKER_COMPOSE="docker-compose -f deployment/docker-compose.yml"
 
 # Set terraform to deploy to dev or staging
 if [ "${DEV_DEPLOY}" = "1" ]; then
-    TERRAFORM_DIR=/opt/src/terraform/dev
+    TERRAFORM_DIR=/opt/src/deployment/terraform/dev
 else
     if [[ "${CI}" != "true" ]]; then
         echo "Only CI can deploy to staging!"
         exit 1
     fi
-    TERRAFORM_DIR=/opt/src/terraform/${ENVIRONMENT}
+    TERRAFORM_DIR=/opt/src/deployment/terraform/${ENVIRONMENT}
 fi
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
