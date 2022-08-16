@@ -45,9 +45,6 @@ class AnimationSettings(BaseSettings):
     @classmethod
     @cachedmethod(lambda cls: cls._cache)
     def get(cls) -> "AnimationSettings":
-        import os
-
-        logger.info(f"DEBUG: {os.environ.get('ANIMATION_CONTAINER_ACCOUNT_KEY')}")
         settings = AnimationSettings()  # type: ignore
         logger.info(f"API URL: {settings.api_root_url}")
         logger.info(f"Concurrency limit: {settings.tile_request_concurrency}")
