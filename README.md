@@ -11,6 +11,10 @@ This repository contains two components of the Planetary Computer APIs: the STAC
 The `pcstac` project provides a STAC API which indexes Microsoft's publicly available [geospatial data](https://planetarycomputer.microsoft.com/catalog) and an API for searching through this large collection.
 The `pctiler` provides visualization and data access capabilities for the data in the Planetary Computer.
 
+## Azure Functions
+
+This repository also contains Azure Functions that provide additional endpoints for working with Planetary Computer data and metadata. This includes Function endpoints for generating images and animations based on STAC searches, using the tiler to render mosaiced data from Collections
+
 ## Collection configuration
 
 See [collection config](./docs/collection-config.md) for more on developing collection configurations.
@@ -25,17 +29,19 @@ For documentation of how you can deploy your own test version of these services,
 
 After building the project locally using the instructions below, you can access the development version of the services by pointing your browser to the following URLs:
 
-|                      |                              |
-|----------------------|------------------------------|
-| STAC API (via nginx) | <http://localhost:8080/stac> |
-| Tiler (via nginx)    | <http://localhost:8080/data> |
-| STAC API (direct)    | <http://localhost:8081>      |
-| Tiler (direct)       | <http://localhost:8082>      |
+|                      |                                        |
+| -------------------- | -------------------------------------- |
+| STAC API (via nginx) | <http://localhost:8080/stac>           |
+| Tiler (via nginx)    | <http://localhost:8080/data>           |
+| Funcs (vai nginx)    | <http://localhost:8080/f/image>, etc.. |
+| STAC API (direct)    | <http://localhost:8081>                |
+| Tiler (direct)       | <http://localhost:8082>                |
+| Funcs (direct)       | <http://localhost:8083>                |
 
-To see the HTTP endpoints availble, visit the OpenAPI documentation for each service:
+To see the HTTP endpoints available for FastAPI servers, visit the OpenAPI documentation for each service:
 
 |           |                                   |
-|-----------|-----------------------------------|
+| --------- | --------------------------------- |
 | STAC API  | <http://localhost:8080/stac/docs> |
 | Tiler API | <http://localhost:8080/data/docs> |
 
@@ -77,7 +83,7 @@ To run the servers, use
 > ./scripts/server
 ```
 
-This will bring up the development database, STAC API, and Tiler.
+This will bring up the development database, STAC API, Tiler, Azure Functions, and other services.
 
 #### Testing and and formatting
 
@@ -95,11 +101,11 @@ To format code, use
 
 ## Changing environments
 
-By default, the `stac` and `tiler` services will run against the development containers brought up by `scripts/server`.
+By default, the `stac`, `tiler`, `funcs`, and supporting services will run against the development containers brought up by `scripts/server`.
 It can sometimes be convenient to test against other services, e.g. a test database deployed on Azure.
-To do that, you can create a new environment file for the services based on `./pc-stac.dev.env` and `./pc-tiler.dev.env`.
+To do that, you can create a new environment file for the services based on `./pc-stac.dev.env`, `./pc-tiler.dev.env`, and/or `./pc-funcs.dev.env`.
 Any environment file named similarly will be .gitignore'd, so you can leave them in your local clone and avoid
-committing (e.g. `./pc-stac.testing.env`). You then need to set the `PC_STAC_ENV_FILE` and `PC_TILER_ENV_FILE` to the
+committing (e.g. `./pc-stac.testing.env`). You then need to set the `PC_STAC_ENV_FILE`, `PC_TILER_ENV_FILE`, and `PC_FUNCS_ENV_FILE` to the
 environment files you want to use before running `scripts/server`. __Note__: Be careful not to run migrations
 with a non-dev database set - avoid `scripts/setup`, or ensure the migration connection is still using the local
 dev database even if using a remote test db.

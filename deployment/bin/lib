@@ -1,5 +1,14 @@
 #!/bin/bash
 
+function require_env() {
+    v=$(eval echo \$${1})
+
+    if [[ -z ${v} ]]; then
+        echo "Must set ${1} as environment variable" >&2
+        exit 1
+    fi
+}
+
 function setup_env() {
 
     # Directory for rendered values and templates
@@ -35,6 +44,8 @@ function gather_tf_output() {
     export INGRESS_IP=$(tf_output ingress_ip)
     export DNS_LABEL=$(tf_output dns_label)
 
+    export FUNCTION_APP_NAME=$(tf_output function_app_name)
+
     if [ "${1}" ]; then
         popd
     fi
@@ -46,13 +57,17 @@ function render_values() {
     bin/jinja ${TF_OUTPUT_FILE} ${TEMPLATE_PATH} ${DEPLOY_VALUES_FILE}
 }
 
-function cluster_login() {
-    echo "Logging into the cluster..."
-
+function azlogin() {
     az login --service-principal \
         --username ${ARM_CLIENT_ID} \
         --password ${ARM_CLIENT_SECRET} \
         --tenant ${ARM_TENANT_ID}
+}
+
+function cluster_login() {
+    echo "Logging into the cluster..."
+
+    azlogin;
 
     az aks get-credentials \
         --resource-group ${RESOURCE_GROUP} \
@@ -81,4 +96,20 @@ function full_setup() {
         cluster_login;
         setup_helm;
     fi
+}
+
+function deploy_funcs() {
+    require_env "FUNCTION_APP_NAME"
+
+    azlogin
+
+    rm -rf /opt/src/pcfuncs_deploy
+    cp -r /opt/src/pcfuncs /opt/src/pcfuncs_deploy
+
+    pushd /opt/src/pcfuncs_deploy
+    # Create symlink to enable function app building of pctasks
+    ln -s /opt/src/pccommon /opt/src/pcfuncs_deploy/pccommon_linked
+    cp requirements-deploy.txt requirements.txt
+    func azure functionapp publish ${FUNCTION_APP_NAME} --python
+    popd
 }

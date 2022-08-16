@@ -6,6 +6,14 @@ RUN apt-get install -y wget unzip curl gnupg \
     python3-pip \
     jq
 
+# Install Azure Function Tools
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg
+RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-focal-prod focal main" \
+    > /etc/apt/sources.list.d/dotnetdev.list
+
+RUN apt-get update && apt-get install -y azure-functions-core-tools-4
+
 # Install Terraform 0.14.4
 
 RUN wget -O terraform.zip https://releases.hashicorp.com/terraform/0.14.4/terraform_0.14.4_linux_amd64.zip
@@ -31,5 +39,6 @@ RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
 # Install Jinja
 RUN pip3 install Jinja2
+
 
 WORKDIR /opt/src
