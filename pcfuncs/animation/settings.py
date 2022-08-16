@@ -3,14 +3,14 @@ from typing import Optional
 
 from azure.storage.blob import ContainerClient
 from cachetools import Cache, LRUCache, cachedmethod
-from pydantic import BaseSettings, validator
+from pydantic import BaseSettings
 
 from pccommon.blob import get_container_client
 
 from .constants import (
     ANIMATION_SETTINGS_PREFIX,
     DEFAULT_ANIMATION_CONTAINER_URL,
-    MAX_CONCURRENCY,
+    DEFAULT_CONCURRENCY,
 )
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ class AnimationSettings(BaseSettings):
     output_storage_url: str = DEFAULT_ANIMATION_CONTAINER_URL
     output_sas: Optional[str] = None
     output_account_key: Optional[str] = None
-    tile_request_concurrency: int = 10
+    tile_request_concurrency: int = DEFAULT_CONCURRENCY
 
     def get_container_client(self) -> ContainerClient:
         return get_container_client(
@@ -31,12 +31,6 @@ class AnimationSettings(BaseSettings):
             sas_token=self.output_sas,
             account_key=self.output_account_key,
         )
-
-    @validator("tile_request_concurrency")
-    def _validate_concurrency(cls, v: int) -> int:
-        if v > MAX_CONCURRENCY:
-            raise ValueError(f"tile_request_concurrency must be <= {MAX_CONCURRENCY}")
-        return v
 
     class Config:
         env_prefix = ANIMATION_SETTINGS_PREFIX

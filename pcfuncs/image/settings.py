@@ -4,12 +4,12 @@ from typing import Optional
 
 from azure.storage.blob import ContainerClient
 from cachetools import Cache, LRUCache, cachedmethod
-from pydantic import BaseSettings, validator
+from pydantic import BaseSettings
 
 from pccommon.blob import get_container_client
 
 IMAGE_SETTINGS_PREFIX = "IMAGE_"
-MAX_CONCURRENCY = 10
+DEFAULT_CONCURRENCY = 10
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class ImageSettings(BaseSettings):
     output_storage_url: str
     output_sas: Optional[str] = None
     output_account_key: Optional[str] = None
-    tile_request_concurrency: int = MAX_CONCURRENCY
+    tile_request_concurrency: int = DEFAULT_CONCURRENCY
 
     # Maximum tiles to fetch for a single request
     max_tile_count: int = 144
@@ -46,12 +46,6 @@ class ImageSettings(BaseSettings):
             data_api_url_override or self.api_root_url,
             f"mosaic/info?collection={collection_id}",
         )
-
-    @validator("tile_request_concurrency")
-    def _validate_concurrency(cls, v: int) -> int:
-        if v > MAX_CONCURRENCY:
-            raise ValueError(f"tile_request_concurrency must be <= {MAX_CONCURRENCY}")
-        return v
 
     class Config:
         env_prefix = IMAGE_SETTINGS_PREFIX
