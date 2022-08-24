@@ -68,7 +68,7 @@ function cluster_login() {
         --login spn \
         --client-id ${ARM_CLIENT_ID} \
         --client-secret ${ARM_CLIENT_SECRET} \
-        --file=kubeconfig
+        --kubeconfig=kubeconfig
     export KUBECONFIG=kubeconfig
 }
 
