@@ -113,3 +113,9 @@ output "redis_password" {
 output "redis_port" {
   value = azurerm_redis_cache.pc.ssl_port
 }
+
+# Functions
+
+output "function_app_name" {
+  value = azurerm_function_app.pcfuncs.name
+}

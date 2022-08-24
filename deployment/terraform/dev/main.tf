@@ -17,6 +17,15 @@ module "resources" {
   stac_replica_count = 1
   tiler_replica_count = 1
 
+  # Funcs
+  output_storage_account_name = "pcfilestest"
+  output_container_name = "output"
+  funcs_data_api_url = "https://planetarycomputer.microsoft.com/api/data/v1"
+  funcs_tile_request_concurrency = 10
+
+  animation_output_storage_url = "https://pcfilestest.blob.core.windows.net/output/animations"
+  image_output_storage_url = "https://pcfilestest.blob.core.windows.net/output/images"
+
 }
 
 terraform {

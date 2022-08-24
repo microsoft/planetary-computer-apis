@@ -1,4 +1,5 @@
 services:
+
   stac:
     image: pc-apis-stac
     build:
@@ -16,6 +17,7 @@ services:
       - redis
     command: >
       bash -c "pypgstac pgready && uvicorn pcstac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
+
   tiler:
     image: pc-apis-tiler
     # For Mac OS M1 user, you'll need to add `platform: linux/amd64`.
@@ -34,6 +36,20 @@ services:
     depends_on:
       - database
     command: [ "uvicorn", "pctiler.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers" ]
+
+  funcs:
+    image: pc-apis-funcs
+    build:
+      context: .
+      dockerfile: pcfuncs/Dockerfile
+    env_file: ${PC_FUNCS_ENV_FILE:-./pc-funcs.dev.env}
+    ports:
+      - "8083:80"
+    volumes:
+      - ./pccommon:/home/site/pccommon
+      - ./pcfuncs:/home/site/wwwroot
+      - .:/opt/src
+
   nginx:
     image: pc-apis-nginx
     container_name: pc-apis-nginx
@@ -52,6 +68,7 @@ services:
       - ./nginx/etc/nginx:/etc/nginx
     ports:
       - 8080:80
+
   database:
     container_name: pc-stac-db
     image: pc-apis-stac-db
@@ -66,6 +83,7 @@ services:
       - "5432:5432"
     volumes:
       - pc-apis-pgdata:/var/lib/postgresql/data
+
   azurite:
     container_name: pcapis-azurite
     image: mcr.microsoft.com/azure-storage/azurite:3.17.1
@@ -78,6 +96,7 @@ services:
       - "10002:10002" # Table
     volumes:
       - pc-apis-azurite-data:/workspace
+
   redis:
     image: redis:6.2.6-buster
     command: redis-server --port 6380 --requirepass devcache

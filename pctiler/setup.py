@@ -25,19 +25,6 @@ inst_reqs = [
 ]
 
 extra_reqs = {
-    "test": [
-        "pytest",
-        "pytest-asyncio==0.18.*",
-        "httpx==0.19.0",
-    ],
-    "dev": [
-        "black==22.3.0",
-        "flake8==3.8.4",
-        "isort==5.9.2",
-        "mypy==0.800",
-        "openapi-spec-validator==0.3.0",
-    ],
-    # server deps
     "server": [
         "uvicorn[standard]>=0.17.0,<0.18.0",
     ],

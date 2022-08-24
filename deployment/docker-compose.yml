@@ -3,8 +3,8 @@ services:
     container_name: pc-apis-deploy
     image: pc-apis-deploy
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: deployment/Dockerfile
     environment:
       - ACR_STAC_REPO=${ACR_STAC_REPO:-mcr.microsoft.com/planetary-computer-apis/stac}
       - ACR_TILER_REPO=${ACR_TILER_REPO:-mcr.microsoft.com/planetary-computer-apis/tiler}
@@ -18,5 +18,8 @@ services:
 
       # Used in the dev stack as an identifier
       - TF_VAR_username=${USER}
+    working_dir: /opt/src/deployment
     volumes:
-      - .:/opt/src
+      - ../deployment:/opt/src/deployment
+      - ../pccommon:/opt/src/pccommon:ro
+      - ../pcfuncs:/opt/src/pcfuncs:ro
