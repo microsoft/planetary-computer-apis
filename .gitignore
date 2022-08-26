@@ -118,3 +118,5 @@ override.tf
 queryable_schemas/
 
 .metals/
+
+kubeconfig
