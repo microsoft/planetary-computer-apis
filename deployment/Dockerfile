@@ -1,10 +1,11 @@
 FROM ubuntu:18.04
 
-RUN apt-get update
+RUN apt-get update --fix-missing
 RUN apt-get install -y wget unzip curl gnupg \
     apt-transport-https \
     python3-pip \
-    jq
+    jq \
+    git
 
 # Install Azure Function Tools
 
@@ -44,7 +45,7 @@ RUN curl -sL https://github.com/Azure/kubelogin/releases/download/v0.0.18/kubelo
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
 # Install Jinja
-RUN pip3 install Jinja2
+RUN pip3 install Jinja2 pyyaml==6.0
 
 
 WORKDIR /opt/src

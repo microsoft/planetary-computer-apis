@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+"
+}
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+    -t)
+        PACKAGE_TAG=${2}
+        shift
+        shift
+        ;;
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+DOCKER_COMPOSE="docker-compose -f deployment/docker-compose.yml"
+
+# Set terraform to deploy to dev or staging
+if [[ "${CI}" != "true" ]]; then
+    echo "Only CI can publish!"
+    exit 1
+fi
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    # Build deployment container
+    ${DOCKER_COMPOSE} build
+
+    # Run deployment script
+    ${DOCKER_COMPOSE} run --rm \
+        deploy bin/publish_func \
+        -t "${PACKAGE_TAG}"
+fi
