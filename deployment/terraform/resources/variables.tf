@@ -84,6 +84,37 @@ variable "pc_sdk_subscription_key_secret_name" {
   default = "pct-tiler-sdk-subscription-key"
 }
 
+# -- Functions --
+
+variable "output_storage_account_name" {
+  type = string
+}
+
+variable "output_container_name" {
+  type = string
+}
+
+variable "funcs_tile_request_concurrency" {
+  type = number
+  default = 10
+}
+
+variable "funcs_data_api_url" {
+  type = string
+}
+
+# Animation
+
+variable "animation_output_storage_url" {
+  type = string
+}
+
+# Image
+
+variable "image_output_storage_url" {
+  type = string
+}
+
 # -----------------
 # Local variables
 

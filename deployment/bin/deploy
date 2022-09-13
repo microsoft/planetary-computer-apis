@@ -53,15 +53,6 @@ while [[ "$#" -gt 0 ]]; do case $1 in
 # Check and configure environment #
 ###################################
 
-function require_env() {
-    v=$(eval echo \$${1})
-
-    if [[ -z ${v} ]]; then
-        echo "Must set ${1} as environment variable" >&2
-        exit 1
-    fi
-}
-
 if [[ -z ${TERRAFORM_DIR} ]]; then
     echo "Must pass in TERRAFORM_DIR with -t"
     exit 1
@@ -188,5 +179,11 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${DNS_LABEL}" \
         --wait \
         --timeout 2m0s
+
+    #########################
+    # Deploy Azure Function #
+    #########################
+
+    deploy_funcs
 
 fi
