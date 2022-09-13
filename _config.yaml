@@ -1,5 +1,5 @@
-title: Planetary Computer APIs Helm charts for Kubernetes
-description: This site stores Helm chart tarballs for the Planteary Computer APIs
+title: Planetary Computer APIs Function packages and Helm charts
+description: This site stores Function package zip files and Helm chart tarballs for the Planteary Computer APIs
 theme: minima
 url: "https://microsoft.github.io/planetary-computer-apis"
 repo_name: planetary-computer-apis
