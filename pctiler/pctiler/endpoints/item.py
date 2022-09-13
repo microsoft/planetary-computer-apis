@@ -51,7 +51,7 @@ def map(
     tilejson_url += f"?{qs}"
 
     item_url = urljoin(
-        get_settings().stac_api_href,
+        get_settings().get_stac_api_href(request),
         f"collections/{collection}/items/{item}",
     )
 
