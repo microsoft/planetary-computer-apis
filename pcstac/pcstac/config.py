@@ -1,4 +1,6 @@
 from functools import lru_cache
+from urllib.parse import urljoin
+from fastapi import Request
 
 from pydantic import BaseModel, BaseSettings, Field
 from stac_fastapi.extensions.core import (
@@ -95,6 +97,19 @@ class Settings(BaseSettings):
     api_version: str = f"v{API_VERSION}"
     rate_limits: RateLimits
     back_pressures: BackPressures
+
+    def get_tiler_href(self, request: Request) -> str:
+        """Generates the tiler HREF.
+
+        if the setting for the tiler HREF
+        is relative, then use the request's base URL to generate the
+        absolute URL.
+        """
+        if request:
+            base_hostname = f"{request.url.scheme}://{request.url.netloc}/"
+            return urljoin(base_hostname, self.tiler_href)
+        else:
+            return self.tiler_href
 
     class Config:
         env_prefix = ENV_VAR_PCAPIS_PREFIX
