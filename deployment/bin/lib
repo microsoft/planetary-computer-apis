@@ -110,18 +110,25 @@ function full_setup() {
     fi
 }
 
+function prepare_funcs() {
+    rm -rf /opt/src/pcfuncs_deploy
+    cp -r /opt/src/pcfuncs /opt/src/pcfuncs_deploy
+
+    pushd /opt/src/pcfuncs_deploy || exit
+    # Create symlink to enable function app building of pctasks
+    ln -s /opt/src/pccommon /opt/src/pcfuncs_deploy/pccommon_linked
+    cp requirements-deploy.txt requirements.txt
+    popd || exit
+}
+
 function deploy_funcs() {
     require_env "FUNCTION_APP_NAME"
 
     azlogin
 
-    rm -rf /opt/src/pcfuncs_deploy
-    cp -r /opt/src/pcfuncs /opt/src/pcfuncs_deploy
+    prepare_funcs
 
     pushd /opt/src/pcfuncs_deploy
-    # Create symlink to enable function app building of pctasks
-    ln -s /opt/src/pccommon /opt/src/pcfuncs_deploy/pccommon_linked
-    cp requirements-deploy.txt requirements.txt
     func azure functionapp publish ${FUNCTION_APP_NAME} --python
     popd
 }

@@ -1,0 +1,124 @@
+#!/bin/bash
+
+source bin/lib
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0") -t PACKAGE_TAG
+Publish Azure function zip package to gh-pages.
+
+-t PACKAGE_TAG: The version tag used for the filename. Required.
+"
+}
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+    -t)
+        PACKAGE_TAG=${2}
+        shift
+        shift
+        ;;
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+if [[ -z ${PACKAGE_TAG} ]]; then
+    echo "Must pass in PACKAGE_TAG with -t"
+    exit
+fi
+
+require_env GITHUB_TOKEN
+require_env GITHUB_ACTOR
+
+echo "Building function package with tag: ${PACKAGE_TAG}"
+
+configure() {
+    git config --global user.name "${GITHUB_ACTOR}"
+    git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+    if [[ -z ${GITHUB_REPOSITORY} ]]; then
+        GITHUB_REPOSITORY="microsoft/planetary-computer-apis"
+    fi
+
+    OWNER=$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")
+    REPOSITORY=$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")
+
+    REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${OWNER}/${REPOSITORY}"
+    BRANCH=gh-pages
+
+    PKG_TMP_DIR=$(mktemp -d)
+    PKG_NAME="planetary-computer-func-${PACKAGE_TAG}"
+}
+
+package() {
+    echo "Packaging function app..."
+
+    prepare_funcs
+
+    pushd /opt/src/pcfuncs_deploy
+    func pack --output "${PKG_TMP_DIR}/${PKG_NAME}"
+    popd
+}
+
+update() {
+    # Clone the repo and checkout the gh-pages branch. Update the function
+    # metadata index and the artifact to be included in the published Pages
+    # deployment.
+
+    TMP_REPO_DIR=$(mktemp -d)
+    PKG_TARGET_DIR="${TMP_REPO_DIR}/${REPOSITORY}/func-packages"
+    pushd "$TMP_REPO_DIR" >& /dev/null
+
+    git clone "${REPO_URL}"
+    cd "${REPOSITORY}"
+    git remote set-url origin "${REPO_URL}"
+    git checkout "${BRANCH}"
+
+    # Target directory for published func packages
+    mkdir -p "${PKG_TARGET_DIR}"
+
+    # Update the func index file with the metadata for the new package
+    if [[ -f "func-index.yaml" ]]; then
+        echo "Found function index, merging package version"
+
+        mv -f "${PKG_TMP_DIR}/${PKG_NAME}.zip" "${PKG_TARGET_DIR}"
+        /opt/src/deployment/bin/update_func_index "${PKG_NAME}" "${PACKAGE_TAG}"
+    else
+        echo "Could not find pcfunc publish index"
+        exit 1
+    fi
+
+    upload
+
+    popd >& /dev/null
+    rm -rf "$TMP_REPO_DIR"
+}
+
+upload() {
+    git add func-index.yaml
+    git add "${PKG_TARGET_DIR}/${PKG_NAME}.zip"
+    git status
+
+    git commit -m "Publish func package ${PKG_NAME}"
+    git push origin ${BRANCH}
+
+    echo "Published function package ${PKG_NAME} to ${BRANCH}"
+}
+
+# Package the function app and upload it gh-pages
+configure
+package
+update

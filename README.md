@@ -30,7 +30,7 @@ For documentation of how you can deploy your own test version of these services,
 After building the project locally using the instructions below, you can access the development version of the services by pointing your browser to the following URLs:
 
 |                      |                                        |
-| -------------------- | -------------------------------------- |
+|----------------------|----------------------------------------|
 | STAC API (via nginx) | <http://localhost:8080/stac>           |
 | Tiler (via nginx)    | <http://localhost:8080/data>           |
 | Funcs (vai nginx)    | <http://localhost:8080/f/image>, etc.. |
@@ -41,7 +41,7 @@ After building the project locally using the instructions below, you can access 
 To see the HTTP endpoints available for FastAPI servers, visit the OpenAPI documentation for each service:
 
 |           |                                   |
-| --------- | --------------------------------- |
+|-----------|-----------------------------------|
 | STAC API  | <http://localhost:8080/stac/docs> |
 | Tiler API | <http://localhost:8080/data/docs> |
 
@@ -110,7 +110,7 @@ environment files you want to use before running `scripts/server`. __Note__: Be 
 with a non-dev database set - avoid `scripts/setup`, or ensure the migration connection is still using the local
 dev database even if using a remote test db.
 
-## Published images and charts
+## Published images, charts, and functions
 
 This project publishes images and helm charts, which are used in the deployment of the Planetary Computer.
 
@@ -125,6 +125,9 @@ Images following images are hosted in the [Microsoft Container Registry](https:/
 
 See the [Helm chart repository](https://microsoft.github.io/planetary-computer-apis) published to GitHub pages for the published charts.
 
+### Functions
+
+See the [Function package repository](https://microsoft.github.io/planetary-computer-apis) published to GitHub pages for the published Azure Functions.
 ### Building /queryable schemas
 
 Schemas can be built/updated with

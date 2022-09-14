@@ -18,6 +18,11 @@ services:
 
       # Used in the dev stack as an identifier
       - TF_VAR_username=${USER}
+
+      # Used in function deployment injected by GH Actions
+      - GITHUB_TOKEN
+      - GITHUB_REPOSITORY
+      - GITHUB_ACTOR
     working_dir: /opt/src/deployment
     volumes:
       - ../deployment:/opt/src/deployment

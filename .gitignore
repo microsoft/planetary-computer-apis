@@ -120,3 +120,8 @@ queryable_schemas/
 .metals/
 
 kubeconfig
+
+# gh-pages
+Gemfile
+Gemfile.lock
+_site/
