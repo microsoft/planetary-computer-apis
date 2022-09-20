@@ -7,11 +7,10 @@ from typing import Any, Dict, List, Type
 
 import aiohttp
 from dateutil.relativedelta import relativedelta
+from funclib.errors import BBoxTooLargeError
 from mercantile import Bbox, Tile, tiles
 from PIL import Image
 from PIL.Image import Image as PILImage
-
-from funclib.errors import BBoxTooLargeError
 
 from .constants import MAX_TILE_COUNT
 from .frame import AnimationFrame

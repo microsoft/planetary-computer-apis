@@ -2,16 +2,14 @@ import json
 import logging
 
 import azure.functions as func
+from funclib.errors import BBoxTooLargeError
 from pydantic import ValidationError
-
 
 from .animation import PcMosaicAnimation
 from .models import AnimationRequest, AnimationResponse
-from .stamps.progress_bar import ProgressBarStamp
 from .stamps.brand import BrandStamp
+from .stamps.progress_bar import ProgressBarStamp
 from .utils import upload_gif
-
-from funclib.errors import BBoxTooLargeError
 
 
 async def main(req: func.HttpRequest) -> func.HttpResponse:

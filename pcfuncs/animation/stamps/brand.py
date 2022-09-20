@@ -1,4 +1,5 @@
 import glob
+
 from PIL import Image, ImageDraw, ImageFont
 from PIL.Image import Image as PILImage
 
