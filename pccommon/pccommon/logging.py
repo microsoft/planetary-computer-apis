@@ -4,7 +4,7 @@ across all services
 
 import logging
 import sys
-from typing import Optional
+from typing import Any, Optional, Tuple, cast
 from urllib.parse import urlparse
 
 from fastapi import Request
@@ -51,10 +51,28 @@ class CustomDimensionsFilter(logging.Filter):
         return bool(record.__dict__["custom_dimensions"])
 
 
+# Prevent successful health check pings from being logged
+class HealthCheckFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        if len(record.args) != 5:
+            return True
+
+        args = cast(Tuple[str, str, str, str, int], record.args)
+        endpoint = args[2]
+        status = args[4]
+        if endpoint == "/_mgmt/ping" and status == 200:
+            return False
+
+        return True
+
+
 # Initialize logging, including a console handler, and sending all logs containing
 # custom_dimensions to Application Insights
 def init_logging(service_name: str) -> None:
     config = get_apis_config()
+
+    # Exclude health check endpoint pings from the uvicorn logs
+    logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
 
     # Setup logging for current package and pccommon
     for package in [PACKAGES[service_name], "pccommon"]:
