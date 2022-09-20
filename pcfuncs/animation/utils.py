@@ -9,10 +9,6 @@ from pyproj import Transformer
 from .settings import AnimationSettings
 
 
-class BBoxTooLargeError(Exception):
-    pass
-
-
 @dataclass
 class Point:
     x: float

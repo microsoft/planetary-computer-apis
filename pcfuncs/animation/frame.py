@@ -5,6 +5,7 @@ from mercantile import Bbox, Tile, xy_bounds
 from PIL import Image
 from PIL.Image import Image as PILImage
 
+from .stamps.stamp import FrameStamp
 from .utils import Point, geop_to_imgp, to_3857
 
 
@@ -15,6 +16,9 @@ class AnimationFrame:
         tile_images: List[io.BytesIO],
         bbox: Bbox,
         tile_size: int,
+        frame_number: int,
+        frame_count: int,
+        stamps: List[FrameStamp],
     ):
         self.tiles = tiles
         self.tile_images = tile_images
@@ -24,6 +28,9 @@ class AnimationFrame:
         self.num_rows = self._get_num_rows()
         self.px_width = self.num_cols * self.tile_size
         self.px_height = self.num_rows * self.tile_size
+        self.frame_count = frame_count
+        self.frame_number = frame_number
+        self.stamps = stamps
 
     def _get_num_cols(self) -> int:
         return len(set([tile.x for tile in self.tiles]))
@@ -71,4 +78,13 @@ class AnimationFrame:
             else:
                 y += 1
 
-        return self._crop(mosaic)
+        cropped_frame = self._crop(mosaic)
+        return self.stamp_frame(cropped_frame)
+
+    def stamp_frame(self, mosaic: PILImage) -> PILImage:
+        image = mosaic.copy()
+        for Stamp in self.stamps:
+            stamper = Stamp(self)
+            image = stamper.apply(image)
+
+        return image

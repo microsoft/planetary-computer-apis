@@ -4,9 +4,14 @@ import logging
 import azure.functions as func
 from pydantic import ValidationError
 
+
 from .animation import PcMosaicAnimation
 from .models import AnimationRequest, AnimationResponse
-from .utils import BBoxTooLargeError, upload_gif
+from .stamps.progress_bar import ProgressBarStamp
+from .stamps.brand import BrandStamp
+from .utils import upload_gif
+
+from funclib.errors import BBoxTooLargeError
 
 
 async def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -52,12 +57,19 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 async def handle_request(req: AnimationRequest) -> AnimationResponse:
+    stamps = []
+    if req.show_progressbar:
+        stamps.append(ProgressBarStamp)
+    if req.show_branding:
+        stamps.append(BrandStamp)
+
     animator = PcMosaicAnimation(
         bbox=req.bbox,
         zoom=req.zoom,
         cql=req.cql,
         render_params=req.get_encoded_render_params(),
         frame_duration=req.duration,
+        stamps=stamps,
     )
 
     gif = await animator.get(

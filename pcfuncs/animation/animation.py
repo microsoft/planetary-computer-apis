@@ -3,7 +3,7 @@ import io
 import logging
 from copy import deepcopy
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Type
 
 import aiohttp
 from dateutil.relativedelta import relativedelta
@@ -11,10 +11,12 @@ from mercantile import Bbox, Tile, tiles
 from PIL import Image
 from PIL.Image import Image as PILImage
 
+from funclib.errors import BBoxTooLargeError
+
 from .constants import MAX_TILE_COUNT
 from .frame import AnimationFrame
 from .settings import AnimationSettings
-from .utils import BBoxTooLargeError
+from .stamps.stamp import FrameStamp
 
 
 class PcMosaicAnimation:
@@ -24,6 +26,7 @@ class PcMosaicAnimation:
         zoom: int,
         cql: Dict[str, Any],
         render_params: str,
+        stamps: List[Type[FrameStamp]],
         frame_duration: int = 250,
     ):
         self.bbox = bbox
@@ -38,6 +41,7 @@ class PcMosaicAnimation:
         settings = AnimationSettings.get()
         self.registerUrl = f"{settings.api_root_url}/mosaic/register/"
         self.async_limit = asyncio.Semaphore(settings.tile_request_concurrency)
+        self.stamps = stamps
 
         if len(self.tiles) > MAX_TILE_COUNT:
             raise BBoxTooLargeError(
@@ -98,13 +102,17 @@ class PcMosaicAnimation:
                         return empty
 
     async def get(
-        self, delta: relativedelta, start: datetime, total_frames: int
+        self, delta: relativedelta, start: datetime, frame_count: int
     ) -> io.BytesIO:
         frames: List[asyncio.Future[PILImage]] = []
 
         next_date = start
-        for _ in range(total_frames):
-            frames.append(asyncio.ensure_future(self._get_frame(next_date)))
+        for frame_number in range(frame_count):
+            frames.append(
+                asyncio.ensure_future(
+                    self._get_frame(next_date, frame_count, frame_number)
+                )
+            )
             next_date += delta
 
         image_frames: List[PILImage] = list(await asyncio.gather(*frames))
@@ -122,7 +130,9 @@ class PcMosaicAnimation:
 
         return output
 
-    async def _get_frame(self, date: datetime) -> PILImage:
+    async def _get_frame(
+        self, date: datetime, frame_count: int, frame_number: int
+    ) -> PILImage:
         tile_path = await self._get_tilejson(date.isoformat())
 
         tasks: List[asyncio.Future[io.BytesIO]] = []
@@ -138,5 +148,14 @@ class PcMosaicAnimation:
         bbox = Bbox(
             left=self.bbox[0], bottom=self.bbox[1], right=self.bbox[2], top=self.bbox[3]
         )
-        frame = AnimationFrame(self.tiles, tile_images, bbox, self.tile_size)
+        frame = AnimationFrame(
+            tiles=self.tiles,
+            tile_images=tile_images,
+            bbox=bbox,
+            tile_size=self.tile_size,
+            frame_count=frame_count,
+            frame_number=frame_number,
+            stamps=self.stamps,
+        )
+
         return frame.get_mosaic()

@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 from urllib.parse import quote
 
 from dateutil.relativedelta import relativedelta
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, validator
 
 from .constants import MAX_FRAMES
 
@@ -38,6 +38,8 @@ class AnimationRequest(BaseModel):
     step: int
     unit: str
     frames: int
+    show_branding: bool = Field(default=True, alias="showBranding")
+    show_progressbar: bool = Field(default=True, alias="showProgressBar")
 
     @validator("render_params")
     def _validate_render_params(cls, v: str) -> str:
