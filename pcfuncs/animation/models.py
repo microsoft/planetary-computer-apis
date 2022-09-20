@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List
 from urllib.parse import quote
 
 from dateutil.relativedelta import relativedelta
