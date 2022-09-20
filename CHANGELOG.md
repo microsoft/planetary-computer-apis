@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- Move to using Azure AD based RBAC for AKS [#114](https://github.com/microsoft/planetary-computer-apis/pull/114)
+
+### Added
+
+- Adds function-based API endpoints for image and animation (ported from Explorer) [#115](https://github.com/microsoft/planetary-computer-apis/pull/115), [#119](https://github.com/microsoft/planetary-computer-apis/pull/115)
+- Publish Azure Function packages to GitHub Pages based repo [117](https://github.com/microsoft/planetary-computer-apis/pull/117)
+
 ## [2022.3.0]
 
 ### Changed
@@ -14,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Include hostname in redis cache keys  [#98](https://github.com/microsoft/planetary-computer-apis/pull/98)
 - Update titiler-pgstac version and forward Request in reader [#91](https://github.com/microsoft/planetary-computer-apis/pull/91)
 - Upgrade uvicorn [#106](https://github.com/microsoft/planetary-computer-apis/pull/106)
-- Publish Azure Function packages to GitHub Pages based repo [117](https://github.com/microsoft/planetary-computer-apis/pull/117)
 
 ## [2022.2.0]
 
