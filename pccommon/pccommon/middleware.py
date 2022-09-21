@@ -90,6 +90,7 @@ async def timeout_middleware(
 
         return PlainTextResponse(
             f"The request exceeded the maximum allowed time, please try again."
+            " If the issue persists, please contact planetarycomputer@microsoft.com."
             f"\n\n{debug_msg}",
             status_code=HTTP_504_GATEWAY_TIMEOUT,
         )
