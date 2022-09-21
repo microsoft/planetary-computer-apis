@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- Move to using Azure AD based RBAC for AKS [#114](https://github.com/microsoft/planetary-computer-apis/pull/114)
+
+### Added
+
+- Adds function-based API endpoints for image and animation (ported from Explorer) [#115](https://github.com/microsoft/planetary-computer-apis/pull/115), [#119](https://github.com/microsoft/planetary-computer-apis/pull/115)
+- Publish Azure Function packages to GitHub Pages based repo [117](https://github.com/microsoft/planetary-computer-apis/pull/117)
+- Adds timeout middleware and less verbose logging for debugging gateway timeout issues [#120](https://github.com/microsoft/planetary-computer-apis/pull/120)
+
 ## [2022.3.0]
 
 ### Changed
