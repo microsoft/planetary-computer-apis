@@ -4,7 +4,7 @@ across all services
 
 import logging
 import sys
-from typing import Any, Optional, Tuple, cast
+from typing import Optional, Tuple, cast
 from urllib.parse import urlparse
 
 from fastapi import Request

@@ -12,6 +12,7 @@ stac:
     minDbConnections: "1"
     maxDbConnections: "1"
     webConcurrency: "1"
+    request_timeout: 30
 
   rate_limit:
     collections: 500
@@ -59,6 +60,7 @@ tiler:
     minDbConnections: "1"
     maxDbConnections: "1"
     webConcurrency: "1"
+    request_timeout: 30
 
   deploy:
     replicaCount: "{{ tf.tiler_replica_count }}"

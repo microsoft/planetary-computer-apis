@@ -1,9 +1,13 @@
+import asyncio
 import logging
+import time
 from typing import Awaitable, Callable
 
 from fastapi import HTTPException, Request, Response
 from fastapi.applications import FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import PlainTextResponse
+from starlette.status import HTTP_504_GATEWAY_TIMEOUT
 from starlette.types import Message
 
 from pccommon.logging import get_custom_dimensions
@@ -61,3 +65,31 @@ class RequestTracingMiddleware(BaseHTTPMiddleware):
         await self.set_body(request)
         response = await trace_request(self.service_name, request, call_next)
         return response
+
+
+async def timeout_middleware(
+    request: Request,
+    call_next: Callable[[Request], Awaitable[Response]],
+    timeout: int,
+) -> Response:
+    try:
+        start_time = time.time()
+        return await asyncio.wait_for(call_next(request), timeout=timeout)
+
+    except asyncio.TimeoutError:
+        process_time = time.time() - start_time
+        log_dimensions = get_custom_dimensions({"request_time": process_time}, request)
+
+        logger.exception(
+            "Request timeout",
+            extra=log_dimensions,
+        )
+
+        ref_id = log_dimensions["custom_dimensions"].get("ref_id")
+        debug_msg = f"Debug information for support: {ref_id}" if ref_id else ""
+
+        return PlainTextResponse(
+            f"The request exceeded the maximum allowed time, please try again."
+            f"\n\n{debug_msg}",
+            status_code=HTTP_504_GATEWAY_TIMEOUT,
+        )

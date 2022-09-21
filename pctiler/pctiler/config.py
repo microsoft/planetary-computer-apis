@@ -12,6 +12,7 @@ STAC_API_URL_ENV_VAR = "STAC_API_URL"
 STAC_API_HREF_ENV_VAR = "STAC_API_HREF"
 
 DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR = "DEFAULT_MAX_ITEMS_PER_TILE"
+REQUEST_TIMEOUT_ENV_VAR = "REQUEST_TIMEOUT"
 
 
 @dataclass
@@ -40,6 +41,7 @@ class Settings(BaseSettings):
     default_max_items_per_tile: int = Field(
         env=DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR, default=10
     )
+    request_timout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
 
     feature_flags: FeatureFlags = FeatureFlags()
 

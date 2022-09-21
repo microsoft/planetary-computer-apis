@@ -69,6 +69,8 @@ spec:
               value: "{{ .Values.tiler.server.minDbConnections }}"
             - name: DB_MAX_CONN_SIZE
               value: "{{ .Values.tiler.server.maxDbConnections }}"
+            - name: REQUEST_TIMEOUT
+              value: "{{ .Values.tiler.server.request_timeout}}"
             - name: STAC_API_URL
               value: "{{ .Values.tiler.stac_api_url}}"
             - name: STAC_API_HREF

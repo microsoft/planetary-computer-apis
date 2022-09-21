@@ -12,6 +12,7 @@ tiler:
     minDbConnections: "1"
     maxDbConnections: "1"
     webConcurrency: "1"
+    request_timeout: 30
 
   service:
     type: ClusterIP

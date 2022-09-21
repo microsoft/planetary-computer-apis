@@ -18,7 +18,11 @@ from titiler.mosaic.errors import MOSAIC_STATUS_CODES
 from titiler.pgstac.db import close_db_connection, connect_to_db
 
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import RequestTracingMiddleware, handle_exceptions
+from pccommon.middleware import (
+    RequestTracingMiddleware,
+    handle_exceptions,
+    timeout_middleware,
+)
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.endpoints import health, item, legend, pg_mosaic
@@ -42,25 +46,33 @@ app.state.service_name = ServiceName.TILER
 
 app.include_router(
     item.pc_tile_factory.router,
-    prefix=get_settings().item_endpoint_prefix,
+    prefix=settings.item_endpoint_prefix,
     tags=["Item tile endpoints"],
 )
 
 app.include_router(
     pg_mosaic.pgstac_mosaic_factory.router,
-    prefix=get_settings().mosaic_endpoint_prefix,
+    prefix=settings.mosaic_endpoint_prefix,
     tags=["PgSTAC Mosaic endpoints"],
 )
 
 app.include_router(
     legend.legend_router,
-    prefix=get_settings().legend_endpoint_prefix,
+    prefix=settings.legend_endpoint_prefix,
     tags=["Legend endpoints"],
 )
 
 app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 
 app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.TILER)
+
+
+@app.middleware("http")
+async def _timeout_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    """Add a timeout to all requests."""
+    return await timeout_middleware(request, call_next, timeout=settings.request_timout)
 
 
 @app.middleware("http")
@@ -76,7 +88,7 @@ add_exception_handlers(app, MOSAIC_STATUS_CODES)
 app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
 app.add_middleware(TotalTimeMiddleware)
 
-if get_settings().debug:
+if settings.debug:
     app.add_middleware(LoggerMiddleware)
 
 app.add_middleware(
@@ -127,7 +139,7 @@ def custom_openapi() -> Dict:
     if not app.openapi_schema:
         schema = get_openapi(
             title="Preview of Tile Access Features",
-            version=get_settings().api_version,
+            version=settings.api_version,
             routes=app.routes,
         )
         app.openapi_schema = fixup_schema(app.root_path, schema)

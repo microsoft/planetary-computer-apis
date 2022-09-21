@@ -15,7 +15,11 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import RequestTracingMiddleware, handle_exceptions
+from pccommon.middleware import (
+    RequestTracingMiddleware,
+    handle_exceptions,
+    timeout_middleware,
+)
 from pccommon.openapi import fixup_schema
 from pccommon.redis import connect_to_redis
 from pcstac.api import PCStacApi
@@ -81,6 +85,16 @@ app.add_middleware(
 )
 
 app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.STAC)
+
+
+@app.middleware("http")
+async def _timeout_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    """Add a timeout to all requests."""
+    return await timeout_middleware(
+        request, call_next, timeout=app_settings.request_timout
+    )
 
 
 @app.middleware("http")
