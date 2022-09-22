@@ -25,8 +25,6 @@ class AnimationSettings(BaseSettings):
     output_account_key: Optional[str] = None
     tile_request_concurrency: int = DEFAULT_CONCURRENCY
 
-    resource_path = "/home/site/wwwroot/animation/resources"
-
     def get_container_client(self) -> ContainerClient:
         return get_container_client(
             self.output_storage_url,

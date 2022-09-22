@@ -2,8 +2,8 @@ from typing import TYPE_CHECKING
 from PIL import Image, ImageDraw, ImageFont
 from PIL.Image import Image as PILImage
 
-from animation.settings import AnimationSettings
-from animation.stamps.stamp import TRANSPARENT, FrameStamp
+from funclib.resources import Resources
+from funclib.stamps.stamp import TRANSPARENT, FrameStamp
 
 if TYPE_CHECKING:
     from animation.frame import AnimationFrame
@@ -11,8 +11,7 @@ if TYPE_CHECKING:
 
 class LogoStamp(FrameStamp):
     def apply(self, image: PILImage) -> PILImage:
-        settings = AnimationSettings.get()
-        logo = Image.open(f"{settings.resource_path}/ms-logo-gray.jpg")
+        logo = Image.open(Resources.logo_path())
 
         RIGHT_OFFSET = 141
         BOTTOM_OFFSET = 55
@@ -30,8 +29,8 @@ class LogoStamp(FrameStamp):
 class PcUrlStamp(FrameStamp):
     def __init__(self, frame: "AnimationFrame"):
         super().__init__(frame)
+        self.font = ImageFont.truetype(Resources.font_path(), 12)
         self.text = "planetarycomputer.microsoft.com"
-        self.font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf", 12)
         self.text_width, self.text_height = self.font.getsize(self.text)
 
     def apply(self, image: PILImage) -> PILImage:

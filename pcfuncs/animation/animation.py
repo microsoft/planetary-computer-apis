@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Type
 import aiohttp
 from dateutil.relativedelta import relativedelta
 from funclib.errors import BBoxTooLargeError
+from funclib.stamps.stamp import FrameStamp
 from mercantile import Bbox, Tile, tiles
 from PIL import Image
 from PIL.Image import Image as PILImage
@@ -15,7 +16,6 @@ from PIL.Image import Image as PILImage
 from .constants import MAX_TILE_COUNT
 from .frame import AnimationFrame
 from .settings import AnimationSettings
-from .stamps.stamp import FrameStamp
 
 
 class PcMosaicAnimation:

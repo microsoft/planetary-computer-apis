@@ -5,7 +5,7 @@ from mercantile import Bbox, Tile, xy_bounds
 from PIL import Image
 from PIL.Image import Image as PILImage
 
-from .stamps.stamp import FrameStamp
+from funclib.stamps.stamp import FrameStamp
 from .utils import Point, geop_to_imgp, to_3857
 
 
