@@ -1,7 +1,7 @@
 from functools import lru_cache
 from urllib.parse import urljoin
-from fastapi import Request
 
+from fastapi import Request
 from pydantic import BaseModel, BaseSettings, Field
 from stac_fastapi.extensions.core import (
     FieldsExtension,

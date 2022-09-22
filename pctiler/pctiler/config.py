@@ -2,8 +2,8 @@ import os
 from dataclasses import dataclass
 from functools import lru_cache
 from urllib.parse import urljoin
-from fastapi import Request
 
+from fastapi import Request
 from pydantic import BaseSettings, Field
 
 # Hostname to fetch STAC information from
