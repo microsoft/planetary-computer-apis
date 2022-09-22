@@ -1,7 +1,7 @@
 import json
 import logging
 import re
-from typing import Awaitable, Callable, List, Optional, Tuple, Union
+from typing import Awaitable, Callable, List, Optional, Tuple, Union, cast
 
 from fastapi import Request, Response
 from opencensus.ext.azure.trace_exporter import AzureExporter
@@ -112,8 +112,10 @@ async def _collection_item_from_request(
     try:
         collection_id_match = collection_id_re.match(f"{url}")
         if collection_id_match:
-            collection_id = collection_id_match.group("collection_id")
-            item_id = collection_id_match.group("item_id")
+            collection_id = cast(
+                Optional[str], collection_id_match.group("collection_id")
+            )
+            item_id = cast(Optional[str], collection_id_match.group("item_id"))
             return (collection_id, item_id)
         elif path.endswith("/search") or path.endswith("/register"):
             return await _parse_collection_from_search(request)

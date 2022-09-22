@@ -99,11 +99,16 @@ def setup_azurite() -> None:
     blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
         AZURITE_CONNECT_STRING
     )
-    containers = [c.name for c in blob_service_client.list_containers()]
-    for container in ["output"]:
-        if container not in containers:
-            print(f"~ ~ Creating container {container}...")
-            blob_service_client.create_container(container)
+    existing_containers = [c.name for c in blob_service_client.list_containers()]
+    pc_apis_containers = [{"name": "output", "public_access": "container"}]
+
+    for container in pc_apis_containers:
+        name = container["name"]
+        access = container.get("public_access", None)
+
+        if name not in existing_containers:
+            print(f"~ ~ Creating container {name}...")
+            blob_service_client.create_container(name, public_access=access)
 
     print("~ Done Azurite setup.")
 

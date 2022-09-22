@@ -187,6 +187,29 @@ class RenderOptions(CamelModel):
     conditions: Optional[List[RenderOptionCondition]] = None
 
 
+class AnimationHint(CamelModel):
+    """
+    Defines hints for animation frame settings, to be used as default overrides, for a
+    particular collection. If not set, a global default will be used on the frontend.
+
+    Attributes
+    ----------
+    unit:
+        One of mins, hours, days, weeks, months, years
+    step:
+        The number of units to increment per frame
+    duration:
+        The number of seconds to display each frame
+    frame_count:
+        The total number of frames to generate
+    """
+
+    unit: Optional[str] = None
+    step: Optional[int] = None
+    duration: Optional[int] = None
+    frame_count: Optional[int] = None
+
+
 class DefaultLocation(CamelModel):
     """
     Defines a default location for showcasing a collection.
@@ -208,6 +231,7 @@ class MosaicInfo(CamelModel):
     render_options: List[RenderOptions]
     default_location: DefaultLocation
     default_custom_query: Optional[Dict[str, Any]] = None
+    animation_hint: Optional[AnimationHint] = None
 
 
 class CollectionConfig(BaseModel):
