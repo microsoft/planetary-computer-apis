@@ -31,7 +31,7 @@ to_3857 = Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True)
 
 def upload_gif(gif: io.BytesIO, collection_name: str) -> str:
     settings = AnimationSettings.get()
-    filename = f"mspc-{collection_name}-{uuid4().hex}.gif"
+    filename = f"planetarycomputer-{collection_name}-{uuid4().hex[:14]}.gif"
     blob_url = os.path.join(settings.output_storage_url, filename)
     with settings.get_container_client() as container_client:
         gif.seek(0)

@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from .animation import PcMosaicAnimation
 from .models import AnimationRequest, AnimationResponse
-from .stamps.brand import BrandStamp
+from .stamps.branding import LogoStamp
 from .stamps.progress_bar import ProgressBarStamp
 from .utils import upload_gif
 
@@ -59,7 +59,7 @@ async def handle_request(req: AnimationRequest) -> AnimationResponse:
     if req.show_progressbar:
         stamps.append(ProgressBarStamp)
     if req.show_branding:
-        stamps.append(BrandStamp)
+        stamps.append(LogoStamp)
 
     animator = PcMosaicAnimation(
         bbox=req.bbox,
