@@ -18,7 +18,7 @@
   },
   "extensions": {
     "http": {
-        "routePrefix": ""
+      "routePrefix": "api/f/v1"
     }
-}
+  }
 }
