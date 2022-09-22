@@ -28,6 +28,7 @@ API_DESCRIPTION = (
 TILER_HREF_ENV_VAR = "TILER_HREF"
 DB_MIN_CONN_ENV_VAR = "DB_MIN_CONN_SIZE"
 DB_MAX_CONN_ENV_VAR = "DB_MAX_CONN_SIZE"
+REQUEST_TIMEOUT_ENV_VAR = "REQUEST_TIMEOUT"
 
 EXTENSIONS = [
     # STAC API Extensions
@@ -97,6 +98,7 @@ class Settings(BaseSettings):
     api_version: str = f"v{API_VERSION}"
     rate_limits: RateLimits
     back_pressures: BackPressures
+    request_timout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
 
     def get_tiler_href(self, request: Request) -> str:
         """Generates the tiler HREF.

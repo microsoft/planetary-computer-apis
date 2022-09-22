@@ -13,6 +13,7 @@ stac:
     maxDbConnections: "1"
     webConcurrency: "1"
     useApiHydrate: true
+    request_timeout: 30
 
   service:
     type: ClusterIP
