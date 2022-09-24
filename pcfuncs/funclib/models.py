@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from urllib.parse import quote
 
 from pydantic import BaseModel
@@ -19,16 +19,16 @@ class RenderOptions(BaseModel):
     One of: first, highest, lowest, mean, median, stdev
     """
 
-    assets: Optional[List[str]] = None
+    assets: Optional[Union[str, List[str]]] = None
     """Assets to render."""
 
-    asset_bidx: Optional[List[str]] = None
-    """Per asset band indexes (e.g. data|1;2;3, cog|1)"""
+    asset_bidx: Optional[Union[str, List[str]]] = None
+    """Per asset band indexes (e.g. data|1,2,3, cog|1)"""
 
     expression: Optional[str] = None
     """Band math expression between assets (e.g. asset1 + asset2 / asset3)"""
 
-    asset_expression: Optional[List[str]] = None
+    asset_expression: Optional[Union[str, List[str]]] = None
     """Per asset band expression (e.g. data|b1*b2+b3, cog|b1+b3)"""
 
     nodata: Optional[str] = None
@@ -40,7 +40,7 @@ class RenderOptions(BaseModel):
     resampling: Optional[str] = None
     """rasterio resampling method. Default is nearest"""
 
-    rescale: Optional[List[str]] = None
+    rescale: Optional[Union[str, List[str]]] = None
     """comma (',') delimited Min,Max range. Can set multiple time for multiple bands."""
 
     color_formula: Optional[str] = None
@@ -85,9 +85,9 @@ class RenderOptions(BaseModel):
         for key, value in options.items():
             if isinstance(value, list):
                 for item in value:
-                    encoded_options.append(f"{key}={quote(item)}")
+                    encoded_options.append(f"{key}={quote(str(item))}")
             else:
-                encoded_options.append(f"{key}={quote(value)}")
+                encoded_options.append(f"{key}={quote(str(value))}")
         encoded_options.append("tile_scale=2")
         return "&".join(encoded_options)
 
