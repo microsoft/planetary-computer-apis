@@ -6,7 +6,7 @@ import logging
 import random
 import time
 from dataclasses import dataclass, field
-from typing import Callable, List, Optional, TypeVar
+from typing import Any, Callable, Coroutine, List, Optional, TypeVar
 
 T = TypeVar("T")
 
@@ -73,6 +73,50 @@ def with_backoff(
 
             # Try to do the thing and return
             return fn()
+
+        except Exception as e:
+            if is_throttle(e):
+                # Handle throttling by backing off a random bit
+                actual_wait = backoff_wait_seconds * random.uniform(0.8, 1.2)
+                logger.warning(
+                    f"Service responded with throttling message - "
+                    f"trying again in {actual_wait:.1f} seeconds..."
+                )
+                time.sleep(actual_wait)
+                throttle_exception = e
+            else:
+                raise
+
+    # Try as we might, sometimes we fail
+    raise BackoffError(
+        "Potential throttling issue - see inner exception. "
+        f"Tried backoff {len(strategy.waits)} times "
+        f"up to {strategy.waits[-1]} seconds"
+    ) from throttle_exception
+
+
+async def with_backoff_async(
+    fn: Callable[[], Coroutine[Any, Any, T]],
+    strategy: Optional[BackoffStrategy] = None,
+    is_throttle: Optional[Callable[[Exception], bool]] = None,
+) -> T:
+    """Executes the given function fn. If an exception is raised
+    that returns True from is_throttle, wait for a bit and try again,
+    or fail after so many retries.
+    """
+    if strategy is None:
+        strategy = BackoffStrategy()
+
+    if is_throttle is None:
+        is_throttle = is_common_throttle_exception
+
+    throttle_exception: Optional[Exception] = None
+
+    for backoff_wait_seconds in strategy.waits:
+        try:
+
+            # Try to do the thing and return
+            return await fn()
 
         except Exception as e:
             if is_throttle(e):

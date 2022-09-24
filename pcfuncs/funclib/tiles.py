@@ -12,9 +12,17 @@ from funclib.raster import Bbox, PILRaster, Raster, RasterExtent
 from mercantile import Tile
 from PIL import Image
 
+from pccommon.backoff import BackoffStrategy, with_backoff_async
+
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=Raster)
+
+
+class TilerError(Exception):
+    def __init__(self, msg: str, resp: aiohttp.ClientResponse):
+        super().__init__(msg)
+        self.resp = resp
 
 
 @dataclass
@@ -104,24 +112,34 @@ class TileSet(ABC, Generic[T]):
 
 class PILTileSet(TileSet[PILRaster]):
     async def _get_tile(self, url: str) -> io.BytesIO:
-        async with aiohttp.ClientSession() as session:
-            async with self._async_limit:
-                async with session.get(url) as resp:
-                    # Download the image tile, block if exceeding concurrency limits
-                    if self._async_limit.locked():
-                        logger.info("Concurrency limit reached, waiting...")
-                        await asyncio.sleep(1)
+        async def _f() -> io.BytesIO:
+            async with aiohttp.ClientSession() as session:
+                async with self._async_limit:
+                    async with session.get(url) as resp:
+                        # Download the image tile, block if exceeding concurrency limits
+                        if self._async_limit.locked():
+                            logger.info("Concurrency limit reached, waiting...")
+                            await asyncio.sleep(1)
 
-                    if resp.status == 200:
-                        return io.BytesIO(await resp.read())
-                    else:
-                        logger.warning(f"Tile request: {resp.status} {url}")
-                        img_bytes = Image.new(
-                            "RGB", (self.tile_size, self.tile_size), "gray"
-                        )
-                        empty = io.BytesIO()
-                        img_bytes.save(empty, format="png")
-                        return empty
+                        if resp.status == 200:
+                            return io.BytesIO(await resp.read())
+                        else:
+                            raise TilerError(
+                                f"Error downloading tile: {url}", resp=resp
+                            )
+
+        try:
+            return await with_backoff_async(
+                _f,
+                is_throttle=lambda e: isinstance(e, TilerError),
+                strategy=BackoffStrategy(waits=[0.2, 0.5, 0.75, 1, 2]),
+            )
+        except TilerError as e:
+            logger.warning(f"Tile request: {e.resp.status} {url}")
+            img_bytes = Image.new("RGB", (self.tile_size, self.tile_size), "gray")
+            empty = io.BytesIO()
+            img_bytes.save(empty, format="png")
+            return empty
 
     async def get_mosaic(self, tiles: List[Tile]) -> PILRaster:
         tasks: List[asyncio.Future[io.BytesIO]] = []
