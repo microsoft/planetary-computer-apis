@@ -3,12 +3,12 @@ import io
 import logging
 from copy import deepcopy
 from datetime import datetime
-from typing import Any, Dict, List, Type
+from typing import Any, Callable, Dict, List
 
 import aiohttp
 from dateutil.relativedelta import relativedelta
 from funclib.errors import BBoxTooLargeError
-from funclib.stamps.stamp import FrameStamp
+from funclib.stamps.stamp import ImageStamp
 from mercantile import Bbox, Tile, tiles
 from PIL import Image
 from PIL.Image import Image as PILImage
@@ -25,7 +25,7 @@ class PcMosaicAnimation:
         zoom: int,
         cql: Dict[str, Any],
         render_params: str,
-        stamps: List[Type[FrameStamp]],
+        stamps: List[Callable[[AnimationFrame], ImageStamp]],
         frame_duration: int = 250,
     ):
         self.bbox = bbox

@@ -1,13 +1,16 @@
 import json
 import logging
+from typing import Callable, List
 
 import azure.functions as func
 from funclib.errors import BBoxTooLargeError
 from funclib.stamps.branding import LogoStamp
 from funclib.stamps.progress_bar import ProgressBarStamp
+from funclib.stamps.stamp import ImageStamp
 from pydantic import ValidationError
 
 from .animation import PcMosaicAnimation
+from .frame import AnimationFrame
 from .models import AnimationRequest, AnimationResponse
 from .utils import upload_gif
 
@@ -55,11 +58,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 async def handle_request(req: AnimationRequest) -> AnimationResponse:
-    stamps = []
+    stamps: List[Callable[[AnimationFrame], ImageStamp]] = []
     if req.show_progressbar:
-        stamps.append(ProgressBarStamp)
+        stamps.append(lambda f: ProgressBarStamp(f.frame_number, f.frame_count))
     if req.show_branding:
-        stamps.append(LogoStamp)
+        stamps.append(lambda _: LogoStamp())
 
     animator = PcMosaicAnimation(
         bbox=req.bbox,

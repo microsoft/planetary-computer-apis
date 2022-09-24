@@ -1,11 +1,11 @@
 import io
-from typing import Any, List
+from typing import Any, Callable, List
 
+from funclib.stamps.stamp import ImageStamp
 from mercantile import Bbox, Tile, xy_bounds
 from PIL import Image
 from PIL.Image import Image as PILImage
 
-from funclib.stamps.stamp import FrameStamp
 from .utils import Point, geop_to_imgp, to_3857
 
 
@@ -18,7 +18,7 @@ class AnimationFrame:
         tile_size: int,
         frame_number: int,
         frame_count: int,
-        stamps: List[FrameStamp],
+        stamps: List[Callable[["AnimationFrame"], ImageStamp]],
     ):
         self.tiles = tiles
         self.tile_images = tile_images
@@ -83,8 +83,8 @@ class AnimationFrame:
 
     def stamp_frame(self, mosaic: PILImage) -> PILImage:
         image = mosaic.copy()
-        for Stamp in self.stamps:
-            stamper = Stamp(self)
+        for create_stamp in self.stamps:
+            stamper = create_stamp(self)
             image = stamper.apply(image)
 
         return image

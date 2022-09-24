@@ -1,20 +1,21 @@
 from PIL import Image, ImageDraw
 from PIL.Image import Image as PILImage
 
-from .stamp import TRANSPARENT, FrameStamp
+from .stamp import TRANSPARENT, ImageStamp
 
 BAR_HEIGHT = 3
 BG_PAD = 0.2
 
 
-class ProgressBarStamp(FrameStamp):
+class ProgressBarStamp(ImageStamp):
+    def __init__(self, frame_number: int, frame_count: int) -> None:
+        self.frame_number = frame_number
+        self.frame_count = frame_count
+
     def apply(self, image: PILImage) -> PILImage:
-        tile_frame = self.frame
         bar_frame = Image.new("RGBA", (image.width, image.height), TRANSPARENT)
 
-        bar_width = int(
-            image.width * (tile_frame.frame_number / (tile_frame.frame_count - 1))
-        )
+        bar_width = int(image.width * (self.frame_number / (self.frame_count - 1)))
 
         draw = ImageDraw.Draw(bar_frame)
         x0, y0 = 0, image.height - BAR_HEIGHT
