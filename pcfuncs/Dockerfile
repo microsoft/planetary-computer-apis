@@ -13,3 +13,5 @@ RUN pip install -r /home/site/wwwroot/requirements.txt
 
 COPY requirements-dev.txt /home/site/
 RUN pip install -r /home/site/requirements-dev.txt
+
+ENV PYTHONPATH=/home/site/wwwroot
