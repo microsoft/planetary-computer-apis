@@ -5,6 +5,7 @@ from typing import Any
 import azure.functions as func
 from funclib.errors import BBoxTooLargeError, InvalidInputError
 from funclib.raster import Bbox, ExportFormats
+from funclib.stamps.branding import LogoStamp
 from funclib.tiles import PILTileSet, TileSet
 from pydantic import ValidationError
 
@@ -30,6 +31,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         parsed_request = ImageRequest(**body)
     except ValidationError as e:
+        logger.warning(e.json(indent=2))
         return func.HttpResponse(
             status_code=400,
             mimetype="application/json",
@@ -105,6 +107,9 @@ async def handle_request(req: ImageRequest) -> ImageResponse:
     # Optionally mask the image (TODO: implement with rasterio)
     if req.mask:
         result = mosaic.mask(geom)
+
+    if req.show_branding:
+        LogoStamp().apply(result.image)
 
     # Upload the image to output storage.
     result_url = upload_image(result.to_bytes(), req.get_collection())

@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional
 
 from funclib.models import RenderOptions
 from funclib.raster import ExportFormats
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, validator
 
 from .settings import ImageSettings
 from .utils import get_geom_from_cql
@@ -33,6 +33,9 @@ class ImageRequest(BaseModel):
 
     rows: int
     """The desired image height in pixels."""
+
+    show_branding: bool = Field(default=True, alias="showBranding")
+    """Stamp the Microsoft logo on the image"""
 
     format: ExportFormats = ExportFormats.PNG
     """The desired image format."""
