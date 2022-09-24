@@ -12,7 +12,14 @@ class ImageRequest(BaseModel):
     cql: Dict[str, Any]
     """CQL query to render.
 
-    This must include a s_intersects op with a geometry
+    If this does not include a s_intersects op with a geometry,
+    a geometry must be supplied.
+    """
+
+    geometry: Optional[Dict[str, Any]] = None
+    """Geometry of are to capture.
+
+    Must be supplied if cql does not include a s_intersects op with a geometry.
     """
 
     render_params: str
@@ -37,19 +44,24 @@ class ImageRequest(BaseModel):
     """Override for the data API URL. Useful for testing."""
 
     def get_geometry(self) -> Dict[str, Any]:
-        geom = get_geom_from_cql(self.cql)
-        assert geom
-        return geom
+        assert self.geometry
+        return self.geometry
 
     def get_render_options(self) -> RenderOptions:
         return RenderOptions.from_query_params(self.render_params)
 
-    @validator("cql")
-    def _validate_cql(cls, v: Dict[str, Any]) -> Dict[str, Any]:
-        if not get_geom_from_cql(v):
-            raise ValueError(
-                "Invalid CQL: Must contain a geometry in an s_intersects operation"
-            )
+    @validator("geometry")
+    def _validate_cql(
+        cls, v: Optional[Dict[str, Any]], values: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        if not v:
+            cql = values["cql"]
+            v = get_geom_from_cql(cql)
+            if not v:
+                raise ValueError(
+                    "Missing Geometry: Request must contain a geometry "
+                    "or the cql contain a geometry in an s_intersects operation"
+                )
         return v
 
     @validator("render_params")
