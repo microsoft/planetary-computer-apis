@@ -26,7 +26,7 @@ from pccommon.backoff import BackoffStrategy, with_backoff_async
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=Raster)
-U = TypeVar("U")
+U = TypeVar("U", bound="TileSet")
 
 
 class TilerError(Exception):
