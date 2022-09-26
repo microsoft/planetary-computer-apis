@@ -3,12 +3,21 @@ import io
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, List, Optional, TypeVar
+from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from urllib.parse import urlsplit
 
 import aiohttp
 import mercantile
 from funclib.models import RenderOptions
-from funclib.raster import Bbox, PILRaster, Raster, RasterExtent
+from funclib.raster import (
+    Bbox,
+    ExportFormats,
+    GDALRaster,
+    PILRaster,
+    Raster,
+    RasterExtent,
+)
+from funclib.settings import BaseExporterSettings
 from mercantile import Tile
 from PIL import Image
 
@@ -17,6 +26,7 @@ from pccommon.backoff import BackoffStrategy, with_backoff_async
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=Raster)
+U = TypeVar("U")
 
 
 class TilerError(Exception):
@@ -109,6 +119,42 @@ class TileSet(ABC, Generic[T]):
             )
         ]
 
+    @classmethod
+    async def create(
+        cls: Type[U],
+        cql: Dict[str, Any],
+        render_options: RenderOptions,
+        settings: BaseExporterSettings,
+        data_api_url_override: Optional[str] = None,
+    ) -> U:
+        register_url = settings.get_register_url(data_api_url_override)
+
+        async with aiohttp.ClientSession() as session:
+            # Register the search and get the tilejson_url back
+            resp = await session.post(register_url, json=cql)
+            mosaic_info = await resp.json()
+            tilejson_href = [
+                link["href"]
+                for link in mosaic_info["links"]
+                if link["rel"] == "tilejson"
+            ][0]
+            tile_url = f"{tilejson_href}?{render_options.encoded_query_string}"
+
+            # Get the full tile path template
+            resp = await session.get(tile_url)
+            tilejson = await resp.json()
+            tile_url = tilejson["tiles"][0]
+
+            scheme, netloc, path, _, _ = urlsplit(tile_url)
+            tile_url = f"{scheme}://{netloc}{path}".replace("@1x", "@2x")
+
+            return cls(tile_url, render_options)
+
+
+class GDALTileSet(TileSet[GDALRaster]):
+    async def get_mosaic(self, tiles: List[Tile]) -> GDALRaster:
+        raise NotImplementedError()
+
 
 class PILTileSet(TileSet[PILRaster]):
     async def _get_tile(self, url: str) -> io.BytesIO:
@@ -176,3 +222,23 @@ class PILTileSet(TileSet[PILRaster]):
         )
 
         return PILRaster(raster_extent, mosaic)
+
+
+async def get_tile_set(
+    cql: Dict[str, Any],
+    render_options: RenderOptions,
+    settings: BaseExporterSettings,
+    format: ExportFormats = ExportFormats.PNG,
+    data_api_url_override: Optional[str] = None,
+) -> Union[PILTileSet, GDALTileSet]:
+    """Gets a tile set for the given CQL query and render options."""
+
+    # Get the TileSet
+    if format == ExportFormats.PNG:
+        return await PILTileSet.create(
+            cql, render_options, settings, data_api_url_override
+        )
+    else:
+        return await GDALTileSet.create(
+            cql, render_options, settings, data_api_url_override
+        )

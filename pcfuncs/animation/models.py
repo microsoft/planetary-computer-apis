@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, List
-from urllib.parse import quote
+from typing import Any, Callable, Dict, List, Optional
 
 from dateutil.relativedelta import relativedelta
+from funclib.models import RenderOptions
 from pydantic import BaseModel, Field, validator
 
 from .constants import MAX_FRAMES
@@ -41,16 +41,12 @@ class AnimationRequest(BaseModel):
     show_branding: bool = Field(default=True, alias="showBranding")
     show_progressbar: bool = Field(default=True, alias="showProgressBar")
 
+    data_api_url: Optional[str] = None
+    """Override for the data API URL. Useful for testing."""
+
     @validator("render_params")
     def _validate_render_params(cls, v: str) -> str:
-        try:
-            render_options = _get_render_options(v)
-        except Exception:
-            raise ValueError("Invalid render_params")
-        if "collection" not in render_options:
-            raise ValueError("Missing collection in render_params")
-        if len(render_options["collection"]) != 1:
-            raise ValueError("Multiple collections in render_params")
+        RenderOptions.from_query_params(v)
         return v
 
     @validator("unit")
@@ -61,18 +57,12 @@ class AnimationRequest(BaseModel):
             )
         return v
 
+    def get_render_options(self) -> RenderOptions:
+        return RenderOptions.from_query_params(self.render_params)
+
     def get_collection(self) -> str:
         render_options = _get_render_options(self.render_params)
         return render_options["collection"][0]
-
-    def get_encoded_render_params(self) -> str:
-        encoded_options = [
-            f"{key}={quote(v)}"
-            for key, value in _get_render_options(self.render_params).items()
-            for v in value
-        ]
-        encoded_options.append("tile_scale=2")
-        return "&".join(encoded_options)
 
     def get_valid_frames(self) -> int:
         return min(self.frames, MAX_FRAMES)

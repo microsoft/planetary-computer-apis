@@ -8,9 +8,9 @@ BG_PAD = 0.2
 
 
 class ProgressBarStamp(ImageStamp):
-    def __init__(self, frame_number: int, frame_count: int) -> None:
-        self.frame_number = frame_number
+    def __init__(self, frame_count: int, frame_number: int) -> None:
         self.frame_count = frame_count
+        self.frame_number = frame_number
 
     def apply(self, image: PILImage) -> PILImage:
         bar_frame = Image.new("RGBA", (image.width, image.height), TRANSPARENT)

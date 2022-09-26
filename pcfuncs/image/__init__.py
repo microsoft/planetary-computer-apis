@@ -1,17 +1,16 @@
 import json
 import logging
-from typing import Any
 
 import azure.functions as func
 from funclib.errors import BBoxTooLargeError, InvalidInputError
-from funclib.raster import Bbox, ExportFormats
+from funclib.raster import Bbox, PILRaster
 from funclib.stamps.branding import LogoStamp
-from funclib.tiles import PILTileSet, TileSet
+from funclib.tiles import TileSet, get_tile_set
 from pydantic import ValidationError
 
 from .models import ImageRequest, ImageResponse
 from .settings import ImageSettings
-from .utils import get_min_zoom, register_search_and_get_tile_url, upload_image
+from .utils import get_min_zoom, upload_image
 
 logger = logging.getLogger(__name__)
 
@@ -87,17 +86,13 @@ async def handle_request(req: ImageRequest) -> ImageResponse:
             f"collection {render_options.collection}."
         )
 
-    # Register the search and get the tile URL for the mosaic.
-    tile_url = await register_search_and_get_tile_url(
-        req.cql, render_options=render_options, data_api_url_override=req.data_api_url
+    tile_set = await get_tile_set(
+        req.cql,
+        render_options=render_options,
+        settings=settings,
+        data_api_url_override=req.data_api_url,
+        format=req.format,
     )
-
-    # Get the TileSet
-    tile_set: TileSet[Any]
-    if req.format == ExportFormats.PNG:
-        tile_set = PILTileSet(tile_url, render_options=render_options)
-    else:
-        raise NotImplementedError(f"Export format {req.format} not implemented")
 
     # Create the mosaic from the covering tiles, crop to the geometry bounds,
     # and resample to the requested image size.
@@ -109,7 +104,10 @@ async def handle_request(req: ImageRequest) -> ImageResponse:
         result = mosaic.mask(geom)
 
     if req.show_branding:
-        LogoStamp().apply(result.image)
+        if isinstance(result, PILRaster):
+            LogoStamp().apply(result.image)
+        else:
+            raise NotImplementedError("Branding not implemented for non-PIL raster")
 
     # Upload the image to output storage.
     result_url = upload_image(result.to_bytes(), req.get_collection())

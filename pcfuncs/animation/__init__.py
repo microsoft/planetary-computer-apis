@@ -10,8 +10,8 @@ from funclib.stamps.stamp import ImageStamp
 from pydantic import ValidationError
 
 from .animation import PcMosaicAnimation
-from .frame import AnimationFrame
 from .models import AnimationRequest, AnimationResponse
+from .settings import AnimationSettings
 from .utils import upload_gif
 
 
@@ -58,19 +58,26 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 async def handle_request(req: AnimationRequest) -> AnimationResponse:
-    stamps: List[Callable[[AnimationFrame], ImageStamp]] = []
+    settings = AnimationSettings.get()
+    stamps: List[Callable[[int, int], ImageStamp]] = []
     if req.show_progressbar:
-        stamps.append(lambda f: ProgressBarStamp(f.frame_number, f.frame_count))
+        stamps.append(
+            lambda frame_count, frame_number: ProgressBarStamp(
+                frame_count, frame_number
+            )
+        )
     if req.show_branding:
-        stamps.append(lambda _: LogoStamp())
+        stamps.append(lambda x, y: LogoStamp())
 
     animator = PcMosaicAnimation(
         bbox=req.bbox,
         zoom=req.zoom,
         cql=req.cql,
-        render_params=req.get_encoded_render_params(),
-        frame_duration=req.duration,
+        render_options=req.get_render_options(),
+        settings=settings,
         stamps=stamps,
+        frame_duration=req.duration,
+        data_api_url_override=req.data_api_url,
     )
 
     gif = await animator.get(

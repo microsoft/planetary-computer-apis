@@ -34,11 +34,11 @@ class ImageRequest(BaseModel):
     rows: int
     """The desired image height in pixels."""
 
-    show_branding: bool = Field(default=True, alias="showBranding")
-    """Stamp the Microsoft logo on the image"""
-
     format: ExportFormats = ExportFormats.PNG
     """The desired image format."""
+
+    show_branding: bool = Field(default=True, alias="showBranding")
+    """Stamp the Microsoft logo on the image"""
 
     mask: bool = False
     """If true, the image will be masked with the input geometry."""
@@ -81,6 +81,13 @@ class ImageRequest(BaseModel):
                 f"Too many pixels requested: {cols * v} > {settings.max_pixels}. "
                 "Choose a smaller image size via reducing cols or rows."
             )
+        return v
+
+    @validator("show_branding")
+    def _validate_show_branding(cls, v: bool, values: Dict[str, Any]) -> bool:
+        if v:
+            if values["format"] != ExportFormats.PNG:
+                raise ValueError("Branding is only supported for PNG images.")
         return v
 
     def get_collection(self) -> str:
