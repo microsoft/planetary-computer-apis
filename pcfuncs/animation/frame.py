@@ -1,11 +1,11 @@
 import io
 from typing import Any, List
 
+from funclib.stamps.stamp import FrameStamp
 from mercantile import Bbox, Tile, xy_bounds
 from PIL import Image
 from PIL.Image import Image as PILImage
 
-from funclib.stamps.stamp import FrameStamp
 from .utils import Point, geop_to_imgp, to_3857
 
 

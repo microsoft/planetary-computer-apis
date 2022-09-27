@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING
-from PIL import Image, ImageDraw, ImageFont
-from PIL.Image import Image as PILImage
 
 from funclib.resources import Resources
 from funclib.stamps.stamp import TRANSPARENT, FrameStamp
+from PIL import Image, ImageDraw, ImageFont
+from PIL.Image import Image as PILImage
 
 if TYPE_CHECKING:
     from animation.frame import AnimationFrame
