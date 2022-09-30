@@ -12,6 +12,8 @@ inst_reqs = [
     # Required due to some imports related to pypgstac CLI usage in startup script
     "pypgstac[psycopg]==0.6.6",
     "pystac==1.*",
+    # TODO: remove after https://github.com/stac-utils/stac-fastapi/pull/466
+    "pygeoif==0.7",
 ]
 
 extra_reqs = {
