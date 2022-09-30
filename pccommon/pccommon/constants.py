@@ -18,6 +18,11 @@ X_AZURE_CLIENTIP = "X-Azure-ClientIP"
 X_ORIGINAL_FORWARDED_FOR = "X-Original-Forwarded-For"
 X_FORWARDED_FOR = "X-Forwarded-For"
 
+X_REQUEST_ENTITY = "X-PC-Request-Entity"
+X_AZURE_REF = "X-Azure-Ref"
+
+QS_REQUEST_ENTITY = "request_entity"
+
 HTTP_429_TOO_MANY_REQUESTS = 429
 
 HTTP_PATH = COMMON_ATTRIBUTES["HTTP_PATH"]
