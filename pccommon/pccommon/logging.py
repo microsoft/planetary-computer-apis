@@ -4,7 +4,7 @@ across all services
 
 import logging
 import sys
-from typing import Optional, Tuple, cast
+from typing import Optional, Tuple, Union, cast
 from urllib.parse import urlparse
 
 from fastapi import Request
@@ -118,7 +118,7 @@ def request_to_path(request: Request) -> str:
     return parsed_url.path
 
 
-def get_request_entity(request: Request) -> str:
+def get_request_entity(request: Request) -> Union[str, None]:
     """Get the request entity from the given request. If not present as a
     header, attempt to parse from the query string
     """
