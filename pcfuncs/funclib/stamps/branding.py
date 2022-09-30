@@ -1,15 +1,10 @@
-from typing import TYPE_CHECKING
+from funclib.resources import Resources
+from funclib.stamps.stamp import TRANSPARENT, ImageStamp
 from PIL import Image, ImageDraw, ImageFont
 from PIL.Image import Image as PILImage
 
-from funclib.resources import Resources
-from funclib.stamps.stamp import TRANSPARENT, FrameStamp
 
-if TYPE_CHECKING:
-    from animation.frame import AnimationFrame
-
-
-class LogoStamp(FrameStamp):
+class LogoStamp(ImageStamp):
     def apply(self, image: PILImage) -> PILImage:
         logo = Image.open(Resources.logo_path())
 
@@ -26,10 +21,9 @@ class LogoStamp(FrameStamp):
         return image
 
 
-class PcUrlStamp(FrameStamp):
-    def __init__(self, frame: "AnimationFrame"):
-        super().__init__(frame)
-        self.font = ImageFont.truetype(Resources.font_path(), 12)
+class PcUrlStamp(ImageStamp):
+    def __init__(self) -> None:
+        self.font = ImageFont.truetype(Resources.font_path(), 12)  # type: ignore
         self.text = "planetarycomputer.microsoft.com"
         self.text_width, self.text_height = self.font.getsize(self.text)
 
