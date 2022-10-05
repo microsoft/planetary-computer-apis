@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Publish Azure Function packages to GitHub Pages based repo [117](https://github.com/microsoft/planetary-computer-apis/pull/117)
 - Adds timeout middleware and less verbose logging for debugging gateway timeout issues [#120](https://github.com/microsoft/planetary-computer-apis/pull/120)
 
+### Fixed
+
+- Configure CORS correctly at the nginx-ingress level [#127](https://github.com/microsoft/planetary-computer-apis/pull/127)
+
 ## [2022.3.0]
 
 ### Changed
