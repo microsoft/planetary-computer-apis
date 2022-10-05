@@ -23,7 +23,7 @@ resource "azurerm_subnet" "cache_subnet" {
   virtual_network_name = azurerm_virtual_network.pc.name
   resource_group_name  = azurerm_resource_group.pc.name
   address_prefixes     = ["10.2.0.0/16"]
-  service_endpoints = []
+  service_endpoints    = []
 }
 
 resource "azurerm_network_security_group" "pc" {
@@ -38,7 +38,7 @@ resource "azurerm_network_security_group" "pc" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "*"
+    destination_port_ranges    = ["80", "443"]
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
