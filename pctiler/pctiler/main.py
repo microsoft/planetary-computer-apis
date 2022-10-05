@@ -92,6 +92,8 @@ app.add_middleware(TotalTimeMiddleware)
 if settings.debug:
     app.add_middleware(LoggerMiddleware)
 
+# Note: If requests are being sent through an application gateway like
+# nginx-ingress, you may need to configure CORS through that system.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

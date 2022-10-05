@@ -130,6 +130,13 @@ pcingress:
       nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
       nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
 
+      # Enable CORS
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
+      nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+      nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+      nginx.ingress.kubernetes.io/cors-allow-headers: "X-PC-Request-Entity,DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+
 migrations:
   enabled: false
 

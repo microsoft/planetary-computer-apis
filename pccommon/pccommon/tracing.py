@@ -10,7 +10,14 @@ from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
 
 from pccommon.config import get_apis_config
-from pccommon.constants import HTTP_METHOD, HTTP_PATH, HTTP_STATUS_CODE, HTTP_URL
+from pccommon.constants import (
+    HTTP_METHOD,
+    HTTP_PATH,
+    HTTP_STATUS_CODE,
+    HTTP_URL,
+    X_AZURE_REF,
+    X_REQUEST_ENTITY,
+)
 from pccommon.logging import request_to_path
 from pccommon.utils import get_request_ip
 
@@ -59,7 +66,11 @@ async def trace_request(
 
             tracer.add_attribute_to_current_span(
                 attribute_key="ref_id",
-                attribute_value=request.headers.get("X-Azure-Ref"),
+                attribute_value=request.headers.get(X_AZURE_REF),
+            )
+            tracer.add_attribute_to_current_span(
+                attribute_key="request_entity",
+                attribute_value=request.headers.get(X_REQUEST_ENTITY),
             )
             tracer.add_attribute_to_current_span(
                 attribute_key="request_ip",
