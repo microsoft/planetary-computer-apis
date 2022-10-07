@@ -1,19 +1,19 @@
 import asyncio
 import io
-import logging
 from copy import deepcopy
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
 
-import aiohttp
 from dateutil.relativedelta import relativedelta
 from funclib.errors import BBoxTooLargeError
 from funclib.models import RenderOptions
+from funclib.raster import Bbox
 from funclib.stamps.stamp import ImageStamp
 from funclib.tiles import PILTileSet
 from mercantile import Tile, tiles
-from PIL import Image
 from PIL.Image import Image as PILImage
+from pyproj import CRS
+
 
 from .constants import MAX_TILE_COUNT
 from .settings import AnimationSettings
@@ -31,7 +31,7 @@ class PcMosaicAnimation:
         data_api_url_override: Optional[str] = None,
         frame_duration: int = 250,
     ):
-        self.bbox = bbox
+        self.bbox = Bbox(bbox[0], bbox[1], bbox[2], bbox[3], crs=CRS.from_epsg(4326))
         self.zoom = zoom
         self.cql = cql
         self.render_options = render_options
@@ -67,26 +67,6 @@ class PcMosaicAnimation:
         frame_cql = deepcopy(self.cql)
         frame_cql["filter"]["args"] = new_args
         return frame_cql
-
-    async def _get_tile(self, url: str) -> io.BytesIO:
-        async with aiohttp.ClientSession() as session:
-            async with self.async_limit:
-                # Download the image tile, block if exceeding concurrency limits
-                async with await session.get(url) as resp:
-                    if self.async_limit.locked():
-                        logging.info("Concurrency limit reached, waiting...")
-                        await asyncio.sleep(1)
-
-                    if resp.status == 200:
-                        return io.BytesIO(await resp.read())
-                    else:
-                        logging.warning(f"Tile request: {resp.status} {url}")
-                        img_bytes = Image.new(
-                            "RGB", (self.tile_size, self.tile_size), "gray"
-                        )
-                        empty = io.BytesIO()
-                        img_bytes.save(empty, format="png")
-                        return empty
 
     async def get(
         self, delta: relativedelta, start: datetime, frame_count: int
@@ -128,7 +108,7 @@ class PcMosaicAnimation:
         )
 
         raster = await tile_set.get_mosaic(self.tiles)
-        image = raster.image
+        image = raster.crop(self.bbox).image
         for create_stamp in self.stamps:
             stamper = create_stamp(frame_count, frame_number)
             image = stamper.apply(image)
