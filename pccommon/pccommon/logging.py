@@ -4,14 +4,21 @@ across all services
 
 import logging
 import sys
-from typing import Optional, Tuple, cast
+from typing import Optional, Tuple, Union, cast
 from urllib.parse import urlparse
 
 from fastapi import Request
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 
 from pccommon.config import get_apis_config
-from pccommon.constants import HTTP_METHOD, HTTP_PATH, HTTP_URL
+from pccommon.constants import (
+    HTTP_METHOD,
+    HTTP_PATH,
+    HTTP_URL,
+    QS_REQUEST_ENTITY,
+    X_AZURE_REF,
+    X_REQUEST_ENTITY,
+)
 
 
 class ServiceName:
@@ -111,11 +118,21 @@ def request_to_path(request: Request) -> str:
     return parsed_url.path
 
 
+def get_request_entity(request: Request) -> Union[str, None]:
+    """Get the request entity from the given request. If not present as a
+    header, attempt to parse from the query string
+    """
+    return request.headers.get(X_REQUEST_ENTITY) or request.query_params.get(
+        QS_REQUEST_ENTITY
+    )
+
+
 def get_custom_dimensions(dimensions: dict, request: Request) -> dict:
     """Merge the base dimensions with the given dimensions."""
 
     base_dimensions = {
-        "ref_id": request.headers.get("X-Azure-Ref"),
+        "ref_id": request.headers.get(X_AZURE_REF),
+        "request_entity": get_request_entity(request),
         "service": request.app.state.service_name,
         HTTP_URL: str(request.url),
         HTTP_METHOD: str(request.method),

@@ -167,3 +167,8 @@ class PILRaster(Raster):
 
     def mask(self, geom: Dict[str, Any]) -> "PILRaster":
         raise NotImplementedError("PILRaster does not support masking")
+
+
+class GDALRaster(Raster):
+    # TODO: Implement
+    ...

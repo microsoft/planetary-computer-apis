@@ -8,11 +8,12 @@ fi
 
 function usage() {
     echo -n \
-        "Usage: $(basename "$0") [--stac, --tiler, --db, --deploy]
+        "Usage: $(basename "$0") [--stac, --tiler, --funcs, --db, --deploy]
 Runs a console in the development container
 
 --stac - Drops into a dev stac service container. Default.
 --tiler - Drops into a dev tiler service container.
+--funcs - Drops into a funcs service container.
 --db - Drops into a db container
 --deploy - Drops into a deploy container
 "
@@ -31,6 +32,10 @@ while [[ "$#" > 0 ]]; do case $1 in
         ;;
     --tiler)
         DEV_TILER_CONSOLE=1
+        shift
+        ;;
+    --funcs)
+        FUNCS_CONSOLE=1
         shift
         ;;
     --deploy)
@@ -65,6 +70,15 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             -f docker-compose.dev.yml \
             run --rm \
             tiler-dev /bin/bash
+
+        exit 0
+    fi
+
+    if [[ "${FUNCS_CONSOLE}" ]]; then
+        docker-compose \
+            -f docker-compose.yml \
+            run --rm \
+            funcs /bin/bash
 
         exit 0
     fi

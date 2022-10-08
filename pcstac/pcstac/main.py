@@ -77,9 +77,11 @@ app: FastAPI = api.app
 
 app.state.service_name = ServiceName.STAC
 
+# Note: If requests are being sent through an application gateway like
+# nginx-ingress, you may need to configure CORS through that system.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins="*",
+    allow_origins=["*"],
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )

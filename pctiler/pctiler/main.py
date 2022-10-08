@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.openapi.utils import get_openapi
 from morecantile.defaults import tms as defaultTileMatrices
 from morecantile.models import TileMatrixSet
+from pccommon.constants import X_REQUEST_ENTITY
 from starlette.middleware.cors import CORSMiddleware
 from titiler.core.errors import DEFAULT_STATUS_CODES, add_exception_handlers
 from titiler.core.middleware import (
@@ -91,12 +92,13 @@ app.add_middleware(TotalTimeMiddleware)
 if settings.debug:
     app.add_middleware(LoggerMiddleware)
 
+# Note: If requests are being sent through an application gateway like
+# nginx-ingress, you may need to configure CORS through that system.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins="*",
-    allow_credentials=True,
+    allow_origins=["*"],
     allow_methods=["GET", "POST"],
-    allow_headers=["*"],
+    allow_headers=[X_REQUEST_ENTITY],
 )
 
 

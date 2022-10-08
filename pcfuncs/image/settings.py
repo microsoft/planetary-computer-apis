@@ -4,7 +4,7 @@ from typing import Optional
 
 from azure.storage.blob import ContainerClient
 from cachetools import Cache, LRUCache, cachedmethod
-from pydantic import BaseSettings
+from funclib.settings import BaseExporterSettings
 
 from pccommon.blob import get_container_client
 
@@ -14,13 +14,9 @@ DEFAULT_CONCURRENCY = 10
 logger = logging.getLogger(__name__)
 
 
-class ImageSettings(BaseSettings):
+class ImageSettings(BaseExporterSettings):
     _cache: Cache = LRUCache(maxsize=100)
 
-    api_root_url: str = "https://planetarycomputer.microsoft.com/api/data/v1"
-    output_storage_url: str
-    output_sas: Optional[str] = None
-    output_account_key: Optional[str] = None
     tile_request_concurrency: int = DEFAULT_CONCURRENCY
 
     # Maximum tiles to fetch for a single request
