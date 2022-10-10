@@ -14,6 +14,7 @@ from .lulc import lulc_colormaps
 from .modis import modis_colormaps
 from .mtbs import mtbs_colormaps
 from .noaa_c_cap import noaa_c_cap_colormaps
+from .noaa_mrms_qpe import noaa_mrms_qpe_colormaps
 from .viirs import viirs_colormaps
 
 ################################################################################
@@ -30,6 +31,7 @@ custom_colormaps: Dict[str, ColorMapType] = {
     **lidar_colormaps,
     **chloris_colormaps,
     **noaa_c_cap_colormaps,
+    **noaa_mrms_qpe_colormaps,
     **alos_palsar_mosaic_colormaps,
     **viirs_colormaps,
 }
