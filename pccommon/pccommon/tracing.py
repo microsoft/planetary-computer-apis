@@ -62,8 +62,7 @@ async def trace_request(
             # are slow.
             request.state.parent_span = span
 
-            response = await call_next(request)
-
+            # Add request dimensions to the trace prior to calling the next middleware
             tracer.add_attribute_to_current_span(
                 attribute_key="ref_id",
                 attribute_value=request.headers.get(X_AZURE_REF),
@@ -75,9 +74,6 @@ async def trace_request(
             tracer.add_attribute_to_current_span(
                 attribute_key="request_ip",
                 attribute_value=get_request_ip(request),
-            )
-            tracer.add_attribute_to_current_span(
-                attribute_key=HTTP_STATUS_CODE, attribute_value=response.status_code
             )
             tracer.add_attribute_to_current_span(
                 attribute_key=HTTP_METHOD, attribute_value=str(request.method)
@@ -103,6 +99,13 @@ async def trace_request(
                         attribute_key="item", attribute_value=item_id
                     )
 
+            # Call next middleware
+            response = await call_next(request)
+
+            # Include response dimensions in the trace
+            tracer.add_attribute_to_current_span(
+                attribute_key=HTTP_STATUS_CODE, attribute_value=response.status_code
+            )
         return response
     else:
         return await call_next(request)
