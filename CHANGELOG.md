@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Configure CORS correctly at the nginx-ingress level [#127](https://github.com/microsoft/planetary-computer-apis/pull/127)
+- Make config cache access thread safe to prevent key errors [#130](https://github.com/microsoft/planetary-computer-apis/pull/130)
+- Upgrade starlette (via fork) to prevent middleware errors [#130](https://github.com/microsoft/planetary-computer-apis/pull/130)
+- Better request tracing [#130](https://github.com/microsoft/planetary-computer-apis/pull/130)
 
 ## [2022.3.0]
 
