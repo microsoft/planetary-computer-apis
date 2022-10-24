@@ -4,7 +4,12 @@ from setuptools import find_packages, setup
 
 # Runtime requirements.
 inst_reqs = [
-    "fastapi>=0.75.2",
+    # --->
+    # TODO: restore fastapi release install after starlette dep upgraded to >= 0.21.0
+    # "fastapi>=0.75.2",
+    "fastapi @ git+https://github.com/mmcfarland/fastapi/@982e7caf086bffeace8554da6d69e5f3082f14a3#egg=fastapi",
+    "starlette>=0.21.0,<0.22.0",
+    # <---
     "opencensus-ext-azure==1.0.8",
     "opencensus-ext-logging==0.1.0",
     "orjson==3.5.2",
