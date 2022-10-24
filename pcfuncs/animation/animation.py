@@ -14,7 +14,6 @@ from mercantile import Tile, tiles
 from PIL.Image import Image as PILImage
 from pyproj import CRS
 
-
 from .constants import MAX_TILE_COUNT
 from .settings import AnimationSettings
 
