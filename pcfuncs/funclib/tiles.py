@@ -162,11 +162,6 @@ class PILTileSet(TileSet[PILRaster]):
             async with aiohttp.ClientSession() as session:
                 async with self._async_limit:
                     async with session.get(url) as resp:
-                        # Download the image tile, block if exceeding concurrency limits
-                        if self._async_limit.locked():
-                            logger.info("Concurrency limit reached, waiting...")
-                            await asyncio.sleep(1)
-
                         if resp.status == 200:
                             return io.BytesIO(await resp.read())
                         else:
