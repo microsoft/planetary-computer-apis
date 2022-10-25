@@ -1,5 +1,8 @@
 FROM python:3.9-slim
 
+# git required for pip installs from git
+RUN apt update && apt install -y git
+
 # The devops Personal Access Token for accessing
 # Azure Artifacts. Note: This will be visible as
 # plain text in the docker build logs. Only use your

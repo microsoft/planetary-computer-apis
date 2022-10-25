@@ -1,3 +1,4 @@
+from threading import Lock
 from typing import (
     Any,
     Callable,
@@ -58,6 +59,7 @@ class TableService:
         self._service_client: Optional[TableServiceClient] = None
         self._table_client: Optional[TableClient] = None
         self._cache: Cache = TTLCache(maxsize=1024, ttl=ttl or DEFAULT_TTL)
+        self._cache_lock: Lock = Lock()
 
     def _ensure_table_client(self) -> None:
         if not self._table_client:
@@ -187,7 +189,7 @@ class ModelTableService(Generic[M], TableService):
                 }
             )
 
-    @cachedmethod(cache=lambda self: self._cache)
+    @cachedmethod(cache=lambda self: self._cache, lock=lambda self: self._cache_lock)
     def get(self, partition_key: str, row_key: str) -> Optional[M]:
         with self as table_client:
             try:
