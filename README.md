@@ -128,10 +128,3 @@ See the [Helm chart repository](https://microsoft.github.io/planetary-computer-a
 ### Functions
 
 See the [Function package repository](https://microsoft.github.io/planetary-computer-apis) published to GitHub pages for the published Azure Functions.
-### Building /queryable schemas
-
-Schemas can be built/updated with
-
-```console
-./scripts/build_queryables
-```

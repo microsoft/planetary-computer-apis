@@ -236,7 +236,6 @@ class MosaicInfo(CamelModel):
 
 class CollectionConfig(BaseModel):
     render_config: DefaultRenderConfig
-    queryables: Dict[str, Any]
     mosaic_info: MosaicInfo
 
     class Config:
