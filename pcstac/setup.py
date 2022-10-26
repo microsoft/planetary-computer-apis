@@ -10,7 +10,7 @@ inst_reqs = [
     "stac-fastapi.types @ git+https://github.com/stac-utils/stac-fastapi/@162a1a2c324b4c2bfe3451f7ae19d7840a0e0452#egg=stac-fastapi.types&subdirectory=stac_fastapi/types",
     "pccommon",
     # Required due to some imports related to pypgstac CLI usage in startup script
-    "pypgstac[psycopg]==0.6.6",
+    "pypgstac[psycopg]==0.6.9",
     "pystac==1.*",
     # TODO: remove after https://github.com/stac-utils/stac-fastapi/pull/466
     "pygeoif==0.7",
