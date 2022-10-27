@@ -175,8 +175,8 @@ class PILTileSet(TileSet[PILRaster]):
                 is_throttle=lambda e: isinstance(e, TilerError),
                 strategy=BackoffStrategy(waits=[0.2, 0.5, 0.75, 1, 2]),
             )
-        except TilerError as e:
-            logger.warning(f"Tile request: {e.resp.status} {url}")
+        except Exception:
+            logger.warning(f"Tile request failed with backoff: {url}")
             img_bytes = Image.new("RGB", (self.tile_size, self.tile_size), "gray")
             empty = io.BytesIO()
             img_bytes.save(empty, format="png")
