@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2022.4.0]
+
 ### Changed
 
 - Move to using Azure AD based RBAC for AKS [#114](https://github.com/microsoft/planetary-computer-apis/pull/114)
