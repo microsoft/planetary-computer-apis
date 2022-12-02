@@ -30,6 +30,7 @@ def test_multi_asset() -> None:
     assert qs == (
         "collection=my_collection_id&item=my_item_id&"
         "assets=data1&assets=data2&colormap_name=terrain&rescale=-1000%2C4000"
+        "&format=png"
     )
 
 
@@ -38,6 +39,7 @@ def test_single_asset() -> None:
     assert qs == (
         "collection=my_collection_id&item=my_item_id&assets=data1&"
         "colormap_name=terrain&rescale=-1000%2C4000"
+        "&format=png"
     )
 
 
@@ -47,6 +49,7 @@ def test_no_asset() -> None:
     assert qs == (
         f"collection=my_collection_id&item=my_item_id&expression={encoded_params}"
         "&colormap_name=terrain&rescale=-1000%2C4000"
+        "&format=png"
     )
 
 
@@ -55,6 +58,7 @@ def test_collection_only() -> None:
     assert qs == (
         "collection=my_collection_id&assets=data1&colormap_name=terrain&"
         "rescale=-1000%2C4000"
+        "&format=png"
     )
 
 
@@ -64,7 +68,7 @@ def test_get_render_config() -> None:
     encoded_params = quote_plus("image|1,2,3")
     assert (
         config.get_full_render_qs("naip")
-        == f"collection=naip&assets=image&asset_bidx={encoded_params}"
+        == f"collection=naip&assets=image&asset_bidx={encoded_params}&format=png"
     )
 
 
@@ -91,4 +95,26 @@ def test_listlike_rescale() -> None:
     assert result == (
         "collection=test&expression=HH%2CHV%2CHH%2FHV&"
         "rescale=0%2C9000&rescale=0%2C1000&rescale=0%2C1"
+        "&format=png"
     )
+
+
+def test_render_config_preserves_format() -> None:
+    config = DefaultRenderConfig(
+        render_params={"format": "jpg"},
+        minzoom=8,
+    )
+
+    parsed = config.get_render_params()
+    assert "format=jpg" in parsed
+    assert "format=png" not in parsed
+
+
+def test_render_config_defaults_format_png() -> None:
+    config = DefaultRenderConfig(
+        render_params={},
+        minzoom=8,
+    )
+
+    parsed = config.get_render_params()
+    assert "format=png" in parsed

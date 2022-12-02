@@ -58,7 +58,13 @@ class DefaultRenderConfig(BaseModel):
         return "".join(params)
 
     def get_render_params(self) -> str:
-        return f"&{get_param_str(self.render_params)}"
+        default_params = f"&{get_param_str(self.render_params)}"
+
+        if "format" in self.render_params:
+            return default_params
+
+        # Encforce PNG rendering when otherwise unspecified
+        return default_params + "&format=png"
 
     @property
     def should_add_collection_links(self) -> bool:

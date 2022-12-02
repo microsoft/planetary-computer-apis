@@ -2,7 +2,7 @@ name: Publish charts (dev)
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 defaults:
@@ -14,17 +14,17 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required due to the way Git works, without it this action won't be able to find any or the correct tags
 
-      - name: 'Get Previous tag'
+      - name: "Get Previous tag"
         id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        uses: "WyriHaximus/github-action-get-previous-tag@v1.2.2"
         with:
           fallback: 2022.2.0
 
-      - name: 'Get next minor version'
+      - name: "Get next minor version"
         id: semvers
         uses: "WyriHaximus/github-action-next-semvers@v1"
         with:
