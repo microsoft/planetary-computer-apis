@@ -39,13 +39,16 @@ pgstac_mosaic_factory = MosaicTilerFactory(
     reader_dependency=ReaderParams,
     router_prefix=get_settings().mosaic_endpoint_prefix,
     backend_dependency=BackendParams,
+    add_map_viewer=False,
+    add_statistics=False,
+    add_mosaic_list=False,
 )
 
 
 @pgstac_mosaic_factory.router.get(
     "/info", response_model=MosaicInfo, response_class=ORJSONResponse
 )
-def map(
+def mosaic_info(
     request: Request, collection: str = Query(..., description="STAC Collection ID")
 ) -> ORJSONResponse:
     collection_config = get_collection_config(collection)
