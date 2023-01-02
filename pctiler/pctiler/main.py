@@ -46,7 +46,8 @@ app = FastAPI(
 app.state.service_name = ServiceName.TILER
 
 # Note:
-# With titiler.pgstac >3.0, items endpoint has changed and use path-parameter /collections/{collectionId}/items/{itemId} instead of query-parameter
+# With titiler.pgstac >3.0, items endpoint has changed and use path-parameter
+# /collections/{collectionId}/items/{itemId} instead of query-parameter
 # https://github.com/stac-utils/titiler-pgstac/blob/d16102bf331ba588f31e131e65b07637d649b4bd/titiler/pgstac/main.py#L87-L92
 app.include_router(
     item.pc_tile_factory.router,

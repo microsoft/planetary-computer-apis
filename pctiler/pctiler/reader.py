@@ -10,7 +10,6 @@ from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
 from geojson_pydantic import Polygon
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
-from rio_tiler.io.base import BaseReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
 from rio_tiler.types import AssetInfo
