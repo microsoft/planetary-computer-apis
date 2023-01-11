@@ -512,7 +512,7 @@ async def test_get_missing_item(app_client):
 
 
 @pytest.mark.asyncio
-async def test_relative_link_construction():
+async def test_relative_link_construction(app):
     req = Request(
         scope={
             "type": "http",
@@ -523,6 +523,7 @@ async def test_relative_link_construction():
             "raw_path": b"/tab/abc",
             "query_string": b"",
             "headers": {},
+            "app": app,
         }
     )
     links = CollectionLinks(collection_id="naip", request=req)
