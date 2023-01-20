@@ -45,6 +45,20 @@ class TileInfo:
         assets["tilejson"] = self._get_collection_tilejson_asset()
         collection["assets"] = assets  # assets not a required property.
 
+    def inject_collection_vectortile_assets(self, collection: Collection) -> None:
+        """Inject vector tile assets to a collection"""
+        assets = collection.get("assets", {})
+
+        for tileset in self.render_config.vector_tilesets or []:
+            tile_path = f"vector/collections/{self.collection_id}/tilesets/{tileset.id}/tilejson.json"  # noqa
+            assets[tileset.id] = {
+                "title": tileset.name,
+                "href": urljoin(self.tiler_href, tile_path),
+                "type": pystac.MediaType.JSON,
+                "roles": ["tiles"],
+            }
+        collection["assets"] = assets
+
     def inject_item(self, item: Item) -> None:
         """Inject rendering links to an item"""
         item_id = item.get("id", "")

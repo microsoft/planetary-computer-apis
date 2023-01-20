@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional
 
 from pccommon.config.collections import CollectionConfig, DefaultRenderConfig
 from pccommon.config.core import PCAPIsConfig
@@ -16,3 +16,12 @@ def get_collection_config(collection_id: str) -> Optional[CollectionConfig]:
 
 def get_render_config(collection_id: str) -> Optional[DefaultRenderConfig]:
     return map_opt(lambda c: c.render_config, get_collection_config(collection_id))
+
+
+def get_all_render_configs() -> Dict[str, DefaultRenderConfig]:
+    return {
+        id: coll.render_config
+        for id, coll in get_apis_config()
+        .get_collection_config_table()
+        .get_all_configs()
+    }

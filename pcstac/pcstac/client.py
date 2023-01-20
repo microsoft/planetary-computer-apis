@@ -5,7 +5,6 @@ from urllib.parse import urljoin
 
 import attr
 from fastapi import Request
-from pccommon.config.collections import DefaultRenderConfig
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.types.errors import NotFoundError
 from stac_fastapi.types.stac import (
@@ -17,6 +16,7 @@ from stac_fastapi.types.stac import (
 )
 
 from pccommon.config import get_all_render_configs, get_render_config
+from pccommon.config.collections import DefaultRenderConfig
 from pccommon.logging import get_custom_dimensions
 from pccommon.redis import back_pressure, cached_result, rate_limit
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
@@ -68,6 +68,9 @@ class PCClient(CoreCrudClient):
             tile_info = TileInfo(collection_id, config, request)
             if config.should_add_collection_links:
                 tile_info.inject_collection(collection)
+
+            if config.has_vector_tiles:
+                tile_info.inject_collection_vectortile_assets(collection)
 
         collection.get("links", []).append(
             {

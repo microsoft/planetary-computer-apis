@@ -26,7 +26,7 @@ from pccommon.middleware import (
 )
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
-from pctiler.endpoints import health, item, legend, pg_mosaic
+from pctiler.endpoints import health, item, legend, pg_mosaic, vector_tiles
 
 # Initialize logging
 init_logging(ServiceName.TILER)
@@ -61,6 +61,12 @@ app.include_router(
     legend.legend_router,
     prefix=settings.legend_endpoint_prefix,
     tags=["Legend endpoints"],
+)
+
+app.include_router(
+    vector_tiles.vector_tile_router,
+    prefix=settings.vector_tile_endpoint_prefix,
+    tags=["Collection vector tile endpoints"],
 )
 
 app.include_router(health.health_router, tags=["Liveliness/Readiness"])
