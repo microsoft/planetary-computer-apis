@@ -201,6 +201,7 @@ class ModelTableService(Generic[M], TableService):
             except ResourceNotFoundError:
                 return None
 
+    @cachedmethod(cache=lambda self: self._cache, lock=lambda self: self._cache_lock)
     def get_all(self) -> Iterable[Tuple[Optional[str], Optional[str], M]]:
         with self as table_client:
             for entity in table_client.query_entities(""):
