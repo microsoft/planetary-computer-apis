@@ -9,7 +9,7 @@ class TilerError(Exception, ABC):
         pass
 
 
-class VectorTileError(TilerError):
+class VectorTileError(HTTPException):
     def __init__(
         self,
         collection: str,
@@ -18,28 +18,30 @@ class VectorTileError(TilerError):
         x: int,
         y: int,
     ) -> None:
+
         super().__init__(
-            f"Error loading tile {z}/{x}/{y} for tileset: '{tileset_id}' in "
-            f"collection: '{collection}'"
-        )
-        self.collection = collection
-        self.tileset_id = tileset_id
-        self.z = z
-        self.x = x
-        self.y = y
-
-    def to_http(self) -> HTTPException:
-        return HTTPException(
             status_code=500,
+            detail=(
+                f"Error loading tile {z}/{x}/{y} for tileset: '{tileset_id}' in "
+                f"collection: '{collection}'"
+            ),
         )
 
 
-class VectorTileNotFoundError(VectorTileError):
-    def to_http(self) -> HTTPException:
-        return HTTPException(
+class VectorTileNotFoundError(HTTPException):
+    def __init__(
+        self,
+        collection: str,
+        tileset_id: str,
+        z: int,
+        x: int,
+        y: int,
+    ) -> None:
+
+        super().__init__(
             status_code=404,
             detail=(
-                f"Tile {self.z}/{self.x}/{self.y} not found for tileset "
-                f"{self.tileset_id} in collection {self.collection}"
+                f"Tile {z}/{x}/{y} not found for tileset "
+                f"{tileset_id} in collection {collection}"
             ),
         )
