@@ -12,7 +12,7 @@ inst_reqs = [
     "azure-identity==1.7.1",
     "azure-data-tables==12.4.0",
     "azure-storage-blob==12.12.0",
-    "pydantic==1.9.0",
+    "pydantic>=1.9, <2.0.0",
     "cachetools==5.0.0",
     "types-cachetools==4.2.9",
     "pyhumps==3.5.3",

@@ -10,7 +10,7 @@ inst_reqs = [
     "stac-fastapi.types @ git+https://github.com/stac-utils/stac-fastapi/@25879afe94296eb82b94b523bfa2871b686e035a#egg=stac-fastapi.types&subdirectory=stac_fastapi/types",
     "pccommon",
     # Required due to some imports related to pypgstac CLI usage in startup script
-    "pypgstac[psycopg]==0.6.9",
+    "pypgstac[psycopg]==0.6.13",
     "pystac==1.*",
 ]
 
