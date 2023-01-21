@@ -61,6 +61,9 @@ class TableService:
         self._cache: Cache = TTLCache(maxsize=1024, ttl=ttl or DEFAULT_TTL)
         self._cache_lock: Lock = Lock()
 
+    def _get_cache(self) -> Cache:
+        return self._cache
+
     def _ensure_table_client(self) -> None:
         if not self._table_client:
             raise TableError("Table client not initialized. Use as a context manager.")
@@ -189,7 +192,11 @@ class ModelTableService(Generic[M], TableService):
                 }
             )
 
-    @cachedmethod(cache=lambda self: self._cache, lock=lambda self: self._cache_lock)
+    @cachedmethod(
+        cache=lambda self: self._get_cache(),
+        lock=lambda self: self._cache_lock,
+        key=lambda _, partition_key, row_key: f"get_{partition_key}_{row_key}",
+    )
     def get(self, partition_key: str, row_key: str) -> Optional[M]:
         with self as table_client:
             try:
@@ -201,7 +208,11 @@ class ModelTableService(Generic[M], TableService):
             except ResourceNotFoundError:
                 return None
 
-    @cachedmethod(cache=lambda self: self._cache, lock=lambda self: self._cache_lock)
+    @cachedmethod(
+        cache=lambda self: self._get_cache(),
+        lock=lambda self: self._cache_lock,
+        key=lambda _: "getall",
+    )
     def get_all(self) -> Iterable[Tuple[Optional[str], Optional[str], M]]:
         with self as table_client:
             for entity in table_client.query_entities("PartitionKey eq ''"):

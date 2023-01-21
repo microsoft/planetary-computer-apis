@@ -46,7 +46,15 @@ class VectorTileReader:
         if response.status_code != 200:
             raise Exception(f"Error loading tile {blob_url}")
 
-        return response.raw.read()
+        ts = time.perf_counter()
+        b = response.raw.read()
+        logger.info(
+            "Perf: PBF raw bytes read",
+            extra=get_custom_dimensions(
+                {"duration": f"{time.perf_counter() - ts:0.4f}"}, self.request
+            ),
+        )
+        return b
 
     def _blob_url_for_tile(self, z: int, x: int, y: int) -> str:
         """

@@ -36,7 +36,7 @@ async def get_tilejson(
     tile_url = str(
         request.url_for(
             "get_tile",
-            collection=collection_id,
+            collection_id=collection_id,
             tileset_id=tileset_id,
             z="{z}",
             x="{x}",
@@ -78,8 +78,8 @@ async def get_tile(
     y: int = Path(description="Tile row"),
 ) -> Response:
     """Get a vector tile for a given tileset."""
-
     tileset = _get_tileset_config(collection_id, tileset_id)
+
     reader = VectorTileReader(collection_id, tileset, request)
 
     try:
