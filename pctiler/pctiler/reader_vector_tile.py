@@ -1,12 +1,18 @@
+import logging
+import time
 from typing import Optional
 
 import planetary_computer as pc
 import requests
+from starlette.requests import Request
 
 from pccommon.config.collections import VectorTileset
+from pccommon.logging import get_custom_dimensions
 from pctiler.config import get_settings
 
 settings = get_settings()
+
+logger = logging.getLogger(__name__)
 
 
 class VectorTileReader:
@@ -14,7 +20,8 @@ class VectorTileReader:
     Load a vector tile from a storage account container and return
     """
 
-    def __init__(self, collection: str, tileset: VectorTileset):
+    def __init__(self, collection: str, tileset: VectorTileset, request: Request):
+        self.request = request
         self.tileset = tileset
         self.collection = collection
 
@@ -23,7 +30,15 @@ class VectorTileReader:
         Get a vector tile from a storage account container
         """
         blob_url = self._blob_url_for_tile(z, x, y)
+
+        ts = time.perf_counter()
         response = requests.get(blob_url, stream=True)
+        logger.info(
+            "Perf: PBF upsteam load time",
+            extra=get_custom_dimensions(
+                {"duration": f"{time.perf_counter() - ts:0.4f}"}, self.request
+            ),
+        )
 
         if response.status_code == 404:
             return None

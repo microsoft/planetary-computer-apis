@@ -68,6 +68,7 @@ async def get_tilejson(
     response_class=Response,
 )
 async def get_tile(
+    request: Request,
     collection_id: str = Path(description="STAC Collection ID"),
     tileset_id: str = Path(
         description="Registered tileset ID, see Collection metadata for valid values."
@@ -79,7 +80,7 @@ async def get_tile(
     """Get a vector tile for a given tileset."""
 
     tileset = _get_tileset_config(collection_id, tileset_id)
-    reader = VectorTileReader(collection_id, tileset)
+    reader = VectorTileReader(collection_id, tileset, request)
 
     try:
         pbf = reader.get_tile(z, x, y)
