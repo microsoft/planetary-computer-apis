@@ -17,6 +17,7 @@ from stac_fastapi.types.stac import (
 
 from pccommon.config import get_all_render_configs, get_render_config
 from pccommon.config.collections import DefaultRenderConfig
+from pccommon.constants import DEFAULT_COLLECTION_REGION
 from pccommon.logging import get_custom_dimensions
 from pccommon.redis import back_pressure, cached_result, rate_limit
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
@@ -55,13 +56,14 @@ class PCClient(CoreCrudClient):
 
         return sorted(list(set(base_conformance_classes)))
 
-    def inject_collection_links(
+    def inject_collection_extras(
         self,
         collection: Collection,
         request: Request,
         render_config: Optional[DefaultRenderConfig] = None,
     ) -> Collection:
-        """Add extra/non-mandatory links to a Collection"""
+        """Add extra/non-mandatory links, assets, and properties to a Collection"""
+
         collection_id = collection.get("id", "")
         config = render_config or get_render_config(collection_id)
         if config:
@@ -71,6 +73,9 @@ class PCClient(CoreCrudClient):
 
             if config.has_vector_tiles:
                 tile_info.inject_collection_vectortile_assets(collection)
+
+        if "msft:region" not in collection:
+            collection["msft:region"] = DEFAULT_COLLECTION_REGION
 
         collection.get("links", []).append(
             {
@@ -131,7 +136,7 @@ class PCClient(CoreCrudClient):
                     pass
                 else:
                     modified_collections.append(
-                        self.inject_collection_links(col, _request, render_config)
+                        self.inject_collection_extras(col, _request, render_config)
                     )
             collections["collections"] = modified_collections
             return collections
@@ -171,7 +176,7 @@ class PCClient(CoreCrudClient):
                 result = await _super.get_collection(collection_id, **kwargs)
             except NotFoundError:
                 raise NotFoundError(f"No collection with id '{collection_id}' found!")
-            return self.inject_collection_links(result, _request, render_config)
+            return self.inject_collection_extras(result, _request, render_config)
 
         cache_key = f"{CACHE_KEY_COLLECTION}:{collection_id}"
         return await cached_result(_fetch, cache_key, kwargs["request"])
