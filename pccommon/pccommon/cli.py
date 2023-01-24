@@ -66,6 +66,7 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
         else:
             for (_, collection_id, col_config) in col_config_table.get_all():
                 assert collection_id
+                assert col_config
                 result[collection_id] = col_config.dict()
 
     elif type == "container":
@@ -80,6 +81,7 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
             result[f"{con_account}/{id}"] = con_config.dict()
         else:
             for (storage_account, container, con_config) in con_config_table.get_all():
+                assert con_config
                 result[f"{storage_account}/{container}"] = con_config.dict()
     else:
         print(f"Unknown type: {type}")

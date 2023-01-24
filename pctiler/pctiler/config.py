@@ -13,6 +13,7 @@ STAC_API_HREF_ENV_VAR = "STAC_API_HREF"
 
 DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR = "DEFAULT_MAX_ITEMS_PER_TILE"
 REQUEST_TIMEOUT_ENV_VAR = "REQUEST_TIMEOUT"
+VECTORTILE_SA_BASE_URL_ENV_VAR = "VECTORTILE_SA_BASE_URL"
 
 
 @dataclass
@@ -36,6 +37,9 @@ class Settings(BaseSettings):
     item_endpoint_prefix: str = "/item"
     mosaic_endpoint_prefix: str = "/mosaic"
     legend_endpoint_prefix: str = "/legend"
+    vector_tile_endpoint_prefix: str = "/vector"
+    vector_tile_sa_base_url: str = Field(env=VECTORTILE_SA_BASE_URL_ENV_VAR)
+
     debug: bool = os.getenv("TILER_DEBUG", "False").lower() == "true"
     api_version: str = "1.0"
     default_max_items_per_tile: int = Field(
