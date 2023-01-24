@@ -2,11 +2,10 @@ name: Planetary Computer APIs PR CI
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -14,3 +13,14 @@ jobs:
 
       - name: Run cibuild
         run: ./scripts/cibuild
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10" # stac-api-validator requires >= 3.10
+          cache: "pip"
+      - name: Validate
+        run: ./scripts/validate
