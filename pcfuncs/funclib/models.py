@@ -4,6 +4,7 @@ from urllib.parse import quote
 import attr
 import numpy
 from pydantic import BaseModel
+from rasterio.coords import BoundingBox
 from rasterio.enums import ColorInterp, Resampling
 from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rio_tiler.models import ImageData
@@ -169,10 +170,10 @@ class RIOImage(ImageData):
             mask,
             assets=self.assets,
             crs=self.crs,
-            bounds=bbox,
+            bounds=BoundingBox(*bbox),
             band_names=self.band_names,
             metadata=self.metadata,
-            dataset_statistics=self.dataset_statistics,
+            # dataset_statistics=self.dataset_statistics,  # added in rio-tiler 4.0
         )
 
     # This is slightly different from the resize method in rio-tiler 4.0
@@ -195,7 +196,7 @@ class RIOImage(ImageData):
             bounds=self.bounds,
             band_names=self.band_names,
             metadata=self.metadata,
-            dataset_statistics=self.dataset_statistics,
+            # dataset_statistics=self.dataset_statistics,  # added in rio-tiler 4.0
         )
 
     @classmethod
