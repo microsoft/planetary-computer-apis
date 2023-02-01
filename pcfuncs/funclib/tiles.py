@@ -8,7 +8,8 @@ from urllib.parse import urlsplit
 
 import aiohttp
 import mercantile
-from funclib.models import RenderOptions
+import numpy
+from funclib.models import RenderOptions, RIOImage
 from funclib.raster import (
     Bbox,
     ExportFormats,
@@ -20,6 +21,7 @@ from funclib.raster import (
 from funclib.settings import BaseExporterSettings
 from mercantile import Tile
 from PIL import Image
+from rasterio.io import MemoryFile
 
 from pccommon.backoff import BackoffStrategy, with_backoff_async
 
@@ -152,8 +154,82 @@ class TileSet(ABC, Generic[T]):
 
 
 class GDALTileSet(TileSet[GDALRaster]):
+    async def _get_tile(self, url: str) -> Union[RIOImage, None]:
+        async def _f() -> RIOImage:
+            async with aiohttp.ClientSession() as session:
+                async with self._async_limit:
+                    # We set Accept-Encoding to make sure the response is compressed
+                    async with session.get(
+                        url, headers={"Accept-Encoding": "gzip"}
+                    ) as resp:
+                        if resp.status == 200:
+                            with MemoryFile(io.BytesIO(await resp.read())) as mem:
+                                with mem.open() as src:
+                                    return RIOImage.from_rio(src)
+                        else:
+                            raise TilerError(
+                                f"Error downloading tile: {url}", resp=resp
+                            )
+
+        try:
+            return await with_backoff_async(
+                _f,
+                is_throttle=lambda e: isinstance(e, TilerError),
+                strategy=BackoffStrategy(waits=[0.2, 0.5, 0.75, 1, 2]),
+            )
+        except Exception:
+            logger.warning(f"Tile request failed with backoff: {url}")
+            return None
+
     async def get_mosaic(self, tiles: List[Tile]) -> GDALRaster:
-        raise NotImplementedError()
+        tasks: List[asyncio.Future[Union[RIOImage, None]]] = []
+        for tile in tiles:
+            url = self.get_tile_url(tile.z, tile.x, tile.y)
+            print(f"Downloading {url}")
+            tasks.append(asyncio.ensure_future(self._get_tile(url)))
+
+        tile_images: List[Union[RIOImage, None]] = list(await asyncio.gather(*tasks))
+
+        tileset_dimensions = get_tileset_dimensions(tiles, self.tile_size)
+
+        # Get Count / datatype from the first tile_images
+        count: int
+        dtype: str
+        for im in tile_images:
+            if im:
+                count = im.count
+                dtype = im.data.dtype
+                break
+
+        mosaic = RIOImage(  # type: ignore
+            numpy.zeros(
+                (count, tileset_dimensions.total_rows, tileset_dimensions.total_cols),
+                dtype=dtype,
+            )
+        )
+
+        x = 0
+        y = 0
+        for i, img in enumerate(tile_images):
+            if not img:
+                continue
+
+            mosaic.paste(tile, (x * self.tile_size, y * self.tile_size))
+
+            # Increment the row/col position for subsequent tiles
+            if (i + 1) % tileset_dimensions.tile_rows == 0:
+                y = 0
+                x += 1
+            else:
+                y += 1
+
+        raster_extent = RasterExtent(
+            bbox=Bbox.from_tiles(tiles),
+            cols=tileset_dimensions.total_cols,
+            rows=tileset_dimensions.total_rows,
+        )
+
+        return GDALRaster(raster_extent, mosaic)
 
 
 class PILTileSet(TileSet[PILRaster]):
