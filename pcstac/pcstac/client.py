@@ -15,7 +15,9 @@ from stac_fastapi.types.stac import (
     LandingPage,
 )
 
-from pccommon.config import get_render_config
+from pccommon.config import get_all_render_configs, get_render_config
+from pccommon.config.collections import DefaultRenderConfig
+from pccommon.constants import DEFAULT_COLLECTION_REGION
 from pccommon.logging import get_custom_dimensions
 from pccommon.redis import back_pressure, cached_result, rate_limit
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
@@ -54,16 +56,26 @@ class PCClient(CoreCrudClient):
 
         return sorted(list(set(base_conformance_classes)))
 
-    def inject_collection_links(
-        self, collection: Collection, request: Request
+    def inject_collection_extras(
+        self,
+        collection: Collection,
+        request: Request,
+        render_config: Optional[DefaultRenderConfig] = None,
     ) -> Collection:
-        """Add extra/non-mandatory links to a Collection"""
+        """Add extra/non-mandatory links, assets, and properties to a Collection"""
+
         collection_id = collection.get("id", "")
-        render_config = get_render_config(collection_id)
-        if render_config and render_config.should_add_collection_links:
-            TileInfo(collection_id, render_config, request).inject_collection(
-                collection
-            )
+        config = render_config or get_render_config(collection_id)
+        if config:
+            tile_info = TileInfo(collection_id, config, request)
+            if config.should_add_collection_links:
+                tile_info.inject_collection(collection)
+
+            if config.has_vector_tiles:
+                tile_info.inject_collection_vectortile_assets(collection)
+
+        if "msft:region" not in collection:
+            collection["msft:region"] = DEFAULT_COLLECTION_REGION
 
         collection.get("links", []).append(
             {
@@ -110,15 +122,21 @@ class PCClient(CoreCrudClient):
 
         async def _fetch() -> Collections:
             collections = await _super.all_collections(**kwargs)
+            render_configs = get_all_render_configs()
             modified_collections = []
             for col in collections.get("collections", []):
                 collection_id = col.get("id", "")
-                render_config = get_render_config(collection_id)
+                render_config = render_configs.get(
+                    collection_id,
+                    DefaultRenderConfig(
+                        create_links=False, minzoom=0, render_params={}
+                    ),
+                )
                 if render_config and render_config.hidden:
                     pass
                 else:
                     modified_collections.append(
-                        self.inject_collection_links(col, _request)
+                        self.inject_collection_extras(col, _request, render_config)
                     )
             collections["collections"] = modified_collections
             return collections
@@ -158,7 +176,7 @@ class PCClient(CoreCrudClient):
                 result = await _super.get_collection(collection_id, **kwargs)
             except NotFoundError:
                 raise NotFoundError(f"No collection with id '{collection_id}' found!")
-            return self.inject_collection_links(result, _request)
+            return self.inject_collection_extras(result, _request, render_config)
 
         cache_key = f"{CACHE_KEY_COLLECTION}:{collection_id}"
         return await cached_result(_fetch, cache_key, kwargs["request"])

@@ -75,6 +75,7 @@ services:
       - FF_VRT="yes"
       - STAC_API_URL=http://stac:8081
       - STAC_API_HREF=http://localhost:8080/stac/
+      - VECTORTILE_SA_BASE_URL=http://example.com
       - PCAPIS_DEBUG=TRUE
 
       # titiler.pgstac

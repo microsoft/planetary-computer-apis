@@ -36,6 +36,7 @@ tiler:
   stac_api_href: ""
   pc_sdk_sas_url: ""
   pc_sdk_subscription_key: ""
+  vectortile_sa_base_url: ""
 
   default_max_items_per_tile: 5
   host: "0.0.0.0"

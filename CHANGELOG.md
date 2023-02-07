@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- New endpoints under `/vector` that server collection level Mapbox Vector Tiles (MVT) [#147](https://github.com/microsoft/planetary-computer-apis/pull/147)
+
 ## [2022.4.0]
 
 ### Changed

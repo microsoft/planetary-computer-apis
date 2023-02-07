@@ -77,6 +77,8 @@ spec:
               value: "{{ .Values.tiler.stac_api_href}}"
             - name: PC_SDK_SAS_URL
               value: "{{ .Values.tiler.pc_sdk_sas_url}}"
+            - name: VECTORTILE_SA_BASE_URL
+              value: "{{ .Values.tiler.vectortile_sa_base_url}}"
             - name: PC_SDK_SUBSCRIPTION_KEY
               value: "{{ .Values.tiler.pc_sdk_subscription_key}}"
             - name: DEFAULT_MAX_ITEMS_PER_TILE
