@@ -10,9 +10,9 @@ from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
 from geojson_pydantic import Polygon
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
-from rio_tiler.io.base import BaseReader
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
+from rio_tiler.types import AssetInfo
 from starlette.requests import Request
 from titiler.core.dependencies import DefaultDependency
 from titiler.pgstac import mosaic as pgstac_mosaic
@@ -23,7 +23,6 @@ from pccommon.cdn import BlobCDN
 from pccommon.config import get_render_config
 from pccommon.logging import get_custom_dimensions
 from pctiler.config import get_settings
-from pctiler.reader_cog import CustomCOGReader  # type:ignore
 
 logger = logging.getLogger(__name__)
 
@@ -44,36 +43,41 @@ class ReaderParams(DefaultDependency):
 @attr.s
 class ItemSTACReader(PgSTACReader):
 
-    # TODO: remove CustomCOGReader once moved to rasterio 1.3
-    reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
-
     # We make request an optional attribute to avoid re-writing
     # the whole list of attribute
     request: Optional[Request] = attr.ib(default=None)
 
-    def _get_asset_url(self, asset: str) -> str:
-        asset_url = BlobCDN.transform_if_available(super()._get_asset_url(asset))
+    def _get_asset_info(self, asset: str) -> AssetInfo:
+        """return asset's url."""
+        asset_url = BlobCDN.transform_if_available(
+            super()._get_asset_info(asset)["url"]
+        )
 
         if self.input.collection_id:
             render_config = get_render_config(self.input.collection_id)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
-        return asset_url
+        asset_info = self.input.assets[asset]
+        info = AssetInfo(url=asset_url)
+
+        if "file:header_size" in asset_info.extra_fields:
+            h = asset_info.extra_fields["file:header_size"]
+            info["env"] = {"GDAL_INGESTED_BYTES_AT_OPEN": h}
+
+        return info
 
 
 @attr.s
 class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
     """Custom version of titiler.pgstac.mosaic.CustomSTACReader)."""
 
-    reader: Type[BaseReader] = attr.ib(default=CustomCOGReader)
-
     # We make request an optional attribute to avoid re-writing
     # the whole list of attribute
     request: Optional[Request] = attr.ib(default=None)
 
-    def _get_asset_url(self, asset: str) -> str:
-        """Validate asset names and return asset's url.
+    def _get_asset_info(self, asset: str) -> AssetInfo:
+        """Validate asset names and return asset's info.
 
         Args:
             asset (str): STAC asset name.
@@ -93,7 +97,15 @@ class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
-        return asset_url
+        info = AssetInfo(url=asset_url)
+        if "file:header_size" in self.input["assets"][asset]:
+            info["env"] = {
+                "GDAL_INGESTED_BYTES_AT_OPEN": self.input["assets"][asset][
+                    "file:header_size"
+                ]
+            }
+
+        return info
 
 
 @attr.s

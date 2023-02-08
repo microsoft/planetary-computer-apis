@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0") [url]
+Run stac-api-validator on the local server
+"
+}
+
+geometry='{"type":"Polygon","coordinates":[[[-85.3125,30.9375],[-85.3125,31],[-85.375,31],[-85.375,30.9375],[-85.3125,30.9375]]]}'
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    scripts/setup
+    which stac-api-validator >/dev/null || pip install stac-api-validator==0.4.1
+    stac-api-validator --root-url http://localhost:8080/stac/ \
+        --conformance collections \
+        --conformance core \
+        --collection naip \
+        --geometry "$geometry"
+
+        # Currently broken:
+        # - `--conformance features`: needs https://github.com/stac-utils/stac-fastapi/pull/508
+        # - `--conformance item-search`: needs https://github.com/stac-utils/stac-api-validator/pull/237 and *not* stac-api-validate v0.4.2 (https://github.com/stac-utils/stac-api-validator/issues/240)
+fi
