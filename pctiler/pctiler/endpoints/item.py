@@ -4,7 +4,7 @@ from fastapi import Query, Request, Response
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
 from titiler.core.factory import MultiBaseTilerFactory
-from titiler.pgstac.dependencies import ItemPathParams
+from titiler.pgstac.dependencies import ItemPathParams  # removed in titiler.pgstac 3.0
 
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
@@ -30,6 +30,8 @@ pc_tile_factory = MultiBaseTilerFactory(
     colormap_dependency=PCColorMapParams,
     reader_dependency=ReaderParams,
     router_prefix=get_settings().item_endpoint_prefix,
+    # We remove the titiler default `/map` viewer
+    add_viewer=False,
 )
 
 
