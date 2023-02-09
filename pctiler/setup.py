@@ -18,6 +18,8 @@ inst_reqs = [
     "matplotlib==3.4.*",
     "importlib_resources>=1.1.0;python_version<'3.9'",
     "pccommon",
+    "xarray",
+    "rioxarray",
 ]
 
 extra_reqs = {
