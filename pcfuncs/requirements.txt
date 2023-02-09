@@ -14,7 +14,7 @@ pillow==9.3.0
 pyproj==3.3.1
 pydantic>=1.9,<2.0.0
 rasterio==1.3.*
-rio-tiler==3.1.*  # same as titiler 0.7.0
+rio-tiler==4.1.*  # same as titiler 0.10.2
 
 # Deployment needs to copy the local code into
 # the app code directory, so requires a separate

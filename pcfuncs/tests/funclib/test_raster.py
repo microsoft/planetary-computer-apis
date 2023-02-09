@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import rasterio
 from funclib.models import RIOImage
 from funclib.raster import Bbox, GDALRaster, PILRaster, RasterExtent
 from PIL import Image
@@ -40,8 +39,8 @@ def test_raster_extent_map_to_grid() -> None:
 
 
 def test_rio_crop() -> None:
-    with rasterio.open(DATA_FILES / "s2.png") as src:
-        img = RIOImage.from_rio(src)
+    with open(DATA_FILES / "s2.png", "rb") as src:
+        img = RIOImage.from_bytes(src.read())
 
     raster = GDALRaster(
         extent=RasterExtent(

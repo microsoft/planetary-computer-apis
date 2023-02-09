@@ -2,13 +2,9 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from urllib.parse import quote
 
 import attr
-import numpy
 from pydantic import BaseModel
 from rasterio.coords import BoundingBox
-from rasterio.enums import ColorInterp, Resampling
-from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rio_tiler.models import ImageData
-from rio_tiler.utils import get_array_statistics, non_alpha_indexes, resize_array
 
 
 class RenderOptions(BaseModel):
@@ -114,7 +110,9 @@ class RenderOptions(BaseModel):
 
 
 @attr.s
-class RIOImage(ImageData):
+class RIOImage(ImageData):  # type: ignore
+    """Extend ImageData class."""
+
     @property
     def size(self) -> Tuple[int, int]:
         return (self.width, self.height)
@@ -143,105 +141,34 @@ class RIOImage(ImageData):
         if box is None:
             box = (0, 0)
 
-        if box:
-            if len(box) == 2:
-                minx, maxy = box  # type: ignore
-                self.data[:, maxy:, minx:] = img.data
-                self.mask[maxy:, minx:] = img.mask
+        if len(box) == 2:
+            size = img.size
+            box += (box[0] + size[0], box[1] + size[1])  # type: ignore
+            minx, maxy, maxx, miny = box  # type: ignore
+        elif len(box) == 4:
+            # TODO add more size tests
+            minx, maxy, maxx, miny = box  # type: ignore
 
-            elif len(box) == 4:
-                # TODO add more size tests
-                minx, maxy, maxy, miny = box  # type: ignore
-                self.data[:, maxy:miny, minx:maxy] = img.data
-                self.mask[maxy:miny, minx:maxy] = img.mask
+        else:
+            raise Exception("Invalid box format")
 
-            else:
-                raise Exception("Invalid box format")
+        self.data[:, maxy:miny, minx:maxx] = img.data
+        self.mask[maxy:miny, minx:maxx] = img.mask
 
     def crop(self, bbox: Tuple[int, int, int, int]) -> "RIOImage":
-        """From rio-tiler 4.0"""
+        """Almost like ImageData.clip but do not deal with Geo transform."""
         col_min, row_min, col_max, row_max = bbox
 
         data = self.data[:, row_min:row_max, col_min:col_max]
         mask = self.mask[row_min:row_max, col_min:col_max]
 
-        return RIOImage(  # type: ignore
+        return RIOImage(
             data,
             mask,
             assets=self.assets,
             crs=self.crs,
-            bounds=BoundingBox(*bbox),
+            bounds=bbox,
             band_names=self.band_names,
             metadata=self.metadata,
-            # dataset_statistics=self.dataset_statistics,  # added in rio-tiler 4.0
+            dataset_statistics=self.dataset_statistics,
         )
-
-    # This is slightly different from the resize method in rio-tiler 4.0
-    def resize(  # type: ignore
-        self,
-        size: Tuple[int, int],
-        resampling_method: Resampling = "nearest",
-    ) -> "RIOImage":
-        """From rio-tiler 4.0"""
-        width, height = size
-
-        data = resize_array(self.data, height, width, resampling_method)
-        mask = resize_array(self.mask, height, width, resampling_method)
-
-        return RIOImage(  # type: ignore
-            data,
-            mask,
-            assets=self.assets,
-            crs=self.crs,
-            bounds=self.bounds,
-            band_names=self.band_names,
-            metadata=self.metadata,
-            # dataset_statistics=self.dataset_statistics,  # added in rio-tiler 4.0
-        )
-
-    @classmethod
-    def from_rio(
-        cls, dataset: Union[DatasetReader, DatasetWriter, MemoryFile]
-    ) -> "RIOImage":
-        indexes = non_alpha_indexes(dataset)
-
-        if ColorInterp.alpha in dataset.colorinterp:
-            # If dataset has an alpha band we need to get the mask using
-            # the alpha band index and then split the data and mask values
-            alpha_idx = dataset.colorinterp.index(ColorInterp.alpha) + 1
-            idx = tuple(indexes) + (alpha_idx,)
-            data = dataset.read(indexes=idx)
-            data, mask = data[0:-1], data[-1].astype("uint8")
-
-        else:
-            data = dataset.read(indexes=indexes)
-            mask = dataset.dataset_mask()
-
-        return cls(  # type: ignore
-            data,
-            mask,
-            crs=dataset.crs,
-            bounds=dataset.bounds,
-        )
-
-    def statistics(
-        self,
-        categorical: bool = False,
-        categories: Optional[List[float]] = None,
-        percentiles: List[int] = [2, 98],
-        hist_options: Optional[Dict] = None,
-    ) -> Dict:
-        data = numpy.ma.array(self.data)
-        data.mask = self.mask == 0
-
-        hist_options = hist_options or {}
-
-        stats = get_array_statistics(
-            data,
-            categorical=categorical,
-            categories=categories,
-            percentiles=percentiles,
-            **hist_options,
-        )
-
-        return {f"{self.band_names[ix]}": stats[ix] for ix in range(len(stats))}

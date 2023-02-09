@@ -21,7 +21,6 @@ from funclib.raster import (
 from funclib.settings import BaseExporterSettings
 from mercantile import Tile
 from PIL import Image
-from rasterio.io import MemoryFile
 
 from pccommon.backoff import BackoffStrategy, with_backoff_async
 
@@ -163,9 +162,8 @@ class GDALTileSet(TileSet[GDALRaster]):
                         url, headers={"Accept-Encoding": "gzip"}
                     ) as resp:
                         if resp.status == 200:
-                            with MemoryFile(io.BytesIO(await resp.read())) as mem:
-                                with mem.open() as src:
-                                    return RIOImage.from_rio(src)
+                            return RIOImage.from_bytes(await resp.read())  # type: ignore
+
                         else:
                             raise TilerError(
                                 f"Error downloading tile: {url}", resp=resp
@@ -192,14 +190,16 @@ class GDALTileSet(TileSet[GDALRaster]):
 
         tileset_dimensions = get_tileset_dimensions(tiles, self.tile_size)
 
-        # Get Count / datatype from the first tile_images
-        count: int
-        dtype: str
+        # By default if no tiles where return we create an
+        # empty mosaic with 3 bands and uint8
+        count: int = 3
+        dtype: str = "uint8"
         for im in tile_images:
             if im:
+
                 count = im.count
                 dtype = im.data.dtype
-                break
+                break  # Get Count / datatype from the first valid tile_images
 
         mosaic = RIOImage(  # type: ignore
             numpy.zeros(
@@ -214,7 +214,7 @@ class GDALTileSet(TileSet[GDALRaster]):
             if not img:
                 continue
 
-            mosaic.paste(tile, (x * self.tile_size, y * self.tile_size))
+            mosaic.paste(img, (x * self.tile_size, y * self.tile_size))
 
             # Increment the row/col position for subsequent tiles
             if (i + 1) % tileset_dimensions.tile_rows == 0:

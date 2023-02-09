@@ -208,7 +208,7 @@ class GDALRaster(Raster):
     def resample(self, cols: int, rows: int) -> "GDALRaster":
         return GDALRaster(
             extent=RasterExtent(bbox=self.extent.bbox, cols=cols, rows=rows),
-            image=self.image.resize((cols, rows)),
+            image=self.image.resize(rows, cols),  # type: ignore
         )
 
     def mask(self, geom: Dict[str, Any]) -> "GDALRaster":
