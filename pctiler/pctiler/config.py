@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     item_endpoint_prefix: str = "/item"
     mosaic_endpoint_prefix: str = "/mosaic"
     legend_endpoint_prefix: str = "/legend"
+    zarr_endpoint_prefix: str = "/zarr"
     vector_tile_endpoint_prefix: str = "/vector"
     vector_tile_sa_base_url: str = Field(env=VECTORTILE_SA_BASE_URL_ENV_VAR)
 

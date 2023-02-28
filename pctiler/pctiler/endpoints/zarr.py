@@ -14,6 +14,9 @@ from titiler.core.models.mapbox import TileJSON
 from titiler.core.resources.enums import ImageType
 from titiler.core.resources.responses import JSONResponse
 
+from pctiler.colormaps import PCColorMapParams
+from pctiler.config import get_settings
+
 
 @dataclass
 class XarrayTilerFactory(BaseTilerFactory):
@@ -262,3 +265,9 @@ class XarrayTilerFactory(BaseTilerFactory):
                         "maxzoom": maxzoom if maxzoom is not None else src_dst.maxzoom,
                         "tiles": [tiles_url],
                     }
+
+
+zarr_factory = XarrayTilerFactory(
+    colormap_dependency=PCColorMapParams,
+    router_prefix=get_settings().zarr_endpoint_prefix,
+)
