@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Literal, Optional, Tuple, Type
+from typing import Dict, List, Literal, Optional, Tuple, Type
 from urllib.parse import urlencode
 
 import xarray
@@ -21,7 +21,7 @@ class XarrayTilerFactory(BaseTilerFactory):
     # Default reader is set to rio_tiler.io.Reader
     reader: Type[BaseReader] = XarrayReader
 
-    def register_routes(self):
+    def register_routes(self) -> None:  # type: ignore
         """Register Info / Tiles / TileJSON endoints."""
 
         @self.router.get(
@@ -32,9 +32,9 @@ class XarrayTilerFactory(BaseTilerFactory):
             responses={200: {"description": "Return dataset's basic info."}},
         )
         def info_endpoint(
-            src_path=Depends(self.path_dependency),
+            src_path: str = Depends(self.path_dependency),
             variable: str = Query(..., description="Xarray Variable"),
-        ):
+        ) -> Info:
             """Return dataset's basic info."""
             with xarray.open_dataset(
                 src_path, engine="zarr", decode_coords="all"
@@ -63,11 +63,11 @@ class XarrayTilerFactory(BaseTilerFactory):
             r"/tiles/{TileMatrixSetId}/{z}/{x}/{y}@{scale}x.{format}",
             **img_endpoint_params,
         )
-        def tiles_endpoint(
+        def tiles_endpoint(  # type: ignore
             z: int = Path(..., ge=0, le=30, description="TileMatrixSet zoom level"),
             x: int = Path(..., description="TileMatrixSet column"),
             y: int = Path(..., description="TileMatrixSet row"),
-            TileMatrixSetId: Literal[tuple(self.supported_tms.list())] = Query(
+            TileMatrixSetId: Literal[tuple(self.supported_tms.list())] = Query(  # type: ignore
                 self.default_tms,
                 description=f"TileMatrixSet Name (default: '{self.default_tms}')",
             ),
@@ -77,7 +77,7 @@ class XarrayTilerFactory(BaseTilerFactory):
             format: ImageType = Query(
                 None, description="Output image type. Default is auto."
             ),
-            src_path=Depends(self.path_dependency),
+            src_path: str = Depends(self.path_dependency),
             variable: str = Query(..., description="Xarray Variable"),
             post_process=Depends(self.process_dependency),
             rescale: Optional[List[Tuple[float, ...]]] = Depends(RescalingParams),
@@ -90,7 +90,7 @@ class XarrayTilerFactory(BaseTilerFactory):
             ),
             colormap=Depends(self.colormap_dependency),
             render_params=Depends(self.render_dependency),
-        ):
+        ) -> Response:
             """Create map tile from a dataset."""
             tms = self.supported_tms.get(TileMatrixSetId)
 
@@ -144,13 +144,13 @@ class XarrayTilerFactory(BaseTilerFactory):
             responses={200: {"description": "Return a tilejson"}},
             response_model_exclude_none=True,
         )
-        def tilejson_endpoint(
+        def tilejson_endpoint(  # type: ignore
             request: Request,
-            TileMatrixSetId: Literal[tuple(self.supported_tms.list())] = Query(
+            TileMatrixSetId: Literal[tuple(self.supported_tms.list())] = Query(  # type: ignore
                 self.default_tms,
                 description=f"TileMatrixSet Name (default: '{self.default_tms}')",
             ),
-            src_path=Depends(self.path_dependency),
+            src_path: str = Depends(self.path_dependency),
             variable: str = Query(..., description="Xarray Variable"),
             tile_format: Optional[ImageType] = Query(
                 None, description="Output image type. Default is auto."
@@ -177,7 +177,7 @@ class XarrayTilerFactory(BaseTilerFactory):
             ),
             colormap=Depends(self.colormap_dependency),  # noqa
             render_params=Depends(self.render_dependency),  # noqa
-        ):
+        ) -> Dict:
             """Return TileJSON document for a dataset."""
             route_params = {
                 "z": "{z}",
