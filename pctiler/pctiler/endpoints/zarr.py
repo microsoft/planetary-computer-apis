@@ -268,6 +268,6 @@ class XarrayTilerFactory(BaseTilerFactory):
 
 
 zarr_factory = XarrayTilerFactory(
-    colormap_dependency=PCColorMapParams,
-    router_prefix=get_settings().zarr_endpoint_prefix,
+    colormap_dependency=PCColorMapParams,  # type: ignore
+    router_prefix=get_settings().zarr_endpoint_prefix,  # type: ignore
 )
