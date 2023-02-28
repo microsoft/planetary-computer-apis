@@ -25,6 +25,19 @@ class XarrayTilerFactory(BaseTilerFactory):
         """Register Info / Tiles / TileJSON endoints."""
 
         @self.router.get(
+            "/variables",
+            response_class=JSONResponse,
+            responses={200: {"description": "Return dataset's Variables."}},
+        )
+        def variable_endpoint(
+            src_path: str = Depends(self.path_dependency),
+        ) -> List[str]:
+            with xarray.open_dataset(
+                src_path, engine="zarr", decode_coords="all"
+            ) as src:
+                return [i for i in src.data_vars]  # type: ignore
+
+        @self.router.get(
             "/info",
             response_model=Info,
             response_model_exclude_none=True,
@@ -34,19 +47,36 @@ class XarrayTilerFactory(BaseTilerFactory):
         def info_endpoint(
             src_path: str = Depends(self.path_dependency),
             variable: str = Query(..., description="Xarray Variable"),
+            show_times: bool = Query(
+                None, description="Show info about the time dimension"
+            ),
         ) -> Info:
             """Return dataset's basic info."""
+            show_times = show_times or False
+
             with xarray.open_dataset(
                 src_path, engine="zarr", decode_coords="all"
             ) as src:
-                ds = src[variable][:1]
+                ds = src[variable]
+                times = []
+                if "time" in ds.dims:
+                    times = [str(x.data) for x in ds.time]
+                    # To avoid returning huge a `band_metadata` and `band_descriptions`
+                    # we only return info of the first time slice
+                    ds = src[variable][0]
 
                 # Make sure we are a CRS
                 crs = ds.rio.crs or "epsg:4326"
                 ds.rio.write_crs(crs, inplace=True)
 
                 with self.reader(ds) as dst:
-                    return dst.info()
+                    info = dst.info().dict()
+
+                if times and show_times:
+                    info["count"] = len(times)
+                    info["times"] = times
+
+            return info
 
         @self.router.get(r"/tiles/{z}/{x}/{y}", **img_endpoint_params)
         @self.router.get(r"/tiles/{z}/{x}/{y}.{format}", **img_endpoint_params)
@@ -79,6 +109,9 @@ class XarrayTilerFactory(BaseTilerFactory):
             ),
             src_path: str = Depends(self.path_dependency),
             variable: str = Query(..., description="Xarray Variable"),
+            time_slice: int = Query(
+                None, description="Slice of time to read (if available)"
+            ),
             post_process=Depends(self.process_dependency),
             rescale: Optional[List[Tuple[float, ...]]] = Depends(RescalingParams),
             color_formula: Optional[str] = Query(
@@ -97,7 +130,10 @@ class XarrayTilerFactory(BaseTilerFactory):
             with xarray.open_dataset(
                 src_path, engine="zarr", decode_coords="all"
             ) as src:
-                ds = src[variable][:1]
+                ds = src[variable]
+                if "time" in ds.dims:
+                    time_slice = time_slice or 0
+                    ds = ds[time_slice : time_slice + 1]
 
                 # Make sure we are a CRS
                 crs = ds.rio.crs or "epsg:4326"
@@ -152,6 +188,9 @@ class XarrayTilerFactory(BaseTilerFactory):
             ),
             src_path: str = Depends(self.path_dependency),
             variable: str = Query(..., description="Xarray Variable"),
+            time_slice: int = Query(
+                None, description="Slice of time to read (if available)"
+            ),  # noqa
             tile_format: Optional[ImageType] = Query(
                 None, description="Output image type. Default is auto."
             ),
@@ -210,7 +249,7 @@ class XarrayTilerFactory(BaseTilerFactory):
             with xarray.open_dataset(
                 src_path, engine="zarr", decode_coords="all"
             ) as src:
-                ds = src[variable][:1]
+                ds = src[variable]
 
                 # Make sure we are a CRS
                 crs = ds.rio.crs or "epsg:4326"
