@@ -100,7 +100,9 @@ class XarrayTilerFactory(BaseTilerFactory):
             z: int = Path(..., ge=0, le=30, description="TileMatrixSet zoom level"),
             x: int = Path(..., description="TileMatrixSet column"),
             y: int = Path(..., description="TileMatrixSet row"),
-            TileMatrixSetId: Literal[tuple(self.supported_tms.list())] = Query(  # type: ignore
+            TileMatrixSetId: Literal[  # type: ignore
+                tuple(self.supported_tms.list())
+            ] = Query(
                 self.default_tms,
                 description=f"TileMatrixSet Name (default: '{self.default_tms}')",
             ),
@@ -185,7 +187,9 @@ class XarrayTilerFactory(BaseTilerFactory):
         )
         def tilejson_endpoint(  # type: ignore
             request: Request,
-            TileMatrixSetId: Literal[tuple(self.supported_tms.list())] = Query(  # type: ignore
+            TileMatrixSetId: Literal[  # type: ignore
+                tuple(self.supported_tms.list())
+            ] = Query(
                 self.default_tms,
                 description=f"TileMatrixSet Name (default: '{self.default_tms}')",
             ),
