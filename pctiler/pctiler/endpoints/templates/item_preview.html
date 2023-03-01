@@ -17,7 +17,7 @@
     <script>
 
         $.ajax({
-            url: '{{ tileJson|safe }}',
+            url: '{{ tileJson | safe }}',
             success: function (tileJson) {
                 var map = L.map('map', {
                     center: [tileJson.center[1], tileJson.center[0]],
