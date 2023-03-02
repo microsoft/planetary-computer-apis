@@ -31,7 +31,14 @@ def load(
             account_url=account_url, sas_token=sas, table_name=table
         )
         for coll_id, config in rows.items():
-            col_config_table.set_config(coll_id, CollectionConfig(**config))
+            print("Loading config for collection", coll_id)
+            try:
+                col_config_table.set_config(coll_id, CollectionConfig(**config))
+            except Exception as e:
+                print("========================================")
+                print(f"Error loading config for collection {coll_id}: {e}")
+                print(f"{coll_id} has been skipped!")
+                print("========================================")
 
     elif type == "container":
         cont_config_table = ContainerConfigTable.from_sas_token(
