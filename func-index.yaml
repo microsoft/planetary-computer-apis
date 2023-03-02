@@ -1,4 +1,4 @@
-generated: '2023-03-02T16:44:56.973980+00:00'
+generated: '2023-03-02T18:47:48.691624+00:00'
 name: Planetary Computer Functions Package Index
 packages:
 - created: '2022-10-27T01:25:02.939218+00:00'
@@ -17,11 +17,11 @@ packages:
   name: planetary-computer-func-2023.1.0
   url: https://microsoft.github.io/planetary-computer-apis/func-packages/planetary-computer-func-2023.1.0.zip
   version: 2023.1.0
-- created: '2023-03-02T15:32:49.772636+00:00'
-  name: planetary-computer-func-2023.2.0-dev
-  url: https://microsoft.github.io/planetary-computer-apis/func-packages/planetary-computer-func-2023.2.0-dev.zip
-  version: 2023.2.0-dev
 - created: '2023-03-02T16:44:56.973980+00:00'
   name: planetary-computer-func-2023.1.1
   url: https://microsoft.github.io/planetary-computer-apis/func-packages/planetary-computer-func-2023.1.1.zip
   version: 2023.1.1
+- created: '2023-03-02T18:47:48.691624+00:00'
+  name: planetary-computer-func-2023.2.0-dev
+  url: https://microsoft.github.io/planetary-computer-apis/func-packages/planetary-computer-func-2023.2.0-dev.zip
+  version: 2023.2.0-dev
