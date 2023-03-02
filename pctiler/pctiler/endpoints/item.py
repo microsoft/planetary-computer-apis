@@ -1,11 +1,11 @@
-from urllib.parse import urljoin
+from urllib.parse import quote_plus, urljoin
 
 from fastapi import Query, Request, Response
 from fastapi.templating import Jinja2Templates
+from html_sanitizer.sanitizer import Sanitizer
 from starlette.responses import HTMLResponse
 from titiler.core.factory import MultiBaseTilerFactory
-from titiler.pgstac.dependencies import ItemPathParams
-from html_sanitizer.sanitizer import Sanitizer
+from titiler.pgstac.dependencies import ItemPathParams  # removed in titiler.pgstac 3.0
 
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
@@ -50,8 +50,8 @@ def map(
     # Sanitize collection and item to avoid XSS when the values are templated
     # into the rendered html page
     sanitizer = Sanitizer()
-    collection_sanitized = sanitizer.sanitize(collection)
-    item_sanitized = sanitizer.sanitize(item)
+    collection_sanitized = quote_plus(sanitizer.sanitize(collection))
+    item_sanitized = quote_plus(sanitizer.sanitize(item))
 
     qs = render_config.get_full_render_qs(collection_sanitized, item_sanitized)
     tilejson_url = pc_tile_factory.url_for(request, "tilejson")
