@@ -1,60 +1,63 @@
 <html lang="en">
-<head>
+  <head>
     <title>Planetary Computer STAC Item Preview</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-        crossorigin="" />
-</head>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+  </head>
 
-<body>
-    <div id="map" style="position:fixed;right:0px;left:0px;height:100%;">
-    </div>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-        crossorigin="">
-        </script>
+  <body>
+    <div
+      id="map"
+      style="position: fixed; right: 0px; left: 0px; height: 100%"
+    ></div>
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+      $.ajax({
+        url: "{{ tileJson | safe }}",
+        success: function (tileJson) {
+          var map = L.map("map", {
+            center: [tileJson.center[1], tileJson.center[0]],
+            zoom: 13,
+          });
+          var baseLayer = L.tileLayer(
+            "https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png"
+          ).addTo(map);
 
-        $.ajax({
-            url: '{{ tileJson | safe }}',
-            success: function (tileJson) {
-                var map = L.map('map', {
-                    center: [tileJson.center[1], tileJson.center[0]],
-                    zoom: 13,
-                });
-                var baseLayer = L.tileLayer(
-                    'https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png'
-                ).addTo(map);
+          var tiles = tileJson.tiles[0];
 
-                var tiles = tileJson.tiles[0];
+          var tileLayer = L.tileLayer(tiles, {
+            minZoom: tileJson.minzoon,
+            maxZoom: tileJson.maxzoom,
+          }).addTo(map);
 
-                var tileLayer = L.tileLayer(tiles, {
-                    minZoom: tileJson.minzoon,
-                    maxZoom: tileJson.maxzoom
+          $.ajax({
+            url: "{{ itemUrl }}",
+            success: function (item) {
+              map.whenReady(function () {
+                footprint = new L.GeoJSON(item);
+                L.geoJSON(item, {
+                  style: {
+                    color: "#05a6f0",
+                    opacity: 0.7,
+                    fillOpacity: 0,
+                  },
                 }).addTo(map);
 
-                $.ajax({
-                    url: '{{ itemUrl }}',
-                    success: function (item) {
-                        map.whenReady(function () {
-                            footprint = new L.GeoJSON(item);
-                            L.geoJSON(item, {
-                                "style": {
-                                    "color": "#05a6f0",
-                                    "opacity": 0.7,
-                                    "fillOpacity": 0,
-
-                                }
-                            }).addTo(map);
-
-                            map.fitBounds(footprint.getBounds());
-                        });
-                    }
-                });
-            }
-        });
+                map.fitBounds(footprint.getBounds());
+              });
+            },
+          });
+        },
+      });
     </script>
-</body>
-
+  </body>
 </html>
