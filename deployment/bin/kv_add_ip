@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Add runner public IP to Key Vault firewall allow list
+"
+}
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    runnerIpAddress=$(curl http://ipinfo.io/json | jq -r ".ip")
+
+    az keyvault network-rule add -g ${KEY_VAULT_RESOURCE_GROUP_NAME}  -n ${KEY_VAULT_NAME} --ip-address $runnerIpAddress
+
+fi
