@@ -16,6 +16,7 @@ resource "azurerm_kubernetes_cluster" "pc" {
     vm_size        = "Standard_DS2_v2"
     node_count     = var.aks_node_count
     vnet_subnet_id = azurerm_subnet.node_subnet.id
+    orchestrator_version = var.k8s_version
   }
 
   identity {
