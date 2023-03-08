@@ -20,6 +20,7 @@ inst_reqs = [
     "pccommon",
     "xarray",
     "rioxarray",
+    "zarr",
 ]
 
 extra_reqs = {
