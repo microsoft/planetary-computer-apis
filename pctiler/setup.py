@@ -21,6 +21,7 @@ inst_reqs = [
     "xarray",
     "rioxarray",
     "zarr",
+    "fsspec",
 ]
 
 extra_reqs = {
