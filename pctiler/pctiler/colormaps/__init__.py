@@ -7,8 +7,8 @@ from rio_tiler.types import ColorMapType
 from titiler.core.dependencies import ColorMapParams
 
 from .alos_palsar_mosaic import alos_palsar_mosaic_colormaps
-from .io_bii import io_bii_colormaps
 from .chloris import chloris_colormaps
+from .io_bii import io_bii_colormaps
 from .jrc import jrc_colormaps
 from .lidarusgs import lidar_colormaps
 from .lulc import lulc_colormaps
