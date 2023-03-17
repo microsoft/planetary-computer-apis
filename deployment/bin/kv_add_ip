@@ -2,6 +2,8 @@
 
 set -e
 
+source bin/lib
+
 if [[ "${CI}" ]]; then
     set -x
 fi
@@ -24,8 +26,12 @@ while [[ "$#" -gt 0 ]]; do case $1 in
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
-    runnerIpAddress=$(curl http://ipinfo.io/json | jq -r ".ip")
+    cidr=$(get_cidr_range)
 
-    az keyvault network-rule add -g ${KEY_VAULT_RESOURCE_GROUP_NAME}  -n ${KEY_VAULT_NAME} --ip-address $runnerIpAddress
+    az keyvault network-rule add \
+        -g ${KEY_VAULT_RESOURCE_GROUP_NAME}  \
+        -n ${KEY_VAULT_NAME} \
+        --ip-address $cidr \
+        --subscription ${ARM_SUBSCRIPTION_ID}
 
 fi
