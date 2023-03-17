@@ -9,4 +9,12 @@ resource "azurerm_public_ip" "pc" {
   tags = {
     environment = var.environment
   }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags, e.g. because a management agent
+      # updates these based on some ruleset managed elsewhere.
+      tags,
+    ]
+  }
 }
