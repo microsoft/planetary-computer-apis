@@ -22,6 +22,9 @@ inst_reqs = [
     "rioxarray",
     "zarr",
     "fsspec",
+    "requests",
+    "aiohttp",
+    "adlfs",
 ]
 
 extra_reqs = {
