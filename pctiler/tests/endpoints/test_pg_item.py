@@ -14,3 +14,17 @@ async def test_item(client: AsyncClient) -> None:
     )
     assert response.status_code == 200
     assert response.json() == ["image"]
+
+
+@pytest.mark.asyncio
+async def test_item_preview_xss(client: AsyncClient) -> None:
+    xss = "%27});alert('xss injected');//</script>"
+
+    item_id = "al_m_3008501_ne_16_060_20191109_20200114"
+    item_id_xss = f"{item_id}{xss}"
+
+    response_xss = await client.get(f"/item/map?collection=naip&item={item_id_xss}")
+
+    # The XSS should be sanitized out of the response
+    assert response_xss.status_code == 200
+    assert "//</script>" not in response_xss.text
