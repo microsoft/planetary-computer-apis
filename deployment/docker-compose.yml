@@ -23,6 +23,10 @@ services:
       - GITHUB_TOKEN
       - GITHUB_REPOSITORY
       - GITHUB_ACTOR
+
+      # Used to open KV firewall for accessing tf.secrets
+      - KEY_VAULT_NAME=pc-test-deploy-secrets
+      - KEY_VAULT_RESOURCE_GROUP_NAME=pc-test-manual-resources
     working_dir: /opt/src/deployment
     volumes:
       - ../deployment:/opt/src/deployment

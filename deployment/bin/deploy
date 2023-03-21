@@ -80,6 +80,13 @@ echo "IMAGE_TAG: ${IMAGE_TAG}"
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
+    #########################
+    # Add IP to KV firewall #
+    #########################
+
+    bin/azlogin
+    bin/kv_add_ip
+
     #####################
     # Deploy Terraform  #
     #####################
@@ -102,6 +109,12 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     gather_tf_output
 
     popd
+
+    ##############################
+    # Remove IP from KV firewall #
+    ##############################
+
+    bin/kv_rmv_ip
 
     ############################
     # Render Helm chart values #
