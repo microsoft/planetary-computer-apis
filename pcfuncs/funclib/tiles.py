@@ -3,13 +3,13 @@ import io
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 from urllib.parse import urlsplit
 
 import aiohttp
 import mercantile
 import numpy
-from funclib.models import RenderOptions, RIOImage
+from funclib.models import RenderOptions
 from funclib.raster import (
     Bbox,
     ExportFormats,
@@ -21,6 +21,7 @@ from funclib.raster import (
 from funclib.settings import BaseExporterSettings
 from mercantile import Tile
 from PIL import Image
+from rio_tiler.models import ImageData
 
 from pccommon.backoff import BackoffStrategy, with_backoff_async
 
@@ -56,6 +57,46 @@ def get_tileset_dimensions(tiles: List[Tile], tile_size: int) -> TileSetDimensio
         total_rows=tile_rows * tile_size,
         tile_size=tile_size,
     )
+
+
+def paste_into_image(
+    from_image: ImageData,
+    to_image: ImageData,
+    box: Optional[
+        Union[
+            Tuple[int, int],
+            Tuple[int, int, int, int],
+        ]
+    ]
+) -> None:
+    """Paste image data from one to the other."""
+    if from_image.count != to_image.count:
+        raise Exception("Cannot merge 2 images with different band number")
+
+    if from_image.data.dtype != to_image.data.dtype:
+        raise Exception("Cannot merge 2 images with different datatype")
+
+    # Pastes another image into this image.
+    # The box argument is either a 2-tuple giving the upper left corner,
+    # a 4-tuple defining the left, upper, right, and lower pixel coordinate,
+    # or None (same as (0, 0)). See Coordinate System. If a 4-tuple is given,
+    # the size of the pasted image must match the size of the region.
+    if box is None:
+        box = (0, 0)
+
+    if len(box) == 2:
+        size = (from_image.width, from_image.height)
+        box += (box[0] + size[0], box[1] + size[1])  # type: ignore
+        minx, maxy, maxx, miny = box  # type: ignore
+    elif len(box) == 4:
+        # TODO add more size tests
+        minx, maxy, maxx, miny = box  # type: ignore
+
+    else:
+        raise Exception("Invalid box format")
+
+    to_image.data[:, maxy:miny, minx:maxx] = from_image.data
+    to_image.mask[maxy:miny, minx:maxx] = from_image.mask
 
 
 class TileSet(ABC, Generic[T]):
@@ -153,8 +194,10 @@ class TileSet(ABC, Generic[T]):
 
 
 class GDALTileSet(TileSet[GDALRaster]):
-    async def _get_tile(self, url: str) -> Union[RIOImage, None]:
-        async def _f() -> RIOImage:
+    async def _get_tile(
+        self, url: str,
+    ) -> Union[ImageData, None]:
+        async def _f() -> ImageData:
             async with aiohttp.ClientSession() as session:
                 async with self._async_limit:
                     # We set Accept-Encoding to make sure the response is compressed
@@ -162,7 +205,9 @@ class GDALTileSet(TileSet[GDALRaster]):
                         url, headers={"Accept-Encoding": "gzip"}
                     ) as resp:
                         if resp.status == 200:
-                            return RIOImage.from_bytes(await resp.read())  # type: ignore
+                            return ImageData.from_bytes(
+                                await resp.read()
+                            )
 
                         else:
                             raise TilerError(
@@ -180,13 +225,13 @@ class GDALTileSet(TileSet[GDALRaster]):
             return None
 
     async def get_mosaic(self, tiles: List[Tile]) -> GDALRaster:
-        tasks: List[asyncio.Future[Union[RIOImage, None]]] = []
+        tasks: List[asyncio.Future[Union[ImageData, None]]] = []
         for tile in tiles:
             url = self.get_tile_url(tile.z, tile.x, tile.y)
             print(f"Downloading {url}")
             tasks.append(asyncio.ensure_future(self._get_tile(url)))
 
-        tile_images: List[Union[RIOImage, None]] = list(await asyncio.gather(*tasks))
+        tile_images: List[Union[ImageData, None]] = list(await asyncio.gather(*tasks))
 
         tileset_dimensions = get_tileset_dimensions(tiles, self.tile_size)
 
@@ -201,7 +246,7 @@ class GDALTileSet(TileSet[GDALRaster]):
                 dtype = im.data.dtype
                 break  # Get Count / datatype from the first valid tile_images
 
-        mosaic = RIOImage(  # type: ignore
+        mosaic = ImageData(  # type: ignore
             numpy.zeros(
                 (count, tileset_dimensions.total_rows, tileset_dimensions.total_cols),
                 dtype=dtype,
@@ -214,7 +259,11 @@ class GDALTileSet(TileSet[GDALRaster]):
             if not img:
                 continue
 
-            mosaic.paste(img, (x * self.tile_size, y * self.tile_size))
+            paste_into_image(
+                img,
+                mosaic,
+                (x * self.tile_size, y * self.tile_size),
+            )
 
             # Increment the row/col position for subsequent tiles
             if (i + 1) % tileset_dimensions.tile_rows == 0:

@@ -1,10 +1,7 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 from urllib.parse import quote
 
-import attr
 from pydantic import BaseModel
-from rasterio.coords import BoundingBox
-from rio_tiler.models import ImageData
 
 
 class RenderOptions(BaseModel):
@@ -107,68 +104,3 @@ class RenderOptions(BaseModel):
                 result[k] = v
 
         return RenderOptions(**result)
-
-
-@attr.s
-class RIOImage(ImageData):  # type: ignore
-    """Extend ImageData class."""
-
-    @property
-    def size(self) -> Tuple[int, int]:
-        return (self.width, self.height)
-
-    def paste(
-        self,
-        img: "RIOImage",
-        box: Optional[
-            Union[
-                Tuple[int, int],
-                Tuple[int, int, int, int],
-            ]
-        ],
-    ) -> None:
-        if img.count != self.count:
-            raise Exception("Cannot merge 2 images with different band number")
-
-        if img.data.dtype != self.data.dtype:
-            raise Exception("Cannot merge 2 images with different datatype")
-
-        # Pastes another image into this image.
-        # The box argument is either a 2-tuple giving the upper left corner,
-        # a 4-tuple defining the left, upper, right, and lower pixel coordinate,
-        # or None (same as (0, 0)). See Coordinate System. If a 4-tuple is given,
-        # the size of the pasted image must match the size of the region.
-        if box is None:
-            box = (0, 0)
-
-        if len(box) == 2:
-            size = img.size
-            box += (box[0] + size[0], box[1] + size[1])  # type: ignore
-            minx, maxy, maxx, miny = box  # type: ignore
-        elif len(box) == 4:
-            # TODO add more size tests
-            minx, maxy, maxx, miny = box  # type: ignore
-
-        else:
-            raise Exception("Invalid box format")
-
-        self.data[:, maxy:miny, minx:maxx] = img.data
-        self.mask[maxy:miny, minx:maxx] = img.mask
-
-    def crop(self, bbox: Tuple[int, int, int, int]) -> "RIOImage":
-        """Almost like ImageData.clip but do not deal with Geo transform."""
-        col_min, row_min, col_max, row_max = bbox
-
-        data = self.data[:, row_min:row_max, col_min:col_max]
-        mask = self.mask[row_min:row_max, col_min:col_max]
-
-        return RIOImage(
-            data,
-            mask,
-            assets=self.assets,
-            crs=self.crs,
-            bounds=bbox,
-            band_names=self.band_names,
-            metadata=self.metadata,
-            dataset_statistics=self.dataset_statistics,
-        )

@@ -45,13 +45,13 @@ def test_rio_crop() -> None:
     raster = GDALRaster(
         extent=RasterExtent(
             bbox=Bbox(0, 0, 10, 10),
-            cols=img.size[0],
-            rows=img.size[1],
+            cols=img.width,
+            rows=img.height,
         ),
         image=img,
     )
 
     cropped = raster.crop(Bbox(0, 0, 5, 5))
 
-    assert abs(cropped.extent.cols - (img.size[0] / 2)) < 1
-    assert abs(cropped.extent.rows - (img.size[1] / 2)) < 1
+    assert abs(cropped.extent.cols - (img.width / 2)) < 1
+    assert abs(cropped.extent.rows - (img.height / 2)) < 1

@@ -6,9 +6,9 @@ from functools import reduce
 from typing import Any, Dict, List, Optional, Tuple, TypeVar
 
 import mercantile
-from funclib.models import RIOImage
 from PIL.Image import Image as PILImage
 from pyproj import CRS, Transformer
+from rio_tiler.models import ImageData
 
 T = TypeVar("T", bound="Raster")
 
@@ -171,7 +171,7 @@ class PILRaster(Raster):
 
 
 class GDALRaster(Raster):
-    def __init__(self, extent: RasterExtent, image: RIOImage) -> None:
+    def __init__(self, extent: RasterExtent, image: ImageData) -> None:
         self.image = image
         super().__init__(extent)
 
@@ -194,8 +194,19 @@ class GDALRaster(Raster):
         col_min, row_min = self.extent.map_to_grid(bbox.xmin, bbox.ymax)
         col_max, row_max = self.extent.map_to_grid(bbox.xmax, bbox.ymin)
 
-        box: Any = (col_min, row_min, col_max, row_max)
-        cropped = self.image.crop(box)
+        data = self.image.data[:, row_min:row_max, col_min:col_max]
+        mask = self.image.mask[row_min:row_max, col_min:col_max]
+        cropped = ImageData(
+            data,
+            mask,
+            assets=self.image.assets,
+            crs=self.image.crs,
+            bounds=bbox,
+            band_names=self.image.band_names,
+            metadata=self.image.metadata,
+            dataset_statistics=self.image.dataset_statistics,
+        )
+
         return GDALRaster(
             extent=RasterExtent(
                 bbox,
