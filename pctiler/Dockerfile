@@ -1,7 +1,9 @@
 FROM python:3.9-slim
+FROM mambaorg/micromamba:1.4.0
+COPY --chown=$MAMBA_USER:$MAMBA_USER pctiler/environment.yaml /tmp/env.yaml
 
-# git required for pip installs from git
-RUN apt update && apt install -y git
+RUN micromamba install -y -n base -f /tmp/env.yaml && \
+    micromamba clean --all --yes
 
 # The devops Personal Access Token for accessing
 # Azure Artifacts. Note: This will be visible as
