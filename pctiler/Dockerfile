@@ -16,10 +16,11 @@ ARG DEVOPS_PAT
 EXPOSE 8000
 
 WORKDIR /opt/src
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
 COPY pccommon /opt/src/pccommon
 COPY pctiler /opt/src/pctiler
-RUN pip install -e ./pccommon -e ./pctiler[server]
+RUN python3 -m pip install -e ./pccommon -e ./pctiler[server]
 
 # GDAL config
 ENV GDAL_CACHEMAX 200
