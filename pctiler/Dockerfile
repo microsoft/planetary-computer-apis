@@ -1,4 +1,3 @@
-FROM python:3.9-slim
 FROM mambaorg/micromamba:1.4.0
 COPY --chown=$MAMBA_USER:$MAMBA_USER pctiler/environment.yaml /tmp/env.yaml
 
