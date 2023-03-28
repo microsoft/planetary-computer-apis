@@ -67,7 +67,7 @@ def paste_into_image(
             Tuple[int, int],
             Tuple[int, int, int, int],
         ]
-    ]
+    ],
 ) -> None:
     """Paste image data from one to the other."""
     if from_image.count != to_image.count:
@@ -195,7 +195,8 @@ class TileSet(ABC, Generic[T]):
 
 class GDALTileSet(TileSet[GDALRaster]):
     async def _get_tile(
-        self, url: str,
+        self,
+        url: str,
     ) -> Union[ImageData, None]:
         async def _f() -> ImageData:
             async with aiohttp.ClientSession() as session:
@@ -205,9 +206,7 @@ class GDALTileSet(TileSet[GDALRaster]):
                         url, headers={"Accept-Encoding": "gzip"}
                     ) as resp:
                         if resp.status == 200:
-                            return ImageData.from_bytes(
-                                await resp.read()
-                            )
+                            return ImageData.from_bytes(await resp.read())
 
                         else:
                             raise TilerError(
@@ -241,7 +240,6 @@ class GDALTileSet(TileSet[GDALRaster]):
         dtype: str = "uint8"
         for im in tile_images:
             if im:
-
                 count = im.count
                 dtype = im.data.dtype
                 break  # Get Count / datatype from the first valid tile_images

@@ -1,18 +1,15 @@
 import json
 import logging
-from typing import Callable, List
+from typing import Dict
 
 import azure.functions as func
 from funclib.errors import BBoxTooLargeError
-from funclib.stamps.branding import LogoStamp
-from funclib.stamps.progress_bar import ProgressBarStamp
-from funclib.stamps.stamp import ImageStamp
 from pydantic import ValidationError
+from rio_tiler.models import BandStatistics
 
-from .animation import PcMosaicAnimation
-from .models import AnimationRequest, AnimationResponse
-from .settings import AnimationSettings
-from .utils import upload_gif
+from .models import StatisticsRequest
+from .settings import StatisticsSettings
+from .statistics import PcMosaicImage
 
 
 async def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -26,7 +23,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     try:
-        parsed_request = AnimationRequest(**body)
+        parsed_request = StatisticsRequest(**body)
     except ValidationError as e:
         return func.HttpResponse(
             status_code=400,
@@ -57,34 +54,18 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-async def handle_request(req: AnimationRequest) -> AnimationResponse:
-    settings = AnimationSettings.get()
-    stamps: List[Callable[[int, int], ImageStamp]] = []
-    if req.show_progressbar:
-        stamps.append(
-            lambda frame_count, frame_number: ProgressBarStamp(
-                frame_count, frame_number
-            )
-        )
-    if req.show_branding:
-        stamps.append(lambda x, y: LogoStamp())
+async def handle_request(req: StatisticsRequest) -> Dict[str, BandStatistics]:
+    settings = StatisticsSettings.get()
 
-    animator = PcMosaicAnimation(
+    mosaic_image = PcMosaicImage(
         bbox=req.bbox,
         zoom=req.zoom,
         cql=req.cql,
         render_options=req.get_render_options(),
         settings=settings,
-        stamps=stamps,
-        frame_duration=req.duration,
         data_api_url_override=req.data_api_url,
     )
 
-    gif = await animator.get(
-        req.get_relative_delta(),
-        req.start,
-        req.get_valid_frames(),
-    )
+    img = await mosaic_image.get()
 
-    gif_url = upload_gif(gif, req.get_collection())
-    return AnimationResponse(url=gif_url)
+    return img.statistics()
