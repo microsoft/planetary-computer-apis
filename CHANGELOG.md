@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New endpoints under `/vector` that server collection level Mapbox Vector Tiles (MVT) [#147](https://github.com/microsoft/planetary-computer-apis/pull/147)
 
+### Changed
+
+- Updated **stac-fastapi-pgstac** to v2.4.5 [#163](https://github.com/microsoft/planetary-computer-apis/pull/163)
+
 ## [2022.4.0]
 
 ### Changed
@@ -62,7 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed bug in legend/colormap endpoint [#53](https://github.com/microsoft/planetary-computer-apis/pull/53)
 - Fixed tiler for Ground Control Point datasets, implemented for Sentinel 1 GRD [#90](https://github.com/microsoft/planetary-computer-apis/pull/90)
-
 
 ## [2022.1.3]
 
