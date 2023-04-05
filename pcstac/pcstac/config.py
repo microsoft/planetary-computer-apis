@@ -40,9 +40,9 @@ EXTENSIONS = [
         conformance_classes=[
             FilterConformanceClasses.FILTER,
             FilterConformanceClasses.ITEM_SEARCH_FILTER,
-            FilterConformanceClasses.BASIC_CQL,
-            FilterConformanceClasses.CQL_JSON,
-            FilterConformanceClasses.CQL_TEXT,
+            FilterConformanceClasses.BASIC_CQL2,
+            FilterConformanceClasses.CQL2_JSON,
+            FilterConformanceClasses.CQL2_TEXT,
         ],
     ),
     # stac_fastapi extensions
