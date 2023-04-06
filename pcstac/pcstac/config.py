@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import List
 from urllib.parse import urljoin
 
 from fastapi import Request
@@ -9,11 +10,16 @@ from stac_fastapi.extensions.core import (
     QueryExtension,
     SortExtension,
     TokenPaginationExtension,
+    TransactionExtension,
 )
 from stac_fastapi.extensions.core.filter.filter import FilterConformanceClasses
+from stac_fastapi.pgstac.config import Settings as ApiSettings
+from stac_fastapi.types.extension import ApiExtension
 
 from pccommon.config.core import ENV_VAR_PCAPIS_PREFIX, PCAPIsConfig
 from pcstac.filter import MSPCFiltersClient
+from pcstac.search import RedisBaseItemCache
+from stac_fastapi.pgstac.transactions import TransactionsClient
 
 API_VERSION = "1.2"
 STAC_API_VERSION = "v1.0.0-rc.1"
@@ -25,29 +31,33 @@ API_DESCRIPTION = (
     "hosted by the Microsoft Planetary Computer"
 )
 
-TILER_HREF_ENV_VAR = "TILER_HREF"
 DB_MIN_CONN_ENV_VAR = "DB_MIN_CONN_SIZE"
 DB_MAX_CONN_ENV_VAR = "DB_MAX_CONN_SIZE"
+DEBUG_ENV_VAR = "DEBUG"
 REQUEST_TIMEOUT_ENV_VAR = "REQUEST_TIMEOUT"
+TILER_HREF_ENV_VAR = "TILER_HREF"
 
-EXTENSIONS = [
-    # STAC API Extensions
-    QueryExtension(),
-    SortExtension(),
-    FieldsExtension(),
-    FilterExtension(
-        client=MSPCFiltersClient(),
-        conformance_classes=[
-            FilterConformanceClasses.FILTER,
-            FilterConformanceClasses.ITEM_SEARCH_FILTER,
-            FilterConformanceClasses.BASIC_CQL,
-            FilterConformanceClasses.CQL_JSON,
-            FilterConformanceClasses.CQL_TEXT,
-        ],
-    ),
-    # stac_fastapi extensions
-    TokenPaginationExtension(),
-]
+
+def get_extensions() -> List[ApiExtension]:
+    return [
+        # STAC API Extensions
+        QueryExtension(),
+        SortExtension(),
+        FieldsExtension(),
+        FilterExtension(
+            client=MSPCFiltersClient(),
+            conformance_classes=[
+                FilterConformanceClasses.FILTER,
+                FilterConformanceClasses.ITEM_SEARCH_FILTER,
+                FilterConformanceClasses.BASIC_CQL,
+                FilterConformanceClasses.CQL_JSON,
+                FilterConformanceClasses.CQL_TEXT,
+            ],
+        ),
+        # stac_fastapi extensions
+        TokenPaginationExtension(),
+        TransactionExtension(client=TransactionsClient(), settings=get_api_settings()),
+    ]
 
 
 class RateLimits(BaseModel):
@@ -90,7 +100,7 @@ class Settings(BaseSettings):
 
     api = PCAPIsConfig.from_environment()
 
-    debug: bool = False
+    debug: bool = Field(env=DEBUG_ENV_VAR, default=False)
     tiler_href: str = Field(env=TILER_HREF_ENV_VAR, default="")
     db_max_conn_size: int = Field(env=DB_MAX_CONN_ENV_VAR, default=1)
     db_min_conn_size: int = Field(env=DB_MIN_CONN_ENV_VAR, default=1)
@@ -122,3 +132,15 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+@lru_cache
+def get_api_settings() -> ApiSettings:
+    app_settings = get_settings()
+
+    return ApiSettings(
+        db_max_conn_size=app_settings.db_max_conn_size,
+        db_min_conn_size=app_settings.db_min_conn_size,
+        base_item_cache=RedisBaseItemCache,
+        debug=app_settings.debug,
+    )

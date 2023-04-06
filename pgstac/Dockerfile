@@ -4,7 +4,6 @@ FROM postgres:14 as pg
 ENV POSTGIS_MAJOR 3
 ENV PGUSER postgres
 ENV PGDATABASE postgres
-ENV PGHOST localhost
 
 RUN \
     apt-get update \

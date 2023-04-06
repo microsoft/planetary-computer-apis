@@ -28,13 +28,13 @@ from pcstac.config import (
     API_DESCRIPTION,
     API_TITLE,
     API_VERSION,
-    EXTENSIONS,
+    get_extensions,
+    get_api_settings,
     get_settings,
 )
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.search import PCSearch, PCSearchGetRequest, RedisBaseItemCache
+from pcstac.search import PCSearch, PCSearchGetRequest
 
-DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 
 # Initialize logging
 init_logging(ServiceName.STAC)
@@ -48,25 +48,22 @@ hydrate_mode_label = os.environ.get("USE_API_HYDRATE", "False")
 logger.info(f"API Hydrate mode enabled: {hydrate_mode_label}")
 
 app_settings = get_settings()
+api_settings = get_api_settings()
+extensions = get_extensions()
 
 search_get_request_model = create_get_request_model(
-    EXTENSIONS, base_model=PCSearchGetRequest
+    extensions, base_model=PCSearchGetRequest
 )
-search_post_request_model = create_post_request_model(EXTENSIONS, base_model=PCSearch)
+search_post_request_model = create_post_request_model(extensions, base_model=PCSearch)
 
 api = PCStacApi(
     title=API_TITLE,
     description=API_DESCRIPTION,
     api_version=API_VERSION,
-    settings=Settings(
-        db_max_conn_size=app_settings.db_max_conn_size,
-        db_min_conn_size=app_settings.db_min_conn_size,
-        base_item_cache=RedisBaseItemCache,
-        debug=DEBUG,
-    ),
-    client=PCClient.create(post_request_model=search_post_request_model),
-    extensions=EXTENSIONS,
     app=FastAPI(root_path=APP_ROOT_PATH, default_response_class=ORJSONResponse),
+    settings=api_settings,
+    client=PCClient.create(post_request_model=search_post_request_model),
+    extensions=extensions,
     search_get_request_model=search_get_request_model,
     search_post_request_model=search_post_request_model,
     response_class=ORJSONResponse,

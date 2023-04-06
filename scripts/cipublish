@@ -8,12 +8,14 @@ fi
 
 function usage() {
     echo -n \
-        "Usage: $(basename "$0") --acr ACR_NAME --tag IMAGE_TAG
+        "Usage: $(basename "$0") --acr ACR_NAME --tag IMAGE_TAG [--imageprefix IMAGE_PREFIX]
 Publishes images for this project.
 
 Must be logged in to the ACR (e.g. with az acr login -n ACR_NAME)
 
 --acr: The name of the ACR to publish to
+--tag: The tag to publish the images with
+--imageprefix: The prefix to use for the image names (default: public/planetary-computer-apis)
 "
 }
 
@@ -25,6 +27,11 @@ while [[ "$#" > 0 ]]; do case $1 in
         ;;
     --tag)
         IMAGE_TAG=$2
+        shift
+        shift
+        ;;
+    --imageprefix)
+        IMAGE_PREFIX=$2
         shift
         shift
         ;;
@@ -50,6 +57,10 @@ if [[ -z ${IMAGE_TAG} ]]; then
     exit 1
 fi
 
+if [[ -z ${IMAGE_PREFIX} ]]; then
+    IMAGE_PREFIX="public/planetary-computer-apis"
+fi
+
 function publish_image() {
     local local_image=$1
     local published_image=$2
@@ -64,7 +75,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     # Publish images
 
-    publish_image "pc-apis-stac" "public/planetary-computer-apis/stac"
-    publish_image "pc-apis-tiler" "public/planetary-computer-apis/tiler"
+    publish_image "pc-apis-stac" "${IMAGE_PREFIX}/stac"
+    publish_image "pc-apis-tiler" "${IMAGE_PREFIX}/tiler"
 
 fi
