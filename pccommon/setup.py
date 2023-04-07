@@ -4,23 +4,20 @@ from setuptools import find_packages, setup
 
 # Runtime requirements.
 inst_reqs = [
-    # --->
-    # TODO: restore fastapi release install after starlette dep upgraded to >= 0.21.0
-    # "fastapi>=0.75.2",
-    "fastapi @ git+https://github.com/mmcfarland/fastapi/@982e7caf086bffeace8554da6d69e5f3082f14a3#egg=fastapi",
-    "starlette>=0.21.0,<0.22.0",
-    # <---
+    "fastapi==0.90.1",
+    "starlette>=0.22.0,<0.23.0",
     "opencensus-ext-azure==1.0.8",
     "opencensus-ext-logging==0.1.0",
     "orjson==3.5.2",
     "azure-identity==1.7.1",
     "azure-data-tables==12.4.0",
     "azure-storage-blob==12.12.0",
-    "pydantic==1.9.0",
-    "cachetools==5.0.0",
+    "pydantic>=1.9, <2.0.0",
+    "cachetools~=5.3",
     "types-cachetools==4.2.9",
     "pyhumps==3.5.3",
     "redis==4.2.0-rc1",
+    "html-sanitizer==1.9",
 ]
 
 extra_reqs = {

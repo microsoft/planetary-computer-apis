@@ -26,7 +26,7 @@ from pccommon.middleware import (
 )
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
-from pctiler.endpoints import health, item, legend, pg_mosaic
+from pctiler.endpoints import health, item, legend, pg_mosaic, vector_tiles
 
 # Initialize logging
 init_logging(ServiceName.TILER)
@@ -45,6 +45,10 @@ app = FastAPI(
 
 app.state.service_name = ServiceName.TILER
 
+# Note:
+# With titiler.pgstac >3.0, items endpoint has changed and use path-parameter
+# /collections/{collectionId}/items/{itemId} instead of query-parameter
+# https://github.com/stac-utils/titiler-pgstac/blob/d16102bf331ba588f31e131e65b07637d649b4bd/titiler/pgstac/main.py#L87-L92
 app.include_router(
     item.pc_tile_factory.router,
     prefix=settings.item_endpoint_prefix,
@@ -61,6 +65,12 @@ app.include_router(
     legend.legend_router,
     prefix=settings.legend_endpoint_prefix,
     tags=["Legend endpoints"],
+)
+
+app.include_router(
+    vector_tiles.vector_tile_router,
+    prefix=settings.vector_tile_endpoint_prefix,
+    tags=["Collection vector tile endpoints"],
 )
 
 app.include_router(health.health_router, tags=["Liveliness/Readiness"])

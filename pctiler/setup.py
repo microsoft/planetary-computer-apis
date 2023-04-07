@@ -9,13 +9,13 @@ inst_reqs = [
     "pystac==1.*",
     "planetary-computer==0.4.*",
 
-    "rasterio==1.2.*",
-    "titiler.core==0.7.0",
-    "titiler.mosaic==0.7.0",
+    "rasterio==1.3.*",
+    "titiler.core==0.10.2",
+    "titiler.mosaic==0.10.2",
 
     # titiler-pgstac
     "psycopg[binary,pool]",
-    "titiler.pgstac==0.1.0",
+    "titiler.pgstac==0.2.2",
 
     # colormap dependencies
     "matplotlib==3.4.*",

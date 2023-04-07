@@ -1,10 +1,11 @@
-from urllib.parse import urljoin
+from urllib.parse import quote_plus, urljoin
 
 from fastapi import Query, Request, Response
 from fastapi.templating import Jinja2Templates
+from html_sanitizer.sanitizer import Sanitizer
 from starlette.responses import HTMLResponse
 from titiler.core.factory import MultiBaseTilerFactory
-from titiler.pgstac.dependencies import ItemPathParams
+from titiler.pgstac.dependencies import ItemPathParams  # removed in titiler.pgstac 3.0
 
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
@@ -30,6 +31,8 @@ pc_tile_factory = MultiBaseTilerFactory(
     colormap_dependency=PCColorMapParams,
     reader_dependency=ReaderParams,
     router_prefix=get_settings().item_endpoint_prefix,
+    # We remove the titiler default `/map` viewer
+    add_viewer=False,
 )
 
 
@@ -46,13 +49,19 @@ def map(
             content=f"No item map available for collection {collection}",
         )
 
-    qs = render_config.get_full_render_qs(collection, item)
+    # Sanitize collection and item to avoid XSS when the values are templated
+    # into the rendered html page
+    sanitizer = Sanitizer()
+    collection_sanitized = quote_plus(sanitizer.sanitize(collection))
+    item_sanitized = quote_plus(sanitizer.sanitize(item))
+
+    qs = render_config.get_full_render_qs(collection_sanitized, item_sanitized)
     tilejson_url = pc_tile_factory.url_for(request, "tilejson")
     tilejson_url += f"?{qs}"
 
     item_url = urljoin(
         get_settings().get_stac_api_href(request),
-        f"collections/{collection}/items/{item}",
+        f"collections/{collection_sanitized}/items/{item_sanitized}",
     )
 
     return templates.TemplateResponse(
@@ -60,8 +69,8 @@ def map(
         context={
             "request": request,
             "tileJson": tilejson_url,
-            "collectionId": collection,
-            "itemId": item,
+            "collectionId": collection_sanitized,
+            "itemId": item_sanitized,
             "itemUrl": item_url,
         },
     )

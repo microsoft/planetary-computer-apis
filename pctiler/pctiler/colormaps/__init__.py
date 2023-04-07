@@ -8,13 +8,14 @@ from titiler.core.dependencies import ColorMapParams
 
 from .alos_palsar_mosaic import alos_palsar_mosaic_colormaps
 from .chloris import chloris_colormaps
+from .io_bii import io_bii_colormaps
 from .jrc import jrc_colormaps
 from .lidarusgs import lidar_colormaps
 from .lulc import lulc_colormaps
 from .modis import modis_colormaps
 from .mtbs import mtbs_colormaps
 from .noaa_c_cap import noaa_c_cap_colormaps
-from .noaa_mrms_qpe import noaa_mrms_qpe_colormaps
+from .qpe import qpe_colormaps
 from .viirs import viirs_colormaps
 
 ################################################################################
@@ -24,6 +25,7 @@ from .viirs import viirs_colormaps
 ################################################################################
 registered_cmaps = cmap
 custom_colormaps: Dict[str, ColorMapType] = {
+    **io_bii_colormaps,
     **jrc_colormaps,
     **lulc_colormaps,
     **modis_colormaps,
@@ -31,8 +33,8 @@ custom_colormaps: Dict[str, ColorMapType] = {
     **lidar_colormaps,
     **chloris_colormaps,
     **noaa_c_cap_colormaps,
-    **noaa_mrms_qpe_colormaps,
     **alos_palsar_mosaic_colormaps,
+    **qpe_colormaps,
     **viirs_colormaps,
 }
 

@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Run cibuild
         run: ./scripts/cibuild
@@ -21,10 +21,10 @@ jobs:
         run:
           case "${GITHUB_REF}" in
             *tags*)
-              echo "::set-output name=tag::${GITHUB_REF/refs\/tags\//}"
+              echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
               ;;
             *)
-              echo "::set-output name=tag::latest"
+              echo "tag=latest" >> $GITHUB_OUTPUT
               ;;
           esac
 
@@ -47,7 +47,7 @@ jobs:
     needs:
       - build_and_publish
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Get image tag
         id: get_image_tag
@@ -55,10 +55,10 @@ jobs:
         run:
           case "${GITHUB_REF}" in
             *tags*)
-              echo "::set-output name=tag::${GITHUB_REF/refs\/tags\//}"
+              echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
               ;;
             *)
-              echo "::set-output name=tag::latest"
+              echo "tag=latest" >> $GITHUB_OUTPUT
               ;;
           esac
 

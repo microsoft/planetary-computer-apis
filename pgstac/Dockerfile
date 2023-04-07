@@ -1,4 +1,4 @@
-FROM postgres:13 as pg
+FROM postgres:14 as pg
 
 
 ENV POSTGIS_MAJOR 3

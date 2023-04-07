@@ -1,11 +1,49 @@
-from typing import Any, Dict, List, Optional
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 import orjson
 from humps import camelize
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from pccommon.tables import ModelTableService
 from pccommon.utils import get_param_str, orjson_dumps
+
+
+class RenderOptionType(str, Enum):
+    def __str__(self) -> str:
+        return self.value
+
+    raster_tile = "raster-tile"
+    vt_polygon = "vt-polygon"
+    vt_line = "vt-line"
+
+
+class CamelModel(BaseModel):
+    class Config:
+        alias_generator = camelize
+        allow_population_by_field_name = True
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
+
+
+class VectorTileset(CamelModel):
+    """
+    Defines a static vector tileset for a collection. Used primarily to generate
+    tilejson metadata for the collection-level vector tile assets.
+
+
+    id:
+        The id of the vector tileset. This should match the prefix of the blob
+        path where the associated vector tiles are stored. Will also be used in
+        a URL.
+    """
+
+    id: str
+    name: Optional[str] = None
+    maxzoom: Optional[int] = Field(13, ge=0, le=24)
+    minzoom: Optional[int] = Field(0, ge=0, le=24)
+    center: Optional[List[float]] = None
+    bounds: Optional[List[float]] = None
 
 
 class DefaultRenderConfig(BaseModel):
@@ -18,6 +56,12 @@ class DefaultRenderConfig(BaseModel):
     most convenient renderings for human consumption and preview.
     For example, if a TIF asset can be viewed as an RGB approximating
     normal human vision, parameters will likely encode this rendering.
+
+    vector_tilesets:
+        TileJSON metadata defining static vector tilesets generated for this
+        collection. These are used to generate VT routes included as
+        collection-level assets in the STAC metadata as well as resolve paths to
+        the VT storage account and container to proxy actual pbf files.
     """
 
     render_params: Dict[str, Any]
@@ -30,6 +74,7 @@ class DefaultRenderConfig(BaseModel):
     mosaic_preview_coords: Optional[List[float]] = None
     requires_token: bool = False
     max_items_per_tile: Optional[int] = None
+    vector_tilesets: Optional[List[VectorTileset]] = None
     hidden: bool = False  # Hide from API
 
     def get_full_render_qs(self, collection: str, item: Optional[str] = None) -> str:
@@ -58,7 +103,26 @@ class DefaultRenderConfig(BaseModel):
         return "".join(params)
 
     def get_render_params(self) -> str:
-        return f"&{get_param_str(self.render_params)}"
+        default_params = f"&{get_param_str(self.render_params)}"
+
+        if "format" in self.render_params:
+            return default_params
+
+        # Enforce PNG rendering when otherwise unspecified
+        return default_params + "&format=png"
+
+    def get_vector_tileset(self, tileset_id: str) -> Optional[VectorTileset]:
+        """
+        Get a tileset by id.
+        """
+        tilesets = self.vector_tilesets or []
+        matches = [tileset for tileset in tilesets if tileset.id == tileset_id]
+
+        return matches[0] if matches else None
+
+    @property
+    def has_vector_tiles(self) -> bool:
+        return bool(self.vector_tilesets)
 
     @property
     def should_add_collection_links(self) -> bool:
@@ -74,14 +138,6 @@ class DefaultRenderConfig(BaseModel):
         return self.create_links and (not self.hidden)
 
     class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
-
-
-class CamelModel(BaseModel):
-    class Config:
-        alias_generator = camelize
-        allow_population_by_field_name = True
         json_loads = orjson.loads
         json_dumps = orjson_dumps
 
@@ -118,7 +174,7 @@ class LegendConfig(CamelModel):
         `none` (note, `none` is a string literal).
     labels:
         List of string labels, ideally fewer than 3 items. Will be flex
-        spaced-between under the lagend image.
+        spaced-between under the legend image.
     trim_start:
         The number of items to trim from the start of the legend definition.
         Used if there are values important for rendering (e.g. nodata) that
@@ -127,7 +183,7 @@ class LegendConfig(CamelModel):
         Same as trim_start, but for the end of the legend definition.
     scale_factor:
         A factor to multiply interval legend labels by. Useful for scaled
-        reasters whose colormap definitions map to unscaled values, effectively
+        rasters whose colormap definitions map to unscaled values, effectively
         showing legend labels as scaled values.
     """
 
@@ -136,6 +192,34 @@ class LegendConfig(CamelModel):
     trim_start: Optional[int]
     trim_end: Optional[int]
     scale_factor: Optional[float]
+
+
+class VectorTileOptions(CamelModel):
+    """
+    Defines a set of vector tile render options for a collection.
+
+    Attributes
+    ----------
+    tilejson_key:
+        The key in the collection-level assets which contains the tilejson URL.
+    source_layer:
+        The source layer name to render from the associated vector tiles.
+    fill_color:
+        The fill color for polygons.
+    stroke_color:
+        The stroke color for lines.
+    stroke_width:
+        The stroke width for lines.
+    filter:
+        MapBox Filter Expression to filter vector features by.
+    """
+
+    tilejson_key: str
+    source_layer: str
+    fill_color: Optional[str]
+    stroke_color: Optional[str]
+    stroke_width: Optional[int]
+    filter: Optional[List[Any]]
 
 
 class RenderOptionCondition(CamelModel):
@@ -166,10 +250,15 @@ class RenderOptions(CamelModel):
     description:
         A longer description of the render option that can be used to explain
         its content.
+    type:
+        The type of render option, defaults to raster-tile.
     options:
-        A URL query-string encoded string of TiTiler rendering options. See
-        "Query Parameters":
+        A URL query-string encoded string of TiTiler rendering options. Valid
+        only for `raster-tile` types.  See "Query Parameters":
         https://developmentseed.org/titiler/endpoints/cog/#description
+    vector_options:
+        Options for rendering vector tiles. Valid only for `vt-polygon` and
+        `vt-line` types.
     min_zoom:
         Zoom level at which to start rendering the layer.
     legend:
@@ -181,7 +270,9 @@ class RenderOptions(CamelModel):
 
     name: str
     description: Optional[str] = None
-    options: str
+    type: Optional[RenderOptionType] = Field(default=RenderOptionType.raster_tile)
+    options: Optional[str]
+    vector_options: Optional[VectorTileOptions] = None
     min_zoom: int
     legend: Optional[LegendConfig] = None
     conditions: Optional[List[RenderOptionCondition]] = None
@@ -251,3 +342,6 @@ class CollectionConfigTable(ModelTableService[CollectionConfig]):
 
     def set_config(self, collection_id: str, config: CollectionConfig) -> None:
         self.upsert("", collection_id, config)
+
+    def get_all_configs(self) -> List[Tuple[Optional[str], CollectionConfig]]:
+        return [(config[1], config[2]) for config in self.get_all()]

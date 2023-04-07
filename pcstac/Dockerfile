@@ -9,7 +9,7 @@ WORKDIR /opt/src
 
 COPY pcstac /opt/src/pcstac
 COPY pccommon /opt/src/pccommon
-RUN pip install -e ./pccommon -e ./pcstac[server]
+RUN pip install -r ./pcstac/requirements.txt -e ./pccommon -e ./pcstac[server]
 
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=81

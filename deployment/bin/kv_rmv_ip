@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+source bin/lib
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Remove runner public IP from Key Vault firewall allow list
+"
+}
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    cidr=$(get_cidr_range)
+
+    az keyvault network-rule remove \
+        -g ${KEY_VAULT_RESOURCE_GROUP_NAME}  \
+        -n ${KEY_VAULT_NAME} \
+        --ip-address $cidr \
+        --subscription ${ARM_SUBSCRIPTION_ID}
+
+fi

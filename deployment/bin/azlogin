@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Login to Azure CLI
+"
+}
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    az login --service-principal \
+        --username ${ARM_CLIENT_ID} \
+        --password ${ARM_CLIENT_SECRET} \
+        --tenant ${ARM_TENANT_ID}
+
+fi

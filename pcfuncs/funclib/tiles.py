@@ -162,11 +162,6 @@ class PILTileSet(TileSet[PILRaster]):
             async with aiohttp.ClientSession() as session:
                 async with self._async_limit:
                     async with session.get(url) as resp:
-                        # Download the image tile, block if exceeding concurrency limits
-                        if self._async_limit.locked():
-                            logger.info("Concurrency limit reached, waiting...")
-                            await asyncio.sleep(1)
-
                         if resp.status == 200:
                             return io.BytesIO(await resp.read())
                         else:
@@ -180,8 +175,8 @@ class PILTileSet(TileSet[PILRaster]):
                 is_throttle=lambda e: isinstance(e, TilerError),
                 strategy=BackoffStrategy(waits=[0.2, 0.5, 0.75, 1, 2]),
             )
-        except TilerError as e:
-            logger.warning(f"Tile request: {e.resp.status} {url}")
+        except Exception:
+            logger.warning(f"Tile request failed with backoff: {url}")
             img_bytes = Image.new("RGB", (self.tile_size, self.tile_size), "gray")
             empty = io.BytesIO()
             img_bytes.save(empty, format="png")
