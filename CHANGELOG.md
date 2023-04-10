@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated **stac-fastapi-pgstac** to v2.4.5 [#163](https://github.com/microsoft/planetary-computer-apis/pull/163)
+- Updated tiler to use conda to manage dependencies, support LERC [#169](https://github.com/microsoft/planetary-computer-apis/pull/169)
 
 ## [2022.4.0]
 

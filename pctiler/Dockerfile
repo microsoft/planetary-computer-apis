@@ -1,7 +1,8 @@
-FROM python:3.9-slim
+FROM mambaorg/micromamba:1.4.0
+COPY --chown=$MAMBA_USER:$MAMBA_USER pctiler/environment.yaml /tmp/env.yaml
 
-# git required for pip installs from git
-RUN apt update && apt install -y git
+RUN micromamba install -y -n base -f /tmp/env.yaml && \
+    micromamba clean --all --yes
 
 # The devops Personal Access Token for accessing
 # Azure Artifacts. Note: This will be visible as
@@ -15,10 +16,11 @@ ARG DEVOPS_PAT
 EXPOSE 8000
 
 WORKDIR /opt/src
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
-COPY pccommon /opt/src/pccommon
-COPY pctiler /opt/src/pctiler
-RUN pip install -e ./pccommon -e ./pctiler[server]
+COPY --chown=$MAMBA_USER:$MAMBA_USER pccommon /opt/src/pccommon
+COPY --chown=$MAMBA_USER:$MAMBA_USER pctiler /opt/src/pctiler
+RUN python3 -m pip install -e ./pccommon -e ./pctiler[server]
 
 # GDAL config
 ENV GDAL_CACHEMAX 200

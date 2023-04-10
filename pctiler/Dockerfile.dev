@@ -1,6 +1,8 @@
 FROM pc-apis-tiler
 
-COPY requirements-dev.txt requirements-dev.txt
-RUN pip install -r requirements-dev.txt
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
-RUN pip install -e ./pccommon -e ./pctiler
+COPY --chown=$MAMBA_USER:$MAMBA_USER requirements-dev.txt requirements-dev.txt
+
+RUN python3 -m pip install -r requirements-dev.txt
+RUN python3 -m pip install -e ./pccommon -e ./pctiler
