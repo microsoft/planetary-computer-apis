@@ -45,7 +45,6 @@ We'll make a new file for just our dataset's config, call it `alos-palsar-config
             "minzoom": 8,
             "requires_token": true
         },
-        "queryables": {},
         "mosaic_info": {
             "mosaics": [],
             "render_options": [],
@@ -107,7 +106,6 @@ After you've found a good set of rendering options, add it to the configuration 
             "minzoom": 8,
             "requires_token": true
         },
-        "queryables": {},
         "mosaic_info": {
             "mosaics": [],
             "render_options": [

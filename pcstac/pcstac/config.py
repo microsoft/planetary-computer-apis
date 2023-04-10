@@ -13,7 +13,7 @@ from stac_fastapi.extensions.core import (
 from stac_fastapi.extensions.core.filter.filter import FilterConformanceClasses
 
 from pccommon.config.core import ENV_VAR_PCAPIS_PREFIX, PCAPIsConfig
-from pcstac.filter import MSPCFiltersClient
+from pcstac.filter import PCFiltersClient
 
 API_VERSION = "1.2"
 STAC_API_VERSION = "v1.0.0-rc.1"
@@ -36,13 +36,13 @@ EXTENSIONS = [
     SortExtension(),
     FieldsExtension(),
     FilterExtension(
-        client=MSPCFiltersClient(),
+        client=PCFiltersClient(),
         conformance_classes=[
             FilterConformanceClasses.FILTER,
             FilterConformanceClasses.ITEM_SEARCH_FILTER,
-            FilterConformanceClasses.BASIC_CQL,
-            FilterConformanceClasses.CQL_JSON,
-            FilterConformanceClasses.CQL_TEXT,
+            FilterConformanceClasses.BASIC_CQL2,
+            FilterConformanceClasses.CQL2_JSON,
+            FilterConformanceClasses.CQL2_TEXT,
         ],
     ),
     # stac_fastapi extensions
