@@ -18,8 +18,8 @@ EXPOSE 8000
 WORKDIR /opt/src
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
-COPY pccommon /opt/src/pccommon
-COPY pctiler /opt/src/pctiler
+COPY --chown=$MAMBA_USER:$MAMBA_USER pccommon /opt/src/pccommon
+COPY --chown=$MAMBA_USER:$MAMBA_USER pctiler /opt/src/pctiler
 RUN python3 -m pip install -e ./pccommon -e ./pctiler[server]
 
 # GDAL config
