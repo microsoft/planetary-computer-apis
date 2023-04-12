@@ -1,26 +1,35 @@
-FROM mambaorg/micromamba:1.4.0
-COPY --chown=$MAMBA_USER:$MAMBA_USER pctiler/environment.yaml /tmp/env.yaml
+# Use a smaller base image, like python:3.9-slim
+FROM python:3.9-slim as build
 
-RUN micromamba install -y -n base -f /tmp/env.yaml && \
-    micromamba clean --all --yes
+# Install Micromamba
+RUN apt-get update && apt-get install -y curl bzip2
+RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
 
-# The devops Personal Access Token for accessing
-# Azure Artifacts. Note: This will be visible as
-# plain text in the docker build logs. Only use your
-# PAT for development containers in your local environment.
-# Azure Pipelines will utilize a temporary key for builds
-# when building deploy images so that there is not arisk of
-# exposure.
-ARG DEVOPS_PAT
+COPY pctiler/environment.yaml /tmp/env.yaml
+
+# Create a separate environment for the packages and remove unnecessary files
+RUN micromamba create -p /opt/conda/envs/myenv -f /tmp/env.yaml && \
+    micromamba clean --all --yes && \
+    rm -rf /root/.cache /tmp/env.yaml
+
+# Multi-stage build to reduce the final image size
+FROM python:3.9-slim
+
+# Copy the environment from the build stage
+COPY --from=build /opt/conda/envs/myenv /opt/conda/envs/myenv
+ENV PATH="/opt/conda/envs/myenv/bin:$PATH"
 
 EXPOSE 8000
 
 WORKDIR /opt/src
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
-COPY --chown=$MAMBA_USER:$MAMBA_USER pccommon /opt/src/pccommon
-COPY --chown=$MAMBA_USER:$MAMBA_USER pctiler /opt/src/pctiler
-RUN python3 -m pip install -e ./pccommon -e ./pctiler[server]
+COPY pccommon /opt/src/pccommon
+COPY pctiler /opt/src/pctiler
+
+# Install the local modules in the new environment
+# RUN /bin/bash -c "source activate myenv && python3 -m pip install -e ./pccommon -e ./pctiler[server]"
+RUN /bin/bash -c "python3 -m pip install -e ./pccommon -e ./pctiler[server]"
 
 # GDAL config
 ENV GDAL_CACHEMAX 200
