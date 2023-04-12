@@ -1,5 +1,4 @@
-# Use a smaller base image, like python:3.9-slim
-FROM python:3.9-slim as build
+FROM ubuntu:latest as build
 
 # Install Micromamba
 RUN apt-get update && apt-get install -y curl bzip2
@@ -12,24 +11,27 @@ RUN micromamba create -p /opt/conda/envs/myenv -f /tmp/env.yaml && \
     micromamba clean --all --yes && \
     rm -rf /root/.cache /tmp/env.yaml
 
-# Multi-stage build to reduce the final image size
-FROM python:3.9-slim
+# Start from a new stage to avoid copying the build environment, and
+# copy the environment from the build stage
+FROM ubuntu:latest
 
-# Copy the environment from the build stage
 COPY --from=build /opt/conda/envs/myenv /opt/conda/envs/myenv
 ENV PATH="/opt/conda/envs/myenv/bin:$PATH"
 
-EXPOSE 8000
-
 WORKDIR /opt/src
-ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
 COPY pccommon /opt/src/pccommon
 COPY pctiler /opt/src/pctiler
 
 # Install the local modules in the new environment
-# RUN /bin/bash -c "source activate myenv && python3 -m pip install -e ./pccommon -e ./pctiler[server]"
-RUN /bin/bash -c "python3 -m pip install -e ./pccommon -e ./pctiler[server]"
+RUN /bin/sh -c "python -m pip install --no-cache-dir -e ./pccommon -e ./pctiler[server]"
+
+# Remove unnecessary files
+RUN find /opt/conda/envs/myenv -type f -name "*.pyc" -exec rm -f {} \;
+RUN rm -rf /opt/conda/envs/myenv/share/doc
+RUN rm -rf /opt/conda/envs/myenv/share/locale
+RUN rm -rf /opt/conda/envs/myenv/man
+RUN rm -rf /opt/conda/envs/myenv/include
 
 # GDAL config
 ENV GDAL_CACHEMAX 200
@@ -56,7 +58,7 @@ ENV MOSAIC_CONCURRENCY 1
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=80
 
-# Run uvicorn as root. The build context user is $MAMBA_USER which doesn't have
-# permission to bind to port 80.
-USER root
+# # Run uvicorn as root. The build context user is $MAMBA_USER which doesn't have
+# # permission to bind to port 80.
+# USER root
 CMD uvicorn pctiler.main:app --host ${APP_HOST} --port ${APP_PORT} --log-level info
