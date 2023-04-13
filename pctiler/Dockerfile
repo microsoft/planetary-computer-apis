@@ -1,14 +1,22 @@
-FROM pctiler-base:latest
+FROM ubuntu:latest as build
 
-COPY pctiler/environment.yaml /tmp/environment.yaml
-RUN /opt/conda/bin/conda env update -f /tmp/environment.yaml
-RUN source ~/.profile
-# RUN /opt/conda/bin/conda activate base
+# Install Micromamba
+RUN apt-get update && apt-get install -y curl bzip2
+RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
 
-RUN /opt/conda/bin/conda clean -afy \
-    && find /opt/conda/ -follow -type f -name '*.a' -delete \
-    && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
-    && find /opt/conda/ -follow -type f -name '*.js.map' -delete
+COPY pctiler/environment.yaml /tmp/env.yaml
+
+# Create a separate environment for the packages and remove unnecessary files
+RUN micromamba create -p /opt/conda/envs/myenv -f /tmp/env.yaml && \
+    micromamba clean --all --yes && \
+    rm -rf /root/.cache /tmp/env.yaml
+
+# Start from a new stage to avoid copying the build environment, and
+# copy the environment from the build stage
+FROM ubuntu:latest
+
+COPY --from=build /opt/conda/envs/myenv /opt/conda/envs/myenv
+ENV PATH="/opt/conda/envs/myenv/bin:$PATH"
 
 WORKDIR /opt/src
 
@@ -16,15 +24,14 @@ COPY pccommon /opt/src/pccommon
 COPY pctiler /opt/src/pctiler
 
 # Install the local modules in the new environment
-# RUN /bin/sh -c "/opt/conda/python -m pip install --no-cache-dir -e ./pccommon -e ./pctiler[server]"
-RUN /opt/conda/bin/conda develop ./pccommon ./pctiler[server]
+RUN /bin/sh -c "python -m pip install --no-cache-dir -e ./pccommon -e ./pctiler[server]"
 
 # Remove unnecessary files
-# RUN find /opt/conda/envs/myenv -type f -name "*.pyc" -exec rm -f {} \;
-# RUN rm -rf /opt/conda/envs/myenv/share/doc
-# RUN rm -rf /opt/conda/envs/myenv/share/locale
-# RUN rm -rf /opt/conda/envs/myenv/man
-# RUN rm -rf /opt/conda/envs/myenv/include
+RUN find /opt/conda/envs/myenv -type f -name "*.pyc" -exec rm -f {} \;
+RUN rm -rf /opt/conda/envs/myenv/share/doc
+RUN rm -rf /opt/conda/envs/myenv/share/locale
+RUN rm -rf /opt/conda/envs/myenv/man
+RUN rm -rf /opt/conda/envs/myenv/include
 
 # GDAL config
 ENV GDAL_CACHEMAX 200
