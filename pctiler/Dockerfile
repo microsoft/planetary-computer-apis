@@ -58,7 +58,4 @@ ENV MOSAIC_CONCURRENCY 1
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=80
 
-# # Run uvicorn as root. The build context user is $MAMBA_USER which doesn't have
-# # permission to bind to port 80.
-# USER root
 CMD uvicorn pctiler.main:app --host ${APP_HOST} --port ${APP_PORT} --log-level info
