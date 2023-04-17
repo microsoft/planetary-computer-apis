@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from rio_tiler.models import ImageData
 from funclib.raster import Bbox, GDALRaster, PILRaster, RasterExtent
 from PIL import Image
+from rio_tiler.models import ImageData
 
 HERE = Path(__file__).parent
 DATA_FILES = HERE / ".." / "data-files"
