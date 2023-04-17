@@ -4,6 +4,7 @@ import threading
 import time
 from enum import Enum
 from types import DynamicClassAttribute
+from typing import Dict, Generator
 
 import pytest
 import uvicorn
@@ -45,17 +46,17 @@ class ImageType(str, Enum):
     jpg = "jpg"
 
     @DynamicClassAttribute
-    def profile(self):
+    def profile(self) -> Dict:
         """Return rio-tiler image default profile."""
         return img_profiles.get(self._name_, {})
 
     @DynamicClassAttribute
-    def driver(self):
+    def driver(self) -> str:
         """Return rio-tiler image default profile."""
         return ImageDriver[self._name_].value
 
     @DynamicClassAttribute
-    def mediatype(self):
+    def mediatype(self) -> str:
         """Return image media type."""
         return MediaType[self._name_].value
 
@@ -63,12 +64,12 @@ class ImageType(str, Enum):
 class Server(uvicorn.Server):
     """Uvicorn Server."""
 
-    def install_signal_handlers(self):
+    def install_signal_handlers(self) -> None:
         """install handlers."""
         pass
 
     @contextlib.contextmanager
-    def run_in_thread(self):
+    def run_in_thread(self) -> Generator:
         """run in thread."""
         thread = threading.Thread(target=self.run)
         thread.start()
@@ -82,7 +83,7 @@ class Server(uvicorn.Server):
 
 
 @pytest.fixture(scope="session")
-def application():
+def application() -> Generator:
     """Run app in Thread."""
     app = FastAPI()
 
@@ -96,7 +97,7 @@ def application():
         tile_scale: int = Query(
             1, gt=0, lt=4, description="Tile size scale. 1=256x256, 2=512x512..."
         ),
-    ):
+    ) -> Response:
         with Reader(collection) as src:
             image = src.tile(x, y, z, tilesize=tile_scale * 256)
 
@@ -114,7 +115,7 @@ def application():
         yield "http://127.0.0.1:5000"
 
 
-async def test_app(application):
+async def test_app(application: str) -> None:
     """Test GDAL Tileset application."""
     tileset = GDALTileSet(
         f"{application}/{{z}}/{{x}}/{{y}}.tif",
@@ -128,10 +129,13 @@ async def test_app(application):
     # Test one Tile
     url = tileset.get_tile_url(7, 44, 25)
     im = await tileset._get_tile(url)
-    assert im.size == (512, 512)
+    assert im
+    assert im.width == 512
+    assert im.height == 512
 
     # Test Mosaic
     mosaic = await tileset.get_mosaic([Tile(44, 25, 7), Tile(45, 25, 7)])
-    assert mosaic.image.size == (1024, 512)  # width, height
+    assert mosaic.image.width == 512
+    assert mosaic.image.height == 1024
     assert mosaic.image.count == 1  # same as cog_file
     assert mosaic.image.data.dtype == "uint16"  # same as cog_file

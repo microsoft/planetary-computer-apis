@@ -37,7 +37,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             status_code=200,
             mimetype="application/json",
-            body=response.json(),
+            body=json.dumps(response),
         )
     except BBoxTooLargeError as e:
         logging.exception(e)
@@ -54,7 +54,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-async def handle_request(req: StatisticsRequest) -> Dict[str, BandStatistics]:
+async def handle_request(req: StatisticsRequest) -> Dict:
     settings = StatisticsSettings.get()
 
     mosaic_image = PcMosaicImage(
@@ -68,4 +68,7 @@ async def handle_request(req: StatisticsRequest) -> Dict[str, BandStatistics]:
 
     img = await mosaic_image.get()
 
-    return img.statistics()
+    return {
+        k: v.dict()
+        for k,v in img.statistics()
+    }
