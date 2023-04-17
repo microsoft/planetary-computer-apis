@@ -68,4 +68,4 @@ async def handle_request(req: StatisticsRequest) -> Dict:
 
     img = await mosaic_image.get()
 
-    return {k: v.dict() for k, v in img.statistics()}
+    return {k: v.dict() for k, v in img.statistics().items()}
