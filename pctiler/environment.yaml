@@ -11,7 +11,6 @@ dependencies:
   - geojson-pydantic==0.4.2
   # colormap dependencies
   - matplotlib-base==3.4.3
-  - git
   - pip
   - pip:
       - "titiler.core==0.10.2"
