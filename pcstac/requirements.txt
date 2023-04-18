@@ -196,7 +196,7 @@ pytz-deprecation-shim==0.1.0.post0
     # via tzlocal
 pyyaml==6.0
     # via uvicorn
-redis==4.2.0rc1
+redis==4.4.4
     # via pccommon (pccommon/setup.py)
 regex==2023.3.23
     # via dateparser
