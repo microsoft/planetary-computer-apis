@@ -13,6 +13,13 @@ RUN micromamba create -p /opt/conda/envs/myenv -f /tmp/env.yaml && \
 
 # Start from a new stage to avoid copying the build environment, and
 # copy the environment from the build stage
+# Remove unnecessary files
+RUN find /opt/conda/envs/myenv -type f -name "*.pyc" -exec rm -f {} \;
+RUN rm -rf /opt/conda/envs/myenv/share/doc
+RUN rm -rf /opt/conda/envs/myenv/share/locale
+RUN rm -rf /opt/conda/envs/myenv/man
+RUN rm -rf /opt/conda/envs/myenv/include
+
 FROM ubuntu:latest
 
 COPY --from=build /opt/conda/envs/myenv /opt/conda/envs/myenv
@@ -25,13 +32,6 @@ COPY pctiler /opt/src/pctiler
 
 # Install the local modules in the new environment
 RUN /bin/sh -c "python -m pip install --no-cache-dir -e ./pccommon -e ./pctiler[server]"
-
-# Remove unnecessary files
-RUN find /opt/conda/envs/myenv -type f -name "*.pyc" -exec rm -f {} \;
-RUN rm -rf /opt/conda/envs/myenv/share/doc
-RUN rm -rf /opt/conda/envs/myenv/share/locale
-RUN rm -rf /opt/conda/envs/myenv/man
-RUN rm -rf /opt/conda/envs/myenv/include
 
 # GDAL config
 ENV GDAL_CACHEMAX 200
