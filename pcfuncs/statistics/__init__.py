@@ -5,7 +5,6 @@ from typing import Dict
 import azure.functions as func
 from funclib.errors import BBoxTooLargeError
 from pydantic import ValidationError
-from rio_tiler.models import BandStatistics
 
 from .models import StatisticsRequest
 from .settings import StatisticsSettings
