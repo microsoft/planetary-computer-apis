@@ -1,0 +1,4 @@
+FROM pc-apis-funcs
+
+COPY pcfuncs/requirements-dev.txt requirements-dev.txt
+RUN pip install -r requirements-dev.txt

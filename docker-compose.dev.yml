@@ -117,3 +117,19 @@ services:
     depends_on:
       - stac
       - tiler
+
+  funcs-dev:
+    image: pc-apis-funcs-dev
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: pcfuncs/Dockerfile.dev
+    env_file: ${PC_FUNCS_ENV_FILE:-./pc-funcs.dev.env}
+    ports:
+      - "8083:80"
+    volumes:
+      - .:/opt/src
+    command: >
+      /bin/bash
+    depends_on:
+      - funcs

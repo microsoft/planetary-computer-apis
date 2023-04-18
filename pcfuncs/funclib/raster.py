@@ -201,7 +201,7 @@ class GDALRaster(Raster):
             mask,
             assets=self.image.assets,
             crs=self.image.crs,
-            bounds=bbox,
+            bounds=bbox.to_list(),
             band_names=self.image.band_names,
             metadata=self.image.metadata,
             dataset_statistics=self.image.dataset_statistics,

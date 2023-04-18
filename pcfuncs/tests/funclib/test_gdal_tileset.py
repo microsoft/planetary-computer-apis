@@ -135,7 +135,7 @@ async def test_app(application: str) -> None:
 
     # Test Mosaic
     mosaic = await tileset.get_mosaic([Tile(44, 25, 7), Tile(45, 25, 7)])
-    assert mosaic.image.width == 512
-    assert mosaic.image.height == 1024
+    assert mosaic.image.width == 1024
+    assert mosaic.image.height == 512
     assert mosaic.image.count == 1  # same as cog_file
     assert mosaic.image.data.dtype == "uint16"  # same as cog_file
