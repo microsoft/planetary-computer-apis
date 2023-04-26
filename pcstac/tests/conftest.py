@@ -19,10 +19,11 @@ from pccommon.logging import ServiceName
 from pccommon.redis import connect_to_redis
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
-from pcstac.config import EXTENSIONS, TILER_HREF_ENV_VAR
+from pcstac.config import get_extensions, TILER_HREF_ENV_VAR
 from pcstac.search import PCSearch, PCSearchGetRequest
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+EXTENSIONS = get_extensions()
 
 # Setting this environment variable to ensure links are properly constructed
 os.environ[TILER_HREF_ENV_VAR] = "http://localhost:8080/data/"

@@ -14,12 +14,12 @@ from stac_fastapi.extensions.core import (
 )
 from stac_fastapi.extensions.core.filter.filter import FilterConformanceClasses
 from stac_fastapi.pgstac.config import Settings as ApiSettings
+from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.types.extension import ApiExtension
 
 from pccommon.config.core import ENV_VAR_PCAPIS_PREFIX, PCAPIsConfig
 from pcstac.filter import PCFiltersClient
 from pcstac.search import RedisBaseItemCache
-from stac_fastapi.pgstac.transactions import TransactionsClient
 
 API_VERSION = "1.2"
 STAC_API_VERSION = "v1.0.0-rc.1"
@@ -45,13 +45,13 @@ def get_extensions() -> List[ApiExtension]:
         SortExtension(),
         FieldsExtension(),
         FilterExtension(
-            client=MSPCFiltersClient(),
+            client=PCFiltersClient(),
             conformance_classes=[
                 FilterConformanceClasses.FILTER,
                 FilterConformanceClasses.ITEM_SEARCH_FILTER,
-                FilterConformanceClasses.BASIC_CQL,
-                FilterConformanceClasses.CQL_JSON,
-                FilterConformanceClasses.CQL_TEXT,
+                FilterConformanceClasses.BASIC_CQL2,
+                FilterConformanceClasses.CQL2_JSON,
+                FilterConformanceClasses.CQL2_TEXT,
             ],
         ),
         # stac_fastapi extensions

@@ -9,7 +9,6 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.errors import DEFAULT_STATUS_CODES
 from stac_fastapi.api.models import create_get_request_model, create_post_request_model
-from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
