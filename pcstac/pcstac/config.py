@@ -17,7 +17,7 @@ from stac_fastapi.pgstac.config import Settings as ApiSettings
 from stac_fastapi.types.extension import ApiExtension
 
 from pccommon.config.core import ENV_VAR_PCAPIS_PREFIX, PCAPIsConfig
-from pcstac.filter import MSPCFiltersClient
+from pcstac.filter import PCFiltersClient
 from pcstac.search import RedisBaseItemCache
 from stac_fastapi.pgstac.transactions import TransactionsClient
 

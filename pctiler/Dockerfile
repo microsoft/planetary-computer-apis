@@ -1,24 +1,37 @@
-FROM python:3.9-slim
+FROM ubuntu:latest as build
 
-# git required for pip installs from git
-RUN apt update && apt install -y git
+# Install Micromamba
+RUN apt-get update && apt-get install -y curl bzip2
+RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
 
-# The devops Personal Access Token for accessing
-# Azure Artifacts. Note: This will be visible as
-# plain text in the docker build logs. Only use your
-# PAT for development containers in your local environment.
-# Azure Pipelines will utilize a temporary key for builds
-# when building deploy images so that there is not arisk of
-# exposure.
-ARG DEVOPS_PAT
+COPY pctiler/environment.yaml /tmp/env.yaml
 
-EXPOSE 8000
+# Create a separate environment for the packages and remove unnecessary files
+RUN micromamba create -p /opt/conda/envs/myenv -f /tmp/env.yaml && \
+    micromamba clean --all --yes && \
+    rm -rf /root/.cache /tmp/env.yaml
+
+# Start from a new stage to avoid copying the build environment, and
+# copy the environment from the build stage
+# Remove unnecessary files
+RUN find /opt/conda/envs/myenv -type f -name "*.pyc" -exec rm -f {} \;
+RUN rm -rf /opt/conda/envs/myenv/share/doc
+RUN rm -rf /opt/conda/envs/myenv/share/locale
+RUN rm -rf /opt/conda/envs/myenv/man
+RUN rm -rf /opt/conda/envs/myenv/include
+
+FROM ubuntu:latest
+
+COPY --from=build /opt/conda/envs/myenv /opt/conda/envs/myenv
+ENV PATH="/opt/conda/envs/myenv/bin:$PATH"
 
 WORKDIR /opt/src
 
 COPY pccommon /opt/src/pccommon
 COPY pctiler /opt/src/pctiler
-RUN pip install -e ./pccommon -e ./pctiler[server]
+
+# Install the local modules in the new environment
+RUN /bin/sh -c "python -m pip install --no-cache-dir -e ./pccommon -e ./pctiler[server]"
 
 # GDAL config
 ENV GDAL_CACHEMAX 200
@@ -44,4 +57,5 @@ ENV MOSAIC_CONCURRENCY 1
 
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=80
+
 CMD uvicorn pctiler.main:app --host ${APP_HOST} --port ${APP_PORT} --log-level info
