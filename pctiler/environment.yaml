@@ -18,4 +18,4 @@ dependencies:
 
       -  # titiler-pgstac
       - "psycopg[binary,pool]"
-      - "titiler.pgstac==0.2.2"
+      - "titiler.pgstac==0.2.4"
