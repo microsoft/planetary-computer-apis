@@ -5,16 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [2023.2]
+
+### Changed
+
+- fix: remove unused noaa_mrms_qpe colormap by @pjhartzell in [#149]h(ttps://github.com/microsoft/planetary-computer-apis/pull/149)
+- Add stac-api-validator by @gadomski in [#148](https://github.com/microsoft/planetary-computer-apis/pull/148)
+- HTML-escape inputs before templating by @mmcfarland in [#155](https://github.com/microsoft/planetary-computer-apis/pull/155)
+- Quote escape qs values before templating to map by @mmcfarland in [#156](https://github.com/microsoft/planetary-computer-apis/pull/156)
+- Upgrade AKS to supported version by @mmcfarland in [#158](https://github.com/microsoft/planetary-computer-apis/pull/158)
+- Add io-bii colormap by @pjhartzell in [#159](https://github.com/microsoft/planetary-computer-apis/pull/159)
+- Upgrade pgstac and use queryables by @mmcfarland in [#131](https://github.com/microsoft/planetary-computer-apis/pull/131)
+- Use conda for tiler dependencies, support LERC rasters by @mmcfarland in [#169](https://github.com/microsoft/planetary-computer-apis/pull/169)
+- update titiler.pgstac by @vincentsarago in [#173](https://github.com/microsoft/planetary-computer-apis/pull/173)
+- Updated **stac-fastapi-pgstac** to v2.4.5 [#163](https://github.com/microsoft/planetary-computer-apis/pull/163)
+
+## [2023.1]
 
 ### Added
 
 - New endpoints under `/vector` that server collection level Mapbox Vector Tiles (MVT) [#147](https://github.com/microsoft/planetary-computer-apis/pull/147)
-
-### Changed
-
-- Updated **stac-fastapi-pgstac** to v2.4.5 [#163](https://github.com/microsoft/planetary-computer-apis/pull/163)
-- Updated tiler to use conda to manage dependencies, support LERC [#169](https://github.com/microsoft/planetary-computer-apis/pull/169)
 
 ## [2022.4.0]
 
