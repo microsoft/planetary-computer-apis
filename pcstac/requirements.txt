@@ -200,7 +200,7 @@ redis==4.2.0rc1
     # via pccommon (pccommon/setup.py)
 regex==2023.3.23
     # via dateparser
-requests==2.28.2
+requests==2.31.0
     # via
     #   azure-core
     #   google-api-core
