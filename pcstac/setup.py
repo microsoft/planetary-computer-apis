@@ -4,10 +4,10 @@ from setuptools import find_packages, setup
 
 # Runtime requirements.
 inst_reqs = [
-    "stac-fastapi.api==2.4.5",
-    "stac-fastapi.extensions==2.4.5",
-    "stac-fastapi.pgstac==2.4.5",
-    "stac-fastapi.types==2.4.5",
+    "stac-fastapi.api==2.4.8",
+    "stac-fastapi.extensions==2.4.8",
+    "stac-fastapi.pgstac==2.4.8",
+    "stac-fastapi.types==2.4.8",
     # Required due to some imports related to pypgstac CLI usage in startup script
     "pypgstac[psycopg]~=0.7",
     "pystac==1.*",
