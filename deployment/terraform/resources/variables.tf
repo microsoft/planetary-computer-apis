@@ -115,6 +115,28 @@ variable "image_output_storage_url" {
   type = string
 }
 
+# Grafana - Prometheus
+
+variable "monitor_workspace_id" {
+  default = "/subscriptions/{sub_id}/resourceGroups/{rg_name}/providers/microsoft.monitor/accounts/{amw_name}"
+}
+
+variable "grafana_name" {
+  default = "grafana-prometheus-metrics"
+}
+
+variable "grafana_sku" {
+  default = "Standard"
+}
+
+variable "grafana_location" {
+  default = "West Europe"
+}
+
+variable "monitor_workspace_location" {
+  default = "West Europe"
+}
+
 # -----------------
 # Local variables
 
