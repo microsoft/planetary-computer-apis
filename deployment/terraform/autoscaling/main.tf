@@ -29,7 +29,7 @@ terraform {
     resource_group_name  = "pc-test-manual-resources"
     storage_account_name = "pctesttfstate"
     container_name       = "pc-test-api"
-    key                  = "pqe-apis.tfstate"
+    key                  = "pqe-apis-autoscaling.tfstate"
   }
 }
 
