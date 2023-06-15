@@ -118,11 +118,11 @@ variable "image_output_storage_url" {
 # Grafana - Prometheus
 
 variable "monitor_workspace_id" {
-  default = "/subscriptions/{sub_id}/resourceGroups/{rg_name}/providers/microsoft.monitor/accounts/{amw_name}"
+  default = "/subscriptions/bc1736b1-60ba-42d1-8304-befc90225972/resourceGroups/ochna-rg/providers/microsoft.monitor/accounts/scaling-monitor-workspace"
 }
 
 variable "grafana_name" {
-  default = "grafana-prometheus-metrics"
+  default = "grafana-prometheus-mts"
 }
 
 variable "grafana_sku" {
@@ -135,6 +135,14 @@ variable "grafana_location" {
 
 variable "monitor_workspace_location" {
   default = "West Europe"
+}
+
+variable "metric_labels_allowlist" {
+  default = null
+}
+
+variable "metric_annotations_allowlist" {
+  default = null
 }
 
 # -----------------

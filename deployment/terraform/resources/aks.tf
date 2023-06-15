@@ -46,14 +46,14 @@ resource "azurerm_role_assignment" "network" {
 }
 
 resource "azurerm_monitor_data_collection_endpoint" "dce" {
-  name                          = "MSProm-${var.monitor_workspace_location}-${azurerm_kubernetes_cluster.pc.name}"
+  name                          = "MSProm-${azurerm_kubernetes_cluster.pc.name}"
   resource_group_name           = azurerm_resource_group.pc.name
   location                      = var.monitor_workspace_location
   kind                          = "Linux"
 }
 
 resource "azurerm_monitor_data_collection_rule" "dcr" {
-  name                = "MSProm-${var.monitor_workspace_location}-${azurerm_kubernetes_cluster.pc.name}"
+  name                = "MSProm-${azurerm_kubernetes_cluster.pc.name}"
   resource_group_name = azurerm_resource_group.pc.name
   location            = var.monitor_workspace_location
   data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.dce.id
@@ -87,7 +87,7 @@ resource "azurerm_monitor_data_collection_rule" "dcr" {
 
 
 resource "azurerm_monitor_data_collection_rule_association" "dcra" {
-  name                        = "MSProm-${var.monitor_workspace_location}-${azurerm_kubernetes_cluster.pc.name}"
+  name                        = "MSProm-${azurerm_kubernetes_cluster.pc.name}"
   target_resource_id          = azurerm_kubernetes_cluster.pc.id
   data_collection_rule_id     = azurerm_monitor_data_collection_rule.dcr.id
   description                 = "Association of data collection rule. Deleting this association will break the data collection for this AKS Cluster."
