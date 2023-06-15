@@ -118,7 +118,8 @@ variable "image_output_storage_url" {
 # Grafana - Prometheus
 
 variable "monitor_workspace_id" {
-  default = "/subscriptions/bc1736b1-60ba-42d1-8304-befc90225972/resourceGroups/ochna-rg/providers/microsoft.monitor/accounts/scaling-monitor-workspace"
+  default = "/subscriptions/a84a690d-585b-4c7c-80d9-851a48af5a50/resourceGroups/pc-test-manual-resources/providers/microsoft.monitor/accounts/amw-pctest"
+  description = "Azure Monitor Workspace (AMW) ID. AMW is required to use Azure Managed Prometheus."
 }
 
 variable "grafana_name" {
