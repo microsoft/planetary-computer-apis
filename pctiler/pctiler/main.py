@@ -16,6 +16,7 @@ from titiler.core.middleware import (
 )
 from titiler.mosaic.errors import MOSAIC_STATUS_CODES
 from titiler.pgstac.db import close_db_connection, connect_to_db
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from pccommon.constants import X_REQUEST_ENTITY
 from pccommon.logging import ServiceName, init_logging
@@ -77,6 +78,7 @@ app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 
 app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.TILER)
 
+instrumentator = Instrumentator().instrument(app)
 
 @app.middleware("http")
 async def _timeout_middleware(
@@ -116,6 +118,7 @@ app.add_middleware(
 async def startup_event() -> None:
     """Connect to database on startup."""
     await connect_to_db(app)
+    instrumentator.expose(app)
 
 
 @app.on_event("shutdown")
