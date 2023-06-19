@@ -193,6 +193,17 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --wait \
         --timeout 2m0s
 
+    echo "=================="
+    echo "==== Prometheus ====="
+    echo "=================="
+
+    echo "Deploying prometheus component..."
+    helm upgrade --install pc-apis-prometheus helm/pc-apis-prometheus \
+        --kube-context "${KUBE_CONTEXT}" \
+        --wait \
+        --timeout 2m0s \
+        -f ${DEPLOY_VALUES_FILE}
+
     #########################
     # Deploy Azure Function #
     #########################
