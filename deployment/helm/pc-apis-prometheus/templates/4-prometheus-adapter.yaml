@@ -81,7 +81,7 @@ metadata:
 data:
   config.yaml: |
     rules:
-    - seriesQuery: 'django_http_responses_total_by_status_view_method_total{namespace!="",pod!="",view!="prometheus-django-metrics"}'
+    - seriesQuery: 'http_requests_total{namespace!="",pod!=""}'
       resources:
         overrides:
           namespace:
