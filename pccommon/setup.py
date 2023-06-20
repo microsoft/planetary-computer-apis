@@ -18,6 +18,7 @@ inst_reqs = [
     "pyhumps==3.5.3",
     "redis==4.2.0-rc1",
     "html-sanitizer==1.9",
+    "prometheus-fastapi-instrumentator==6.0.0",
 ]
 
 extra_reqs = {

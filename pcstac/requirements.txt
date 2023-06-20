@@ -134,6 +134,10 @@ plpygis==0.2.1
     # via pypgstac
 portalocker==2.7.0
     # via msal-extensions
+prometheus-client==0.17.0
+    # via prometheus-fastapi-instrumentator
+prometheus-fastapi-instrumentator==6.0.0
+    # via pccommon (pccommon/setup.py)
 protobuf==4.22.1
     # via
     #   google-api-core
