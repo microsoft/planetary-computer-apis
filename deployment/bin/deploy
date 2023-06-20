@@ -197,8 +197,17 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "==== Prometheus ====="
     echo "=================="
 
+    echo "Deploying prometheus crd..."
+    helm upgrade --install prometheus-crd helm/prometheus-crd \
+        -n pc \
+        --kube-context "${KUBE_CONTEXT}" \
+        --wait \
+        --timeout 2m0s \
+        -f ${DEPLOY_VALUES_FILE}
+
     echo "Deploying prometheus component..."
     helm upgrade --install pc-apis-prometheus helm/pc-apis-prometheus \
+        -n pc \
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
