@@ -212,6 +212,8 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --wait \
         --timeout 2m0s \
 
+    # TODO: Deploy prometheus adapter
+
     echo "Deploying prometheus component..."
     helm upgrade --install pc-apis-prometheus helm/pc-apis-prometheus \
         -n pc \

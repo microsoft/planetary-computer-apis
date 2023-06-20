@@ -5,7 +5,7 @@ metadata:
     app: planetary-computer-stac
     team: devops
   name: planetary-computer-stac
-  namespace: monitoring
+  namespace: pc
 spec:
   endpoints:
   - interval: 10s
