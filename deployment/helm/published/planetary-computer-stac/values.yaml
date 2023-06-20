@@ -18,6 +18,7 @@ stac:
   service:
     type: ClusterIP
     port: 80
+    portName: http
     annotations: {}
 
   rate_limit:

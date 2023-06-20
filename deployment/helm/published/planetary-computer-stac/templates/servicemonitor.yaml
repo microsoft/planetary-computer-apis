@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: planetary-computer-stac
+    team: devops
+  name: planetary-computer-stac
+  namespace: monitoring
+spec:
+  endpoints:
+  - interval: 10s
+    port: http
+  namespaceSelector:
+    matchNames:
+    - pc
+  selector:
+    matchLabels:
+      app: planetary-computer-stac
