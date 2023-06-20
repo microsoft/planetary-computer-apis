@@ -13,6 +13,8 @@ module "resources" {
   cluster_cert_issuer = "letsencrypt"
   cluster_cert_server = "https://acme-v02.api.letsencrypt.org/directory"
 
+  aks_max_node_count = 2
+  aks_min_node_count = 1
   aks_node_count    = 1
   stac_replica_count = 1
   tiler_replica_count = 1
