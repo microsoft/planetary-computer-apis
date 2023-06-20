@@ -136,6 +136,15 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     setup_helm
 
+    # Install namespaces
+
+    echo "Installing namespaces..."
+
+    helm upgrade --install \
+        pc-namespaces helm/pc-namespaces \
+        -n pc-namespaces \
+        --create-namespace
+
     # Install cert-manager
 
     echo "Installing cert-manager..."
@@ -143,7 +152,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     helm upgrade --install \
         cert-manager \
         --namespace pc \
-        --create-namespace \
         --version v1.6.0 \
         --set installCRDs=true jetstack/cert-manager
 
@@ -193,9 +201,9 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --wait \
         --timeout 2m0s
 
-    echo "=================="
+    echo "====================="
     echo "==== Prometheus ====="
-    echo "=================="
+    echo "====================="
 
     echo "Deploying prometheus crd..."
     helm upgrade --install prometheus-crd helm/prometheus-crd \
@@ -203,7 +211,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
-        -f ${DEPLOY_VALUES_FILE}
 
     echo "Deploying prometheus component..."
     helm upgrade --install pc-apis-prometheus helm/pc-apis-prometheus \
@@ -211,7 +218,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
-        -f ${DEPLOY_VALUES_FILE}
 
     #########################
     # Deploy Azure Function #
