@@ -2,17 +2,19 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    app: planetary-computer-stac
+    app.kubernetes.io/instance: planetary-computer-stac
+    app.kubernetes.io/name: planetary-computer-stac
     team: devops
   name: planetary-computer-stac
   namespace: pc
 spec:
   endpoints:
-  - interval: 10s
+  - interval: 15s
     port: http
   namespaceSelector:
     matchNames:
     - pc
   selector:
     matchLabels:
-      app: planetary-computer-stac
+      app.kubernetes.io/instance: planetary-computer-stac
+      app.kubernetes.io/name: planetary-computer-stac
