@@ -235,7 +235,7 @@ stac-fastapi-extensions==2.4.8
     # via
     #   pcstac (pcstac/setup.py)
     #   stac-fastapi-pgstac
-stac-fastapi-pgstac==2.4.8
+stac-fastapi-pgstac==2.4.9
     # via pcstac (pcstac/setup.py)
 stac-fastapi-types==2.4.8
     # via

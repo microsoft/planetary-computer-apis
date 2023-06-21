@@ -16,7 +16,7 @@ from pccommon.config.core import ENV_VAR_PCAPIS_PREFIX, PCAPIsConfig
 from pcstac.filter import PCFiltersClient
 
 API_VERSION = "1.2"
-STAC_API_VERSION = "v1.0.0-rc.1"
+STAC_API_VERSION = "v1.0.0"
 
 API_LANDING_PAGE_ID = "microsoft-pc"
 API_TITLE = "Microsoft Planetary Computer STAC API"
