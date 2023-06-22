@@ -35,6 +35,10 @@ resource "azurerm_kubernetes_cluster" "pc" {
     azure_rbac_enabled = true
   }
 
+  aci_connector_linux {
+    subnet_name = azurerm_subnet.aci.name
+  }
+
   tags = {
     Environment = var.environment
     ManagedBy   = "AI4E"
@@ -461,4 +465,16 @@ resource "azapi_resource" "NodeAndKubernetesRecordingRulesRuleGroupWin" {
   })
   schema_validation_enabled = false
   ignore_missing_property   = false
+}
+
+resource "azurerm_role_assignment" "aci_network_constributor" {
+  scope                = azurerm_subnet.aci.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_kubernetes_cluster.pc.aci_connector_linux[0].connector_identity[0].object_id
+}
+
+resource "azurerm_role_assignment" "aci_reader" {
+  scope                = azurerm_subnet.aci.id
+  role_definition_name = "Reader"
+  principal_id         = azurerm_kubernetes_cluster.pc.aci_connector_linux[0].connector_identity[0].object_id
 }
