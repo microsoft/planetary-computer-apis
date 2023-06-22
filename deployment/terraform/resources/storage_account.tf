@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "pc" {
-  name                     = "${local.nodash_prefix}sa1"
+  name                     = "${local.nodash_prefix}sa1" # TODO: revert "1" from name
   resource_group_name      = azurerm_resource_group.pc.name
   location                 = azurerm_resource_group.pc.location
   account_tier             = "Standard"
