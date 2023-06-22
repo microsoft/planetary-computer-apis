@@ -21,6 +21,14 @@ variable "pc_test_resources_acr" {
   default = "pccomponentstest"
 }
 
+variable "aks_max_node_count" {
+  type = number
+}
+
+variable "aks_min_node_count" {
+  type = number
+}
+
 variable "aks_node_count" {
   type = number
 }

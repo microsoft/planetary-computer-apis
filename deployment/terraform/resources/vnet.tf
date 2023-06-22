@@ -53,3 +53,18 @@ resource "azurerm_subnet_network_security_group_association" "pc-cache" {
   subnet_id                 = azurerm_subnet.cache_subnet.id
   network_security_group_id = azurerm_network_security_group.pc.id
 }
+
+resource "azurerm_subnet" "aci" {
+  name                 = "${local.prefix}-aci-subnet"
+  virtual_network_name = azurerm_virtual_network.pc.name
+  resource_group_name  = azurerm_resource_group.pc.name
+  address_prefixes     = ["10.10.3.0/24"]
+
+  delegation {
+    name = "aciDelegation"
+    service_delegation {
+      name    = "Microsoft.ContainerInstance/containerGroups"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
+}

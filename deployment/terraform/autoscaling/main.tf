@@ -24,6 +24,7 @@ module "resources" {
   animation_output_storage_url = "https://pcfilestest.blob.core.windows.net/output/animations"
   image_output_storage_url     = "https://pcfilestest.blob.core.windows.net/output/images"
 
+  pc_test_resources_acr = "pccomponentstestpublic"
 }
 
 terraform {

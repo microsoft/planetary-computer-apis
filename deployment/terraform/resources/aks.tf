@@ -22,7 +22,8 @@ resource "azurerm_kubernetes_cluster" "pc" {
   }
 
   network_profile {
-    network_plugin    = "kubenet"
+    network_plugin    = "azure"
+    network_policy    = "azure"
     load_balancer_sku = "standard"
   }
 
@@ -33,6 +34,10 @@ resource "azurerm_kubernetes_cluster" "pc" {
   azure_active_directory_role_based_access_control {
     managed = true
     azure_rbac_enabled = true
+  }
+
+  aci_connector_linux {
+    subnet_name = azurerm_subnet.aci.name
   }
 
   tags = {
@@ -461,4 +466,16 @@ resource "azapi_resource" "NodeAndKubernetesRecordingRulesRuleGroupWin" {
   })
   schema_validation_enabled = false
   ignore_missing_property   = false
+}
+
+resource "azurerm_role_assignment" "aci_network_constributor" {
+  scope                = azurerm_subnet.aci.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_kubernetes_cluster.pc.aci_connector_linux[0].connector_identity[0].object_id
+}
+
+resource "azurerm_role_assignment" "aci_reader" {
+  scope                = azurerm_subnet.aci.id
+  role_definition_name = "Reader"
+  principal_id         = azurerm_kubernetes_cluster.pc.aci_connector_linux[0].connector_identity[0].object_id
 }
