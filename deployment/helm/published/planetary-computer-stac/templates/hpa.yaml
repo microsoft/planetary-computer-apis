@@ -14,8 +14,8 @@ spec:
     kind: Deployment
     name: planetary-computer-stac
     # name: {{ include "pcstac.fullname" . }}
-  minReplicas: 1
-  maxReplicas: 30
+  minReplicas: 5
+  maxReplicas: 50
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 30
