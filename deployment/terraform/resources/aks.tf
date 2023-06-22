@@ -6,16 +6,14 @@ resource "azurerm_kubernetes_cluster" "pc" {
   kubernetes_version  = var.k8s_version
 
   default_node_pool {
-    name           = "agentpool"
-    vm_size        = "Standard_DS2_v2"
-    node_count     = var.aks_node_count
-    vnet_subnet_id = azurerm_subnet.node_subnet.id
+    name                 = "agentpool"
+    vm_size              = "Standard_DS2_v2"
+    max_count            = var.aks_max_node_count
+    min_count            = var.aks_min_node_count
+    node_count           = var.aks_node_count
+    vnet_subnet_id       = azurerm_subnet.node_subnet.id
     orchestrator_version = var.k8s_version
-  }
-
-  monitor_metrics {
-    annotations_allowed = var.metric_annotations_allowlist
-    labels_allowed = var.metric_labels_allowlist
+    enable_auto_scaling  = true
   }
 
   network_profile {
