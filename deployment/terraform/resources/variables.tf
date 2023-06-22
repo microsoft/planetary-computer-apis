@@ -115,37 +115,6 @@ variable "image_output_storage_url" {
   type = string
 }
 
-# Grafana - Prometheus
-
-variable "monitor_workspace_id" {
-  default = "/subscriptions/a84a690d-585b-4c7c-80d9-851a48af5a50/resourceGroups/pc-test-manual-resources/providers/microsoft.monitor/accounts/amw-pctest"
-  description = "Azure Monitor Workspace (AMW) ID. AMW is required to use Azure Managed Prometheus."
-}
-
-variable "grafana_name" {
-  default = "grafana-prometheus-mts"
-}
-
-variable "grafana_sku" {
-  default = "Standard"
-}
-
-variable "grafana_location" {
-  default = "West Europe"
-}
-
-variable "monitor_workspace_location" {
-  default = "West Europe"
-}
-
-variable "metric_labels_allowlist" {
-  default = null
-}
-
-variable "metric_annotations_allowlist" {
-  default = null
-}
-
 # -----------------
 # Local variables
 
