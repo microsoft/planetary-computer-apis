@@ -23,7 +23,7 @@ spec:
   - type: Pods
     pods:
       metric:
-        name: http_requests_per_second
+        name: http_requests_per_minute
       target:
         type: AverageValue
         averageValue: 500m
