@@ -1,6 +1,0 @@
-apiVersion: v2
-name: pc-prometheus-adapter
-description: A Helm chart for the prometheus adapter for Planetary Computer APIs
-type: application
-version: 0.1.0
-appVersion: 0.1.0
