@@ -253,3 +253,34 @@ spec:
   insecureSkipTLSVerify: true
   groupPriorityMinimum: 100
   versionPriority: 100
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+  name: custom-metrics-prometheus-adapter
+  namespace: monitoring
+spec:
+  egress:
+  - {}
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus-adapter
+    ports:
+    - port: 9090
+      protocol: TCP
+  podSelector:
+    matchLabels:
+        app.kubernetes.io/component: prometheus
+        app.kubernetes.io/instance: k8s
+        app.kubernetes.io/name: prometheus
+        app.kubernetes.io/part-of: kube-prometheus
+  policyTypes:
+  - Egress
+  - Ingress
