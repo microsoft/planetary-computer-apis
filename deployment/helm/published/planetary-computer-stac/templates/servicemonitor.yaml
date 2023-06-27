@@ -14,6 +14,7 @@ spec:
   endpoints:
   - interval: 15s
     port: http
+    # port: {{ .Values.stac.service.portName }}
   namespaceSelector:
     matchNames:
     - pc

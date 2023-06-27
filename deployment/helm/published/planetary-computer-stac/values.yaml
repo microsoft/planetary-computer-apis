@@ -54,24 +54,30 @@ stac:
     resources: {}
     nodeSelector: {}
     tolerations: []
-    affinity:
-      nodeAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          preference:
-            matchExpressions:
-            - key: kubernetes.azure.com/cluster
-              operator: Exists
-        - weight: 90
-          preference:
-            matchExpressions:
-            - key: type
-              operator: DoesNotExist
+    virtualNodes:
+      enabled: false
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.azure.com/cluster
+                operator: Exists
+          - weight: 90
+            preference:
+              matchExpressions:
+              - key: type
+                operator: DoesNotExist
+      tolerations:
+      - key: virtual-kubelet.io/provider
+        operator: Exists
+      - key: azure.com/aci
+        effect: NoSchedule
+    affinity: {}
     autoscaling:
       enabled: false
     tolerations:
-    - key: virtual-kubelet.io/provider
-      operator: Exists
 
   cert:
     privateKeySecretRef: "letsencrypt-staging"
