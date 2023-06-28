@@ -17,7 +17,7 @@ metadata:
   name: overprovisioning
   namespace: overprovisioning
 spec:
-  replicas: 3
+  replicas: 4
   selector:
     matchLabels:
       run: overprovisioning
@@ -33,5 +33,5 @@ spec:
         resources:
           requests:
             memory: "512Mi"
-            cpu: "800m"
+            cpu: "400m"
           # {{- toYaml .Values.stac.deploy.resources | nindent 10 }}
