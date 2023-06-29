@@ -4,6 +4,7 @@ metadata:
   name: planetary-computer-stac
   # name: {{ include "pcstac.fullname" . }}
   namespace: pc
+  # namespace is assigned by helm command
   labels:
     app.kubernetes.io/instance: planetary-computer-stac
     app.kubernetes.io/name: planetary-computer-stac

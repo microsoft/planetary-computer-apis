@@ -1,0 +1,8 @@
+environment: "staging"
+namespace: "overprovisioning"
+
+overprovision:
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "400m"

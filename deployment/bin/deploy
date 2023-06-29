@@ -223,6 +223,11 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     # Parsing errors: Maybe use kubectl instead
     kubectl apply -f helm/pc-apis-prometheus/templates
 
+    echo "====================="
+    echo "==== Overprovisioning ====="
+    echo "====================="
+
+    kubectl apply -f helm/overprovisioning/templates
 
     #########################
     # Deploy Azure Function #
