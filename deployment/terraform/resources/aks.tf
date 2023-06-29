@@ -31,10 +31,6 @@ resource "azurerm_kubernetes_cluster" "pc" {
     azure_rbac_enabled = true
   }
 
-  aci_connector_linux {
-    subnet_name = azurerm_subnet.aci.name
-  }
-
   tags = {
     Environment = var.environment
     ManagedBy   = "AI4E"
