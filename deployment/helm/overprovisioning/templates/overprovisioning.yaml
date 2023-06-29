@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: overprovisioning
-  # name: {{ .Values.namespace }}
+  name: {{ .Values.namespace }}
 ---
 apiVersion: scheduling.k8s.io/v1
 kind: PriorityClass
@@ -16,8 +15,7 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: cluster-proportional-autoscaler-overprovision
-  namespace: overprovisioning
-  # namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace }}
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -44,8 +42,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: cluster-proportional-autoscaler-overprovision
-    namespace: overprovisioning
-    # namespace: {{ .Values.namespace }}
+    namespace: {{ .Values.namespace }}
 roleRef:
   kind: ClusterRole
   name: cluster-proportional-autoscaler-overprovision
@@ -55,8 +52,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: overprovisioning
-  namespace: overprovisioning
-  # namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -73,17 +69,13 @@ spec:
       - name: reserve-resources
         image: registry.k8s.io/pause:3.9
         resources:
-          requests:
-            memory: "512Mi"
-            cpu: "400m"
-          # {{- toYaml .Values.overprovision.resources | nindent 10 }}
+          {{- toYaml .Values.overprovision.deployment.resources | nindent 10 }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: overprovisioning-autoscaler
-  namespace: overprovisioning
-  # namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace }}
   labels:
     app: overprovisioning-autoscaler
 spec:
@@ -101,10 +93,9 @@ spec:
           name: autoscaler
           command:
             - /cluster-proportional-autoscaler
-            - --namespace=overprovisioning
-            # - --namespace={{ .Values.namespace }}
+            - --namespace={{ .Values.namespace }}
             - --configmap=overprovisioning-autoscaler
-            - --default-params={"linear":{"coresPerReplica":8,"nodesPerReplica":4,"preventSinglePointFailure":false,"includeUnschedulableNodes":true,"min":1,"max":3}}
+            - --default-params={"linear":{"coresPerReplica":{{ .Values.overprovision.hpa.coresPerReplica }},"nodesPerReplica":{{ .Values.overprovision.hpa.nodesPerReplica }},"preventSinglePointFailure":{{ .Values.overprovision.hpa.preventSinglePointFailure }},"includeUnschedulableNodes":{{ .Values.overprovision.hpa.includeUnschedulableNodes }},"min":{{ .Values.overprovision.hpa.minPods }},"max":{{ .Values.overprovision.hpa.maxPods }}}}
             - --target=deployment/overprovisioning
             - --logtostderr=true
             - --v=2

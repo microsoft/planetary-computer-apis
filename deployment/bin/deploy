@@ -215,7 +215,9 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "==== Overprovisioning ====="
     echo "==========================="
 
-    kubectl apply -f helm/overprovisioning/templates
+    helm upgrade --install overprovisioning helm/overprovisioning \
+        --kube-context "${KUBE_CONTEXT}" \
+        --wait \
 
     #########################
     # Deploy Azure Function #
