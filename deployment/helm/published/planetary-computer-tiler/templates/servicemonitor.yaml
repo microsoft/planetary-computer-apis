@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "pctiler.labels" . | nindent 4 }}
+    team: devops
+  name: {{ include "pctiler.fullname" . }}
+spec:
+  endpoints:
+  - interval: 15s
+    port: {{ .Values.tiler.service.portName }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "pctiler.selectorLabels" . | nindent 6 }}
