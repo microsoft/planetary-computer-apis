@@ -12,7 +12,7 @@ resource "azurerm_app_service_plan" "pc" {
 }
 
 resource "azurerm_function_app" "pcfuncs" {
-  name                       = "func-${local.prefix}1"
+  name                       = "func-${local.prefix}1" # TODO: revert "1" from name
   location                   = azurerm_resource_group.pc.location
   resource_group_name        = azurerm_resource_group.pc.name
   app_service_plan_id        = azurerm_app_service_plan.pc.id

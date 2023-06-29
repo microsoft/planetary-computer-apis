@@ -17,7 +17,8 @@ resource "azurerm_kubernetes_cluster" "pc" {
   }
 
   network_profile {
-    network_plugin    = "kubenet"
+    network_plugin    = "azure"
+    network_policy    = "azure"
     load_balancer_sku = "standard"
   }
 
@@ -28,6 +29,10 @@ resource "azurerm_kubernetes_cluster" "pc" {
   azure_active_directory_role_based_access_control {
     managed = true
     azure_rbac_enabled = true
+  }
+
+  aci_connector_linux {
+    subnet_name = azurerm_subnet.aci.name
   }
 
   tags = {

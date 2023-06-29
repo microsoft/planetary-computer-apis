@@ -9,6 +9,8 @@ module "resources" {
   cluster_cert_issuer = "letsencrypt"
   cluster_cert_server = "https://acme-v02.api.letsencrypt.org/directory"
 
+  aks_max_node_count = 10
+  aks_min_node_count = 2
   aks_node_count      = 2
   stac_replica_count  = 2
   tiler_replica_count = 2
@@ -22,6 +24,7 @@ module "resources" {
   animation_output_storage_url = "https://pcfilestest.blob.core.windows.net/output/animations"
   image_output_storage_url     = "https://pcfilestest.blob.core.windows.net/output/images"
 
+  pc_test_resources_acr = "pccomponentstestpublic"
 }
 
 terraform {
