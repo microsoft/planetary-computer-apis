@@ -21,6 +21,10 @@ stac:
     portName: http
     annotations: {}
 
+  hpa:
+    minReplicas: 5
+    maxReplicas: 96
+
   rate_limit:
     collections: 500
     collection: 500

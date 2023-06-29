@@ -1,22 +1,16 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: planetary-computer-stac
-  # name: {{ include "pcstac.fullname" . }}
-  namespace: pc
-  # namespace is assigned by helm command
+  name: {{ include "pcstac.fullname" . }}
   labels:
-    app.kubernetes.io/instance: planetary-computer-stac
-    app.kubernetes.io/name: planetary-computer-stac
-    # {{- include "pcstac.labels" . | nindent 4 }}
+    {{- include "pcstac.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: planetary-computer-stac
-    # name: {{ include "pcstac.fullname" . }}
-  minReplicas: 5
-  maxReplicas: 50
+    name: {{ include "pcstac.fullname" . }}
+  minReplicas: {{ .Values.stac.hpa.minReplicas }}
+  maxReplicas: {{ .Values.stac.hpa.maxReplicas }}
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 30
