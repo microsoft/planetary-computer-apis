@@ -13,6 +13,12 @@ metadata:
   {{- with .Values.pcingress.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
+    {{- if .Values.pcingress.services.stac.blockMetrics -}}
+    nginx.ingress.kubernetes.io/server-snippet: |
+      if ($request_uri = {{ appRootPath }}/metrics) {
+          return 403;
+      }
+    {{- end }}
   {{- end }}
 spec:
   tls:
