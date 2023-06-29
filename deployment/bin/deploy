@@ -206,26 +206,14 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "====================="
 
     echo "Deploying prometheus crd..."
-    # helm upgrade --install prometheus-crd helm/prometheus-crd \
-    #     -n pc \
-    #     --kube-context "${KUBE_CONTEXT}" \
-    #     --wait \
-    #     --timeout 2m0s
-    kubectl apply -f helm/prometheus-crd/templates --server-side
-
+    kubectl apply -f helm/prometheus-crd --server-side
 
     echo "Deploying prometheus component..."
-    # helm upgrade --install pc-apis-prometheus helm/pc-apis-prometheus \
-    #     -n pc \
-    #     --kube-context "${KUBE_CONTEXT}" \
-    #     --wait \
-    #     --timeout 2m0s
-    # Parsing errors: Maybe use kubectl instead
-    kubectl apply -f helm/pc-apis-prometheus/templates
+    kubectl apply -f helm/pc-apis-prometheus
 
-    echo "====================="
+    echo "==========================="
     echo "==== Overprovisioning ====="
-    echo "====================="
+    echo "==========================="
 
     kubectl apply -f helm/overprovisioning/templates
 
