@@ -89,7 +89,6 @@ app.add_middleware(
 
 app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.STAC)
 
-instrumentator = Instrumentator().instrument(app)
 
 @app.middleware("http")
 async def _timeout_middleware(
@@ -111,9 +110,9 @@ async def _handle_exceptions(
 @app.on_event("startup")
 async def startup_event() -> None:
     """Connect to database on startup."""
+    Instrumentator().instrument(app).expose(app)
     await connect_to_db(app)
     await connect_to_redis(app)
-    instrumentator.expose(app)
 
 
 @app.on_event("shutdown")

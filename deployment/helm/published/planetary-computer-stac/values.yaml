@@ -18,6 +18,7 @@ stac:
   service:
     type: ClusterIP
     port: 80
+    portName: http
     annotations: {}
 
   rate_limit:
@@ -53,9 +54,30 @@ stac:
     resources: {}
     nodeSelector: {}
     tolerations: []
+    virtualNodes:
+      enabled: false
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.azure.com/cluster
+                operator: Exists
+          - weight: 90
+            preference:
+              matchExpressions:
+              - key: type
+                operator: DoesNotExist
+      tolerations:
+      - key: virtual-kubelet.io/provider
+        operator: Exists
+      - key: azure.com/aci
+        effect: NoSchedule
     affinity: {}
     autoscaling:
       enabled: false
+    tolerations:
 
   cert:
     privateKeySecretRef: "letsencrypt-staging"

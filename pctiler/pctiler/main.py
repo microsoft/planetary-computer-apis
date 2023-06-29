@@ -78,8 +78,6 @@ app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 
 app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.TILER)
 
-instrumentator = Instrumentator().instrument(app)
-
 @app.middleware("http")
 async def _timeout_middleware(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
@@ -117,6 +115,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event() -> None:
     """Connect to database on startup."""
+    Instrumentator().instrument(app).expose(app)
     await connect_to_db(app)
     instrumentator.expose(app)
 

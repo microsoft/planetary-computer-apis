@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/instance: planetary-computer-stac
+    app.kubernetes.io/name: planetary-computer-stac
+    # {{- include "pcstac.labels" . | nindent 4 }}
+    team: devops
+  name: planetary-computer-stac
+  # name: {{ include "pcstac.fullname" . }}
+  namespace: pc
+  # namespace is assigned by helm command
+spec:
+  endpoints:
+  - interval: 15s
+    port: http
+    # port: {{ .Values.stac.service.portName }}
+  namespaceSelector:
+    matchNames:
+    - pc
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: planetary-computer-stac
+      app.kubernetes.io/name: planetary-computer-stac
+      # {{- include "pcstac.selectorLabels" . | nindent 6 }}
