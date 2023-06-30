@@ -71,6 +71,22 @@ spec:
         resources:
           {{- toYaml .Values.overprovision.deployment.resources | nindent 10 }}
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: overprovisioning-autoscaler
+  namespace: {{ .Values.namespace }}
+data:
+  linear: |-
+    {
+      "coresPerReplica": {{ .Values.overprovision.hpa.coresPerReplica }},
+      "nodesPerReplica": {{ .Values.overprovision.hpa.nodesPerReplica }},
+      "min": {{ .Values.overprovision.hpa.minPods }},
+      "max": {{ .Values.overprovision.hpa.maxPods }},
+      "preventSinglePointFailure": {{ .Values.overprovision.hpa.preventSinglePointFailure }},
+      "includeUnschedulableNodes": {{ .Values.overprovision.hpa.includeUnschedulableNodes }}
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -95,7 +111,7 @@ spec:
             - /cluster-proportional-autoscaler
             - --namespace={{ .Values.namespace }}
             - --configmap=overprovisioning-autoscaler
-            - --default-params={"linear":{"coresPerReplica":{{ .Values.overprovision.hpa.coresPerReplica }},"nodesPerReplica":{{ .Values.overprovision.hpa.nodesPerReplica }},"preventSinglePointFailure":{{ .Values.overprovision.hpa.preventSinglePointFailure }},"includeUnschedulableNodes":{{ .Values.overprovision.hpa.includeUnschedulableNodes }},"min":{{ .Values.overprovision.hpa.minPods }},"max":{{ .Values.overprovision.hpa.maxPods }}}}
+            - --default-params={"linear":{"coresPerReplica":8,"nodesPerReplica":4,"preventSinglePointFailure":false,"includeUnschedulableNodes":true}}
             - --target=deployment/overprovisioning
             - --logtostderr=true
             - --v=2
