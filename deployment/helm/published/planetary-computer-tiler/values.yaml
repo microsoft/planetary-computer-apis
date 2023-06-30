@@ -17,7 +17,12 @@ tiler:
   service:
     type: ClusterIP
     port: 80
+    portName: http
     annotations: {}
+
+  hpa:
+    minReplicas: 5
+    maxReplicas: 96
 
   deploy:
     replicaCount: 10

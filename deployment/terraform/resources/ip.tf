@@ -1,6 +1,6 @@
 resource "azurerm_public_ip" "pc" {
   name                = "${local.prefix}-pc-ip"
-  domain_name_label   = "pct-apis-${var.environment}"
+  domain_name_label   = "pct-apis-${var.environment}1"
   resource_group_name = azurerm_kubernetes_cluster.pc.node_resource_group
   location            = azurerm_resource_group.pc.location
   allocation_method   = "Static"

@@ -102,10 +102,12 @@ pcingress:
       path: "/stac(/|$)(.*)"
       name: "planetary-computer-stac"
       port: "80"
+      blockMetrics: true
     tiler:
       path: "/data(/|$)(.*)"
       name: "planetary-computer-tiler"
       port: "80"
+      blockMetrics: true
 
   cert:
     secretName: "pqe-tls-secret"

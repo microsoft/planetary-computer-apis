@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "pcstac.labels" . | nindent 4 }}
+    team: devops
+  name: {{ include "pcstac.fullname" . }}
+spec:
+  endpoints:
+  - interval: 15s
+    port: {{ .Values.stac.service.portName }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "pcstac.selectorLabels" . | nindent 6 }}

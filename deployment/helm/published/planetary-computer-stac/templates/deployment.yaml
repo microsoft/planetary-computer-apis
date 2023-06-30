@@ -149,7 +149,6 @@ spec:
               value: "{{ .Values.storage.table_value_ttl }}"
             - name: APP_INSIGHTS_INSTRUMENTATION_KEY
               value: "{{ .Values.metrics.instrumentationKey }}"
-
           livenessProbe:
             httpGet:
               path: "/_mgmt/ping"

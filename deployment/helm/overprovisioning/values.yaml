@@ -1,0 +1,18 @@
+environment: "staging"
+namespace: "overprovisioning"
+
+overprovision:
+
+  deployment:
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "400m"
+
+  hpa:
+    coresPerReplica: 8
+    nodesPerReplica: 4
+    minPods: 1
+    maxPods: 3
+    preventSinglePointFailure: false
+    includeUnschedulableNodes: true

@@ -13,6 +13,7 @@ from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import (
@@ -109,6 +110,7 @@ async def _handle_exceptions(
 @app.on_event("startup")
 async def startup_event() -> None:
     """Connect to database on startup."""
+    Instrumentator().instrument(app).expose(app)
     await connect_to_db(app)
     await connect_to_redis(app)
 

@@ -13,6 +13,7 @@ spec:
   type: {{ .Values.stac.service.type }}
   ports:
     - port: {{ .Values.stac.service.port }}
+      name: {{ .Values.stac.service.portName }}
   selector:
     {{- include "pcstac.selectorLabels" . | nindent 4 }}
 {{- end }}
