@@ -7,10 +7,14 @@ resource "azurerm_kubernetes_cluster" "pc" {
 
   default_node_pool {
     name                 = "agentpool"
+    os_sku               = "AzureLinux"
     vm_size              = "Standard_DS2_v2"
     node_count           = var.aks_node_count
     vnet_subnet_id       = azurerm_subnet.node_subnet.id
     orchestrator_version = var.k8s_version
+
+    # remove this after deploying
+    temporary_name_for_rotation = "tmpdefault"
   }
 
   identity {
