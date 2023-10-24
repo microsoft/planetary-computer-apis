@@ -1,10 +1,11 @@
 resource "azurerm_storage_account" "pc" {
-  name                     = "${local.nodash_prefix}sa"
-  resource_group_name      = azurerm_resource_group.pc.name
-  location                 = azurerm_resource_group.pc.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  min_tls_version          = "TLS1_2"
+  name                            = "${local.nodash_prefix}sa"
+  resource_group_name             = azurerm_resource_group.pc.name
+  location                        = azurerm_resource_group.pc.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  min_tls_version                 = "TLS1_2"
+  allow_nested_items_to_be_public = false
 }
 
 # Tables
