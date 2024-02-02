@@ -33,7 +33,7 @@ RUN apt-get install -y kubectl
 RUN curl https://baltocdn.com/helm/signing.asc |  apt-key add -
 RUN echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
 RUN apt-get update
-RUN apt-get install helm=3.5.0-1
+RUN apt-get install helm=3.14.0-1
 
 # Install kubelogin
 

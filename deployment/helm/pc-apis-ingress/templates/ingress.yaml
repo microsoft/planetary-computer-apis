@@ -18,7 +18,7 @@ spec:
   tls:
   - hosts:
     - {{ .Values.pcingress.ingress.tlsHost }}
-    secretName: {{ .Values.pcingress.cert.secretName }}
+    secretName: {{ .Values.secretProvider.kubernetesCertificateSecretName }}
   rules:
   {{- range .Values.pcingress.ingress.hosts }}
     - host: {{ . }}

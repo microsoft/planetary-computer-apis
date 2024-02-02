@@ -84,6 +84,18 @@ variable "pc_sdk_subscription_key_secret_name" {
   default = "pct-tiler-sdk-subscription-key"
 }
 
+variable "secret_provider_keyvault_name" {
+  type = string
+  description = "The name of the KeyVault that holds the secrets"
+  default = "pc-deploy-secrets"
+}
+
+variable "secret_provider_keyvault_secret" {
+  type = string
+  description = "The name of the certificate in the KeyVault for TLS ingress"
+  default = "planetarycomputer-test-certificate"
+}
+
 # -- Functions --
 
 variable "output_storage_account_name" {
