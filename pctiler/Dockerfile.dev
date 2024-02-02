@@ -3,4 +3,4 @@ FROM pc-apis-tiler
 COPY requirements-dev.txt requirements-dev.txt
 
 RUN python3 -m pip install -r requirements-dev.txt
-RUN python3 -m pip install -e ./pccommon -e ./pctiler
+RUN python3 -m pip install -e ./pccommon -e ./pctiler[dev]
