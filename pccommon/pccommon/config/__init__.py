@@ -24,4 +24,5 @@ def get_all_render_configs() -> Dict[str, DefaultRenderConfig]:
         for id, coll in get_apis_config()
         .get_collection_config_table()
         .get_all_configs()
+        if id is not None
     }
