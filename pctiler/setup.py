@@ -1,11 +1,13 @@
 """Setup for pctiler."""
 
+from typing import List
 from setuptools import find_packages, setup
 
 # Runtime requirements, see environment.yaml
-inst_reqs = []
+inst_reqs: List[str] = []
 
 extra_reqs = {
+    "dev": ["types-requests"],
     "server": [
         "uvicorn[standard]>=0.17.0,<0.18.0",
     ],

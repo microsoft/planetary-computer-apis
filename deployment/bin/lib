@@ -43,6 +43,10 @@ function gather_tf_output() {
     export ENVIRONMENT=$(tf_output environment)
     export INGRESS_IP=$(tf_output ingress_ip)
     export DNS_LABEL=$(tf_output dns_label)
+    export AZURE_TENANT=$(tf_output tenant_id)
+    export KEYVAULT_NAME=$(tf_output secret_provider_keyvault_name)
+    export SECRET_PROVIDER_MANAGED_IDENTITY_ID=$(tf_output secret_provider_managed_identity_id)
+    export SECRET_PROVIDER_KEYVAULT_SECRET=$(tf_output secret_provider_keyvault_secret)
 
     export FUNCTION_APP_NAME=$(tf_output function_app_name)
 
@@ -53,7 +57,7 @@ function gather_tf_output() {
 
 function render_values() {
     echo "Rendering chart value files..."
-
+    
     bin/jinja ${TF_OUTPUT_FILE} ${TEMPLATE_PATH} ${DEPLOY_VALUES_FILE}
 }
 

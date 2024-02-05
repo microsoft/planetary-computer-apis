@@ -1,0 +1,16 @@
+controller:
+  podLabels:
+    azure.workload.identity/use: "true"
+  extraVolumes:
+    - name: secrets-store-inline
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: "keyvault"
+  extraVolumeMounts:
+    - name: secrets-store-inline
+      mountPath: "/mnt/secrets-store"
+      readOnly: true
+  extraArgs:
+    default-ssl-certificate: pc/planetarycomputer-test-certificate

@@ -7,6 +7,15 @@ stac:
 tiler:
   enabled: true
 
+secretProvider:
+  create: true
+  providerName: "keyvault"
+  userAssignedIdentityID: ""
+  tenantId: ""
+  keyvaultName: ""
+  keyvaultCertificateName: ""
+  kubernetesCertificateSecretName: ""
+
 pcingress:
   services:
     stac:

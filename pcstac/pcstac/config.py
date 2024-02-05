@@ -64,11 +64,11 @@ class BackPressureConfig(BaseModel):
 
 
 class BackPressures(BaseSettings):
-    collections: BackPressureConfig
-    collection: BackPressureConfig
-    item: BackPressureConfig
-    items: BackPressureConfig
-    search: BackPressureConfig
+    collections: BackPressureConfig = BackPressureConfig()
+    collection: BackPressureConfig = BackPressureConfig()
+    item: BackPressureConfig = BackPressureConfig()
+    items: BackPressureConfig = BackPressureConfig()
+    search: BackPressureConfig = BackPressureConfig()
 
 
 class Settings(BaseSettings):
@@ -96,8 +96,8 @@ class Settings(BaseSettings):
     db_min_conn_size: int = Field(env=DB_MIN_CONN_ENV_VAR, default=1)
     openapi_url: str = "/openapi.json"
     api_version: str = f"v{API_VERSION}"
-    rate_limits: RateLimits
-    back_pressures: BackPressures
+    rate_limits: RateLimits = RateLimits()
+    back_pressures: BackPressures = BackPressures()
     request_timout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
 
     def get_tiler_href(self, request: Request) -> str:
