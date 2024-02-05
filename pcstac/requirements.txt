@@ -71,7 +71,7 @@ deprecated==1.2.14
     # via redis
 exceptiongroup==1.1.1
     # via anyio
-fastapi==0.109.2
+fastapi==0.90.1
     # via
     #   pccommon (pccommon/setup.py)
     #   stac-fastapi-types
@@ -254,7 +254,7 @@ stac-pydantic==2.0.3
     #   stac-fastapi-extensions
     #   stac-fastapi-pgstac
     #   stac-fastapi-types
-starlette==0.36.3
+starlette==0.22.0
     # via
     #   brotli-asgi
     #   fastapi
@@ -269,7 +269,6 @@ typing-extensions==4.9.0
     # via
     #   asgiref
     #   azure-core
-    #   fastapi
     #   psycopg
     #   psycopg-pool
     #   pydantic

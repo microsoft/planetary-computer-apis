@@ -33,6 +33,9 @@ COPY pctiler /opt/src/pctiler
 # Install the local modules in the new environment
 RUN /bin/sh -c "python -m pip install --no-cache-dir -e ./pccommon -e ./pctiler[server]"
 
+# Override starlette version
+RUN /bin/sh -c "python -m pip install --upgrade --force-reinstall starlette==0.27.0"
+
 # GDAL config
 ENV GDAL_CACHEMAX 200
 ENV GDAL_INGESTED_BYTES_AT_OPEN 32768
