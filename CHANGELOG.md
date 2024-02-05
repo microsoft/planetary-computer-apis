@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2024.1]
+
+### Changed
+
+- Upgrade starlette and FastAPI to 0.36.3 and 0.109.2 respectively in [#186](https://github.com/microsoft/planetary-computer-apis/pull/186)
+
 ## [2023.2]
 
 ### Changed
