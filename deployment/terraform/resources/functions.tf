@@ -77,13 +77,3 @@ resource "azurerm_role_assignment" "function-app-animation-container-access" {
     azurerm_function_app.pcfuncs
   ]
 }
-
-resource "azurerm_role_assignment" "function-app-azure-maps-render-token-access" {
-  scope                = azurerm_maps_account.azmaps.id
-  role_definition_name = "Azure Maps Search and Render Data Reader"
-  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
-
-  depends_on = [
-    azurerm_function_app.pcfuncs
-  ]
-}
