@@ -54,6 +54,12 @@ resource "azurerm_function_app" "pcfuncs" {
       allowed_origins = ["*"]
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 # Note: this must be in the same subscription as the rest of the deployed infrastructure
@@ -65,6 +71,16 @@ data "azurerm_storage_container" "output" {
 resource "azurerm_role_assignment" "function-app-animation-container-access" {
   scope                = data.azurerm_storage_container.output.resource_manager_id
   role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
+
+  depends_on = [
+    azurerm_function_app.pcfuncs
+  ]
+}
+
+resource "azurerm_role_assignment" "function-app-azure-maps-render-token-access" {
+  scope                = azurerm_maps_account.azmaps.id
+  role_definition_name = "Azure Maps Search and Render Data Reader"
   principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
 
   depends_on = [
