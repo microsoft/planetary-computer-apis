@@ -11,11 +11,6 @@ variable "pc_test_resources_rg" {
   default = "pc-test-manual-resources"
 }
 
-variable "pc_datacatalog_rg" {
-  type    = string
-  default = "pc-datacatalog-rg"
-}
-
 variable "pc_test_resources_kv" {
   type    = string
   default = "pc-test-deploy-secrets"
@@ -24,11 +19,6 @@ variable "pc_test_resources_kv" {
 variable "pc_test_resources_acr" {
   type    = string
   default = "pccomponentstest"
-}
-
-variable "pc_azure_maps" {
-  type    = string
-  default = "pc-datacatalog-azmaps"
 }
 
 variable "aks_node_count" {
