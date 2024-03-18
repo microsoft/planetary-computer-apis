@@ -15,6 +15,23 @@ This scripts is meant to be run inside the tiler-dev container.
 "
 }
 
+while [[ $# -gt 0 ]]; do case $1 in
+    --no-integration)
+        INTEGRATION="--no-integration"
+        shift
+        ;;
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     echo "Running mypy for tiler..."
@@ -27,6 +44,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     flake8 pctiler/pctiler pctiler/tests
 
     echo "Running unit tests for tiler..."
-    python -m pytest pctiler/tests
+    python -m pytest pctiler/tests ${INTEGRATION:+$INTEGRATION}
 
 fi

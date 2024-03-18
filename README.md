@@ -77,6 +77,12 @@ After migrations and development database loading are in place, you can rebuild 
 
 #### Running the services
 
+There is a local proxy service that facilitates a local "managed identity" functionality, run as your local identity. Make sure to run
+
+```console
+az login
+```
+
 To run the servers, use
 
 ```console

@@ -42,6 +42,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Common labels
 */}}
 {{- define "pctiler.labels" -}}
+azure.workload.identity/use: {{ .Values.tiler.deploy.useWorkloadIdentity | quote}}
 helm.sh/chart: {{ include "pctiler.chart" . }}
 {{ include "pctiler.selectorLabels" . }}
 {{- if .Chart.AppVersion }}

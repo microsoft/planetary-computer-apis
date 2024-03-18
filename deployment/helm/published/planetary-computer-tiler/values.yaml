@@ -31,6 +31,9 @@ tiler:
     affinity: {}
     autoscaling:
       enabled: false
+    useWorkloadIdentity: false
+    serviceAccount:
+      annotations: {}
 
   stac_api_url: ""
   stac_api_href: ""

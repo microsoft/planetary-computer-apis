@@ -1,5 +1,7 @@
 FROM pc-apis-tiler
 
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
 COPY requirements-dev.txt requirements-dev.txt
 
 RUN python3 -m pip install -r requirements-dev.txt
