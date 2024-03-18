@@ -66,6 +66,12 @@ tiler:
     replicaCount: "{{ tf.tiler_replica_count }}"
     podAnnotations:
       "pc/gitsha": "{{ env.GIT_COMMIT }}"
+    useWorkloadIdentity: true
+
+    serviceAccount:
+      annotations:
+        "azure.workload.identity/client-id": {{ tf.cluster_tiler_identity_client_id }}
+        "azure.workload.identity/tenant-id": {{ tf.tenant_id }}
 
   default_max_items_per_tile: 5
   appRootPath: "/data"

@@ -112,6 +112,7 @@ services:
       - PCAPIS_REDIS_SSL=FALSE
     volumes:
       - .:/opt/src
+      - ~/.azure:/root/.azure
     command: >
       /bin/bash
     depends_on:

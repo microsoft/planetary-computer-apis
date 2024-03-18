@@ -4,7 +4,7 @@ module "resources" {
   environment = "staging"
   region      = "West Europe"
 
-  k8s_version = "1.25.6"
+  k8s_version = "1.28.5"
 
   cluster_cert_issuer = "letsencrypt"
   cluster_cert_server = "https://acme-v02.api.letsencrypt.org/directory"

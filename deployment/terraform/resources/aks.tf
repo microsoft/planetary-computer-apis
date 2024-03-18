@@ -8,9 +8,11 @@ resource "azurerm_kubernetes_cluster" "pc" {
   key_vault_secrets_provider {
     secret_rotation_enabled = true
   }
-  oidc_issuer_enabled = true
 
-   # https://learn.microsoft.com/en-us/azure/aks/auto-upgrade-cluster#use-cluster-auto-upgrade
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
+
+  # https://learn.microsoft.com/en-us/azure/aks/auto-upgrade-cluster#use-cluster-auto-upgrade
   automatic_channel_upgrade = "rapid"
 
   # https://learn.microsoft.com/en-us/azure/aks/auto-upgrade-node-os-image
@@ -40,6 +42,30 @@ resource "azurerm_kubernetes_cluster" "pc" {
     Environment = var.environment
     ManagedBy   = "AI4E"
   }
+}
+
+# Workload Identity for tiler access to the Azure Maps account
+resource "azurerm_user_assigned_identity" "tiler" {
+  name                = "id-${local.prefix}"
+  location            = var.region
+  resource_group_name = azurerm_resource_group.pc.name
+}
+
+resource "azurerm_federated_identity_credential" "tiler" {
+  name                = "federated-id-${local.prefix}"
+  resource_group_name = azurerm_resource_group.pc.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = azurerm_kubernetes_cluster.pc.oidc_issuer_url
+  subject             = "system:serviceaccount:pc:planetary-computer-tiler"
+  parent_id           = azurerm_user_assigned_identity.tiler.id
+  timeouts {}
+}
+
+resource "azurerm_role_assignment" "cluster-identity-maps-render-token" {
+  scope                = azurerm_maps_account.azmaps.id
+  role_definition_name = "Azure Maps Search and Render Data Reader"
+  principal_id         = azurerm_user_assigned_identity.tiler.principal_id
+
 }
 
 # add the role to the identity the kubernetes cluster was assigned

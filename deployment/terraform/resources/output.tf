@@ -51,6 +51,10 @@ output "cluster_cert_server" {
   value = var.cluster_cert_server
 }
 
+output "cluster_tiler_identity_client_id" {
+  value = azurerm_user_assigned_identity.tiler.client_id
+}
+
 ## Ingress
 
 output "ingress_ip" {

@@ -34,6 +34,7 @@ class Settings(BaseSettings):
 
     title: str = "Preview of Tile Access Services"
     openapi_url: str = "/openapi.json"
+    configuration_endpoint_prefix: str = "/config"
     item_endpoint_prefix: str = "/item"
     mosaic_endpoint_prefix: str = "/mosaic"
     legend_endpoint_prefix: str = "/legend"

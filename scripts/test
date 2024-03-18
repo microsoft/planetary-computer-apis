@@ -23,6 +23,8 @@ Options
         Only test pccommon
     --funcs
         Only test funcs
+    --no-integration
+        Don't run tests which need external authenticated resources
 "
 }
 
@@ -42,6 +44,10 @@ while [[ $# -gt 0 ]]; do case $1 in
         ;;
     --funcs)
         FUNCS_ONLY="1"
+        shift
+        ;;
+    --no-integration)
+        NO_INTEGRATION="--no-integration"
         shift
         ;;
     --help)
@@ -71,7 +77,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             run --rm \
-            tiler-dev scripts/bin/test-tiler
+            tiler-dev scripts/bin/test-tiler ${NO_INTEGRATION} 
     fi
 
     if [ -z "${TILER_ONLY}${COMMON_ONLY}${FUNCS_ONLY}" ]; then
