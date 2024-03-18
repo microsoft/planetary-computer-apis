@@ -1,11 +1,12 @@
 FROM ubuntu:20.04
 
 RUN apt-get update --fix-missing
-RUN apt-get install -y wget unzip curl gnupg \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y wget unzip curl gnupg \
     apt-transport-https \
     python3-pip \
     jq \
-    git
+    git \
+    libicu66
 
 # Install Azure Function Tools
 
