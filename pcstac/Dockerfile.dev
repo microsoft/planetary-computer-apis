@@ -4,3 +4,4 @@ COPY requirements-dev.txt requirements-dev.txt
 RUN pip install -r requirements-dev.txt
 
 RUN pip install -e ./pccommon[dev] -e ./pcstac
+RUN /bin/sh -c "python -m pip install --upgrade --force-reinstall starlette==0.27.0"

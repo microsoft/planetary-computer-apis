@@ -6,3 +6,4 @@ COPY requirements-dev.txt requirements-dev.txt
 
 RUN python3 -m pip install -r requirements-dev.txt
 RUN python3 -m pip install -e ./pccommon -e ./pctiler[dev]
+RUN /bin/sh -c "python -m pip install --upgrade --force-reinstall starlette==0.27.0"

@@ -5,6 +5,8 @@ from setuptools import find_packages, setup
 # Runtime requirements.
 inst_reqs = [
     "fastapi==0.90.1",
+    # Version override by pip install in Dockerfiles to address CVE.
+    # Cannot do it here due to unnecessary pip version constraints in FastAPI.
     "starlette>=0.22.0,<0.23.0",
     "opencensus-ext-azure==1.0.8",
     "opencensus-ext-logging==0.1.0",

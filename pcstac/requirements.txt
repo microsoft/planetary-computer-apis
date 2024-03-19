@@ -265,7 +265,7 @@ termcolor==2.3.0
     # via fire
 types-cachetools==4.2.9
     # via pccommon (pccommon/setup.py)
-typing-extensions==4.6.3
+typing-extensions==4.9.0
     # via
     #   asgiref
     #   azure-core

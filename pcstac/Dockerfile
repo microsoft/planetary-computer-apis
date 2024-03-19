@@ -11,6 +11,9 @@ COPY pcstac /opt/src/pcstac
 COPY pccommon /opt/src/pccommon
 RUN pip install -r ./pcstac/requirements.txt -e ./pccommon -e ./pcstac[server]
 
+# Override starlette version
+RUN /bin/sh -c "python -m pip install --upgrade --force-reinstall starlette==0.27.0"
+
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=81
 
