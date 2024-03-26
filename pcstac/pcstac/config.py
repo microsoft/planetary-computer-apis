@@ -98,7 +98,7 @@ class Settings(BaseSettings):
     api_version: str = f"v{API_VERSION}"
     rate_limits: RateLimits = RateLimits()
     back_pressures: BackPressures = BackPressures()
-    request_timout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
+    request_timeout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
 
     def get_tiler_href(self, request: Request) -> str:
         """Generates the tiler HREF.
