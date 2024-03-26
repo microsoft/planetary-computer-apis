@@ -10,7 +10,7 @@ inst_reqs = [
     "stac-fastapi.types==2.4.5",
     # Required due to some imports related to pypgstac CLI usage in startup script
     "pypgstac[psycopg]~=0.7",
-    "pystac==1.*",
+    "pystac>=1.8,<2.0",
 ]
 
 extra_reqs = {
