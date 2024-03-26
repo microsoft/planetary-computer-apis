@@ -7,7 +7,7 @@ if [[ "${CI}" ]]; then
 fi
 
 echo "== Generating requirements.txt ..."
-pip_compile_options="--generate-hashes --reuse-hashes --emit-index-url --annotate --verbose"
+pip_compile_options="--emit-index-url --annotate --verbose"
 
 docker-compose \
     -f docker-compose.yml \
