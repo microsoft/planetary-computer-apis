@@ -31,6 +31,7 @@ COPY pccommon /opt/src/pccommon
 COPY pctiler /opt/src/pctiler
 
 # Install the local modules in the new environment
+RUN /bin/sh -c "python -m pip install -r ./pctiler/requirements-server.txt --no-cache-dir"
 RUN /bin/sh -c "python -m pip install --no-cache-dir -e ./pccommon -e ./pctiler[server]"
 
 # GDAL config

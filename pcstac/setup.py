@@ -8,6 +8,7 @@ inst_reqs = [
     "stac-fastapi.extensions==2.4.8",
     "stac-fastapi.pgstac==2.4.9",
     "stac-fastapi.types==2.4.8",
+    "pydantic==1.10.14",
     # Required due to some imports related to pypgstac CLI usage in startup script
     "pypgstac[psycopg]~=0.7",
     "pystac>=1.9",
