@@ -70,7 +70,6 @@ pydantic[dotenv]==1.10.14
     # via
     #   fastapi
     #   geojson-pydantic
-    #   pcstac (pcstac/setup.py)
     #   pypgstac
     #   stac-fastapi-api
     #   stac-fastapi-extensions
