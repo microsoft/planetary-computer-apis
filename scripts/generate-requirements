@@ -22,10 +22,3 @@ docker-compose \
     run --rm \
     tiler-dev \
     pip-compile ./pctiler/setup.py --extra server -o pctiler/requirements-server.txt $pip_compile_options
-
-# docker-compose \
-#     -f docker-compose.yml \
-#     -f docker-compose.dev.yml \
-#     run --rm \
-#     sas-dev \
-#     pip-compile -o pcsas/requirements.txt $pip_compile_options
