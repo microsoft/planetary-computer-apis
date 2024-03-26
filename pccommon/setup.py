@@ -11,7 +11,7 @@ inst_reqs = [
     "orjson==3.5.2",
     "azure-identity==1.7.1",
     "azure-data-tables==12.4.0",
-    "azure-storage-blob==12.12.0",
+    "azure-storage-blob==12.19.1",
     "pydantic>=1.9, <2.0.0",
     "cachetools~=5.3",
     "types-cachetools==4.2.9",
