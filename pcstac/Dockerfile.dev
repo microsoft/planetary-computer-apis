@@ -3,4 +3,4 @@ FROM pc-apis-stac
 COPY requirements-dev.txt requirements-dev.txt
 RUN pip install -r requirements-dev.txt
 
-RUN pip install -e ./pccommon[dev] -e ./pcstac
+RUN pip install --no-deps -e ./pccommon[dev] -e ./pcstac

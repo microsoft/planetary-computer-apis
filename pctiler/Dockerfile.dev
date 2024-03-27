@@ -5,4 +5,4 @@ RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 COPY requirements-dev.txt requirements-dev.txt
 
 RUN python3 -m pip install -r requirements-dev.txt
-RUN python3 -m pip install -e ./pccommon -e ./pctiler[dev]
+RUN python3 -m pip install --no-deps -e ./pccommon -e ./pctiler[dev]

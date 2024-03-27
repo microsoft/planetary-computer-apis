@@ -56,6 +56,7 @@ lark==0.12.0
     # via pygeofilter
 orjson==3.9.15
     # via
+    #   pcstac (pcstac/setup.py)
     #   pypgstac
     #   stac-fastapi-pgstac
 plpygis==0.2.2
