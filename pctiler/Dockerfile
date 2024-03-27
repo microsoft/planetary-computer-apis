@@ -7,8 +7,9 @@ COPY pctiler /opt/src/pctiler
 
 # Install the local modules in the new environment
 RUN /bin/sh -c "python -m pip install -U 'setuptools>=65.5.1'"
-RUN /bin/sh -c "python -m pip install -r ./pccommon/requirements.txt --no-cache-dir"
-RUN /bin/sh -c "python -m pip install -r ./pctiler/requirements-server.txt --no-cache-dir"
+# The order of these pip installs is important :(
+RUN /bin/sh -c "python -m pip install -r ./pccommon/requirements.txt"
+RUN /bin/sh -c "python -m pip install -r ./pctiler/requirements-server.txt"
 RUN /bin/sh -c "python -m pip install --no-deps -e ./pccommon -e ./pctiler[server]"
 
 # GDAL config
