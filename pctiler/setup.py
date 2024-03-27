@@ -13,6 +13,9 @@ inst_reqs: List[str] = [
     "titiler.core==0.10.2",
     "titiler.mosaic==0.10.2",
     "pillow==10.2.0",
+    "boto3==1.34.71",
+    "botocore==1.34.71",
+    "pydantic==1.10.14",
     # titiler-pgstac
     "psycopg[binary,pool]",
     "titiler.pgstac==0.2.4",
