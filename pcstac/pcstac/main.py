@@ -16,10 +16,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import (
-    add_timeout,
-    http_exception_handler,
-)
+from pccommon.middleware import add_timeout, http_exception_handler
 from pccommon.openapi import fixup_schema
 from pccommon.redis import connect_to_redis
 from pcstac.api import PCStacApi
