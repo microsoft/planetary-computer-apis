@@ -7,7 +7,7 @@ cachetools<=4.2.
 pytest==7.*
 pytest-asyncio==0.18.*
 httpx>=0.22.0
-
+pip-tools
 # Mypy types
 types-python-dateutil
 types-cachetools

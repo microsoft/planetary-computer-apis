@@ -2,10 +2,10 @@ from typing import List
 
 import pytest
 from httpx import AsyncClient
-from pytest import Config, Item
+from pytest import Config, Item, Parser
 
 
-def pytest_addoption(parser) -> None:
+def pytest_addoption(parser: Parser) -> None:
     parser.addoption(
         "--no-integration",
         action="store_true",
