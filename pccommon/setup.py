@@ -18,7 +18,7 @@ inst_reqs = [
     "pyhumps==3.5.3",
     "redis==4.2.0-rc1",
     "html-sanitizer==1.9",
-    "urllib3>=1.26.6",
+    "urllib3>=1.26.18",
 ]
 
 extra_reqs = {
