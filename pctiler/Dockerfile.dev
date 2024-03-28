@@ -4,5 +4,9 @@ RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
 COPY requirements-dev.txt requirements-dev.txt
 
-RUN python3 -m pip install -r requirements-dev.txt
-RUN python3 -m pip install -r pctiler/requirements-dev.txt
+RUN --mount=type=cache,target=/root/.cache \
+    --mount=type=bind,source=requirements-dev.txt,target=requirements-dev.txt \
+    python3 -m pip install -r requirements-dev.txt
+
+RUN --mount=type=cache,target=/root/.cache \
+    python3 -m pip install -r pctiler/requirements-dev.txt
