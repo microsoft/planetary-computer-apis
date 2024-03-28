@@ -3,7 +3,6 @@ import logging
 import os
 from typing import Any, Dict
 
-from brotli_asgi import BrotliMiddleware
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
@@ -29,7 +28,6 @@ from pcstac.config import (
     get_settings,
 )
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.middleware import ProxyHeaderHostMiddleware
 from pcstac.search import PCSearch, PCSearchGetRequest, RedisBaseItemCache
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
@@ -68,7 +66,6 @@ api = PCStacApi(
     search_get_request_model=search_get_request_model,
     search_post_request_model=search_post_request_model,
     response_class=ORJSONResponse,
-    middlewares=[BrotliMiddleware, ProxyHeaderHostMiddleware],
     exceptions={**DEFAULT_STATUS_CODES, **PC_DEFAULT_STATUS_CODES},
 )
 
