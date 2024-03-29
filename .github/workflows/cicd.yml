@@ -34,7 +34,7 @@ jobs:
           CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
         run:
           docker login pcccr.azurecr.io --username ${CLIENT_ID} --password ${CLIENT_SECRET}
-          az acr login --username ${CLIENT_ID} --password ${CLIENT_SECRET}
+          az acr login --name pcccr --username ${CLIENT_ID} --password ${CLIENT_SECRET}
 
       - name: Publish images
         run: ./scripts/cipublish --acr pcccr --tag ${{steps.get_image_tag.outputs.tag}}
