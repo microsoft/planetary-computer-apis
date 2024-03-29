@@ -92,9 +92,9 @@ function publish_image() {
     local full_image_name="${ACR_NAME}.azurecr.io/${published_image}:${IMAGE_TAG}"
 
     local local_image_digest=$(docker inspect --format='{{.RepoDigests}}' "${local_image}" | cut -d'@' -f2)
-    local remote_image_digest=$(az acr repository show-manifests --name $ACR_NAME --repository $published_image --query "[?tags[? @ == '$IMAGE_TAG']].digest" -o tsv)
+    local remote_image_digest=$(az acr manifest show-metadata $full_image_name | jq -r .digest)
 
-    if ["$local_image_digest" != "$remote_image_digest"]; then
+    if [ "$local_image_digest" != "$remote_image_digest" ]; then
         # Image rolling tag exists in the registry, update the end-of-life
         # annotation for the existing image.
         deprecate_image $full_image_name
