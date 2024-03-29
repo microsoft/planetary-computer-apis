@@ -50,21 +50,87 @@ if [[ -z ${IMAGE_TAG} ]]; then
     exit 1
 fi
 
+function install_oras() {
+    # https://oras.land/docs/installation/
+    VERSION="1.1.0"
+    curl -LO "https://github.com/oras-project/oras/releases/download/v${VERSION}/oras_${VERSION}_linux_amd64.tar.gz"
+    mkdir -p oras-install/
+    tar -zxf oras_${VERSION}_*.tar.gz -C oras-install/
+    sudo mv oras-install/oras /usr/local/bin/
+    rm -rf oras_${VERSION}_*.tar.gz oras-install/
+}
+
+function deprecate_image() {
+    local full_image_name_with_digest=$1
+    deprecated_since=$(date --utc --iso-8601=seconds) 
+    if oras discover $full_image_name_with_digest -o json | jq '.manifests[].annotations' | grep -q "vnd.microsoft.lifecycle.end-of-life.date" ; then
+        echo "Lifecycle metadata annotation for $full_image_name_with_digest already exists, skip."
+    else
+        echo "Deprecating previous image $full_image_name_with_digest"
+        oras attach \
+            --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
+            --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$deprecated_since" \
+            "$full_image_name_with_digest"
+    fi
+}
+
+function set_lineage() {
+    local full_image_name_with_digest=$1
+    # if the annotation already exists, do not add it again
+    if oras discover $full_image_name_with_digest -o json | jq '.manifests[].annotations."vnd.microsoft.artifact.lineage.rolling-tag"' | grep -q $IMAGE_TAG; then
+        echo "Lineage annotation for $IMAGE_TAG already exists, skip."
+    else
+        echo "Adding $full_image_name_with_digest to lineage $IMAGE_TAG"
+        oras attach \
+            --artifact-type "application/vnd.microsoft.artifact.lineage" \
+            --annotation "vnd.microsoft.artifact.lineage.rolling-tag=$IMAGE_TAG" \
+            "$full_image_name_with_digest"
+    fi
+}
+
 function publish_image() {
     local local_image=$1
     local published_image=$2
     local full_image_name="${ACR_NAME}.azurecr.io/${published_image}:${IMAGE_TAG}"
 
+    local local_image_digest=$(docker inspect --format='{{.RepoDigests}}' "${local_image}" | cut -d'@' -f2)
+    local remote_image_digest=$(az acr manifest show-metadata $full_image_name | jq -r .digest)
+
+    if [ -z "$remote_image_digest" ]; then
+        echo "No remote image found, will publish a new image."
+    elif [ "$local_image_digest" != "$remote_image_digest" ]; then
+        # Image rolling tag exists in the registry, update the end-of-life
+        # annotation for the existing image.
+        deprecate_image "$full_image_name@$remote_image_digest"
+    else
+        echo "No changes, licycle metadata annotation will not be attached."
+    fi
+
     echo "Publishing ${local_image} to ${full_image_name}"
     docker tag "${local_image}" "${full_image_name}"
     docker push "${full_image_name}"
+    local remote_image_digest=$(az acr manifest show-metadata $full_image_name | jq -r .digest)
+    set_lineage "$full_image_name@$remote_image_digest"
 }
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
-    # Publish images
+    if ! command -v oras &> /dev/null
+    then
+        install_oras
+    fi
 
-    publish_image "pc-apis-stac" "public/planetary-computer-apis/stac"
-    publish_image "pc-apis-tiler" "public/planetary-computer-apis/tiler"
+    # only _tagged_ releases will be synced from pcccr to MAR
+    case $IMAGE_TAG in
+        *latest*)
+            image_prefix="private"
+            ;;
+        *)
+            image_prefix="public"
+            ;;
+    esac
+    # Publish images
+    publish_image "pc-apis-stac" "$image_prefix/planetary-computer-apis/stac"
+    publish_image "pc-apis-tiler" "$image_prefix/planetary-computer-apis/tiler"
 
 fi
