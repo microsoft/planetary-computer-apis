@@ -63,11 +63,15 @@ function install_oras() {
 function deprecate_image() {
     local full_image_name_with_digest=$1
     deprecated_since=$(date --utc --iso-8601=seconds) 
-    echo "Deprecating previous image $full_image_name_with_digest"
-    oras attach \
-        --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
-        --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$deprecated_since" \
-        "$full_image_name_with_digest"
+    if oras discover $full_image_name_with_digest -o json | jq '.manifests[].annotations' | grep -q "vnd.microsoft.lifecycle.end-of-life.date" ; then
+        echo "Lifecycle metadata annotation for $full_image_name_with_digest already exists, skip."
+    else
+        echo "Deprecating previous image $full_image_name_with_digest"
+        oras attach \
+            --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
+            --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$deprecated_since" \
+            "$full_image_name_with_digest"
+    fi
 }
 
 function set_lineage() {
@@ -92,7 +96,9 @@ function publish_image() {
     local local_image_digest=$(docker inspect --format='{{.RepoDigests}}' "${local_image}" | cut -d'@' -f2)
     local remote_image_digest=$(az acr manifest show-metadata $full_image_name | jq -r .digest)
 
-    if [ "$local_image_digest" != "$remote_image_digest" ]; then
+    if [ -z "$remote_image_digest" ]; then
+        echo "No remote image found, will publish a new image."
+    elif [ "$local_image_digest" != "$remote_image_digest" ]; then
         # Image rolling tag exists in the registry, update the end-of-life
         # annotation for the existing image.
         deprecate_image "$full_image_name@$remote_image_digest"
@@ -116,7 +122,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     # only _tagged_ releases will be synced from pcccr to MAR
     case $IMAGE_TAG in
-        "latest")
+        *latest*)
             image_prefix="private"
             ;;
         *)
