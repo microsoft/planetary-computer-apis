@@ -13,6 +13,6 @@ CI authentication for this project.
 "
 }
 
-sudo curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 az acr login --name pcccr --username ${CLIENT_ID} --password ${CLIENT_SECRET}
 docker login pcccr.azurecr.io --username ${CLIENT_ID} --password ${CLIENT_SECRET}
