@@ -102,7 +102,11 @@ isodate==0.6.1
 lark==0.12.0
     # via pygeofilter
 lxml[html-clean]==5.2.0
-    # via html-sanitizer
+    # via
+    #   html-sanitizer
+    #   lxml-html-clean
+lxml-html-clean==0.1.0
+    # via pccommon (pccommon/setup.py)
 msal==1.22.0
     # via
     #   azure-identity
