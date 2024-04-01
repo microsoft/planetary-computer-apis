@@ -17,7 +17,7 @@ inst_reqs = [
     "types-cachetools==4.2.9",
     "pyhumps==3.5.3",
     "redis==4.2.0-rc1",
-    "html-sanitizer==1.9",
+    "html-sanitizer==2.4",
 ]
 
 extra_reqs = {

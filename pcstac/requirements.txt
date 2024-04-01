@@ -87,7 +87,7 @@ googleapis-common-protos==1.59.1
     # via google-api-core
 h11==0.14.0
     # via uvicorn
-html-sanitizer==1.9.0
+html-sanitizer==2.4.0
     # via pccommon (pccommon/setup.py)
 httptools==0.5.0
     # via uvicorn
@@ -101,7 +101,7 @@ isodate==0.6.1
     # via msrest
 lark==0.12.0
     # via pygeofilter
-lxml==4.9.2
+lxml[html-clean]==5.2.0
     # via html-sanitizer
 msal==1.22.0
     # via
@@ -143,9 +143,7 @@ protobuf==4.23.2
 psutil==5.9.5
     # via opencensus-ext-azure
 psycopg[binary]==3.1.9
-    # via
-    #   psycopg
-    #   pypgstac
+    # via pypgstac
 psycopg-binary==3.1.9
     # via psycopg
 psycopg-pool==3.1.7
@@ -182,7 +180,6 @@ pyjwt[crypto]==2.7.0
 pypgstac[psycopg]==0.7.9
     # via
     #   pcstac (pcstac/setup.py)
-    #   pypgstac
     #   stac-fastapi-pgstac
 pystac==1.9.0
     # via
@@ -281,9 +278,7 @@ urllib3==1.26.16
     #   google-auth
     #   requests
 uvicorn[standard]==0.17.6
-    # via
-    #   pcstac (pcstac/setup.py)
-    #   uvicorn
+    # via pcstac (pcstac/setup.py)
 uvloop==0.17.0
     # via uvicorn
 version-parser==1.0.1
