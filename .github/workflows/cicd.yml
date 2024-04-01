@@ -19,10 +19,13 @@ jobs:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
 
       - name: Authenticate
+        uses: azure/cli@v2
         env:
           CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
           CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
-        run: sudo ./scripts/ciauthenticate
+        with:
+          inlineScript: |
+            ./scripts/ciauthenticate
 
       - name: Run cibuild
         run: ./scripts/cibuild
@@ -40,7 +43,10 @@ jobs:
           esac
 
       - name: Publish images
-        run: ./scripts/cipublish --acr pcccr --tag ${{steps.get_image_tag.outputs.tag}}
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            ./scripts/cipublish --acr pcccr --tag ${{steps.get_image_tag.outputs.tag}}
 
     outputs:
       image_tag: ${{ steps.get_image_tag.outputs.tag }}
