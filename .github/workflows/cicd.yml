@@ -13,6 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Authenticate
+        env:
+          CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
+          CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
+        run: sudo ./scripts/ciauthenticate
+
       - name: Run cibuild
         run: ./scripts/cibuild
 
@@ -27,12 +33,6 @@ jobs:
               echo "tag=latest" >> $GITHUB_OUTPUT
               ;;
           esac
-
-      - name: Authenticate
-        env:
-          CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
-          CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
-        run: sudo ./scripts/ciauthenticate
 
       - name: Publish images
         run: ./scripts/cipublish --acr pcccr --tag ${{steps.get_image_tag.outputs.tag}}
