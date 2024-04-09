@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import logging
 import os
-from typing import Dict, List
+from typing import Awaitable, Callable, Dict, List
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.openapi.utils import get_openapi
 from morecantile.defaults import tms as defaultTileMatrices
 from morecantile.models import TileMatrixSet
@@ -21,6 +21,7 @@ from pccommon.constants import X_REQUEST_ENTITY
 from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import add_timeout, http_exception_handler
 from pccommon.openapi import fixup_schema
+from pccommon.tracing import trace_request
 from pctiler.config import get_settings
 from pctiler.endpoints import (
     configuration,
@@ -88,6 +89,15 @@ app.add_exception_handler(Exception, http_exception_handler)
 add_timeout(app, settings.request_timeout)
 add_exception_handlers(app, DEFAULT_STATUS_CODES)
 add_exception_handlers(app, MOSAIC_STATUS_CODES)
+
+
+@app.middleware("http")
+async def _request_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    """Add a trace to all requests."""
+    return await trace_request(ServiceName.TILER, request, call_next)
+
 
 app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
 app.add_middleware(TotalTimeMiddleware)

@@ -3,11 +3,14 @@ import logging
 import re
 from typing import Awaitable, Callable, List, Optional, Tuple, Union, cast
 
+import fastapi
 from fastapi import Request, Response
 from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
+from opentelemetry import trace
+from starlette.datastructures import QueryParams
 
 from pccommon.config import get_apis_config
 from pccommon.constants import (
@@ -24,6 +27,11 @@ from pccommon.utils import get_request_ip
 _config = get_apis_config()
 logger = logging.getLogger(__name__)
 
+
+COLLECTION = "spatio.collection"
+COLLECTIONS = "spatio.collections"
+ITEM = "spatio.item"
+ITEMS = "spatio.items"
 
 exporter = (
     AzureExporter(
@@ -249,3 +257,49 @@ def _iter_cql(cql: dict, property_name: str) -> Optional[Union[str, List[str]]]:
                             return result
     # No collection was found
     return None
+
+
+def add_stac_attributes_from_search(search_json: str, request: fastapi.Request) -> None:
+    """
+    Try to add the Collection ID and Item ID from a search to the current span.
+    """
+    collection_id, item_id = parse_collection_from_search(
+        json.loads(search_json), request.method, request.query_params
+    )
+    span = trace.get_current_span()
+
+    if collection_id is not None:
+        span.set_attribute(COLLECTIONS, collection_id)
+
+    if item_id is not None:
+        span.set_attribute(ITEMS, item_id)
+
+
+def parse_collection_from_search(
+    body: dict,
+    method: str,
+    query_params: QueryParams,
+) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Parse the collection id from a search request.
+
+    The search endpoint is a bit of a special case. If it's a GET, the collection
+    and item ids are in the querystring. If it's a POST, the collection and item may
+    be in either a CQL-JSON or CQL2-JSON filter body, or a query/stac-ql body.
+    """
+    if method.lower() == "get":
+        collection_id = query_params.get("collections")
+        item_id = query_params.get("ids")
+        return (collection_id, item_id)
+    elif method.lower() == "post":
+        try:
+            if "collections" in body:
+                return _parse_queryjson(body)
+            elif "filter" in body:
+                return _parse_cqljson(body["filter"])
+        except json.JSONDecodeError as e:
+            logger.warning(
+                "Unable to parse search body as JSON. Ignoring collection"
+                f"parameter. {e}"
+            )
+    return (None, None)
