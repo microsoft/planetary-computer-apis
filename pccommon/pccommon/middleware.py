@@ -4,7 +4,7 @@ import time
 from functools import wraps
 from typing import Any, Callable
 
-from fastapi import HTTPException, Request, Response
+from fastapi import Request
 from fastapi.applications import FastAPI
 from fastapi.dependencies.utils import (
     get_body_field,
@@ -16,25 +16,9 @@ from fastapi.routing import APIRoute, request_response
 from starlette.status import HTTP_504_GATEWAY_TIMEOUT
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from pccommon.logging import get_custom_dimensions
 from pccommon.tracing import trace_request
 
 logger = logging.getLogger(__name__)
-
-
-async def http_exception_handler(request: Request, exc: Exception) -> Any:
-    # Log the exception with additional request info if needed
-    logger.exception("Exception when handling request", exc_info=exc)
-    # Return a custom response for HTTPException
-    if isinstance(exc, HTTPException):
-        raise
-    # Handle other exceptions, possibly with a generic response
-    else:
-        logger.exception(
-            "Exception when handling request",
-            extra=get_custom_dimensions({"stackTrace": f"{exc}"}, request),
-        )
-        raise
 
 
 def with_timeout(
@@ -109,15 +93,6 @@ class TraceMiddleware:
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] == "http":
             request: Request = Request(scope, receive)
+            await trace_request(self.service_name, request)
 
-            async def call_next(request: Request) -> Response:
-                # Create a response object to mimic trace_requests call_next
-                # argument
-                response = Response()
-                await self.app(scope, receive, send)
-                return response
-
-            await trace_request(self.service_name, request, call_next)
-
-        else:
-            await self.app(scope, receive, send)
+        await self.app(scope, receive, send)

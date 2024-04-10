@@ -3,7 +3,7 @@ import logging
 import os
 from typing import Any, Dict
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
@@ -15,7 +15,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_handler
+from pccommon.middleware import TraceMiddleware, add_timeout
 from pccommon.openapi import fixup_schema
 from pccommon.redis import connect_to_redis
 from pcstac.api import PCStacApi
@@ -100,7 +100,13 @@ async def shutdown_event() -> None:
     await close_db_connection(app)
 
 
-app.add_exception_handler(Exception, http_exception_handler)
+@app.exception_handler(HTTPException)
+async def http_exception_handler(
+    request: Request, exc: HTTPException
+) -> PlainTextResponse:
+    return PlainTextResponse(
+        str(exc.detail), status_code=exc.status_code, headers=exc.headers
+    )
 
 
 @app.exception_handler(StarletteHTTPException)

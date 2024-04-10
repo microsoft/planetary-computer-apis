@@ -3,8 +3,9 @@ import logging
 import os
 from typing import Dict, List
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import PlainTextResponse
 from morecantile.defaults import tms as defaultTileMatrices
 from morecantile.models import TileMatrixSet
 from starlette.middleware.cors import CORSMiddleware
@@ -19,7 +20,7 @@ from titiler.pgstac.db import close_db_connection, connect_to_db
 
 from pccommon.constants import X_REQUEST_ENTITY
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_handler
+from pccommon.middleware import TraceMiddleware, add_timeout
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.endpoints import (
@@ -84,10 +85,18 @@ app.include_router(
 
 app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 
-app.add_exception_handler(Exception, http_exception_handler)
 add_timeout(app, settings.request_timeout)
 add_exception_handlers(app, DEFAULT_STATUS_CODES)
 add_exception_handlers(app, MOSAIC_STATUS_CODES)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(
+    request: Request, exc: HTTPException
+) -> PlainTextResponse:
+    return PlainTextResponse(
+        str(exc.detail), status_code=exc.status_code, headers=exc.headers
+    )
 
 
 app.add_middleware(TraceMiddleware, service_name=app.state.service_name)
