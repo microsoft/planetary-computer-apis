@@ -46,7 +46,10 @@ def fix_openapi_output(openapi_dict: Dict) -> None:
 
 def set_root_path(root_path: str, schema: Dict[str, Any]) -> Dict[str, Any]:
     def _append_root_path(k: str) -> str:
-        return f"{root_path}{k}"
+        # Only prepend root_path if it's not already included in the server's URL
+        if all(root_path not in server.get("url", "") for server in schema.get("servers", [])):
+            return f"{root_path}{k}"
+        return k
 
     return {
         **{k: v for k, v in schema.items() if k != "paths"},
