@@ -1,9 +1,9 @@
 """FastAPI application using PGStac."""
 import logging
 import os
-from typing import Any, Awaitable, Callable, Dict
+from typing import Any, Dict
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
@@ -15,10 +15,9 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import add_timeout, http_exception_handler
+from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_handler
 from pccommon.openapi import fixup_schema
 from pccommon.redis import connect_to_redis
-from pccommon.tracing import trace_request
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import (
@@ -76,14 +75,7 @@ app.state.service_name = ServiceName.STAC
 
 add_timeout(app, app_settings.request_timeout)
 
-
-@app.middleware("http")
-async def _request_middleware(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    """Add a trace to all requests."""
-    return await trace_request(ServiceName.STAC, request, call_next)
-
+app.add_middleware(TraceMiddleware, service_name=app.state.service_name)
 
 # Note: If requests are being sent through an application gateway like
 # nginx-ingress, you may need to configure CORS through that system.

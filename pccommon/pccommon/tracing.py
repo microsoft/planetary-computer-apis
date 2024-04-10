@@ -9,7 +9,6 @@ from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
-from opentelemetry import trace
 from starlette.datastructures import QueryParams
 
 from pccommon.config import get_apis_config
@@ -27,11 +26,6 @@ from pccommon.utils import get_request_ip
 _config = get_apis_config()
 logger = logging.getLogger(__name__)
 
-
-COLLECTION = "spatio.collection"
-COLLECTIONS = "spatio.collections"
-ITEM = "spatio.item"
-ITEMS = "spatio.items"
 
 exporter = (
     AzureExporter(
@@ -266,13 +260,27 @@ def add_stac_attributes_from_search(search_json: str, request: fastapi.Request) 
     collection_id, item_id = parse_collection_from_search(
         json.loads(search_json), request.method, request.query_params
     )
-    span = trace.get_current_span()
+    tracer = Tracer(
+        exporter=exporter,
+        sampler=ProbabilitySampler(1.0),
+    )
 
-    if collection_id is not None:
-        span.set_attribute(COLLECTIONS, collection_id)
-
-    if item_id is not None:
-        span.set_attribute(ITEMS, item_id)
+    with tracer.span("main") as span:
+        if (
+            hasattr(request.state, "parent_span")
+            and request.state.parent_span is not None
+        ):
+            request.state.parent_span = span
+            if collection_id is not None:
+                tracer.add_attribute_to_current_span(
+                    attribute_key="collection", attribute_value=collection_id
+                )
+                if item_id is not None:
+                    tracer.add_attribute_to_current_span(
+                        attribute_key="item", attribute_value=item_id
+                    )
+        else:
+            logger.warning("No 'parent_span' attribute found in request.state")
 
 
 def parse_collection_from_search(

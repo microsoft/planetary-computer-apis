@@ -20,8 +20,6 @@ inst_reqs = [
     "html-sanitizer==2.4",
     # Soon available as lxml[html_clean]
     "lxml_html_clean==0.1.0",
-    "opentelemetry-api==1.21.0",
-    "opentelemetry-sdk==1.21.0",
 ]
 
 extra_reqs = {
