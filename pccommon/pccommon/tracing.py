@@ -189,28 +189,25 @@ def _iter_cql(cql: dict, property_name: str) -> Optional[Union[str, List[str]]]:
     Recurse through a CQL or CQL2 filter body, returning the value of the
     provided property name, if found. Typical usage will be to provide
     `collection` and `id`.
-
-    :param cql: The CQL filter body as a dictionary.
-    :param property_name: The name of the property to search for, e.g., "collections" or "ids".
-    :return: The value(s) for the specified property, if found, otherwise None.
     """
     if cql is None:
         return None
-
-    if property_name in cql:
-        return cql[property_name]
-
-    for key, value in cql.items():
-        if isinstance(value, dict):
-            result = _iter_cql(value, property_name)
+    for _, v in cql.items():
+        if isinstance(v, dict):
+            result = _iter_cql(v, property_name)
             if result is not None:
                 return result
-        elif isinstance(value, list):
-            for item in value:
+        elif isinstance(v, list):
+            for item in v:
                 if isinstance(item, dict):
-                    result = _iter_cql(item, property_name)
-                    if result is not None:
-                        return result
+                    if "property" in item:
+                        if item["property"] == property_name:
+                            return v[1]
+                    else:
+                        result = _iter_cql(item, property_name)
+                        if result is not None:
+                            return result
+    # No collection was found
     return None
 
 
