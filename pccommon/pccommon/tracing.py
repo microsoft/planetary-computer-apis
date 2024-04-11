@@ -189,22 +189,28 @@ def _iter_cql(cql: dict, property_name: str) -> Optional[Union[str, List[str]]]:
     Recurse through a CQL or CQL2 filter body, returning the value of the
     provided property name, if found. Typical usage will be to provide
     `collection` and `id`.
+
+    :param cql: The CQL filter body as a dictionary.
+    :param property_name: The name of the property to search for, e.g., "collections" or "ids".
+    :return: The value(s) for the specified property, if found, otherwise None.
     """
-    for _, v in cql.items():
-        if isinstance(v, dict):
-            result = _iter_cql(v, property_name)
+    if cql is None:
+        return None
+
+    if property_name in cql:
+        return cql[property_name]
+
+    for key, value in cql.items():
+        if isinstance(value, dict):
+            result = _iter_cql(value, property_name)
             if result is not None:
                 return result
-        elif isinstance(v, list):
-            for item in v:
+        elif isinstance(value, list):
+            for item in value:
                 if isinstance(item, dict):
-                    if "property" in item:
-                        if item["property"] == property_name:
-                            return v[1]
-                    else:
-                        result = _iter_cql(item, property_name)
-                        if result is not None:
-                            return result
+                    result = _iter_cql(item, property_name)
+                    if result is not None:
+                        return result
     return None
 
 
@@ -220,9 +226,10 @@ def add_stac_attributes_from_search(search_json: str, request: fastapi.Request) 
     current_span = execution_context.get_current_span() or parent_span
 
     if current_span:
-        current_span.add_attribute("collection", collection_id)
-        if item_id is not None:
-            current_span.add_attribute("item", item_id)
+        if collection_id is not None:
+            current_span.add_attribute("collection", collection_id)
+            if item_id is not None:
+                current_span.add_attribute("item", item_id)
     else:
         logger.warning("No active or parent span available for adding attributes.")
 
@@ -245,7 +252,7 @@ def parse_collection_from_search(
         return (collection_id, item_id)
     elif method.lower() == "post":
         try:
-            if "collections" in body:
+            if body.get("collections") is not None:
                 return _parse_queryjson(body)
             elif "filter" in body:
                 return _parse_cqljson(body["filter"])
