@@ -9,7 +9,7 @@ module "resources" {
   cluster_cert_issuer = "letsencrypt"
   cluster_cert_server = "https://acme-v02.api.letsencrypt.org/directory"
 
-  pc_test_resources_acr = "pcccr"
+  pc_test_resources_acr = "pccomponentstest"
 
   aks_node_count      = 2
   stac_replica_count  = 2
