@@ -40,7 +40,7 @@ jobs:
           esac
 
       - name: Publish images
-        run: ./scripts/cipublish --acr pcccr --tag ${{steps.get_image_tag.outputs.tag}}
+        run: ./scripts/cipublish --acr pccomponentstest --tag ${{steps.get_image_tag.outputs.tag}}
 
     outputs:
       image_tag: ${{ steps.get_image_tag.outputs.tag }}
