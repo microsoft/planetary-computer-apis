@@ -38,6 +38,37 @@ resource "azurerm_kubernetes_cluster" "pc" {
     azure_rbac_enabled = true
   }
 
+  maintenance_window {
+    allowed {
+      day = "Saturday"
+      hours = [10, 11, 12, 13, 14, 15, 16, 17, 18]
+    }
+    # not_allowed {
+    #   start = ISO8601
+    #   end = ISO8601
+    # }
+  }
+
+  # Recommendation is to make it at least 4 hours long
+  # https://learn.microsoft.com/en-us/azure/aks/planned-maintenance?tabs=json-file#creating-a-maintenance-window
+  maintenance_window_auto_upgrade {
+    frequency = "Weekly"
+    day_of_week = "Saturday"
+    interval = 1
+    duration = 4
+    utc_offset = "+00:00"
+    start_time = "10:00" # UTC
+  }
+
+  maintenance_window_node_os {
+    frequency = "Weekly"
+    day_of_week = "Saturday"
+    interval = 1
+    duration = 4
+    utc_offset = "+00:00"
+    start_time = "14:00" # UTC
+  }
+
   tags = {
     Environment = var.environment
     ManagedBy   = "AI4E"
