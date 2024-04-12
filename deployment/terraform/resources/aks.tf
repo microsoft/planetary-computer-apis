@@ -53,6 +53,7 @@ resource "azurerm_kubernetes_cluster" "pc" {
   # https://learn.microsoft.com/en-us/azure/aks/planned-maintenance?tabs=json-file#creating-a-maintenance-window
   maintenance_window_auto_upgrade {
     frequency = "Weekly"
+    day_of_week = "Saturday"
     interval = 1
     duration = 4
     utc_offset = 0
@@ -61,6 +62,7 @@ resource "azurerm_kubernetes_cluster" "pc" {
 
   maintenance_window_node_os {
     frequency = "Weekly"
+    day_of_week = "Saturday"
     interval = 1
     duration = 4
     utc_offset = 0
