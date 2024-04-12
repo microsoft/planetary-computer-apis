@@ -1,96 +1,103 @@
 import asyncio
 import logging
 import time
-from typing import Awaitable, Callable
+from functools import wraps
+from typing import Any, Callable
 
-from fastapi import HTTPException, Request, Response
+from fastapi import Request
 from fastapi.applications import FastAPI
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import PlainTextResponse
+from fastapi.dependencies.utils import (
+    get_body_field,
+    get_dependant,
+    get_parameterless_sub_dependant,
+)
+from fastapi.responses import PlainTextResponse
+from fastapi.routing import APIRoute, request_response
 from starlette.status import HTTP_504_GATEWAY_TIMEOUT
-from starlette.types import Message
+from starlette.types import ASGIApp, Receive, Scope, Send
 
-from pccommon.logging import get_custom_dimensions
 from pccommon.tracing import trace_request
 
 logger = logging.getLogger(__name__)
 
 
-async def handle_exceptions(
-    request: Request,
-    call_next: Callable[[Request], Awaitable[Response]],
-) -> Response:
-    try:
-        return await call_next(request)
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.exception(
-            "Exception when handling request",
-            extra=get_custom_dimensions({"stackTrace": f"{e}"}, request),
-        )
-        raise
+async def http_exception_handler(request: Request, exc: Exception) -> Any:
+    logger.exception("Exception when handling request", exc_info=exc)
+    raise
 
 
-class RequestTracingMiddleware(BaseHTTPMiddleware):
-    """Custom middleware to use opencensus request traces
+def with_timeout(
+    timeout_seconds: float,
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    def with_timeout_(func: Callable[..., Any]) -> Callable[..., Any]:
+        if asyncio.iscoroutinefunction(func):
+            logger.debug("Adding timeout to function %s", func.__name__)
 
-    Middleware implementations that access a Request object directly
-    will cause subsequent middleware or route handlers to hang. See
+            @wraps(func)
+            async def inner(*args: Any, **kwargs: Any) -> Any:
+                start_time = time.monotonic()
+                try:
+                    return await asyncio.wait_for(
+                        func(*args, **kwargs), timeout=timeout_seconds
+                    )
+                except asyncio.TimeoutError as e:
+                    process_time = time.monotonic() - start_time
+                    # don't have a request object here to get custom dimensions.
+                    log_dimensions = {
+                        "request_time": process_time,
+                    }
+                    logger.exception(
+                        f"Request timeout {e}",
+                        extra=log_dimensions,
+                    )
 
-    https://github.com/tiangolo/fastapi/issues/394
+                    ref_id = log_dimensions.get("ref_id")
+                    debug_msg = (
+                        f" Debug information for support: {ref_id}" if ref_id else ""
+                    )
 
-    for more details on this implementation.
+                    return PlainTextResponse(
+                        f"The request exceeded the maximum allowed time, please"
+                        " try again. If the issue persists, please contact "
+                        "planetarycomputer@microsoft.com."
+                        f"\n\n{debug_msg}",
+                        status_code=HTTP_504_GATEWAY_TIMEOUT,
+                    )
 
-    An alternative approach is to use dependencies on the APIRouter, but
-    the stac-fast api implementation makes that difficult without having
-    to override much of the app initialization.
-    """
+            return inner
+        else:
+            return func
 
-    def __init__(self, app: FastAPI, service_name: str):
-        super().__init__(app)
+    return with_timeout_
+
+
+def add_timeout(app: FastAPI, timeout_seconds: float) -> None:
+    for route in app.router.routes:
+        if isinstance(route, APIRoute):
+            new_endpoint = with_timeout(timeout_seconds)(route.endpoint)
+            route.endpoint = new_endpoint
+            route.dependant = get_dependant(path=route.path_format, call=route.endpoint)
+            for depends in route.dependencies[::-1]:
+                route.dependant.dependencies.insert(
+                    0,
+                    get_parameterless_sub_dependant(
+                        depends=depends, path=route.path_format
+                    ),
+                )
+            route.body_field = get_body_field(
+                dependant=route.dependant, name=route.unique_id
+            )
+            route.app = request_response(route.get_route_handler())
+
+
+class TraceMiddleware:
+    def __init__(self, app: ASGIApp, service_name: str):
+        self.app = app
         self.service_name = service_name
 
-    async def set_body(self, request: Request) -> None:
-        receive_ = await request._receive()
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http":
+            request: Request = Request(scope, receive)
+            await trace_request(self.service_name, request)
 
-        async def receive() -> Message:
-            return receive_
-
-        request._receive = receive
-
-    async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
-    ) -> Response:
-        await self.set_body(request)
-        response = await trace_request(self.service_name, request, call_next)
-        return response
-
-
-async def timeout_middleware(
-    request: Request,
-    call_next: Callable[[Request], Awaitable[Response]],
-    timeout: int,
-) -> Response:
-    try:
-        start_time = time.time()
-        return await asyncio.wait_for(call_next(request), timeout=timeout)
-
-    except asyncio.TimeoutError:
-        process_time = time.time() - start_time
-        log_dimensions = get_custom_dimensions({"request_time": process_time}, request)
-
-        logger.exception(
-            "Request timeout",
-            extra=log_dimensions,
-        )
-
-        ref_id = log_dimensions["custom_dimensions"].get("ref_id")
-        debug_msg = f"Debug information for support: {ref_id}" if ref_id else ""
-
-        return PlainTextResponse(
-            f"The request exceeded the maximum allowed time, please try again."
-            " If the issue persists, please contact planetarycomputer@microsoft.com."
-            f"\n\n{debug_msg}",
-            status_code=HTTP_504_GATEWAY_TIMEOUT,
-        )
+        await self.app(scope, receive, send)

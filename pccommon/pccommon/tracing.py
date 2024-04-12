@@ -1,19 +1,21 @@
 import json
 import logging
 import re
-from typing import Awaitable, Callable, List, Optional, Tuple, Union, cast
+from typing import List, Optional, Tuple, Union, cast
 
-from fastapi import Request, Response
+import fastapi
+from fastapi import Request
 from opencensus.ext.azure.trace_exporter import AzureExporter
+from opencensus.trace import execution_context
 from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.span import SpanKind
 from opencensus.trace.tracer import Tracer
+from starlette.datastructures import QueryParams
 
 from pccommon.config import get_apis_config
 from pccommon.constants import (
     HTTP_METHOD,
     HTTP_PATH,
-    HTTP_STATUS_CODE,
     HTTP_URL,
     X_AZURE_REF,
     X_REQUEST_ENTITY,
@@ -41,8 +43,7 @@ is_trace_enabled = exporter is not None
 async def trace_request(
     service_name: str,
     request: Request,
-    call_next: Callable[[Request], Awaitable[Response]],
-) -> Response:
+) -> None:
     """Construct a request trace with custom dimensions"""
     request_path = request_to_path(request).strip("/")
 
@@ -99,17 +100,6 @@ async def trace_request(
                         attribute_key="item", attribute_value=item_id
                     )
 
-            # Call next middleware
-            response = await call_next(request)
-
-            # Include response dimensions in the trace
-            tracer.add_attribute_to_current_span(
-                attribute_key=HTTP_STATUS_CODE, attribute_value=response.status_code
-            )
-        return response
-    else:
-        return await call_next(request)
-
 
 collection_id_re = re.compile(
     r".*/collections/?(?P<collection_id>[a-zA-Z0-9\-\%]+)?(/items/(?P<item_id>.*))?.*"  # noqa
@@ -122,7 +112,6 @@ async def _collection_item_from_request(
 ) -> Tuple[Optional[str], Optional[str]]:
     """Attempt to get collection and item ids from the request path or querystring."""
     url = request.url
-    path = url.path.strip("/")
     try:
         collection_id_match = collection_id_re.match(f"{url}")
         if collection_id_match:
@@ -131,8 +120,6 @@ async def _collection_item_from_request(
             )
             item_id = cast(Optional[str], collection_id_match.group("item_id"))
             return (collection_id, item_id)
-        elif path.endswith("/search") or path.endswith("/register"):
-            return await _parse_collection_from_search(request)
         else:
             collection_id = request.query_params.get("collection")
             # Some endpoints, like preview/, take an `items` parameter, but
@@ -157,35 +144,6 @@ def _should_trace_request(request: Request) -> bool:
         and request.method.lower() != "head"
         and not request.url.path.strip("/").endswith("_mgmt/ping")
     )
-
-
-async def _parse_collection_from_search(
-    request: Request,
-) -> Tuple[Optional[str], Optional[str]]:
-    """
-    Parse the collection id from a search request.
-
-    The search endpoint is a bit of a special case. If it's a GET, the collection
-    and item ids are in the querystring. If it's a POST, the collection and item may
-    be in either a CQL-JSON or CQL2-JSON filter body, or a query/stac-ql body.
-    """
-
-    if request.method.lower() == "get":
-        collection_id = request.query_params.get("collections")
-        item_id = request.query_params.get("ids")
-        return (collection_id, item_id)
-    elif request.method.lower() == "post":
-        try:
-            body = await request.json()
-            if "collections" in body:
-                return _parse_queryjson(body)
-            elif "filter" in body:
-                return _parse_cqljson(body["filter"])
-        except json.JSONDecodeError:
-            logger.warning(
-                "Unable to parse search body as JSON. Ignoring collection parameter."
-            )
-    return (None, None)
 
 
 def _parse_cqljson(cql: dict) -> Tuple[Optional[str], Optional[str]]:
@@ -232,6 +190,8 @@ def _iter_cql(cql: dict, property_name: str) -> Optional[Union[str, List[str]]]:
     provided property name, if found. Typical usage will be to provide
     `collection` and `id`.
     """
+    if cql is None:
+        return None
     for _, v in cql.items():
         if isinstance(v, dict):
             result = _iter_cql(v, property_name)
@@ -249,3 +209,53 @@ def _iter_cql(cql: dict, property_name: str) -> Optional[Union[str, List[str]]]:
                             return result
     # No collection was found
     return None
+
+
+def add_stac_attributes_from_search(search_json: str, request: fastapi.Request) -> None:
+    """
+    Try to add the Collection ID and Item ID from a search to the current span.
+    """
+    collection_id, item_id = parse_collection_from_search(
+        json.loads(search_json), request.method, request.query_params
+    )
+    parent_span = getattr(request.state, "parent_span", None)
+
+    current_span = execution_context.get_current_span() or parent_span
+
+    if current_span:
+        if collection_id is not None:
+            current_span.add_attribute("collection", collection_id)
+            if item_id is not None:
+                current_span.add_attribute("item", item_id)
+    else:
+        logger.warning("No active or parent span available for adding attributes.")
+
+
+def parse_collection_from_search(
+    body: dict,
+    method: str,
+    query_params: QueryParams,
+) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Parse the collection id from a search request.
+
+    The search endpoint is a bit of a special case. If it's a GET, the collection
+    and item ids are in the querystring. If it's a POST, the collection and item may
+    be in either a CQL-JSON or CQL2-JSON filter body, or a query/stac-ql body.
+    """
+    if method.lower() == "get":
+        collection_id = query_params.get("collections")
+        item_id = query_params.get("ids")
+        return (collection_id, item_id)
+    elif method.lower() == "post":
+        try:
+            if body.get("collections") is not None:
+                return _parse_queryjson(body)
+            elif "filter" in body:
+                return _parse_cqljson(body["filter"])
+        except json.JSONDecodeError as e:
+            logger.warning(
+                "Unable to parse search body as JSON. Ignoring collection"
+                f"parameter. {e}"
+            )
+    return (None, None)
