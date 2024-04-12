@@ -120,17 +120,8 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         install_oras
     fi
 
-    # only _tagged_ releases will be synced from pcccr to MAR
-    case $IMAGE_TAG in
-        *latest*)
-            image_prefix="private"
-            ;;
-        *)
-            image_prefix="public"
-            ;;
-    esac
     # Publish images
-    publish_image "pc-apis-stac" "$image_prefix/planetary-computer-apis/stac"
-    publish_image "pc-apis-tiler" "$image_prefix/planetary-computer-apis/tiler"
+    publish_image "pc-apis-stac" "planetary-computer-apis/stac"
+    publish_image "pc-apis-tiler" "planetary-computer-apis/tiler"
 
 fi
