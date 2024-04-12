@@ -56,7 +56,7 @@ resource "azurerm_kubernetes_cluster" "pc" {
     day_of_week = "Saturday"
     interval = 1
     duration = 4
-    utc_offset = 0
+    utc_offset = "+00:00"
     start_time = "10:00" # UTC
   }
 
@@ -65,7 +65,7 @@ resource "azurerm_kubernetes_cluster" "pc" {
     day_of_week = "Saturday"
     interval = 1
     duration = 4
-    utc_offset = 0
+    utc_offset = "+00:00"
     start_time = "14:00" # UTC
   }
 
