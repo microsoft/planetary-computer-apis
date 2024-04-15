@@ -19,7 +19,7 @@ from titiler.pgstac.db import close_db_connection, connect_to_db
 
 from pccommon.constants import X_REQUEST_ENTITY
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import add_timeout, http_exception_handler
+from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_handler
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.endpoints import (
@@ -84,11 +84,15 @@ app.include_router(
 
 app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 
-app.add_exception_handler(Exception, http_exception_handler)
 add_timeout(app, settings.request_timeout)
 add_exception_handlers(app, DEFAULT_STATUS_CODES)
 add_exception_handlers(app, MOSAIC_STATUS_CODES)
 
+
+app.add_exception_handler(Exception, http_exception_handler)
+
+
+app.add_middleware(TraceMiddleware, service_name=app.state.service_name)
 app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
 app.add_middleware(TotalTimeMiddleware)
 

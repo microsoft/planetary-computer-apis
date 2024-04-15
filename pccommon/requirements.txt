@@ -52,7 +52,7 @@ google-auth==2.29.0
     # via google-api-core
 googleapis-common-protos==1.63.0
     # via google-api-core
-html-sanitizer==1.9.0
+html-sanitizer==2.4.0
     # via pccommon (pccommon/setup.py)
 idna==3.6
     # via
@@ -62,8 +62,12 @@ isodate==0.6.1
     # via
     #   azure-storage-blob
     #   msrest
-lxml==5.1.0
-    # via html-sanitizer
+lxml[html-clean]==5.2.1
+    # via
+    #   html-sanitizer
+    #   lxml-html-clean
+lxml-html-clean==0.1.0
+    # via pccommon (pccommon/setup.py)
 msal==1.28.0
     # via
     #   azure-identity

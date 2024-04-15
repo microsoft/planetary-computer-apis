@@ -127,10 +127,12 @@ This project publishes images and helm charts, which are used in the deployment 
 
 ### Images
 
-Images following images are hosted in the [Microsoft Container Registry](https://github.com/microsoft/ContainerRegistry):
+The following images are hosted in the [Microsoft Container Registry](https://github.com/microsoft/ContainerRegistry):
 
 - `mcr.microsoft.com/planetary-computer-apis/stac`
 - `mcr.microsoft.com/planetary-computer-apis/tiler`
+
+Only tagged builds will be published to MCR, untagged builds will only be published to the internal ACR `pcccr`.
 
 ### Charts
 

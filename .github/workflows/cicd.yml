@@ -13,12 +13,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Log in with Azure
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
+      - name: Authenticate
+        env:
+          CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
+          CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
+        run: ./scripts/ciauthenticate
+
       - name: Run cibuild
         run: ./scripts/cibuild
 
       - name: Get image tag
         id: get_image_tag
-        run:
+        run: 
           case "${GITHUB_REF}" in
             *tags*)
               echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
@@ -28,15 +39,8 @@ jobs:
               ;;
           esac
 
-      - name: Log into the ACR
-        env:
-          CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
-          CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
-        run:
-          docker login pcccr.azurecr.io --username ${CLIENT_ID} --password ${CLIENT_SECRET}
-
       - name: Publish images
-        run: ./scripts/cipublish --acr pcccr --tag ${{steps.get_image_tag.outputs.tag}}
+        run: ./scripts/cipublish --acr pccomponentstest --tag ${{steps.get_image_tag.outputs.tag}}
 
     outputs:
       image_tag: ${{ steps.get_image_tag.outputs.tag }}

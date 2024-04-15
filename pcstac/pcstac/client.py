@@ -20,6 +20,7 @@ from pccommon.config.collections import DefaultRenderConfig
 from pccommon.constants import DEFAULT_COLLECTION_REGION
 from pccommon.logging import get_custom_dimensions
 from pccommon.redis import back_pressure, cached_result, rate_limit
+from pccommon.tracing import add_stac_attributes_from_search
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
 from pcstac.contants import (
     CACHE_KEY_COLLECTION,
@@ -227,6 +228,8 @@ class PCClient(CoreCrudClient):
             return item_collection
 
         search_json = search_request.json()
+        add_stac_attributes_from_search(search_json, request)
+
         logger.info(
             "STAC: Item search body",
             extra=get_custom_dimensions({"search_body": search_json}, request),
