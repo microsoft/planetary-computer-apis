@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import logging
 import os
-from typing import Awaitable, Callable, Dict, List
+from typing import Dict, List
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from morecantile.defaults import tms as defaultTileMatrices
 from morecantile.models import TileMatrixSet
@@ -19,11 +19,7 @@ from titiler.pgstac.db import close_db_connection, connect_to_db
 
 from pccommon.constants import X_REQUEST_ENTITY
 from pccommon.logging import ServiceName, init_logging
-from pccommon.middleware import (
-    RequestTracingMiddleware,
-    handle_exceptions,
-    timeout_middleware,
-)
+from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_handler
 from pccommon.openapi import fixup_schema
 from pctiler.config import get_settings
 from pctiler.endpoints import (
@@ -88,27 +84,15 @@ app.include_router(
 
 app.include_router(health.health_router, tags=["Liveliness/Readiness"])
 
-app.add_middleware(RequestTracingMiddleware, service_name=ServiceName.TILER)
-
-
-@app.middleware("http")
-async def _timeout_middleware(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    """Add a timeout to all requests."""
-    return await timeout_middleware(request, call_next, timeout=settings.request_timout)
-
-
-@app.middleware("http")
-async def _handle_exceptions(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    return await handle_exceptions(request, call_next)
-
-
+add_timeout(app, settings.request_timeout)
 add_exception_handlers(app, DEFAULT_STATUS_CODES)
 add_exception_handlers(app, MOSAIC_STATUS_CODES)
 
+
+app.add_exception_handler(Exception, http_exception_handler)
+
+
+app.add_middleware(TraceMiddleware, service_name=app.state.service_name)
 app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
 app.add_middleware(TotalTimeMiddleware)
 
