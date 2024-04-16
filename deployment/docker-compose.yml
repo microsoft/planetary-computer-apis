@@ -6,8 +6,8 @@ services:
       context: ..
       dockerfile: deployment/Dockerfile
     environment:
-      - ACR_STAC_REPO=${ACR_STAC_REPO:-pccomponentstest.azurecr.io/private/planetary-computer-apis/stac}
-      - ACR_TILER_REPO=${ACR_TILER_REPO:-pccomponentstest.azurecr.io/private/planetary-computer-apis/tiler}
+      - ACR_STAC_REPO=${ACR_STAC_REPO:-pccomponentstest.azurecr.io/planetary-computer-apis/stac}
+      - ACR_TILER_REPO=${ACR_TILER_REPO:-pccomponentstest.azurecr.io/planetary-computer-apis/tiler}
       - IMAGE_TAG
       - GIT_COMMIT
 
