@@ -33,16 +33,16 @@ jobs:
           case "${GITHUB_REF}" in
             *tags*)
               echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
-              echo "ACR=pccomponents" >> $GITHUB_OUTPUT
+              echo "acr=pccomponents" >> $GITHUB_OUTPUT
               ;;
             *)
               echo "tag=latest" >> $GITHUB_OUTPUT
-              echo "ACR=pccomponentstest" >> $GITHUB_OUTPUT
+              echo "acr=pccomponentstest" >> $GITHUB_OUTPUT
               ;;
           esac
 
       - name: Publish images
-        run: ./scripts/cipublish --acr ${{steps.get_image_tag.outputs.ACR}} --tag ${{steps.get_image_tag.outputs.tag}}
+        run: ./scripts/cipublish --acr ${{steps.get_image_tag.outputs.acr}} --tag ${{steps.get_image_tag.outputs.tag}}
 
     outputs:
       image_tag: ${{ steps.get_image_tag.outputs.tag }}
