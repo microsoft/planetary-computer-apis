@@ -48,8 +48,10 @@ h11==0.14.0
     # via uvicorn
 httptools==0.6.1
     # via uvicorn
-idna==3.6
-    # via anyio
+idna==3.7
+    # via
+    #   anyio
+    #   pcstac (pcstac/setup.py)
 iso8601==1.1.0
     # via stac-fastapi-types
 lark==0.12.0

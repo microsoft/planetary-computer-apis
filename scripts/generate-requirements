@@ -2,10 +2,6 @@
 
 set -e
 
-if [[ "${CI}" ]]; then
-    set -x
-fi
-
 echo "== Generating requirements.txt ..."
 pip_compile_options="--emit-index-url --annotate --verbose"
 

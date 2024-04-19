@@ -92,10 +92,11 @@ httpx==0.27.0
     # via
     #   cogeo-mosaic
     #   rio-tiler
-idna==3.6
+idna==3.7
     # via
     #   anyio
     #   httpx
+    #   pctiler (pctiler/setup.py)
     #   requests
 jinja2==3.0.3
     # via

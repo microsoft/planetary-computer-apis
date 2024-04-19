@@ -4,6 +4,7 @@ from setuptools import find_packages, setup
 
 # Runtime requirements.
 inst_reqs = [
+    "idna>=3.7.0",
     "stac-fastapi.api==2.4.8",
     "stac-fastapi.extensions==2.4.8",
     "stac-fastapi.pgstac==2.4.9",
