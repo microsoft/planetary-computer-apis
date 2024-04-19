@@ -16,6 +16,7 @@ inst_reqs: List[str] = [
     "boto3==1.34.71",
     "botocore==1.34.71",
     "pydantic==1.10.14",
+    "idna>=3.7.0",
     # titiler-pgstac
     "psycopg[binary,pool]",
     "titiler.pgstac==0.2.4",
