@@ -27,7 +27,7 @@ jobs:
 
       - name: 'Run Azure CLI commands'
         run: |
-            az role assignment list --output table
+            az role assignment list --output json
             pwd 
       - name: Authenticate
         run: ./scripts/ciauthenticate
