@@ -16,4 +16,3 @@ CI authentication for this project.
 # curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 # az login --service-principal --username ${CLIENT_ID} --tenant "microsoft.onmicrosoft.com" --password ${CLIENT_SECRET}
 az acr login --name pccomponentstest
-# docker login pccomponentstest.azurecr.io --username ${CLIENT_ID} --password ${CLIENT_SECRET}
