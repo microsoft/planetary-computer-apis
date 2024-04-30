@@ -29,7 +29,8 @@ jobs:
         run: |
             az role assignment list --output table
             pwd 
-
+      - name: Authenticate
+        run: ./scripts/ciauthenticate
   validate:
     runs-on: ubuntu-latest
     steps:
