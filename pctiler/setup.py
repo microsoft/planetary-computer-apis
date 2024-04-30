@@ -12,7 +12,7 @@ inst_reqs: List[str] = [
     "rasterio==1.3.9",
     "titiler.core==0.10.2",
     "titiler.mosaic==0.10.2",
-    "pillow==10.2.0",
+    "pillow==10.3.0",
     "boto3==1.34.71",
     "botocore==1.34.71",
     "pydantic==1.10.14",
