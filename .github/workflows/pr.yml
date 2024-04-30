@@ -13,7 +13,20 @@ jobs:
 
       - name: Run cibuild
         run: ./scripts/cibuild
+      
+      - name: Log in with Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
+          tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
+          subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
 
+      - name: 'Run Azure CLI commands'
+        run: |
+            az account show
+            az group list
+            pwd 
+            
   validate:
     runs-on: ubuntu-latest
     steps:
