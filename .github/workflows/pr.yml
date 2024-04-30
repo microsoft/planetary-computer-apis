@@ -11,8 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Run cibuild
-        run: ./scripts/cibuild
+      # - name: Run cibuild
+      #   run: ./scripts/cibuild
       
       - name: Log in with Azure
         uses: azure/login@v1
@@ -26,7 +26,7 @@ jobs:
             az account show
             az group list
             pwd 
-            
+
   validate:
     runs-on: ubuntu-latest
     steps:
