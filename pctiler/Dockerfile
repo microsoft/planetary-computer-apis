@@ -1,29 +1,4 @@
-FROM ubuntu:latest as build
-
-# Install Micromamba
-RUN apt-get update && apt-get install -y curl bzip2
-RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
-
-COPY pctiler/environment.yaml /tmp/env.yaml
-
-# Create a separate environment for the packages and remove unnecessary files
-RUN micromamba create -p /opt/conda/envs/myenv -f /tmp/env.yaml && \
-    micromamba clean --all --yes && \
-    rm -rf /root/.cache /tmp/env.yaml
-
-# Start from a new stage to avoid copying the build environment, and
-# copy the environment from the build stage
-# Remove unnecessary files
-RUN find /opt/conda/envs/myenv -type f -name "*.pyc" -exec rm -f {} \;
-RUN rm -rf /opt/conda/envs/myenv/share/doc
-RUN rm -rf /opt/conda/envs/myenv/share/locale
-RUN rm -rf /opt/conda/envs/myenv/man
-RUN rm -rf /opt/conda/envs/myenv/include
-
-FROM ubuntu:latest
-
-COPY --from=build /opt/conda/envs/myenv /opt/conda/envs/myenv
-ENV PATH="/opt/conda/envs/myenv/bin:$PATH"
+FROM python:3.9-slim
 
 WORKDIR /opt/src
 
@@ -31,7 +6,15 @@ COPY pccommon /opt/src/pccommon
 COPY pctiler /opt/src/pctiler
 
 # Install the local modules in the new environment
-RUN /bin/sh -c "python -m pip install --no-cache-dir -e ./pccommon -e ./pctiler[server]"
+RUN --mount=type=cache,target=/root/.cache \
+    /bin/sh -c "python -m pip install -U 'setuptools>=65.5.1'"
+# The order of these pip installs is important :(
+RUN --mount=type=cache,target=/root/.cache \
+    /bin/sh -c "python -m pip install -r ./pccommon/requirements.txt"
+RUN --mount=type=cache,target=/root/.cache \
+    /bin/sh -c "python -m pip install -r ./pctiler/requirements-server.txt"
+RUN --mount=type=cache,target=/root/.cache \
+    /bin/sh -c "python -m pip install --no-deps -e ./pccommon -e ./pctiler[server]"
 
 # GDAL config
 ENV GDAL_CACHEMAX 200

@@ -61,7 +61,7 @@ class CustomDimensionsFilter(logging.Filter):
 # Prevent successful health check pings from being logged
 class HealthCheckFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        if len(record.args) != 5:
+        if record.args is not None and len(record.args) != 5:
             return True
 
         args = cast(Tuple[str, str, str, str, int], record.args)

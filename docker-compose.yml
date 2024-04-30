@@ -27,6 +27,10 @@ services:
       context: .
       dockerfile: pctiler/Dockerfile
     env_file: ${PC_TILER_ENV_FILE:-./pc-tiler.dev.env}
+    environment:
+        # Allow proxied managed identity requests in dev
+      - IDENTITY_ENDPOINT=http://token-proxy:8086/dev/token
+      - IMDS_ENDPOINT=active
     ports:
       - "8082:8082"
     volumes:
@@ -84,9 +88,20 @@ services:
     volumes:
       - pc-apis-pgdata:/var/lib/postgresql/data
 
+  token-proxy:
+    image: pc-aux-token-proxy
+    build:
+      context: ./auxiliary/az-cli-proxy
+      dockerfile: Dockerfile
+    ports:
+      - 8086:8086
+    volumes:
+      - ./auxiliary/az-cli-proxy:/opt/src/
+      - ~/.azure:/root/.azure
+
   azurite:
     container_name: pcapis-azurite
-    image: mcr.microsoft.com/azure-storage/azurite:3.17.1
+    image: mcr.microsoft.com/azure-storage/azurite:3.29.0
     hostname: azurite
     command: "azurite --silent --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost
       0.0.0.0 -l /workspace"

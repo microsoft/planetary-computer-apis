@@ -114,7 +114,7 @@ async def cached_result(
     try:
         r = request.app.state.redis
         if r:
-            cached: str = await r.get(host_cache_key)
+            cached = await r.get(host_cache_key)
             if cached:
                 logger.info(
                     "Cache result hit",

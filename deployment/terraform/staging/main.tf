@@ -4,10 +4,12 @@ module "resources" {
   environment = "staging"
   region      = "West Europe"
 
-  k8s_version = "1.25.5"
+  k8s_version = "1.28.5"
 
   cluster_cert_issuer = "letsencrypt"
   cluster_cert_server = "https://acme-v02.api.letsencrypt.org/directory"
+
+  pc_test_resources_acr = "pccomponentstest"
 
   aks_node_count      = 2
   stac_replica_count  = 2

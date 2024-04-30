@@ -16,7 +16,7 @@ from pccommon.config.core import ENV_VAR_PCAPIS_PREFIX, PCAPIsConfig
 from pcstac.filter import PCFiltersClient
 
 API_VERSION = "1.2"
-STAC_API_VERSION = "v1.0.0-rc.1"
+STAC_API_VERSION = "v1.0.0"
 
 API_LANDING_PAGE_ID = "microsoft-pc"
 API_TITLE = "Microsoft Planetary Computer STAC API"
@@ -64,11 +64,11 @@ class BackPressureConfig(BaseModel):
 
 
 class BackPressures(BaseSettings):
-    collections: BackPressureConfig
-    collection: BackPressureConfig
-    item: BackPressureConfig
-    items: BackPressureConfig
-    search: BackPressureConfig
+    collections: BackPressureConfig = BackPressureConfig()
+    collection: BackPressureConfig = BackPressureConfig()
+    item: BackPressureConfig = BackPressureConfig()
+    items: BackPressureConfig = BackPressureConfig()
+    search: BackPressureConfig = BackPressureConfig()
 
 
 class Settings(BaseSettings):
@@ -96,9 +96,9 @@ class Settings(BaseSettings):
     db_min_conn_size: int = Field(env=DB_MIN_CONN_ENV_VAR, default=1)
     openapi_url: str = "/openapi.json"
     api_version: str = f"v{API_VERSION}"
-    rate_limits: RateLimits
-    back_pressures: BackPressures
-    request_timout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
+    rate_limits: RateLimits = RateLimits()
+    back_pressures: BackPressures = BackPressures()
+    request_timeout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
 
     def get_tiler_href(self, request: Request) -> str:
         """Generates the tiler HREF.

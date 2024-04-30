@@ -5,6 +5,7 @@ resource "azurerm_public_ip" "pc" {
   location            = azurerm_resource_group.pc.location
   allocation_method   = "Static"
   sku                 = "Standard"
+  zones               = ["1", "2", "3"]
 
   tags = {
     environment = var.environment

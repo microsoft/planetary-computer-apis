@@ -1,13 +1,13 @@
 black==22.3.0
 flake8==3.8.4
 isort==5.9.2
-mypy==0.800
+mypy==1.8.0
 openapi-spec-validator==0.3.0
 cachetools<=4.2.
 pytest==7.*
 pytest-asyncio==0.18.*
 httpx>=0.22.0
-
+pip-tools
 # Mypy types
-
+types-python-dateutil
 types-cachetools

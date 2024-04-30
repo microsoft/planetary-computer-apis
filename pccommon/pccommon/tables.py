@@ -222,7 +222,7 @@ class ModelTableService(Generic[M], TableService):
                 yield (
                     partition_key,
                     row_key,
-                    self._parse_model(entity, partition_key, row_key),
+                    self._parse_model(entity, partition_key, row_key),  # type: ignore
                 )
 
 

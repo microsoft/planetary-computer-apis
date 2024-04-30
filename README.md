@@ -75,7 +75,18 @@ After migrations and development database loading are in place, you can rebuild 
 > ./scripts/update
 ```
 
+`pip` dependencies in `setup.py` are collected and installed through requirements files.
+If you modify dependencies, run `./scripts/generate-requirements` to regenerate
+`requirements-*.txt` used by Dockerfiles otherwise your dependency change will not
+be realized.
+
 #### Running the services
+
+There is a local proxy service that facilitates a local "managed identity" functionality, run as your local identity. Make sure to run
+
+```console
+az login
+```
 
 To run the servers, use
 
@@ -116,10 +127,12 @@ This project publishes images and helm charts, which are used in the deployment 
 
 ### Images
 
-Images following images are hosted in the [Microsoft Container Registry](https://github.com/microsoft/ContainerRegistry):
+The following images are hosted in the [Microsoft Container Registry](https://github.com/microsoft/ContainerRegistry):
 
 - `mcr.microsoft.com/planetary-computer-apis/stac`
 - `mcr.microsoft.com/planetary-computer-apis/tiler`
+
+Only tagged builds will be published to MCR, untagged builds will only be published to the internal ACR `pcccr`.
 
 ### Charts
 

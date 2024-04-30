@@ -14,6 +14,10 @@ output "resource_group" {
   value = azurerm_resource_group.pc.name
 }
 
+output "tenant_id" {
+  value = data.azurerm_client_config.current.tenant_id
+}
+
 # -- Postgres
 
 output "pg_host" {
@@ -47,6 +51,10 @@ output "cluster_cert_server" {
   value = var.cluster_cert_server
 }
 
+output "cluster_tiler_identity_client_id" {
+  value = azurerm_user_assigned_identity.tiler.client_id
+}
+
 ## Ingress
 
 output "ingress_ip" {
@@ -55,6 +63,18 @@ output "ingress_ip" {
 
 output "dns_label" {
   value = azurerm_public_ip.pc.domain_name_label
+}
+
+output "secret_provider_keyvault_name" {
+  value = var.secret_provider_keyvault_name
+}
+
+output "secret_provider_managed_identity_id" {
+  value = azurerm_kubernetes_cluster.pc.key_vault_secrets_provider[0].secret_identity[0].client_id
+}
+
+output "secret_provider_keyvault_secret" {
+  value = var.secret_provider_keyvault_secret
 }
 
 ## STAC API

@@ -20,6 +20,7 @@ from pccommon.config.collections import DefaultRenderConfig
 from pccommon.constants import DEFAULT_COLLECTION_REGION
 from pccommon.logging import get_custom_dimensions
 from pccommon.redis import back_pressure, cached_result, rate_limit
+from pccommon.tracing import add_stac_attributes_from_search
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
 from pcstac.contants import (
     CACHE_KEY_COLLECTION,
@@ -107,7 +108,7 @@ class PCClient(CoreCrudClient):
         settings.back_pressures.collections.req_per_sec,
         settings.back_pressures.collections.inc_ms,
     )
-    async def all_collections(self, **kwargs: Any) -> Collections:
+    async def all_collections(self, request: Request, **kwargs: Any) -> Collections:
         """Read collections from the database and inject PQE links.
         Called with `GET /collections`.
 
@@ -118,10 +119,9 @@ class PCClient(CoreCrudClient):
             Collections.
         """
         _super: CoreCrudClient = super()
-        _request = kwargs["request"]
 
         async def _fetch() -> Collections:
-            collections = await _super.all_collections(**kwargs)
+            collections = await _super.all_collections(request=request, **kwargs)
             render_configs = get_all_render_configs()
             modified_collections = []
             for col in collections.get("collections", []):
@@ -136,12 +136,12 @@ class PCClient(CoreCrudClient):
                     pass
                 else:
                     modified_collections.append(
-                        self.inject_collection_extras(col, _request, render_config)
+                        self.inject_collection_extras(col, request, render_config)
                     )
             collections["collections"] = modified_collections
             return collections
 
-        return await cached_result(_fetch, CACHE_KEY_COLLECTIONS, kwargs["request"])
+        return await cached_result(_fetch, CACHE_KEY_COLLECTIONS, request)
 
     @rate_limit(CACHE_KEY_COLLECTION, settings.rate_limits.collection)
     @back_pressure(
@@ -149,7 +149,9 @@ class PCClient(CoreCrudClient):
         settings.back_pressures.collection.req_per_sec,
         settings.back_pressures.collection.inc_ms,
     )
-    async def get_collection(self, collection_id: str, **kwargs: Any) -> Collection:
+    async def get_collection(
+        self, collection_id: str, request: Request, **kwargs: Any
+    ) -> Collection:
         """Get collection by id and inject PQE links.
         Called with `GET /collections/{collection_id}`.
 
@@ -162,7 +164,6 @@ class PCClient(CoreCrudClient):
             Collection.
         """
         _super: CoreCrudClient = super()
-        _request = kwargs["request"]
 
         async def _fetch() -> Collection:
             try:
@@ -173,13 +174,15 @@ class PCClient(CoreCrudClient):
                 if render_config and render_config.hidden:
                     raise NotFoundError
 
-                result = await _super.get_collection(collection_id, **kwargs)
+                result = await _super.get_collection(
+                    collection_id, request=request, **kwargs
+                )
             except NotFoundError:
                 raise NotFoundError(f"No collection with id '{collection_id}' found!")
-            return self.inject_collection_extras(result, _request, render_config)
+            return self.inject_collection_extras(result, request, render_config)
 
         cache_key = f"{CACHE_KEY_COLLECTION}:{collection_id}"
-        return await cached_result(_fetch, cache_key, kwargs["request"])
+        return await cached_result(_fetch, cache_key, request)
 
     @rate_limit(CACHE_KEY_SEARCH, settings.rate_limits.search)
     @back_pressure(
@@ -188,7 +191,7 @@ class PCClient(CoreCrudClient):
         settings.back_pressures.search.inc_ms,
     )
     async def _search_base(
-        self, search_request: PCSearch, **kwargs: Any
+        self, search_request: PCSearch, request: Request, **kwargs: Any
     ) -> ItemCollection:
         """Cross catalog search (POST).
         Called with `POST /search`.
@@ -198,10 +201,11 @@ class PCClient(CoreCrudClient):
             ItemCollection containing items which match the search criteria.
         """
         _super: CoreCrudClient = super()
-        request = kwargs["request"]
 
         async def _fetch() -> ItemCollection:
-            result = await _super._search_base(search_request, **kwargs)
+            result = await _super._search_base(
+                search_request, request=request, **kwargs
+            )
 
             # Remove context extension until we fully support it.
             result.pop("context", None)
@@ -224,6 +228,8 @@ class PCClient(CoreCrudClient):
             return item_collection
 
         search_json = search_request.json()
+        add_stac_attributes_from_search(search_json, request)
+
         logger.info(
             "STAC: Item search body",
             extra=get_custom_dimensions({"search_body": search_json}, request),
@@ -231,19 +237,16 @@ class PCClient(CoreCrudClient):
 
         hashed_search = hash(search_json)
         cache_key = f"{CACHE_KEY_SEARCH}:{hashed_search}"
-        return await cached_result(_fetch, cache_key, kwargs["request"])
+        return await cached_result(_fetch, cache_key, request)
 
-    async def landing_page(self, **kwargs: Any) -> LandingPage:
+    async def landing_page(self, request: Request, **kwargs: Any) -> LandingPage:
         _super: CoreCrudClient = super()
 
         async def _fetch() -> LandingPage:
-            landing = await _super.landing_page(**kwargs)
-            # Remove once
-            # https://github.com/stac-utils/stac-fastapi/issues/334 is fixed.
-            del landing["stac_extensions"]
+            landing = await _super.landing_page(request=request, **kwargs)
             return landing
 
-        return await cached_result(_fetch, CACHE_KEY_LANDING_PAGE, kwargs["request"])
+        return await cached_result(_fetch, CACHE_KEY_LANDING_PAGE, request)
 
     @rate_limit(CACHE_KEY_ITEMS, settings.rate_limits.items)
     @back_pressure(
@@ -254,6 +257,7 @@ class PCClient(CoreCrudClient):
     async def item_collection(
         self,
         collection_id: str,
+        request: Request,
         limit: Optional[int] = None,
         token: Optional[str] = None,
         **kwargs: Any,
@@ -262,11 +266,11 @@ class PCClient(CoreCrudClient):
 
         async def _fetch() -> ItemCollection:
             return await _super.item_collection(
-                collection_id, limit=limit, token=token, **kwargs
+                collection_id, request=request, limit=limit, token=token, **kwargs
             )
 
         cache_key = f"{CACHE_KEY_ITEMS}:{collection_id}:limit:{limit}:token:{token}"
-        return await cached_result(_fetch, cache_key, kwargs["request"])
+        return await cached_result(_fetch, cache_key, request)
 
     @rate_limit(CACHE_KEY_ITEM, settings.rate_limits.item)
     @back_pressure(
@@ -274,15 +278,19 @@ class PCClient(CoreCrudClient):
         settings.back_pressures.item.req_per_sec,
         settings.back_pressures.item.inc_ms,
     )
-    async def get_item(self, item_id: str, collection_id: str, **kwargs: Any) -> Item:
+    async def get_item(
+        self, item_id: str, collection_id: str, request: Request, **kwargs: Any
+    ) -> Item:
         _super: CoreCrudClient = super()
 
         async def _fetch() -> Item:
-            item = await _super.get_item(item_id, collection_id, **kwargs)
+            item = await _super.get_item(
+                item_id, collection_id, request=request, **kwargs
+            )
             return item
 
         cache_key = f"{CACHE_KEY_ITEM}:{collection_id}:{item_id}"
-        return await cached_result(_fetch, cache_key, kwargs["request"])
+        return await cached_result(_fetch, cache_key, request)
 
     @classmethod
     def create(

@@ -53,35 +53,47 @@ variable "k8s_version" {
 # -- Postgres
 
 variable "pg_host" {
-  type = string
+  type    = string
   default = "pct-stacdb.postgres.database.azure.com"
 }
 
 variable "pg_port" {
-  type = string
+  type    = string
   default = "5432"
 }
 
 variable "pg_user" {
-  type = string
-  default ="planetarycomputertest"
+  type    = string
+  default = "planetarycomputertest"
 }
 
 variable "pg_database" {
-  type = string
+  type    = string
   default = "postgres"
 }
 
 variable "pg_password_secret_name" {
-  type = string
+  type        = string
   description = "The secret name in the KeyVault that holds the db password"
-  default = "pct-db-password"
+  default     = "pct-db-password"
 }
 
 variable "pc_sdk_subscription_key_secret_name" {
-  type = string
+  type        = string
   description = "The secret name in the KeyVault that holds the PC subscription key used by the tiler"
-  default = "pct-tiler-sdk-subscription-key"
+  default     = "pct-tiler-sdk-subscription-key"
+}
+
+variable "secret_provider_keyvault_name" {
+  type        = string
+  description = "The name of the KeyVault that holds the secrets"
+  default     = "pc-deploy-secrets"
+}
+
+variable "secret_provider_keyvault_secret" {
+  type        = string
+  description = "The name of the certificate in the KeyVault for TLS ingress"
+  default     = "planetarycomputer-test-certificate"
 }
 
 # -- Functions --
@@ -95,7 +107,7 @@ variable "output_container_name" {
 }
 
 variable "funcs_tile_request_concurrency" {
-  type = number
+  type    = number
   default = 10
 }
 
@@ -119,8 +131,8 @@ variable "image_output_storage_url" {
 # Local variables
 
 locals {
-  stack_id              = "pct-apis"
-  location              = lower(replace(var.region, " ", ""))
-  prefix                = "${local.stack_id}-${local.location}-${var.environment}"
-  nodash_prefix         = replace("${local.stack_id}${var.environment}", "-", "")
+  stack_id      = "pct-apis"
+  location      = lower(replace(var.region, " ", ""))
+  prefix        = "${local.stack_id}-${local.location}-${var.environment}"
+  nodash_prefix = replace("${local.stack_id}${var.environment}", "-", "")
 }

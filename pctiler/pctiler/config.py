@@ -34,18 +34,19 @@ class Settings(BaseSettings):
 
     title: str = "Preview of Tile Access Services"
     openapi_url: str = "/openapi.json"
+    configuration_endpoint_prefix: str = "/config"
     item_endpoint_prefix: str = "/item"
     mosaic_endpoint_prefix: str = "/mosaic"
     legend_endpoint_prefix: str = "/legend"
     vector_tile_endpoint_prefix: str = "/vector"
-    vector_tile_sa_base_url: str = Field(env=VECTORTILE_SA_BASE_URL_ENV_VAR)
+    vector_tile_sa_base_url: str = Field(env=VECTORTILE_SA_BASE_URL_ENV_VAR, default="")
 
     debug: bool = os.getenv("TILER_DEBUG", "False").lower() == "true"
     api_version: str = "1.0"
     default_max_items_per_tile: int = Field(
         env=DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR, default=10
     )
-    request_timout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
+    request_timeout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
 
     feature_flags: FeatureFlags = FeatureFlags()
 

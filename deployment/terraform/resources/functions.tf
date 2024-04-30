@@ -54,6 +54,12 @@ resource "azurerm_function_app" "pcfuncs" {
       allowed_origins = ["*"]
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 # Note: this must be in the same subscription as the rest of the deployed infrastructure
