@@ -4,10 +4,6 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,22 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # - name: Run cibuild
-      #   run: ./scripts/cibuild
-      
-      - name: Log in with Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
-          tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
-          subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
+      - name: Run cibuild
+        run: ./scripts/cibuild
 
-      - name: 'Run Azure CLI commands'
-        run: |
-            az role assignment list  --query "[].{role:roleDefinitionName, scope:scope}" -o json
-            pwd 
-      - name: Authenticate
-        run: ./scripts/ciauthenticate
   validate:
     runs-on: ubuntu-latest
     steps:
