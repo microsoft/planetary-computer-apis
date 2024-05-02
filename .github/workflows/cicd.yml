@@ -74,7 +74,6 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
           ARM_TENANT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
           ARM_USE_OIDC: true
-          TF_LOG: DEBUG
         run: |
           cd deployment/terraform/staging
           terraform --version
@@ -120,5 +119,4 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
           ARM_TENANT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
           ARM_USE_OIDC: true
-          TF_LOG: DEBUG
         run: ./scripts/cideploy

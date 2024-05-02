@@ -23,7 +23,6 @@ services:
 
       # Used in the dev stack as an identifier
       - TF_VAR_username=${USER}
-      - TF_LOG
 
       # Used in function deployment injected by GH Actions
       - GITHUB_TOKEN
