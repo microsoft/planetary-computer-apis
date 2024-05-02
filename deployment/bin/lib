@@ -82,9 +82,7 @@ function cluster_login() {
     # So we export to a kubeconfig file
     echo "Converting kubeconfig..."
     kubelogin convert-kubeconfig \
-        --login spn \
-        --client-id ${ARM_CLIENT_ID} \
-        --client-secret ${ARM_CLIENT_SECRET} \
+        -l azurecli \
         --kubeconfig=kubeconfig
     echo "Test Kubernetes Access:"
     kubectl get nodes --kubeconfig=kubeconfig
