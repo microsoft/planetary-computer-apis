@@ -27,8 +27,8 @@ jobs:
       - name: Authenticate
         run: ./scripts/ciauthenticate
 
-      - name: Run cibuild
-        run: ./scripts/cibuild
+      # - name: Run cibuild
+      #   run: ./scripts/cibuild
 
       - name: Get image tag
         id: get_image_tag
@@ -44,8 +44,8 @@ jobs:
               ;;
           esac
 
-      - name: Publish images
-        run: ./scripts/cipublish --acr ${{steps.get_image_tag.outputs.acr}} --tag ${{steps.get_image_tag.outputs.tag}}
+      # - name: Publish images
+      #   run: ./scripts/cipublish --acr ${{steps.get_image_tag.outputs.acr}} --tag ${{steps.get_image_tag.outputs.tag}}
 
     outputs:
       image_tag: ${{ steps.get_image_tag.outputs.tag }}
