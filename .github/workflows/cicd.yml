@@ -78,8 +78,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs:
-      - build_and_publish
+    # needs:
+    #   - build_and_publish
     steps:
       - uses: actions/checkout@v3
       
@@ -90,17 +90,17 @@ jobs:
           tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
           subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
 
-      - name: Get image tag
-        id: get_image_tag
-        run:
-          case "${GITHUB_REF}" in
-            *tags*)
-              echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
-              ;;
-            *)
-              echo "tag=latest" >> $GITHUB_OUTPUT
-              ;;
-          esac
+      # - name: Get image tag
+      #   id: get_image_tag
+      #   run:
+      #     case "${GITHUB_REF}" in
+      #       *tags*)
+      #         echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+      #         ;;
+      #       *)
+      #         echo "tag=latest" >> $GITHUB_OUTPUT
+      #         ;;
+      #     esac
 
       - name: Deploy
         # run: ./scripts/cideploy
@@ -112,4 +112,6 @@ jobs:
           ARM_TENANT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
           ARM_USE_OIDC: true
         run:
+          cd deployment/terraform/staging
+          ls
           terraform init
