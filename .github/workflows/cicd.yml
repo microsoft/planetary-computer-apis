@@ -2,7 +2,7 @@ name: Planetary Computer APIs CI/CD
 
 on:
   push:
-    branches: [remove-secret-from-cicd]
+    branches: [main]
     tags: ["*"]
 
 permissions:
@@ -52,6 +52,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - build_and_publish
     steps:
@@ -66,6 +67,7 @@ jobs:
 
       - name: Get image tag
         id: get_image_tag
+        if: ${{ github.base_ref }}
         run:
           case "${GITHUB_REF}" in
             *tags*)
