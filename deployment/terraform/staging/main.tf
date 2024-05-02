@@ -33,8 +33,8 @@ terraform {
     container_name       = "pc-test-api"
     key                  = "pqe-apis.tfstate"
 
-    use_azuread_auth = true
-    use_oidc         = true
+    # use_azuread_auth = true
+    use_oidc = true
   }
 }
 
