@@ -103,7 +103,7 @@ jobs:
           esac
 
       - name: Deploy
-        run: ./scripts/cideploy
+        # run: ./scripts/cideploy
         env:
           IMAGE_TAG: ${{needs.build_and_publish.outputs.image_tag}}
           ENVIRONMENT: staging
@@ -111,4 +111,5 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
           ARM_TENANT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
           ARM_USE_OIDC: true
-          # ARM_CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
+        run:
+          terraform init
