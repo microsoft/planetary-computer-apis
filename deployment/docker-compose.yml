@@ -16,10 +16,10 @@ services:
       - ARM_CLIENT_ID
       - ARM_USE_OIDC
       # - ARM_OIDC_TOKEN
-      - ACTIONS_ID_TOKEN_REQUEST_URL
-      - ACTIONS_ID_TOKEN_REQUEST_TOKEN
-      - ARM_OIDC_REQUEST_TOKEN
-      - ARM_OIDC_REQUEST_URL
+      # - ACTIONS_ID_TOKEN_REQUEST_URL
+      # - ACTIONS_ID_TOKEN_REQUEST_TOKEN
+      # - ARM_OIDC_REQUEST_TOKEN
+      # - ARM_OIDC_REQUEST_URL
       # - ARM_CLIENT_SECRET
 
       # Used in the dev stack as an identifier

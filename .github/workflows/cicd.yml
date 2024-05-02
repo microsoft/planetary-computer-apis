@@ -78,7 +78,7 @@ jobs:
         run: |
           cd deployment/terraform/staging
           terraform --version
-          [[ -z "$ARM_OIDC_TOKEN:0:1" ]] && echo "The variable is empty." || echo "The variable is not empty."
+          [[ -z "$ARM_OIDC_TOKEN" ]] && echo "The variable is empty." || echo "The variable is not empty."
           echo "Client ID: ${ARM_CLIENT_ID:0:5}"
           echo "Subscription ID: ${ARM_SUBSCRIPTION_ID:0:5}"
           echo "Tenant ID: ${ARM_TENANT_ID:0:5}"
