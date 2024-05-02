@@ -166,13 +166,13 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "================"
 
     echo "Deploying Tiler helm chart..."
+    helm rollback planetary-computer-tiler -n pc
     helm upgrade --install planetary-computer-tiler helm/published/planetary-computer-tiler \
         -n pc \
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
         -f ${DEPLOY_VALUES_FILE} \
-        --force
 
     echo "=================="
     echo "==== Ingress ====="
