@@ -11,70 +11,45 @@ permissions:
 
 jobs:
 
-  terraform:
-    runs-on: ubuntu-latest
-    env:
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      ARM_USE_OIDC: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.5
-      - name: Azure login
-        uses: azure/login@v2.0.0
-        with:
-          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
-          tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
-          subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -check
-      - name: Terraform Init
-        id: init
-        run: terraform init -lockfile=readonly
+  # build_and_publish:
 
-  build_and_publish:
+  #   runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-    steps:
-      - uses: actions/checkout@v3
+  #     - name: Log in with Azure
+  #       uses: azure/login@v1
+  #       with:
+  #         client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
+  #         tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
+  #         subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
 
-      - name: Log in with Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
-          tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
-          subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
+  #     - name: Authenticate
+  #       run: ./scripts/ciauthenticate
 
-      - name: Authenticate
-        run: ./scripts/ciauthenticate
+  #     # - name: Run cibuild
+  #     #   run: ./scripts/cibuild
 
-      # - name: Run cibuild
-      #   run: ./scripts/cibuild
+  #     - name: Get image tag
+  #       id: get_image_tag
+  #       run: 
+  #         case "${GITHUB_REF}" in
+  #           *tags*)
+  #             echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT ;
+  #             echo "acr=pccomponents" >> $GITHUB_OUTPUT
+  #             ;;
+  #           *)
+  #             echo "tag=latest" >> $GITHUB_OUTPUT ;
+  #             echo "acr=pccomponentstest" >> $GITHUB_OUTPUT
+  #             ;;
+  #         esac
 
-      - name: Get image tag
-        id: get_image_tag
-        run: 
-          case "${GITHUB_REF}" in
-            *tags*)
-              echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT ;
-              echo "acr=pccomponents" >> $GITHUB_OUTPUT
-              ;;
-            *)
-              echo "tag=latest" >> $GITHUB_OUTPUT ;
-              echo "acr=pccomponentstest" >> $GITHUB_OUTPUT
-              ;;
-          esac
+  #     # - name: Publish images
+  #     #   run: ./scripts/cipublish --acr ${{steps.get_image_tag.outputs.acr}} --tag ${{steps.get_image_tag.outputs.tag}}
 
-      # - name: Publish images
-      #   run: ./scripts/cipublish --acr ${{steps.get_image_tag.outputs.acr}} --tag ${{steps.get_image_tag.outputs.tag}}
-
-    outputs:
-      image_tag: ${{ steps.get_image_tag.outputs.tag }}
+  #   outputs:
+  #     image_tag: ${{ steps.get_image_tag.outputs.tag }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -114,4 +89,5 @@ jobs:
         run: |
           cd deployment/terraform/staging
           ls
+          echo "Client ID: $ARM_CLIENT_ID"
           terraform init
