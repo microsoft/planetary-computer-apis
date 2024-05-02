@@ -171,7 +171,8 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
-        -f ${DEPLOY_VALUES_FILE}
+        -f ${DEPLOY_VALUES_FILE} \
+        --force
 
     echo "=================="
     echo "==== Ingress ====="
