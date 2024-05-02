@@ -85,6 +85,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     #########################
 
     # bin/azlogin
+    ls /root/.azure
     bin/kv_add_ip
 
     #####################
