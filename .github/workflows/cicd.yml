@@ -10,6 +10,32 @@ permissions:
   contents: read
 
 jobs:
+
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_USE_OIDC: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.5
+      - name: Azure login
+        uses: azure/login@v2.0.0
+        with:
+          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
+          tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
+          subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+      - name: Terraform Init
+        id: init
+        run: terraform init -lockfile=readonly
+
   build_and_publish:
 
     runs-on: ubuntu-latest
