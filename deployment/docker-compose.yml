@@ -15,7 +15,11 @@ services:
       - ARM_TENANT_ID
       - ARM_CLIENT_ID
       - ARM_USE_OIDC
-      # - ARM_CLIENT_SECRET
+      - ARM_OIDC_TOKEN
+      - ACTIONS_ID_TOKEN_REQUEST_URL
+      - ACTIONS_ID_TOKEN_REQUEST_TOKEN
+      - ARM_OIDC_REQUEST_TOKEN
+      - ARM_OIDC_REQUEST_URL
 
       # Used in the dev stack as an identifier
       - TF_VAR_username=${USER}
