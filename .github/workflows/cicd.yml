@@ -52,7 +52,6 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'remove-secret-from-cicd' }}
     needs:
       - build_and_publish
     steps:
