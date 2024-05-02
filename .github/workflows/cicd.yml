@@ -56,6 +56,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: Log in with Azure
         uses: azure/login@v1
@@ -75,7 +77,12 @@ jobs:
           TF_LOG: DEBUG
         run: |
           cd deployment/terraform/staging
+          terraform --version
+          echo "Has OIDC token: ${ARM_OIDC_TOKEN:0:1}"
           echo "Client ID: ${ARM_CLIENT_ID:0:5}"
+          echo "Subscription ID: ${ARM_SUBSCRIPTION_ID:0:5}"
+          echo "Tenant ID: ${ARM_TENANT_ID:0:5}"
+          
           terraform init
 
   deploy1:
