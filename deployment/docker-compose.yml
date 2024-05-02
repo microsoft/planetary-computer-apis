@@ -32,3 +32,4 @@ services:
       - ../deployment:/opt/src/deployment
       - ../pccommon:/opt/src/pccommon:ro
       - ../pcfuncs:/opt/src/pcfuncs:ro
+      - ~/.azure:/root/.azure

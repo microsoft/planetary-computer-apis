@@ -84,7 +84,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     # Add IP to KV firewall #
     #########################
 
-    bin/azlogin
+    # bin/azlogin
     bin/kv_add_ip
 
     #####################
