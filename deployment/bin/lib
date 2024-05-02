@@ -82,6 +82,8 @@ function cluster_login() {
     # So we export to a kubeconfig file
     echo "Converting kubeconfig..."
     kubelogin convert-kubeconfig --kubeconfig=kubeconfig
+    echo "Test Kubernetes Access:"
+    kubectl get nodes --kubeconfig=kubeconfig
     export KUBECONFIG=kubeconfig
 }
 
