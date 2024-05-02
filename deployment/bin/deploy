@@ -94,8 +94,8 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     if [[ "${SKIP_TF}" != 1 ]]; then
         echo "Deploying infrastructure with Terraform..."
-        terraform providers
         terraform init --upgrade
+        terraform providers
 
         if [ "${PLAN_ONLY}" ]; then
             terraform plan
