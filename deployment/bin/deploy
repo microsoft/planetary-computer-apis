@@ -95,9 +95,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     if [[ "${SKIP_TF}" != 1 ]]; then
         echo "Deploying infrastructure with Terraform..."
-        echo ${ARM_USE_OIDC}
         terraform init --upgrade
-        terraform providers
 
         if [ "${PLAN_ONLY}" ]; then
             terraform plan
@@ -171,7 +169,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
-        -f ${DEPLOY_VALUES_FILE} \
+        -f ${DEPLOY_VALUES_FILE}
 
     echo "=================="
     echo "==== Ingress ====="
