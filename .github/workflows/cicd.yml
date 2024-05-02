@@ -89,5 +89,5 @@ jobs:
         run: |
           cd deployment/terraform/staging
           ls
-          echo "Client ID: $ARM_CLIENT_ID"
+          echo "Client ID: ${ARM_CLIENT_ID:0:5}"
           terraform init
