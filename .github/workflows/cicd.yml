@@ -53,11 +53,38 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Log in with Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
+          tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
+          subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
+
+      - name: Deploy
+        env:
+          IMAGE_TAG: ${{needs.build_and_publish.outputs.image_tag}}
+          ENVIRONMENT: staging
+          ARM_CLIENT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
+          ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
+          ARM_TENANT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
+          ARM_USE_OIDC: true
+          TF_LOG: DEBUG
+        run: |
+          cd deployment/terraform/staging
+          echo "Client ID: ${ARM_CLIENT_ID:0:5}"
+          terraform init
+
+  deploy1:
+    runs-on: ubuntu-latest
     # needs:
     #   - build_and_publish
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Log in with Azure
         uses: azure/login@v1
         with:
@@ -78,7 +105,6 @@ jobs:
       #     esac
 
       - name: Deploy
-        # run: ./scripts/cideploy
         env:
           IMAGE_TAG: ${{needs.build_and_publish.outputs.image_tag}}
           ENVIRONMENT: staging
@@ -86,8 +112,5 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
           ARM_TENANT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
           ARM_USE_OIDC: true
-        run: |
-          cd deployment/terraform/staging
-          ls
-          echo "Client ID: ${ARM_CLIENT_ID:0:5}"
-          terraform init
+          TF_LOG: DEBUG
+        run: ./scripts/cideploy
