@@ -61,7 +61,6 @@ fi
 require_env "IMAGE_TAG"
 require_env "GIT_COMMIT"
 require_env "ARM_CLIENT_ID"
-# require_env "ARM_CLIENT_SECRET"
 require_env "ARM_TENANT_ID"
 require_env "ARM_USE_OIDC"
 
