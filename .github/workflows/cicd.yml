@@ -2,7 +2,7 @@ name: Planetary Computer APIs CI/CD
 
 on:
   push:
-    branches: [remove-secret-from-cicd]
+    branches: [user/mjm/remove-secret-from-cicd-test]
     tags: ["*"]
 
 permissions:
