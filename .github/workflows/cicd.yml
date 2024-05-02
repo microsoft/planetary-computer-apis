@@ -84,6 +84,7 @@ jobs:
           echo "Tenant ID: ${ARM_TENANT_ID:0:5}"
 
           terraform init
+          terraform plan
 
   deploy1:
     runs-on: ubuntu-latest
