@@ -106,7 +106,7 @@ jobs:
 
       - name: Deploy
         env:
-          IMAGE_TAG: ${{needs.build_and_publish.outputs.image_tag}}
+          IMAGE_TAG: latest
           ENVIRONMENT: staging
           ARM_CLIENT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
           ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
