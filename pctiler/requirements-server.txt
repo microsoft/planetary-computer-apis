@@ -98,7 +98,7 @@ idna==3.7
     #   httpx
     #   pctiler (pctiler/setup.py)
     #   requests
-jinja2==3.0.3
+jinja2==3.1.4
     # via
     #   pctiler (pctiler/setup.py)
     #   titiler-core
