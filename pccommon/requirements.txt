@@ -52,7 +52,7 @@ google-auth==2.29.0
     # via google-api-core
 googleapis-common-protos==1.63.0
     # via google-api-core
-html-sanitizer==2.4.0
+html-sanitizer==2.4.2
     # via pccommon (pccommon/setup.py)
 idna==3.7
     # via
