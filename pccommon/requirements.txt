@@ -122,7 +122,7 @@ pyjwt[crypto]==2.8.0
     # via msal
 redis==4.2.0rc1
     # via pccommon (pccommon/setup.py)
-requests==2.31.0
+requests==2.32.0
     # via
     #   azure-core
     #   google-api-core
