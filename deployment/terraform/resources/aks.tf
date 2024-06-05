@@ -3,7 +3,6 @@ resource "azurerm_kubernetes_cluster" "pc" {
   location            = azurerm_resource_group.pc.location
   resource_group_name = azurerm_resource_group.pc.name
   dns_prefix          = "${local.prefix}-cluster"
-  kubernetes_version  = var.k8s_version
 
   key_vault_secrets_provider {
     secret_rotation_enabled = true
@@ -18,15 +17,15 @@ resource "azurerm_kubernetes_cluster" "pc" {
   # https://learn.microsoft.com/en-us/azure/aks/auto-upgrade-node-os-image
   node_os_channel_upgrade = "NodeImage"
 
-  image_cleaner_enabled = true
+  image_cleaner_enabled        = true
+  image_cleaner_interval_hours = 24
 
   default_node_pool {
-    name                 = "agentpool"
-    os_sku               = "AzureLinux"
-    vm_size              = "Standard_DS2_v2"
-    node_count           = var.aks_node_count
-    vnet_subnet_id       = azurerm_subnet.node_subnet.id
-    orchestrator_version = var.k8s_version
+    name           = "agentpool"
+    os_sku         = "AzureLinux"
+    vm_size        = "Standard_DS2_v2"
+    node_count     = var.aks_node_count
+    vnet_subnet_id = azurerm_subnet.node_subnet.id
   }
 
   identity {
@@ -40,7 +39,7 @@ resource "azurerm_kubernetes_cluster" "pc" {
 
   maintenance_window {
     allowed {
-      day = "Saturday"
+      day   = "Saturday"
       hours = [10, 11, 12, 13, 14, 15, 16, 17, 18]
     }
     # not_allowed {
@@ -52,21 +51,21 @@ resource "azurerm_kubernetes_cluster" "pc" {
   # Recommendation is to make it at least 4 hours long
   # https://learn.microsoft.com/en-us/azure/aks/planned-maintenance?tabs=json-file#creating-a-maintenance-window
   maintenance_window_auto_upgrade {
-    frequency = "Weekly"
+    frequency   = "Weekly"
     day_of_week = "Saturday"
-    interval = 1
-    duration = 4
-    utc_offset = "+00:00"
-    start_time = "10:00" # UTC
+    interval    = 1
+    duration    = 4
+    utc_offset  = "+00:00"
+    start_time  = "10:00" # UTC
   }
 
   maintenance_window_node_os {
-    frequency = "Weekly"
+    frequency   = "Weekly"
     day_of_week = "Saturday"
-    interval = 1
-    duration = 4
-    utc_offset = "+00:00"
-    start_time = "14:00" # UTC
+    interval    = 1
+    duration    = 4
+    utc_offset  = "+00:00"
+    start_time  = "14:00" # UTC
   }
 
   tags = {
