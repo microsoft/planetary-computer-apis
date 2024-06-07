@@ -4,8 +4,6 @@ module "resources" {
   environment = "staging"
   region      = "West Europe"
 
-  k8s_version = "1.28.5"
-
   cluster_cert_issuer = "letsencrypt"
   cluster_cert_server = "https://acme-v02.api.letsencrypt.org/directory"
 
@@ -32,7 +30,7 @@ terraform {
     storage_account_name = "pctesttfstate"
     container_name       = "pc-test-api"
     key                  = "pqe-apis.tfstate"
-    use_oidc = true
+    use_oidc             = true
   }
 }
 
