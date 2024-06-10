@@ -44,6 +44,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     flake8 pctiler/pctiler pctiler/tests
 
     echo "Running unit tests for tiler..."
-    python -m pytest pctiler/tests ${INTEGRATION:+$INTEGRATION}
+    python3 -m pytest pctiler/tests ${INTEGRATION:+$INTEGRATION}
 
 fi

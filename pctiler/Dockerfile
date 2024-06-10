@@ -1,4 +1,7 @@
-FROM python:3.9-slim
+FROM mcr.microsoft.com/cbl-mariner/base/python:3.9
+
+RUN tdnf install -y ca-certificates build-essential \
+    && tdnf clean all
 
 WORKDIR /opt/src
 
@@ -7,14 +10,14 @@ COPY pctiler /opt/src/pctiler
 
 # Install the local modules in the new environment
 RUN --mount=type=cache,target=/root/.cache \
-    /bin/sh -c "python -m pip install -U 'setuptools>=65.5.1'"
+    /bin/sh -c "python3 -m pip install -U 'setuptools>=65.5.1'"
 # The order of these pip installs is important :(
 RUN --mount=type=cache,target=/root/.cache \
-    /bin/sh -c "python -m pip install -r ./pccommon/requirements.txt"
+    /bin/sh -c "python3 -m pip install -r ./pccommon/requirements.txt"
 RUN --mount=type=cache,target=/root/.cache \
-    /bin/sh -c "python -m pip install -r ./pctiler/requirements-server.txt"
+    /bin/sh -c "python3 -m pip install -r ./pctiler/requirements-server.txt"
 RUN --mount=type=cache,target=/root/.cache \
-    /bin/sh -c "python -m pip install --no-deps -e ./pccommon -e ./pctiler[server]"
+    /bin/sh -c "python3 -m pip install --no-deps -e ./pccommon -e ./pctiler[server]"
 
 # GDAL config
 ENV GDAL_CACHEMAX 200
