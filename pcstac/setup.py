@@ -9,10 +9,10 @@ inst_reqs = [
     "stac-fastapi.extensions==2.4.8",
     "stac-fastapi.pgstac==2.4.9",
     "stac-fastapi.types==2.4.8",
-    "orjson>=3.9.15",
+    "orjson==3.10.4",
     # Required due to some imports related to pypgstac CLI usage in startup script
     "pypgstac[psycopg]~=0.7",
-    "pystac>=1.9",
+    "pystac==1.10.1",
 ]
 
 extra_reqs = {

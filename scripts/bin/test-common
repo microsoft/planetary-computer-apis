@@ -28,5 +28,5 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     flake8 pccommon/pccommon pccommon/tests
 
     echo "Running unit tests for common..."
-    python -m pytest pccommon/tests
+    python3 -m pytest pccommon/tests
 fi
