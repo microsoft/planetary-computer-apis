@@ -70,7 +70,10 @@ def mock_clients(
     logs_query_client: MagicMock = mocker.MagicMock()
     logs_query_client.query_workspace.return_value = mock_response
     CONNECTION_STRING: str = (
-        "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+        "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
+        "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsu"
+        "Fq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
+        "TableEndpoint=http://azurite:10002/devstoreaccount1;"
     )
     # Use Azurite for unit tests and populate the table with initial data
     table_service: TableServiceClient = TableServiceClient.from_connection_string(

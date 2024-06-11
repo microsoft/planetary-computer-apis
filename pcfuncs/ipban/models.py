@@ -33,7 +33,8 @@ class UpdateBannedIPTask:
         StorageBlobLogs
         | where TimeGenerated > ago({TIME_WINDOW_IN_HOURS}h)
         | extend IpAddress = tostring(split(CallerIpAddress, ":")[0])
-        | summarize readcount = sum(ResponseBodySize) / (1024 * 1024 * 1024) by IpAddress
+        | summarize readcount = sum(ResponseBodySize) / (1024 * 1024 * 1024)
+        by IpAddress
         | where readcount > {THRESHOLD_READ_COUNT_IN_GB}
         """
         response: Any = self.log_query_client.query_workspace(
