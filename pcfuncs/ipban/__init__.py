@@ -1,20 +1,20 @@
 import datetime
 import logging
-import os
 
 import azure.functions as func
 from azure.data.tables import TableClient, TableServiceClient, UpdateMode
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient
+
 from .constants import *
 from .models import UpdateBannedIPTask
 
 
 def main(mytimer: func.TimerRequest) -> None:
-    utc_timestamp = (
+    utc_timestamp: str = (
         datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat()
     )
-    logging.info("Python timer trigger function ran at %s", utc_timestamp)
+    logging.info("Updating the ip ban list at %s", utc_timestamp)
     credential: DefaultAzureCredential = DefaultAzureCredential()
     logs_query_client: LogsQueryClient = LogsQueryClient(credential)
     table_service_client: TableServiceClient = TableServiceClient(

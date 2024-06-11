@@ -1,10 +1,15 @@
 import datetime
 import logging
+from typing import Any, List, Set
 
 import azure.functions as func
 from azure.data.tables import TableClient, TableServiceClient, UpdateMode
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient
+from azure.monitor.query._models import (
+    LogsTableRow,
+)
+
 from .constants import *
 
 
@@ -13,39 +18,36 @@ class UpdateBannedIPTask:
         self,
         logs_query_client: LogsQueryClient,
         table_client: TableClient,
-    ):
-        self.log_query_client = logs_query_client
-        self.table_client = table_client
+    ) -> None:
+        self.log_query_client: LogsQueryClient = logs_query_client
+        self.table_client: TableClient = table_client
 
-    def run(self):
-        utc_timestamp = (
-            datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat()
-        )
-        logging.info("Python timer trigger function ran at %s", utc_timestamp)
-        query_result = self.get_blob_logs_query_result()
+    def run(self) -> List[LogsTableRow]:
+        query_result: List[LogsTableRow] = self.get_blob_logs_query_result()
         self.update_banned_ips(query_result)
+        return query_result
 
-    def get_blob_logs_query_result(self):
-        query = f"""
+    def get_blob_logs_query_result(self) -> List[LogsTableRow]:
+        query: str = f"""
         StorageBlobLogs
         | where TimeGenerated > ago({TIME_WINDOW_IN_HOURS}h)
         | extend IpAddress = tostring(split(CallerIpAddress, ":")[0])
         | summarize readcount = sum(ResponseBodySize) / (1024 * 1024 * 1024) by IpAddress
         | where readcount > {THRESHOLD_READ_COUNT_IN_GB}
         """
-        response = self.log_query_client.query_workspace(
+        response: Any = self.log_query_client.query_workspace(
             LOG_ANALYTICS_WORKSPACE_ID, query, timespan=None
         )
         return response.tables[0].rows
 
-    def update_banned_ips(self, query_result):
+    def update_banned_ips(self, query_result: List[LogsTableRow]) -> None:
         existing_ips = {
             entity["RowKey"]: entity for entity in self.table_client.list_entities()
         }
-        print(existing_ips)
-        result_ips = set()
+        result_ips: Set[str] = set()
         for result in query_result:
-            ip_address, read_count = result[0], int(result[1])
+            ip_address: str = result[0]
+            read_count: int = int(result[1])
             result_ips.add(ip_address)
             entity = {
                 "PartitionKey": ip_address,
@@ -66,4 +68,4 @@ class UpdateBannedIPTask:
                     partition_key=ip_address, row_key=ip_address
                 )
 
-        logging.info("Table sync complete.")
+        logging.info("IP ban list has been updated successfully")

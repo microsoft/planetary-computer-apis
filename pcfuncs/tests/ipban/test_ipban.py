@@ -1,73 +1,135 @@
+from html import entities
+from typing import Any, Dict, Generator, List, Literal, Tuple
+from unittest.mock import MagicMock
+
 import pytest
+from azure.core.paging import ItemPaged
 from azure.data.tables import TableClient, TableServiceClient, UpdateMode
+from azure.data.tables._entity import TableEntity
+from azure.identity import DefaultAzureCredential
+from azure.monitor.query import LogsQueryClient
+from azure.monitor.query._models import (
+    LogsTableRow,
+)
 from ipban.constants import *
 from ipban.models import UpdateBannedIPTask
+from pytest_mock import MockerFixture
 
-def print_table_entries(table_client: TableClient):
-    print(f"Printing all entries in the table: {table_client.table_name}")
-    entities = table_client.list_entities()
-    for entity in entities:
-        print(entity)
+MOCK_LOGS_QUERY_RESULT = [("192.168.1.1", 170), ("192.168.1.4", 420)]
+TEST_BANNED_IP_TABLE = "testBlobStorageBannedIp"
 
-@pytest.fixture
-def mock_clients(mocker):
-    mock_response = mocker.MagicMock()
-    expected_rows = [("192.168.1.1", 150)]
-    mock_response.tables[0].rows = expected_rows
-    mock_logs_query_client = mocker.MagicMock()
-    mock_logs_query_client.query_workspace.return_value = mock_response
 
-    STORAGE_ACCOUNT_URL = "http://127.0.0.1:10002/devstoreaccount1"
-    STORAGE_ACCOUNT_KEY = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
-    CONNECTION_STRING = f"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey={STORAGE_ACCOUNT_KEY};TableEndpoint={STORAGE_ACCOUNT_URL};"
-
-    # Use Azurite for unit tests and populate the table with initial data
-    table_service = TableServiceClient.from_connection_string(CONNECTION_STRING)
-    table_client = table_service.create_table_if_not_exists(table_name=BANNED_IP_TABLE)
-    entities = [
+def populate_banned_ip_table(table_client: TableClient) -> List[Dict[str, Any]]:
+    print("Populating the table")
+    entities: List[Dict[str, Any]] = [
         {
             "PartitionKey": "192.168.1.1",
             "RowKey": "192.168.1.1",
-            "ReadCount": 50,
-            "Threshold": 100,
-            "TimeWindow": 15,
+            "ReadCount": 647,
+            "Threshold": THRESHOLD_READ_COUNT_IN_GB,
+            "TimeWindow": TIME_WINDOW_IN_HOURS,
         },
         {
             "PartitionKey": "192.168.1.2",
             "RowKey": "192.168.1.2",
-            "ReadCount": 150,
-            "Threshold": 150,
-            "TimeWindow": 30,
+            "ReadCount": 214,
+            "Threshold": THRESHOLD_READ_COUNT_IN_GB,
+            "TimeWindow": TIME_WINDOW_IN_HOURS,
+        },
+        {
+            "PartitionKey": "192.168.1.3",
+            "RowKey": "192.168.1.3",
+            "ReadCount": 550,
+            "Threshold": THRESHOLD_READ_COUNT_IN_GB,
+            "TimeWindow": TIME_WINDOW_IN_HOURS,
         },
     ]
     for entity in entities:
         table_client.create_entity(entity)
-    print("Populating the table")
-    print_table_entries(table_client)
-    yield mock_logs_query_client, table_client
+    return entities
 
-    print("After tests are completed")
-    print_table_entries(table_client)
-    # Clear all entities from the table
+
+def clear_table(table_client: TableClient) -> None:
     entities = list(table_client.list_entities())
     for entity in entities:
         table_client.delete_entity(
             partition_key=entity["PartitionKey"], row_key=entity["RowKey"]
         )
+    entities = list(table_client.list_entities())
+    assert len(entities) == 0
 
-    print("After cleanup are completed")
-    print_table_entries(table_client)
+
+@pytest.fixture
+def mock_clients(
+    mocker: MockerFixture,
+) -> Generator[Tuple[MagicMock, TableClient], Any, None]:
+    mock_response: MagicMock = mocker.MagicMock()
+    mock_response.tables[0].rows = MOCK_LOGS_QUERY_RESULT
+    logs_query_client: MagicMock = mocker.MagicMock()
+    logs_query_client.query_workspace.return_value = mock_response
+    CONNECTION_STRING: str = f"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+    # Use Azurite for unit tests and populate the table with initial data
+    table_service: TableServiceClient = TableServiceClient.from_connection_string(
+        CONNECTION_STRING
+    )
+    table_client = table_service.create_table_if_not_exists(
+        table_name=TEST_BANNED_IP_TABLE
+    )
+
+    # Pre-populate the banned ip table
+    populate_banned_ip_table(table_client)
+    yield logs_query_client, table_client
+
+    # Clear all entities from the table
+    clear_table(table_client)
 
 
-def test_update_banned_ip_task(mock_clients):
+@pytest.fixture
+def integration_clients(
+    mocker: MockerFixture,
+) -> Generator[Tuple[LogsQueryClient, TableClient], Any, None]:
+    credential: DefaultAzureCredential = DefaultAzureCredential()
+    logs_query_client: LogsQueryClient = LogsQueryClient(credential)
+    table_service_client: TableServiceClient = TableServiceClient(
+        endpoint=STORAGE_ACCOUNT_URL, credential=credential
+    )
+    table_client: TableClient = table_service_client.create_table_if_not_exists(
+        TEST_BANNED_IP_TABLE
+    )
+    # Pre-populate the banned ip table
+    populate_banned_ip_table(table_client)
+    yield logs_query_client, table_client
+    # Clear all entities from the table
+    clear_table(table_client)
+
+
+@pytest.mark.integration
+def test_update_banned_ip_integration(
+    integration_clients: Tuple[LogsQueryClient, TableClient]
+) -> None:
+    print("Integration test is running")
+    logs_query_client, table_client = integration_clients
+    task: UpdateBannedIPTask = UpdateBannedIPTask(logs_query_client, table_client)
+    # retrieve the logs query result from pc-api-loganalytics
+    logs_query_result: List[LogsTableRow] = task.run()
+    entities = list(table_client.list_entities())
+    assert len(logs_query_result) == len(entities)
+    for ip, expected_read_count in logs_query_result:
+        entity = table_client.get_entity(ip, ip)
+        assert entity["ReadCount"] == expected_read_count
+        assert entity["Threshold"] == THRESHOLD_READ_COUNT_IN_GB
+        assert entity["TimeWindow"] == TIME_WINDOW_IN_HOURS
+
+
+def test_update_banned_ip(mock_clients: Tuple[MagicMock, TableClient]) -> None:
+    print("Unit test is running")
     mock_logs_query_client, table_client = mock_clients
     task: UpdateBannedIPTask = UpdateBannedIPTask(mock_logs_query_client, table_client)
     task.run()
-    print("Test is done:")
-    print_table_entries(table_client)
-
-    # Fetch updated data from table to check assertions
-    # updated_entity_1 = table_client.get_entity("192.168.1.1", "192.168.1.1")
-    # updated_entity_3 = table_client.get_entity("192.168.1.3", "192.168.1.3")
-    # assert updated_entity_1["ReadCount"] == 200
-    # assert updated_entity_3["ReadCount"] == 300
+    entities = list(table_client.list_entities())
+    assert len(entities) == len(MOCK_LOGS_QUERY_RESULT)
+    for ip, expected_read_count in MOCK_LOGS_QUERY_RESULT:
+        entity = table_client.get_entity(ip, ip)
+        assert entity["ReadCount"] == expected_read_count
+        assert entity["Threshold"] == THRESHOLD_READ_COUNT_IN_GB
+        assert entity["TimeWindow"] == TIME_WINDOW_IN_HOURS
