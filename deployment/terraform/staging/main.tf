@@ -9,7 +9,7 @@ module "resources" {
 
   pc_test_resources_acr = "pccomponentstest"
 
-  aks_node_count      = 2
+  aks_node_count      = 3
   stac_replica_count  = 2
   tiler_replica_count = 2
 
