@@ -1,17 +1,19 @@
-from html import entities
-from typing import Any, Dict, Generator, List, Literal, Tuple
+from typing import Any, Dict, Generator, List, Tuple
 from unittest.mock import MagicMock
 
-import pytest
-from azure.core.paging import ItemPaged
-from azure.data.tables import TableClient, TableServiceClient, UpdateMode
 from azure.data.tables._entity import TableEntity
+import pytest
+from azure.data.tables import TableClient, TableServiceClient
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient
 from azure.monitor.query._models import (
     LogsTableRow,
 )
-from ipban.constants import *
+from constants import (
+    STORAGE_ACCOUNT_URL,
+    THRESHOLD_READ_COUNT_IN_GB,
+    TIME_WINDOW_IN_HOURS,
+)
 from ipban.models import UpdateBannedIPTask
 from pytest_mock import MockerFixture
 
@@ -67,12 +69,14 @@ def mock_clients(
     mock_response.tables[0].rows = MOCK_LOGS_QUERY_RESULT
     logs_query_client: MagicMock = mocker.MagicMock()
     logs_query_client.query_workspace.return_value = mock_response
-    CONNECTION_STRING: str = f"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+    CONNECTION_STRING: str = (
+        "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+    )
     # Use Azurite for unit tests and populate the table with initial data
     table_service: TableServiceClient = TableServiceClient.from_connection_string(
         CONNECTION_STRING
     )
-    table_client = table_service.create_table_if_not_exists(
+    table_client: TableClient = table_service.create_table_if_not_exists(
         table_name=TEST_BANNED_IP_TABLE
     )
 
@@ -115,7 +119,7 @@ def test_update_banned_ip_integration(
     entities = list(table_client.list_entities())
     assert len(logs_query_result) == len(entities)
     for ip, expected_read_count in logs_query_result:
-        entity = table_client.get_entity(ip, ip)
+        entity: TableEntity = table_client.get_entity(ip, ip)
         assert entity["ReadCount"] == expected_read_count
         assert entity["Threshold"] == THRESHOLD_READ_COUNT_IN_GB
         assert entity["TimeWindow"] == TIME_WINDOW_IN_HOURS

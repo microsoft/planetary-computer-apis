@@ -1,16 +1,17 @@
-import datetime
 import logging
 from typing import Any, List, Set
 
-import azure.functions as func
-from azure.data.tables import TableClient, TableServiceClient, UpdateMode
-from azure.identity import DefaultAzureCredential
+from azure.data.tables import TableClient, UpdateMode
 from azure.monitor.query import LogsQueryClient
 from azure.monitor.query._models import (
     LogsTableRow,
 )
 
-from .constants import *
+from constants import (
+    LOG_ANALYTICS_WORKSPACE_ID,
+    THRESHOLD_READ_COUNT_IN_GB,
+    TIME_WINDOW_IN_HOURS,
+)
 
 
 class UpdateBannedIPTask:
