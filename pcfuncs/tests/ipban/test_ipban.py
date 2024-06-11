@@ -1,14 +1,12 @@
 from typing import Any, Dict, Generator, List, Tuple
 from unittest.mock import MagicMock
 
-from azure.data.tables._entity import TableEntity
 import pytest
 from azure.data.tables import TableClient, TableServiceClient
+from azure.data.tables._entity import TableEntity
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient
-from azure.monitor.query._models import (
-    LogsTableRow,
-)
+from azure.monitor.query._models import LogsTableRow
 from ipban.constants import (
     STORAGE_ACCOUNT_URL,
     THRESHOLD_READ_COUNT_IN_GB,

@@ -3,9 +3,7 @@ from typing import Any, List, Set
 
 from azure.data.tables import TableClient, UpdateMode
 from azure.monitor.query import LogsQueryClient
-from azure.monitor.query._models import (
-    LogsTableRow,
-)
+from azure.monitor.query._models import LogsTableRow
 
 from .constants import (
     LOG_ANALYTICS_WORKSPACE_ID,

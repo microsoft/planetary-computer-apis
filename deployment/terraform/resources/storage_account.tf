@@ -29,3 +29,8 @@ resource "azurerm_storage_table" "blobstoragebannedip" {
   name                 = "blobstoragebannedip"
   storage_account_name = azurerm_storage_account.pc.name
 }
+
+resource "azurerm_storage_table" "testblobstoragebannedip" {
+  name                 = "testblobstoragebannedip"
+  storage_account_name = azurerm_storage_account.pc.name
+}
