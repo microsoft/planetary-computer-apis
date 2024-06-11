@@ -31,7 +31,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         -f docker-compose.yml \
         run --rm \
         stac \
-        python /opt/src/pcstac/tests/loadtestdata.py
+        python3 /opt/src/pcstac/tests/loadtestdata.py
 
     echo "Setting up azurite..."
 
@@ -40,7 +40,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         -f docker-compose.dev.yml \
         run --rm \
         stac-dev \
-        python /opt/src/scripts/bin/setup_azurite.py
+        python3 /opt/src/scripts/bin/setup_azurite.py
 
     echo "Done."
 

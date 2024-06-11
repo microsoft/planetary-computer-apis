@@ -28,6 +28,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     flake8 pcstac/pcstac pcstac/tests
 
     echo "Running unit tests for stac..."
-    python -m pytest pcstac/tests
+    python3 -m pytest pcstac/tests
 
 fi

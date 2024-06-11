@@ -18,11 +18,11 @@ attrs==23.2.0
     #   morecantile
     #   rasterio
     #   rio-tiler
-boto3==1.34.71
+boto3==1.34.123
     # via
     #   pctiler (pctiler/setup.py)
     #   rio-tiler
-botocore==1.34.71
+botocore==1.34.123
     # via
     #   boto3
     #   pctiler (pctiler/setup.py)
@@ -62,6 +62,8 @@ cogeo-mosaic==5.0.0
     # via titiler-mosaic
 color-operations==0.1.3
     # via rio-tiler
+contourpy==1.2.1
+    # via matplotlib
 cycler==0.12.1
     # via matplotlib
 exceptiongroup==1.2.0
@@ -70,6 +72,8 @@ fastapi==0.91.0
     # via
     #   titiler-core
     #   titiler-pgstac
+fonttools==4.53.0
+    # via matplotlib
 geojson-pydantic==0.4.2
     # via
     #   pctiler (pctiler/setup.py)
@@ -90,7 +94,11 @@ idna==3.7
     #   httpx
     #   pctiler (pctiler/setup.py)
     #   requests
-jinja2==3.0.3
+importlib-metadata==7.1.0
+    # via rasterio
+importlib-resources==6.4.0
+    # via matplotlib
+jinja2==3.1.4
     # via
     #   pctiler (pctiler/setup.py)
     #   titiler-core
@@ -102,7 +110,7 @@ kiwisolver==1.4.5
     # via matplotlib
 markupsafe==2.1.5
     # via jinja2
-matplotlib==3.4.3
+matplotlib==3.9.0
     # via pctiler (pctiler/setup.py)
 mercantile==1.2.1
     # via supermercado
@@ -115,6 +123,7 @@ numexpr==2.9.0
 numpy==1.26.4
     # via
     #   color-operations
+    #   contourpy
     #   matplotlib
     #   numexpr
     #   rasterio
@@ -123,8 +132,10 @@ numpy==1.26.4
     #   snuggs
     #   supermercado
     #   titiler-core
-orjson==3.9.15
+orjson==3.10.4
     # via pctiler (pctiler/setup.py)
+packaging==24.1
+    # via matplotlib
 pillow==10.3.0
     # via
     #   matplotlib
@@ -154,7 +165,7 @@ pyparsing==3.1.2
     #   snuggs
 pyproj==3.6.1
     # via morecantile
-pystac==1.7.1
+pystac==1.10.1
     # via
     #   pctiler (pctiler/setup.py)
     #   planetary-computer
@@ -172,7 +183,7 @@ python-dotenv==1.0.1
     # via pydantic
 pytz==2024.1
     # via planetary-computer
-rasterio==1.3.9
+rasterio==1.3.10
     # via
     #   cogeo-mosaic
     #   pctiler (pctiler/setup.py)
@@ -235,6 +246,10 @@ urllib3==1.26.18
     # via
     #   botocore
     #   requests
+zipp==3.19.2
+    # via
+    #   importlib-metadata
+    #   importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

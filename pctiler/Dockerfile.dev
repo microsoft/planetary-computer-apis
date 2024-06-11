@@ -1,6 +1,6 @@
 FROM pc-apis-tiler
 
-RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+RUN tdnf install azure-cli -y
 
 COPY requirements-dev.txt requirements-dev.txt
 
