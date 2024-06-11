@@ -6,26 +6,26 @@ from setuptools import find_packages, setup
 inst_reqs = [
     "fastapi==0.90.1",
     "starlette>=0.22.0,<0.23.0",
-    "opencensus-ext-azure==1.0.8",
-    "opencensus-ext-logging==0.1.0",
-    "orjson>=3.9.15",
-    "azure-identity==1.7.1",
-    "azure-data-tables==12.4.0",
-    "azure-storage-blob>=12.19.1",
-    "pydantic>=1.9, <2.0.0",
+    "opencensus-ext-azure==1.1.13",
+    "opencensus-ext-logging==0.1.1",
+    "orjson>=3.10.4",
+    "azure-identity==1.16.0",
+    "azure-data-tables==12.5.0",
+    "azure-storage-blob>=12.20.0",
+    "pydantic>=1.10, <2.0.0",
     "cachetools~=5.3",
     "types-cachetools==4.2.9",
     "pyhumps==3.5.3",
-    "redis==4.2.0-rc1",
+    "redis==4.6.0",
     "idna>=3.7.0",
-    "html-sanitizer==2.4",
+    "html-sanitizer==2.4.4",
     # Soon available as lxml[html_clean]
     "lxml_html_clean==0.1.0",
     "urllib3>=1.26.18",
 ]
 
 extra_reqs = {
-    "test": ["pytest", "pytest-asyncio", "types-redis"],
+    "test": ["pytest", "pytest-asyncio", "types-redis", "types-requests"],
     "dev": ["pytest", "pytest-asyncio", "types-redis"],
 }
 
