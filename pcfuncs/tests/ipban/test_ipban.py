@@ -9,7 +9,7 @@ from azure.monitor.query import LogsQueryClient
 from azure.monitor.query._models import (
     LogsTableRow,
 )
-from constants import (
+from ipban.constants import (
     STORAGE_ACCOUNT_URL,
     THRESHOLD_READ_COUNT_IN_GB,
     TIME_WINDOW_IN_HOURS,

@@ -6,7 +6,7 @@ from azure.data.tables import TableClient, TableServiceClient
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient
 
-from constants import BANNED_IP_TABLE, STORAGE_ACCOUNT_URL
+from .constants import BANNED_IP_TABLE, STORAGE_ACCOUNT_URL
 
 from .models import UpdateBannedIPTask
 

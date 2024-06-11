@@ -7,7 +7,7 @@ from azure.monitor.query._models import (
     LogsTableRow,
 )
 
-from constants import (
+from .constants import (
     LOG_ANALYTICS_WORKSPACE_ID,
     THRESHOLD_READ_COUNT_IN_GB,
     TIME_WINDOW_IN_HOURS,
