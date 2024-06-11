@@ -18,7 +18,7 @@ from ipban.models import UpdateBannedIPTask
 from pytest_mock import MockerFixture
 
 MOCK_LOGS_QUERY_RESULT = [("192.168.1.1", 170), ("192.168.1.4", 420)]
-TEST_BANNED_IP_TABLE = "testBlobStorageBannedIp"
+TEST_BANNED_IP_TABLE = "testblobstoragebannedip"
 
 
 def populate_banned_ip_table(table_client: TableClient) -> List[Dict[str, Any]]:

@@ -1,6 +1,6 @@
 # Constants related to Azure Table Storage
-STORAGE_ACCOUNT_URL = "https://spatiocitest.table.core.windows.net/"
-BANNED_IP_TABLE = "blobStorageBannedIp"
+STORAGE_ACCOUNT_URL = "https://pcfilestest.table.core.windows.net/"
+BANNED_IP_TABLE = "blobstoragebannedip"
 
 # Log Analytics Workspace: pc-api-loganalytics
 LOG_ANALYTICS_WORKSPACE_ID = "78d48390-b6bb-49a9-b7fd-a86f6522e9c4"

@@ -24,3 +24,8 @@ resource "azurerm_storage_table" "ipexceptionlist" {
   name                 = "ipexceptionlist"
   storage_account_name = azurerm_storage_account.pc.name
 }
+
+resource "azurerm_storage_table" "blobstoragebannedip" {
+  name                 = "blobstoragebannedip"
+  storage_account_name = azurerm_storage_account.pc.name
+}
