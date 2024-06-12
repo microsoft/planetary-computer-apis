@@ -18,8 +18,8 @@ class UpdateBannedIPTask:
         logs_query_client: LogsQueryClient,
         table_client: TableClient,
     ) -> None:
-        self.log_query_client: LogsQueryClient = logs_query_client
-        self.table_client: TableClient = table_client
+        self.log_query_client = logs_query_client
+        self.table_client = table_client
 
     def run(self) -> List[LogsTableRow]:
         query_result: List[LogsTableRow] = self.get_blob_logs_query_result()
