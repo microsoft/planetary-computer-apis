@@ -5,11 +5,7 @@ from azure.data.tables import TableClient, UpdateMode
 from azure.monitor.query import LogsQueryClient
 from azure.monitor.query._models import LogsTableRow
 
-from .constants import (
-    LOG_ANALYTICS_WORKSPACE_ID,
-    THRESHOLD_READ_COUNT_IN_GB,
-    TIME_WINDOW_IN_HOURS,
-)
+from .config import settings
 
 
 class UpdateBannedIPTask:
@@ -29,14 +25,14 @@ class UpdateBannedIPTask:
     def get_blob_logs_query_result(self) -> List[LogsTableRow]:
         query: str = f"""
         StorageBlobLogs
-        | where TimeGenerated > ago({TIME_WINDOW_IN_HOURS}h)
+        | where TimeGenerated > ago({settings.time_window_in_hours}h)
         | extend IpAddress = tostring(split(CallerIpAddress, ":")[0])
         | summarize readcount = sum(ResponseBodySize) / (1024 * 1024 * 1024)
         by IpAddress
-        | where readcount > {THRESHOLD_READ_COUNT_IN_GB}
+        | where readcount > {settings.threshold_read_count_in_gb}
         """
         response: Any = self.log_query_client.query_workspace(
-            LOG_ANALYTICS_WORKSPACE_ID, query, timespan=None
+            settings.log_analytics_workspace_id, query, timespan=None
         )
         return response.tables[0].rows
 
@@ -53,8 +49,8 @@ class UpdateBannedIPTask:
                 "PartitionKey": ip_address,
                 "RowKey": ip_address,
                 "ReadCount": read_count,
-                "Threshold": THRESHOLD_READ_COUNT_IN_GB,
-                "TimeWindow": TIME_WINDOW_IN_HOURS,
+                "Threshold": settings.threshold_read_count_in_gb,
+                "TimeWindow": settings.time_window_in_hours,
             }
 
             if ip_address in existing_ips:

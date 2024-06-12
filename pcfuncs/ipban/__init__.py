@@ -6,7 +6,7 @@ from azure.data.tables import TableClient, TableServiceClient
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient
 
-from .constants import BANNED_IP_TABLE, STORAGE_ACCOUNT_URL
+from .config import settings
 from .models import UpdateBannedIPTask
 
 
@@ -18,10 +18,10 @@ def main(mytimer: func.TimerRequest) -> None:
     credential: DefaultAzureCredential = DefaultAzureCredential()
     logs_query_client: LogsQueryClient = LogsQueryClient(credential)
     table_service_client: TableServiceClient = TableServiceClient(
-        endpoint=STORAGE_ACCOUNT_URL, credential=credential
+        endpoint=settings.storage_account_url, credential=credential
     )
     table_client: TableClient = table_service_client.create_table_if_not_exists(
-        BANNED_IP_TABLE
+        settings.banned_ip_table
     )
     task: UpdateBannedIPTask = UpdateBannedIPTask(logs_query_client, table_client)
     task.run()

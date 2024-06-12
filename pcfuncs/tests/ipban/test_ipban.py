@@ -7,11 +7,7 @@ from azure.data.tables._entity import TableEntity
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient
 from azure.monitor.query._models import LogsTableRow
-from ipban.constants import (
-    STORAGE_ACCOUNT_URL,
-    THRESHOLD_READ_COUNT_IN_GB,
-    TIME_WINDOW_IN_HOURS,
-)
+from ipban.config import settings
 from ipban.models import UpdateBannedIPTask
 from pytest_mock import MockerFixture
 
@@ -26,22 +22,22 @@ def populate_banned_ip_table(table_client: TableClient) -> List[Dict[str, Any]]:
             "PartitionKey": "192.168.1.1",
             "RowKey": "192.168.1.1",
             "ReadCount": 647,
-            "Threshold": THRESHOLD_READ_COUNT_IN_GB,
-            "TimeWindow": TIME_WINDOW_IN_HOURS,
+            "Threshold": settings.threshold_read_count_in_gb,
+            "TimeWindow": settings.time_window_in_hours,
         },
         {
             "PartitionKey": "192.168.1.2",
             "RowKey": "192.168.1.2",
             "ReadCount": 214,
-            "Threshold": THRESHOLD_READ_COUNT_IN_GB,
-            "TimeWindow": TIME_WINDOW_IN_HOURS,
+            "Threshold": settings.threshold_read_count_in_gb,
+            "TimeWindow": settings.time_window_in_hours,
         },
         {
             "PartitionKey": "192.168.1.3",
             "RowKey": "192.168.1.3",
             "ReadCount": 550,
-            "Threshold": THRESHOLD_READ_COUNT_IN_GB,
-            "TimeWindow": TIME_WINDOW_IN_HOURS,
+            "Threshold": settings.threshold_read_count_in_gb,
+            "TimeWindow": settings.time_window_in_hours,
         },
     ]
     for entity in entities:
@@ -96,7 +92,7 @@ def integration_clients(
     credential: DefaultAzureCredential = DefaultAzureCredential()
     logs_query_client: LogsQueryClient = LogsQueryClient(credential)
     table_service_client: TableServiceClient = TableServiceClient(
-        endpoint=STORAGE_ACCOUNT_URL, credential=credential
+        endpoint=settings.storage_account_url, credential=credential
     )
     table_client: TableClient = table_service_client.create_table_if_not_exists(
         TEST_BANNED_IP_TABLE
@@ -122,8 +118,8 @@ def test_update_banned_ip_integration(
     for ip, expected_read_count in logs_query_result:
         entity: TableEntity = table_client.get_entity(ip, ip)
         assert entity["ReadCount"] == expected_read_count
-        assert entity["Threshold"] == THRESHOLD_READ_COUNT_IN_GB
-        assert entity["TimeWindow"] == TIME_WINDOW_IN_HOURS
+        assert entity["Threshold"] == settings.threshold_read_count_in_gb
+        assert entity["TimeWindow"] == settings.time_window_in_hours
 
 
 def test_update_banned_ip(mock_clients: Tuple[MagicMock, TableClient]) -> None:
@@ -136,5 +132,5 @@ def test_update_banned_ip(mock_clients: Tuple[MagicMock, TableClient]) -> None:
     for ip, expected_read_count in MOCK_LOGS_QUERY_RESULT:
         entity = table_client.get_entity(ip, ip)
         assert entity["ReadCount"] == expected_read_count
-        assert entity["Threshold"] == THRESHOLD_READ_COUNT_IN_GB
-        assert entity["TimeWindow"] == TIME_WINDOW_IN_HOURS
+        assert entity["Threshold"] == settings.threshold_read_count_in_gb
+        assert entity["TimeWindow"] == settings.time_window_in_hours
