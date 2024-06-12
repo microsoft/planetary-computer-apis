@@ -11,7 +11,7 @@ from ipban.config import settings
 from ipban.models import UpdateBannedIPTask
 from pytest_mock import MockerFixture
 
-MOCK_LOGS_QUERY_RESULT = [("192.168.1.1", 170), ("192.168.1.4", 420)]
+MOCK_LOGS_QUERY_RESULT = [("192.168.1.1", 8000), ("192.168.1.4", 12000)]
 TEST_BANNED_IP_TABLE = "testblobstoragebannedip"
 
 
