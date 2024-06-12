@@ -24,12 +24,14 @@ class UpdateBannedIPTask:
 
     def get_blob_logs_query_result(self) -> List[LogsTableRow]:
         query: str = f"""
-        StorageBlobLogs
-        | where TimeGenerated > ago({settings.time_window_in_hours}h)
-        | extend IpAddress = tostring(split(CallerIpAddress, ":")[0])
-        | summarize readcount = sum(ResponseBodySize) / (1024 * 1024 * 1024)
-        by IpAddress
-        | where readcount > {settings.threshold_read_count_in_gb}
+            StorageBlobLogs
+            | where TimeGenerated > ago({settings.time_window_in_hours}h)
+            | extend IpAddress = tostring(split(CallerIpAddress, ":")[0])
+            | where OperationName == 'GetBlob'
+            | where not(ipv4_is_private(IpAddress))
+            | summarize readcount = sum(ResponseBodySize) / (1024 * 1024 * 1024)
+            by IpAddress
+            | where readcount > {settings.threshold_read_count_in_gb}
         """
         response: Any = self.log_query_client.query_workspace(
             settings.log_analytics_workspace_id, query, timespan=None
