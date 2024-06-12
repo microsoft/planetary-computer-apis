@@ -9,7 +9,7 @@ inst_reqs = [
     "opencensus-ext-azure==1.1.13",
     "opencensus-ext-logging==0.1.1",
     "orjson>=3.10.4",
-    "azure-identity==1.16.0",
+    "azure-identity==1.16.1",
     "azure-data-tables==12.5.0",
     "azure-storage-blob>=12.20.0",
     "pydantic>=1.10, <2.0.0",

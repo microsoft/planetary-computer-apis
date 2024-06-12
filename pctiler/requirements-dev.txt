@@ -190,8 +190,9 @@ rasterio==1.3.10
     #   rio-tiler
     #   supermercado
     #   titiler-core
-requests==2.31.0
+requests==2.32.2
     # via
+    #   pctiler (pctiler/setup.py)
     #   planetary-computer
     #   pystac-client
 rio-tiler==4.1.13
