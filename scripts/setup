@@ -15,7 +15,7 @@ Sets up this project for development.
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     # Build docker containers
-    scripts/update
+    # scripts/update
 
     # Migrate the DB
     echo "migrating..."

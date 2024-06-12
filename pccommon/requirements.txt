@@ -16,7 +16,7 @@ azure-core==1.30.1
     #   opencensus-ext-azure
 azure-data-tables==12.5.0
     # via pccommon (pccommon/setup.py)
-azure-identity==1.16.0
+azure-identity==1.16.1
     # via
     #   opencensus-ext-azure
     #   pccommon (pccommon/setup.py)
