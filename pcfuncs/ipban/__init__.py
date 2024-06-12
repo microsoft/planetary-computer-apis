@@ -9,12 +9,14 @@ from azure.monitor.query import LogsQueryClient
 from .config import settings
 from .models import UpdateBannedIPTask
 
+logger = logging.getLogger(__name__)
+
 
 def main(mytimer: func.TimerRequest) -> None:
     utc_timestamp: str = (
         datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat()
     )
-    logging.info("Updating the ip ban list at %s", utc_timestamp)
+    logger.info("Updating the ip ban list at %s", utc_timestamp)
     credential: DefaultAzureCredential = DefaultAzureCredential()
     logs_query_client: LogsQueryClient = LogsQueryClient(credential)
     table_service_client: TableServiceClient = TableServiceClient(
