@@ -17,6 +17,7 @@ inst_reqs = [
     "types-cachetools==4.2.9",
     "pyhumps==3.5.3",
     "redis==4.6.0",
+    "requests==2.32.3",
     "idna>=3.7.0",
     "html-sanitizer==2.4.4",
     # Soon available as lxml[html_clean]
