@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from funclib.raster import Bbox, PILRaster, RasterExtent
+from funclib.raster import Bbox, GDALRaster, PILRaster, RasterExtent
 from PIL import Image
+from rio_tiler.models import ImageData
 
 HERE = Path(__file__).parent
 DATA_FILES = HERE / ".." / "data-files"
@@ -35,3 +36,22 @@ def test_raster_extent_map_to_grid() -> None:
 
     assert x == 5
     assert y == 5
+
+
+def test_rio_crop() -> None:
+    with open(DATA_FILES / "s2.png", "rb") as src:
+        img = ImageData.from_bytes(src.read())
+
+    raster = GDALRaster(
+        extent=RasterExtent(
+            bbox=Bbox(0, 0, 10, 10),
+            cols=img.width,
+            rows=img.height,
+        ),
+        image=img,
+    )
+
+    cropped = raster.crop(Bbox(0, 0, 5, 5))
+
+    assert abs(cropped.extent.cols - (img.width / 2)) < 1
+    assert abs(cropped.extent.rows - (img.height / 2)) < 1

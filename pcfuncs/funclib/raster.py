@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple, TypeVar
 import mercantile
 from PIL.Image import Image as PILImage
 from pyproj import CRS, Transformer
+from rio_tiler.models import ImageData
 
 T = TypeVar("T", bound="Raster")
 
@@ -170,5 +171,56 @@ class PILRaster(Raster):
 
 
 class GDALRaster(Raster):
-    # TODO: Implement
-    ...
+    def __init__(self, extent: RasterExtent, image: ImageData) -> None:
+        self.image = image
+        super().__init__(extent)
+
+    def to_bytes(self, format: str = ExportFormats.PNG) -> io.BytesIO:
+        img_bytes = self.image.render(
+            add_mask=True,
+            img_format=format.upper(),
+        )
+        return io.BytesIO(img_bytes)
+
+    def crop(self, bbox: Bbox) -> "GDALRaster":
+        # Web mercator of user bbox
+        if (
+            not bbox.crs == self.extent.bbox.crs
+            and bbox.crs is not None
+            and self.extent.bbox.crs is not None
+        ):
+            bbox = bbox.reproject(self.extent.bbox.crs)
+
+        col_min, row_min = self.extent.map_to_grid(bbox.xmin, bbox.ymax)
+        col_max, row_max = self.extent.map_to_grid(bbox.xmax, bbox.ymin)
+
+        data = self.image.data[:, row_min:row_max, col_min:col_max]
+        mask = self.image.mask[row_min:row_max, col_min:col_max]
+        cropped = ImageData(
+            data,
+            mask,
+            assets=self.image.assets,
+            crs=self.image.crs,
+            bounds=bbox.to_list(),
+            band_names=self.image.band_names,
+            metadata=self.image.metadata,
+            dataset_statistics=self.image.dataset_statistics,
+        )
+
+        return GDALRaster(
+            extent=RasterExtent(
+                bbox,
+                cols=col_max - col_min,
+                rows=row_max - row_min,
+            ),
+            image=cropped,
+        )
+
+    def resample(self, cols: int, rows: int) -> "GDALRaster":
+        return GDALRaster(
+            extent=RasterExtent(bbox=self.extent.bbox, cols=cols, rows=rows),
+            image=self.image.resize(rows, cols),  # type: ignore
+        )
+
+    def mask(self, geom: Dict[str, Any]) -> "GDALRaster":
+        raise NotImplementedError("GDALRaster does not support masking")
