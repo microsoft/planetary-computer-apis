@@ -7,9 +7,7 @@
 anyio==3.7.1
     # via
     #   starlette
-    #   watchgod
-asgiref==3.8.1
-    # via uvicorn
+    #   watchfiles
 async-timeout==4.0.3
     # via asyncpg
 asyncpg==0.29.0
@@ -147,22 +145,22 @@ termcolor==2.4.0
     # via fire
 typing-extensions==4.10.0
     # via
-    #   asgiref
     #   fastapi
     #   psycopg
     #   psycopg-pool
     #   pydantic
     #   pygeoif
     #   starlette
+    #   uvicorn
 tzlocal==5.2
     # via dateparser
-uvicorn[standard]==0.17.6
+uvicorn[standard]==0.30.1
     # via pcstac (pcstac/setup.py)
 uvloop==0.19.0
     # via uvicorn
 version-parser==1.0.1
     # via pypgstac
-watchgod==0.8.2
+watchfiles==0.22.0
     # via uvicorn
 websockets==12.0
     # via uvicorn
