@@ -81,8 +81,7 @@ class TileSet(ABC, Generic[T]):
         return url
 
     @abstractmethod
-    async def get_mosaic(self, tiles: List[Tile]) -> T:
-        ...
+    async def get_mosaic(self, tiles: List[Tile]) -> T: ...
 
     @staticmethod
     def get_covering_tiles(
