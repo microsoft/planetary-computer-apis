@@ -1,9 +1,8 @@
 FROM pc-apis-stac
 
-
 RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=requirements-dev.txt,target=requirements-dev.txt \
     pip install -r requirements-dev.txt
 
 RUN --mount=type=cache,target=/root/.cache \
-    pip install -e ./pccommon[dev] -e ./pcstac
+    pip install --no-deps -e ./pccommon[dev] -e ./pcstac

@@ -16,7 +16,7 @@ services:
       - azurite
       - redis
     command: >
-      bash -c "pypgstac pgready && uvicorn pcstac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers"
+      bash -c "pypgstac pgready && uvicorn pcstac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers --root-path '/stac'"
 
   tiler:
     image: pc-apis-tiler

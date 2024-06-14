@@ -390,17 +390,19 @@ async def test_pagination_item_collection(app_client):
     idx = 0
     item_ids = []
     nextThing = None
+
     while True:
         idx += 1
         page_data = page.json()
         item_ids.append(page_data["features"][0]["id"])
-        print(idx, item_ids)
         nextlink = [
             link["href"] for link in page_data["links"] if link["rel"] == "next"
         ]
         if len(nextlink) < 1:
             break
         nextThing = nextlink.pop()
+        assert nextThing.startswith("http://test/stac/collections")
+
         page = await app_client.get(nextThing)
         if idx >= 20:
             assert False

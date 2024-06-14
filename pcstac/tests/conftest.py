@@ -75,7 +75,7 @@ def api_client(pqe_pg):
             post_request_model=search_post_request_model,
         ),
         extensions=EXTENSIONS,
-        app=FastAPI(default_response_class=ORJSONResponse),
+        app=FastAPI(root_path="/stac", default_response_class=ORJSONResponse),
         search_get_request_model=search_get_request_model,
         search_post_request_model=search_post_request_model,
     )
@@ -102,7 +102,7 @@ async def app(api_client) -> AsyncGenerator[FastAPI, None]:
 @pytest.fixture(scope="session")
 async def app_client(app) -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(
-        app=app, base_url="http://test", headers={"X-Forwarded-For": "127.0.0.1"}
+        app=app, base_url="http://test/stac", headers={"X-Forwarded-For": "127.0.0.1"}
     ) as c:
         yield c
 

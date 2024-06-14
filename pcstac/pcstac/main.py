@@ -1,4 +1,5 @@
 """FastAPI application using PGStac."""
+
 import logging
 import os
 from typing import Any, Dict
