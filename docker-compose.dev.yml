@@ -1,6 +1,5 @@
 services:
   stac-dev:
-    platform: linux/amd64
     image: pc-apis-stac-dev
     build:
       context: .

@@ -13,6 +13,7 @@ inst_reqs = [
     # Required due to some imports related to pypgstac CLI usage in startup script
     "pypgstac[psycopg]>=0.8.5,<0.9",
     "pystac==1.10.1",
+    "typing_extensions>=4.6.1",
 ]
 
 extra_reqs = {

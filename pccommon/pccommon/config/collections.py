@@ -1,12 +1,11 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
-import orjson
 from humps import camelize
 from pydantic import BaseModel, Field
 
 from pccommon.tables import ModelTableService
-from pccommon.utils import get_param_str, orjson_dumps
+from pccommon.utils import get_param_str
 
 
 class RenderOptionType(str, Enum):

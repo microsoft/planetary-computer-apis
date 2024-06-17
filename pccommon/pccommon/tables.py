@@ -41,8 +41,10 @@ class TableError(Exception):
     pass
 
 
+# TODO: mypy is complaining locally about
+# "BaseModel" has no attribute "model_dump_json"
 def encode_model(m: BaseModel) -> str:
-    return m.model_dump_json()
+    return m.model_dump_json()  # type: ignore
 
 
 def decode_dict(s: str) -> Dict[str, Any]:

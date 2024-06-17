@@ -2,7 +2,8 @@ from functools import lru_cache
 from urllib.parse import urljoin
 
 from fastapi import Request
-from pydantic import BaseModel, BaseSettings, Field
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings
 from stac_fastapi.extensions.core import (
     FieldsExtension,
     FilterExtension,
@@ -100,6 +101,15 @@ class Settings(BaseSettings):
     back_pressures: BackPressures = BackPressures()
     request_timeout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
 
+    model_config = {
+        "env_prefix": ENV_VAR_PCAPIS_PREFIX,
+        "env_nested_delimiter": "__",
+        # Mypi is complaining about this with
+        # error: Incompatible types (expression has type "str",
+        # TypedDict item "extra" has type "Extra")
+        "extra": "ignore",  # type: ignore
+    }
+
     def get_tiler_href(self, request: Request) -> str:
         """Generates the tiler HREF.
 
@@ -112,11 +122,6 @@ class Settings(BaseSettings):
             return urljoin(base_hostname, self.tiler_href)
         else:
             return self.tiler_href
-
-    class Config:
-        env_prefix = ENV_VAR_PCAPIS_PREFIX
-        extra = "ignore"
-        env_nested_delimiter = "__"
 
 
 @lru_cache

@@ -2,7 +2,6 @@ services:
 
   stac:
     image: pc-apis-stac
-    platform: linux/amd64
     build:
       context: .
       dockerfile: pcstac/Dockerfile
@@ -44,7 +43,6 @@ services:
 
   funcs:
     image: pc-apis-funcs
-    platform: linux/amd64
     build:
       context: .
       dockerfile: pcfuncs/Dockerfile

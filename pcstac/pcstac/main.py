@@ -1,8 +1,9 @@
 """FastAPI application using PGStac."""
 
+from contextlib import asynccontextmanager
 import logging
 import os
-from typing import Any, Dict
+from typing import Any, Dict, AsyncGenerator
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
@@ -10,10 +11,13 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.errors import DEFAULT_STATUS_CODES
 from stac_fastapi.api.models import create_get_request_model, create_post_request_model
+from stac_fastapi.api.middleware import ProxyHeaderMiddleware
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
+from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
+from brotli_asgi import BrotliMiddleware
 
 from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_handler
@@ -51,6 +55,16 @@ search_get_request_model = create_get_request_model(
 )
 search_post_request_model = create_post_request_model(EXTENSIONS, base_model=PCSearch)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator:
+    """FastAPI Lifespan."""
+    await connect_to_db(app)
+    await connect_to_redis(app)
+    yield
+    await close_db_connection(app)
+
+
 api = PCStacApi(
     title=API_TITLE,
     description=API_DESCRIPTION,
@@ -63,11 +77,28 @@ api = PCStacApi(
     ),
     client=PCClient.create(post_request_model=search_post_request_model),
     extensions=EXTENSIONS,
-    app=FastAPI(root_path=APP_ROOT_PATH, default_response_class=ORJSONResponse),
+    app=FastAPI(
+        root_path=APP_ROOT_PATH,
+        default_response_class=ORJSONResponse,
+        lifespan=lifespan,
+    ),
     search_get_request_model=search_get_request_model,
     search_post_request_model=search_post_request_model,
     response_class=ORJSONResponse,
     exceptions={**DEFAULT_STATUS_CODES, **PC_DEFAULT_STATUS_CODES},
+    middleware=[
+        Middleware(BrotliMiddleware),
+        Middleware(ProxyHeaderMiddleware),
+        Middleware(TraceMiddleware, service_name=ServiceName.STAC),
+        # Note: If requests are being sent through an application gateway like
+        # nginx-ingress, you may need to configure CORS through that system.
+        Middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_methods=["GET", "POST"],
+            allow_headers=["*"],
+        ),
+    ],
 )
 
 app: FastAPI = api.app
@@ -75,31 +106,6 @@ app: FastAPI = api.app
 app.state.service_name = ServiceName.STAC
 
 add_timeout(app, app_settings.request_timeout)
-
-app.add_middleware(TraceMiddleware, service_name=app.state.service_name)
-
-# Note: If requests are being sent through an application gateway like
-# nginx-ingress, you may need to configure CORS through that system.
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
-)
-
-
-@app.on_event("startup")
-async def startup_event() -> None:
-    """Connect to database on startup."""
-    await connect_to_db(app)
-    await connect_to_redis(app)
-
-
-@app.on_event("shutdown")
-async def shutdown_event() -> None:
-    """Close database connection."""
-    await close_db_connection(app)
-
 
 app.add_exception_handler(Exception, http_exception_handler)
 
