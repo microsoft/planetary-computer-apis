@@ -4,6 +4,8 @@
 #
 #    pip-compile --extra=server --output-file=pccommon/requirements.txt ./pccommon/setup.py
 #
+annotated-types==0.7.0
+    # via pydantic
 anyio==4.3.0
     # via starlette
 async-timeout==4.0.3
@@ -42,7 +44,7 @@ cryptography==42.0.5
     #   pyjwt
 exceptiongroup==1.2.0
     # via anyio
-fastapi==0.90.1
+fastapi-slim==0.111.0
     # via pccommon (pccommon/setup.py)
 google-api-core==2.18.0
     # via opencensus
@@ -109,14 +111,23 @@ pyasn1-modules==0.3.0
     # via google-auth
 pycparser==2.21
     # via cffi
-pydantic==1.10.14
+pydantic==2.7.4
     # via
-    #   fastapi
+    #   fastapi-slim
     #   pccommon (pccommon/setup.py)
+    #   pydantic-settings
+pydantic-core==2.18.4
+    # via pydantic
+pydantic-settings==2.3.3
+    # via pccommon (pccommon/setup.py)
 pyhumps==3.5.3
     # via pccommon (pccommon/setup.py)
 pyjwt[crypto]==2.8.0
-    # via msal
+    # via
+    #   msal
+    #   pyjwt
+python-dotenv==1.0.1
+    # via pydantic-settings
 redis==4.6.0
     # via pccommon (pccommon/setup.py)
 requests==2.32.3
@@ -137,9 +148,9 @@ sniffio==1.3.1
     # via anyio
 soupsieve==2.5
     # via beautifulsoup4
-starlette==0.22.0
+starlette==0.37.2
     # via
-    #   fastapi
+    #   fastapi-slim
     #   pccommon (pccommon/setup.py)
 types-cachetools==4.2.9
     # via pccommon (pccommon/setup.py)
@@ -149,7 +160,9 @@ typing-extensions==4.10.0
     #   azure-core
     #   azure-data-tables
     #   azure-storage-blob
+    #   fastapi-slim
     #   pydantic
+    #   pydantic-core
     #   starlette
 urllib3==2.2.1
     # via

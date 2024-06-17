@@ -19,11 +19,13 @@ class RenderOptionType(str, Enum):
 
 
 class CamelModel(BaseModel):
-    class Config:
-        alias_generator = camelize
-        allow_population_by_field_name = True
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
+
+    model_config = {
+        # TODO, see if we can use pydantic native function
+        # https://docs.pydantic.dev/latest/api/config/#pydantic.alias_generators.to_camel
+        "alias_generator": camelize,
+        "populate_by_name": True,
+    }
 
 
 class VectorTileset(CamelModel):
@@ -137,10 +139,6 @@ class DefaultRenderConfig(BaseModel):
     def should_add_item_links(self) -> bool:
         return self.create_links and (not self.hidden)
 
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
-
 
 class Mosaics(CamelModel):
     """
@@ -187,11 +185,11 @@ class LegendConfig(CamelModel):
         showing legend labels as scaled values.
     """
 
-    type: Optional[str]
-    labels: Optional[List[str]]
-    trim_start: Optional[int]
-    trim_end: Optional[int]
-    scale_factor: Optional[float]
+    type: Optional[str] = None
+    labels: Optional[List[str]] = None
+    trim_start: Optional[int] = None
+    trim_end: Optional[int] = None
+    scale_factor: Optional[float] = None
 
 
 class VectorTileOptions(CamelModel):
@@ -216,10 +214,10 @@ class VectorTileOptions(CamelModel):
 
     tilejson_key: str
     source_layer: str
-    fill_color: Optional[str]
-    stroke_color: Optional[str]
-    stroke_width: Optional[int]
-    filter: Optional[List[Any]]
+    fill_color: Optional[str] = None
+    stroke_color: Optional[str] = None
+    stroke_width: Optional[int] = None
+    filter: Optional[List[Any]] = None
 
 
 class RenderOptionCondition(CamelModel):
@@ -328,10 +326,6 @@ class MosaicInfo(CamelModel):
 class CollectionConfig(BaseModel):
     render_config: DefaultRenderConfig
     mosaic_info: MosaicInfo
-
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
 
 
 class CollectionConfigTable(ModelTableService[CollectionConfig]):

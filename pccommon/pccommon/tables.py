@@ -42,7 +42,7 @@ class TableError(Exception):
 
 
 def encode_model(m: BaseModel) -> str:
-    return m.json()
+    return m.model_dump_json()
 
 
 def decode_dict(s: str) -> Dict[str, Any]:

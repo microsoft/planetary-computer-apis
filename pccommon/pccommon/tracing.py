@@ -3,7 +3,6 @@ import logging
 import re
 from typing import List, Optional, Tuple, Union, cast
 
-import fastapi
 from fastapi import Request
 from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.trace import execution_context
@@ -211,7 +210,7 @@ def _iter_cql(cql: dict, property_name: str) -> Optional[Union[str, List[str]]]:
     return None
 
 
-def add_stac_attributes_from_search(search_json: str, request: fastapi.Request) -> None:
+def add_stac_attributes_from_search(search_json: str, request: Request) -> None:
     """
     Try to add the Collection ID and Item ID from a search to the current span.
     """

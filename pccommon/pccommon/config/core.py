@@ -4,8 +4,8 @@ from typing import Optional
 from cachetools import Cache, LRUCache, cachedmethod
 from cachetools.func import lru_cache
 from cachetools.keys import hashkey
-from pydantic import BaseModel, BaseSettings, Field, PrivateAttr
-
+from pydantic import BaseModel, Field, PrivateAttr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pccommon.config.collections import CollectionConfigTable
 from pccommon.config.containers import ContainerConfigTable
 from pccommon.constants import DEFAULT_TTL
@@ -46,6 +46,12 @@ class PCAPIsConfig(BaseSettings):
 
     debug: bool = False
 
+    model_config = SettingsConfigDict(
+        env_prefix=ENV_VAR_PCAPIS_PREFIX,
+        env_nested_delimiter="__",
+        extra="ignore",
+    )
+
     @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("collection"))
     def get_collection_config_table(self) -> CollectionConfigTable:
         return CollectionConfigTable.from_account_key(
@@ -80,8 +86,3 @@ class PCAPIsConfig(BaseSettings):
     @lru_cache(maxsize=1)
     def from_environment(cls) -> "PCAPIsConfig":
         return PCAPIsConfig()  # type: ignore
-
-    class Config:
-        env_prefix = ENV_VAR_PCAPIS_PREFIX
-        extra = "ignore"
-        env_nested_delimiter = "__"
