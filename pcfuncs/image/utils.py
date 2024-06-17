@@ -7,13 +7,13 @@ from uuid import uuid4
 import aiohttp
 from funclib.models import RenderOptions
 
-from .settings import ImageSettings
+from .settings import get_settings
 
 
 async def get_min_zoom(
     collection_id: str, data_api_url_override: Optional[str] = None
 ) -> Optional[int]:
-    settings = ImageSettings.get()
+    settings = get_settings()
     async with aiohttp.ClientSession() as session:
         resp = await session.get(
             settings.get_mosaic_info_url(collection_id, data_api_url_override)
@@ -32,7 +32,7 @@ async def get_min_zoom(
 
 
 def upload_image(gif: io.BytesIO, collection_name: str) -> str:
-    settings = ImageSettings.get()
+    settings = get_settings()
     filename = f"mspc-{collection_name}-{uuid4().hex}.png"
     blob_url = os.path.join(settings.output_storage_url, filename)
     with settings.get_container_client() as container_client:
@@ -108,7 +108,7 @@ async def register_search_and_get_tile_url(
     render_options: RenderOptions,
     data_api_url_override: Optional[str] = None,
 ) -> str:
-    settings = ImageSettings.get()
+    settings = get_settings()
     register_url = settings.get_register_url(data_api_url_override)
 
     async with aiohttp.ClientSession() as session:

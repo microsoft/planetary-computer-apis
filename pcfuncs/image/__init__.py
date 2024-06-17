@@ -9,7 +9,7 @@ from funclib.tiles import TileSet, get_tile_set
 from pydantic import ValidationError
 
 from .models import ImageRequest, ImageResponse
-from .settings import ImageSettings
+from .settings import get_settings
 from .utils import get_min_zoom, upload_image
 
 logger = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 async def handle_request(req: ImageRequest) -> ImageResponse:
-    settings = ImageSettings.get()
+    settings = get_settings()
     geom = req.get_geometry()
     bbox = Bbox.from_geom(geom)
     render_options = req.get_render_options()

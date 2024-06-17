@@ -69,12 +69,12 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
         if id:
             col_config = col_config_table.get_config(id)
             assert col_config
-            result[id] = col_config.dict()
+            result[id] = col_config.model_dump()
         else:
             for _, collection_id, col_config in col_config_table.get_all():
                 assert collection_id
                 assert col_config
-                result[collection_id] = col_config.dict()
+                result[collection_id] = col_config.model_dump()
 
     elif type == "container":
         con_config_table = ContainerConfigTable.from_sas_token(
@@ -85,11 +85,11 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
             assert con_account
             con_config = con_config_table.get_config(con_account, id)
             assert con_config
-            result[f"{con_account}/{id}"] = con_config.dict()
+            result[f"{con_account}/{id}"] = con_config.model_dump()
         else:
             for storage_account, container, con_config in con_config_table.get_all():
                 assert con_config
-                result[f"{storage_account}/{container}"] = con_config.dict()
+                result[f"{storage_account}/{container}"] = con_config.model_dump()
     else:
         print(f"Unknown type: {type}")
         return 1

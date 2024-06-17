@@ -2,7 +2,7 @@ import os
 from typing import Optional
 
 from azure.storage.blob import ContainerClient
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 from pccommon.blob import get_container_client
 

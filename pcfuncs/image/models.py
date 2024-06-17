@@ -2,9 +2,9 @@ from typing import Any, Dict, Optional
 
 from funclib.models import RenderOptions
 from funclib.raster import ExportFormats
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ValidationInfo
 
-from .settings import ImageSettings
+from .settings import get_settings, ImageSettings
 from .utils import get_geom_from_cql
 
 
@@ -53,12 +53,14 @@ class ImageRequest(BaseModel):
     def get_render_options(self) -> RenderOptions:
         return RenderOptions.from_query_params(self.render_params)
 
-    @validator("geometry")
+    @field_validator("geometry")
     def _validate_cql(
-        cls, v: Optional[Dict[str, Any]], values: Dict[str, Any]
+        cls,
+        v: Optional[Dict[str, Any]],
+        info: ValidationInfo,
     ) -> Dict[str, Any]:
         if not v:
-            cql = values["cql"]
+            cql = info.data["cql"]
             v = get_geom_from_cql(cql)
             if not v:
                 raise ValueError(
@@ -67,15 +69,15 @@ class ImageRequest(BaseModel):
                 )
         return v
 
-    @validator("render_params")
+    @field_validator("render_params")
     def _validate_render_params(cls, v: str) -> str:
         RenderOptions.from_query_params(v)
         return v
 
-    @validator("rows")
-    def _validate_rows(cls, v: int, values: Dict[str, Any]) -> int:
-        settings = ImageSettings.get()
-        cols = int(values["cols"])
+    @field_validator("rows")
+    def _validate_rows(cls, v: int, info: ValidationInfo) -> int:
+        settings = get_settings()
+        cols = int(info.data["cols"])
         if cols * v > settings.max_pixels:
             raise ValueError(
                 f"Too many pixels requested: {cols * v} > {settings.max_pixels}. "
@@ -83,10 +85,10 @@ class ImageRequest(BaseModel):
             )
         return v
 
-    @validator("show_branding")
-    def _validate_show_branding(cls, v: bool, values: Dict[str, Any]) -> bool:
+    @field_validator("show_branding")
+    def _validate_show_branding(cls, v: bool, info: ValidationInfo) -> bool:
         if v:
-            if values["format"] != ExportFormats.PNG:
+            if info.data["format"] != ExportFormats.PNG:
                 raise ValueError("Branding is only supported for PNG images.")
         return v
 

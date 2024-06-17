@@ -18,9 +18,10 @@ class AnimationSettings(BaseExporterSettings):
     output_storage_url: str = DEFAULT_ANIMATION_CONTAINER_URL
     tile_request_concurrency: int = DEFAULT_CONCURRENCY
 
-    class Config:
-        env_prefix = ANIMATION_SETTINGS_PREFIX
-        env_nested_delimiter = "__"
+    model_config = {
+        "env_prefix": ANIMATION_SETTINGS_PREFIX,
+        "env_nested_delimiter": "__",  # type: ignore
+    }
 
     @classmethod
     @cachedmethod(lambda cls: cls._cache)
