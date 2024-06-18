@@ -8,7 +8,7 @@ import asyncpg
 import pytest
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from pypgstac.db import PgstacDB
 from pypgstac.migrate import Migrate
 from stac_fastapi.api.models import create_get_request_model, create_post_request_model
@@ -102,7 +102,9 @@ async def app(api_client) -> AsyncGenerator[FastAPI, None]:
 @pytest.fixture(scope="session")
 async def app_client(app) -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(
-        app=app, base_url="http://test/stac", headers={"X-Forwarded-For": "127.0.0.1"}
+        transport=ASGITransport(app=app),
+        base_url="http://test/stac",
+        headers={"X-Forwarded-For": "127.0.0.1"},
     ) as c:
         yield c
 

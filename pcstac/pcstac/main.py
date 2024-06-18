@@ -86,7 +86,7 @@ api = PCStacApi(
     search_post_request_model=search_post_request_model,
     response_class=ORJSONResponse,
     exceptions={**DEFAULT_STATUS_CODES, **PC_DEFAULT_STATUS_CODES},
-    middleware=[
+    middlewares=[
         Middleware(BrotliMiddleware),
         Middleware(ProxyHeaderMiddleware),
         Middleware(TraceMiddleware, service_name=ServiceName.STAC),

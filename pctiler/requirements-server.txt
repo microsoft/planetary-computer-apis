@@ -5,13 +5,12 @@
 #    pip-compile --extra=server --output-file=pctiler/requirements-server.txt ./pctiler/setup.py
 #
 affine==2.4.0
-    # via
-    #   rasterio
-    #   supermercado
+    # via rasterio
+annotated-types==0.7.0
+    # via pydantic
 anyio==3.7.1
     # via
     #   httpx
-    #   starlette
     #   watchgod
 asgiref==3.8.1
     # via uvicorn
@@ -22,9 +21,7 @@ attrs==23.2.0
     #   rasterio
     #   rio-tiler
 boto3==1.34.123
-    # via
-    #   pctiler (pctiler/setup.py)
-    #   rio-tiler
+    # via pctiler (pctiler/setup.py)
 botocore==1.34.123
     # via
     #   boto3
@@ -33,7 +30,6 @@ botocore==1.34.123
 cachetools==5.3.3
     # via
     #   cogeo-mosaic
-    #   morecantile
     #   rio-tiler
 certifi==2024.2.2
     # via
@@ -48,21 +44,14 @@ click==8.1.7
     # via
     #   click-plugins
     #   cligj
-    #   mercantile
     #   planetary-computer
     #   rasterio
-    #   stac-pydantic
-    #   supermercado
     #   uvicorn
 click-plugins==1.1.1
-    # via
-    #   rasterio
-    #   supermercado
+    # via rasterio
 cligj==0.7.2
-    # via
-    #   rasterio
-    #   supermercado
-cogeo-mosaic==5.0.0
+    # via rasterio
+cogeo-mosaic==7.1.0
     # via titiler-mosaic
 color-operations==0.1.3
     # via rio-tiler
@@ -72,16 +61,13 @@ cycler==0.12.1
     # via matplotlib
 exceptiongroup==1.2.0
     # via anyio
-fastapi==0.91.0
-    # via
-    #   titiler-core
-    #   titiler-pgstac
+fastapi-slim==0.0.1
+    # via titiler-core
 fonttools==4.53.0
     # via matplotlib
-geojson-pydantic==0.4.2
+geojson-pydantic==1.1.0
     # via
     #   pctiler (pctiler/setup.py)
-    #   stac-pydantic
     #   titiler-core
     #   titiler-pgstac
 h11==0.14.0
@@ -120,12 +106,12 @@ markupsafe==2.1.5
     # via jinja2
 matplotlib==3.9.0
     # via pctiler (pctiler/setup.py)
-mercantile==1.2.1
-    # via supermercado
-morecantile==3.4.0
+morecantile==5.3.0
     # via
     #   cogeo-mosaic
     #   rio-tiler
+    #   supermorecado
+    #   titiler-core
 numexpr==2.9.0
     # via rio-tiler
 numpy==1.26.4
@@ -138,17 +124,18 @@ numpy==1.26.4
     #   rio-tiler
     #   shapely
     #   snuggs
-    #   supermercado
     #   titiler-core
 orjson==3.10.4
     # via pctiler (pctiler/setup.py)
 packaging==24.1
-    # via matplotlib
+    # via
+    #   matplotlib
+    #   planetary-computer
 pillow==10.3.0
     # via
     #   matplotlib
     #   pctiler (pctiler/setup.py)
-planetary-computer==0.4.9
+planetary-computer==1.0.0
     # via pctiler (pctiler/setup.py)
 psycopg[binary,pool]==3.1.18
     # via pctiler (pctiler/setup.py)
@@ -156,17 +143,23 @@ psycopg-binary==3.1.18
     # via psycopg
 psycopg-pool==3.2.1
     # via psycopg
-pydantic[dotenv]==1.10.14
+pydantic==2.7.4
     # via
     #   cogeo-mosaic
-    #   fastapi
     #   geojson-pydantic
     #   morecantile
     #   pctiler (pctiler/setup.py)
     #   planetary-computer
+    #   pydantic-settings
     #   rio-tiler
-    #   stac-pydantic
     #   titiler-core
+    #   titiler-pgstac
+pydantic-core==2.18.4
+    # via pydantic
+pydantic-settings==2.3.3
+    # via
+    #   cogeo-mosaic
+    #   titiler-pgstac
 pyparsing==3.1.2
     # via
     #   matplotlib
@@ -189,7 +182,8 @@ python-dateutil==2.9.0.post0
     #   pystac-client
 python-dotenv==1.0.1
     # via
-    #   pydantic
+    #   planetary-computer
+    #   pydantic-settings
     #   uvicorn
 pytz==2024.1
     # via planetary-computer
@@ -200,14 +194,14 @@ rasterio==1.3.10
     #   cogeo-mosaic
     #   pctiler (pctiler/setup.py)
     #   rio-tiler
-    #   supermercado
+    #   supermorecado
     #   titiler-core
 requests==2.32.2
     # via
     #   pctiler (pctiler/setup.py)
     #   planetary-computer
     #   pystac-client
-rio-tiler==4.1.13
+rio-tiler==6.6.1
     # via
     #   cogeo-mosaic
     #   titiler-core
@@ -225,24 +219,18 @@ sniffio==1.3.1
     #   httpx
 snuggs==1.4.7
     # via rasterio
-stac-pydantic==2.0.3
-    # via titiler-pgstac
-starlette==0.24.0
-    # via
-    #   fastapi
-    #   titiler-pgstac
-supermercado==0.2.0
+supermorecado==0.1.2
     # via cogeo-mosaic
-titiler-core==0.10.2
+titiler-core==0.18.3
     # via
     #   pctiler (pctiler/setup.py)
     #   titiler-mosaic
     #   titiler-pgstac
-titiler-mosaic==0.10.2
+titiler-mosaic==0.18.3
     # via
     #   pctiler (pctiler/setup.py)
     #   titiler-pgstac
-titiler-pgstac==0.2.4
+titiler-pgstac==1.3.0
     # via pctiler (pctiler/setup.py)
 typing-extensions==4.10.0
     # via
@@ -250,7 +238,8 @@ typing-extensions==4.10.0
     #   psycopg
     #   psycopg-pool
     #   pydantic
-    #   starlette
+    #   pydantic-core
+    #   titiler-core
 urllib3==1.26.18
     # via
     #   botocore

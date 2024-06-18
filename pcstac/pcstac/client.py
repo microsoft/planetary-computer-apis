@@ -215,7 +215,7 @@ class PCClient(CoreCrudClient):
             )
             return item_collection
 
-        search_json = search_request.json()
+        search_json = search_request.model_dump_json()
         add_stac_attributes_from_search(search_json, request)
 
         logger.info(

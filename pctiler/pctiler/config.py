@@ -39,14 +39,21 @@ class Settings(BaseSettings):
     mosaic_endpoint_prefix: str = "/mosaic"
     legend_endpoint_prefix: str = "/legend"
     vector_tile_endpoint_prefix: str = "/vector"
-    vector_tile_sa_base_url: str = Field(env=VECTORTILE_SA_BASE_URL_ENV_VAR, default="")
+    vector_tile_sa_base_url: str = Field(
+        default="",
+        json_schema_extra={"env": VECTORTILE_SA_BASE_URL_ENV_VAR},
+    )
 
     debug: bool = os.getenv("TILER_DEBUG", "False").lower() == "true"
     api_version: str = "1.0"
     default_max_items_per_tile: int = Field(
-        env=DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR, default=10
+        default=10,
+        json_schema_extra={"env": DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR},
     )
-    request_timeout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
+    request_timeout: int = Field(
+        default=30,
+        json_schema_extra={"env": REQUEST_TIMEOUT_ENV_VAR},
+    )
 
     feature_flags: FeatureFlags = FeatureFlags()
 

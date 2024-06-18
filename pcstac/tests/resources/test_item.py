@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Callable, Dict
 from urllib.parse import parse_qs, urlparse
 
@@ -7,10 +7,15 @@ import pystac
 import pytest
 from geojson_pydantic.geometries import Polygon
 from stac_fastapi.pgstac.models.links import CollectionLinks
-from stac_pydantic.shared import DATETIME_RFC339
+from stac_pydantic.shared import UtcDatetime
 from starlette.requests import Request
+from pydantic import TypeAdapter
 
 from pcstac.config import get_settings
+
+# Use a TypeAdapter to parse any datetime strings in a consistent manner
+UtcDatetimeAdapter = TypeAdapter(UtcDatetime)
+DATETIME_RFC339 = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 @pytest.mark.asyncio
@@ -116,7 +121,9 @@ async def test_item_search_temporal_query_post(app_client):
     assert items_resp.status_code == 200
 
     first_item = items_resp.json()["features"][0]
-    item_date = datetime.strptime(first_item["properties"]["datetime"], DATETIME_RFC339)
+    item_date = UtcDatetimeAdapter.validate_strings(
+        first_item["properties"]["datetime"]
+    )
     item_date = item_date + timedelta(seconds=1)
 
     params = {
@@ -138,7 +145,9 @@ async def test_item_search_temporal_window_post(app_client):
     assert items_resp.status_code == 200
 
     first_item = items_resp.json()["features"][0]
-    item_date = datetime.strptime(first_item["properties"]["datetime"], DATETIME_RFC339)
+    item_date = UtcDatetimeAdapter.validate_strings(
+        first_item["properties"]["datetime"]
+    )
     item_date_before = item_date - timedelta(seconds=1)
     item_date_after = item_date + timedelta(seconds=1)
 
@@ -151,6 +160,30 @@ async def test_item_search_temporal_window_post(app_client):
     resp = await app_client.post("/search", json=params)
     resp_json = resp.json()
     assert resp_json["features"][0]["id"] == first_item["id"]
+
+
+@pytest.mark.asyncio
+async def test_item_search_temporal_window_post_date_only(app_client):
+    """Test POST search with spatio-temporal query (core)"""
+    items_resp = await app_client.get("/collections/naip/items")
+    assert items_resp.status_code == 200
+
+    first_item = items_resp.json()["features"][0]
+    item_date = UtcDatetimeAdapter.validate_strings(
+        first_item["properties"]["datetime"]
+    )
+    item_date_before = item_date - timedelta(days=1)
+    item_date_after = item_date + timedelta(days=1)
+
+    # NOTE: YYYY-MM-DD format is not supported anymore
+    params = {
+        "collections": first_item["collection"],
+        "bbox": ",".join([str(coord) for coord in first_item["bbox"]]),
+        "datetime": f"{item_date_before.strftime('%Y-%m-%d')}/"
+        f"{item_date_after.strftime('%Y-%m-%d')}",
+    }
+    resp = await app_client.post("/search", json=params)
+    assert resp.status_code == 400
 
 
 @pytest.mark.asyncio
@@ -212,7 +245,9 @@ async def test_item_search_temporal_window_get(app_client):
     assert items_resp.status_code == 200
 
     first_item = items_resp.json()["features"][0]
-    item_date = datetime.strptime(first_item["properties"]["datetime"], DATETIME_RFC339)
+    item_date = UtcDatetimeAdapter.validate_strings(
+        first_item["properties"]["datetime"]
+    )
     item_date_before = item_date - timedelta(seconds=1)
     item_date_after = item_date + timedelta(seconds=1)
 
@@ -234,10 +269,13 @@ async def test_item_search_temporal_window_get_date_only(app_client):
     assert items_resp.status_code == 200
 
     first_item = items_resp.json()["features"][0]
-    item_date = datetime.strptime(first_item["properties"]["datetime"], DATETIME_RFC339)
+    item_date = UtcDatetimeAdapter.validate_strings(
+        first_item["properties"]["datetime"]
+    )
     item_date_before = item_date - timedelta(days=1)
     item_date_after = item_date + timedelta(days=1)
 
+    # NOTE: YYYY-MM-DD format is not supported anymore
     params = {
         "collections": first_item["collection"],
         "bbox": ",".join([str(coord) for coord in first_item["bbox"]]),
@@ -245,13 +283,10 @@ async def test_item_search_temporal_window_get_date_only(app_client):
         f"{item_date_after.strftime('%Y-%m-%d')}",
     }
     resp = await app_client.get("/search", params=params)
-    assert resp.status_code == 200
-    resp_json = resp.json()
-    import json
+    assert resp.status_code == 400
 
-    print(json.dumps(resp_json, indent=2))
-
-    assert resp_json["features"][0]["id"] == first_item["id"]
+    # resp_json = resp.json()
+    # assert resp_json["features"][0]["id"] == first_item["id"]
 
 
 @pytest.mark.asyncio
@@ -454,8 +489,11 @@ async def test_pagination_token_idempotent(app_client):
     # Construct a search that should return all items, but limit to a few
     # so that a "next" link is returned
     page = await app_client.get(
-        "/search", params={"datetime": "1900-01-01/2030-01-01", "limit": 3}
+        "/search",
+        params={"datetime": "1900-01-01T00:00:00Z/2030-01-01T00:00:00Z", "limit": 3},
     )
+    assert page.status_code == 200
+
     # Get the next link
     page_data = page.json()
     next_link = list(filter(lambda l: l["rel"] == "next", page_data["links"]))
@@ -500,7 +538,7 @@ async def test_field_extension_exclude_default_includes(app_client):
 async def test_search_intersects_and_bbox(app_client):
     """Test POST search intersects and bbox are mutually exclusive (core)"""
     bbox = [-118, 34, -117, 35]
-    geoj = Polygon.from_bounds(*bbox).dict(exclude_none=True)
+    geoj = Polygon.from_bounds(*bbox).model_dump(exclude_none=True)
     params = {"bbox": bbox, "intersects": geoj}
     resp = await app_client.post("/search", json=params)
     assert resp.status_code == 400

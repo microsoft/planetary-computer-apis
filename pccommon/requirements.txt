@@ -125,9 +125,7 @@ pydantic-settings==2.3.3
 pyhumps==3.5.3
     # via pccommon (pccommon/setup.py)
 pyjwt[crypto]==2.8.0
-    # via
-    #   msal
-    #   pyjwt
+    # via msal
 python-dotenv==1.0.1
     # via pydantic-settings
 redis==4.6.0

@@ -60,5 +60,5 @@ def mosaic_info(
 
     return ORJSONResponse(
         status_code=200,
-        content=collection_config.mosaic_info.dict(by_alias=True, exclude_unset=True),
+        content=collection_config.mosaic_info.model_dump(by_alias=True, exclude_unset=True),
     )

@@ -38,8 +38,8 @@ def test_parse() -> None:
         ],
         "defaultLocation": {"zoom": 8, "coordinates": [47.1113, -120.8578]},
     }
-    model = MosaicInfo.parse_obj(d)
-    serialized = model.dict(by_alias=True, exclude_unset=True)
+    model = MosaicInfo.model_validate(d)
+    serialized = model.model_dump(by_alias=True, exclude_unset=True)
 
     assert d == serialized
 
@@ -122,7 +122,7 @@ def test_parse_with_legend() -> None:
         "defaultLocation": {"zoom": 10, "coordinates": [24.21647, 91.015209]},
     }
 
-    model = MosaicInfo.parse_obj(d)
-    serialized = model.dict(by_alias=True, exclude_unset=True)
+    model = MosaicInfo.model_validate(d)
+    serialized = model.model_dump(by_alias=True, exclude_unset=True)
 
     assert d == serialized

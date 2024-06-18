@@ -89,17 +89,29 @@ class Settings(BaseSettings):
         version of application
     """
 
-    api = PCAPIsConfig.from_environment()
+    api: PCAPIsConfig = PCAPIsConfig.from_environment()
 
     debug: bool = False
-    tiler_href: str = Field(env=TILER_HREF_ENV_VAR, default="")
-    db_max_conn_size: int = Field(env=DB_MAX_CONN_ENV_VAR, default=1)
-    db_min_conn_size: int = Field(env=DB_MIN_CONN_ENV_VAR, default=1)
+    tiler_href: str = Field(
+        default="",
+        json_schema_extra={"env": TILER_HREF_ENV_VAR},
+    )
+    db_max_conn_size: int = Field(
+        default=1,
+        json_schema_extra={"env": DB_MAX_CONN_ENV_VAR},
+    )
+    db_min_conn_size: int = Field(
+        default=1,
+        json_schema_extra={"env": DB_MIN_CONN_ENV_VAR},
+    )
     openapi_url: str = "/openapi.json"
     api_version: str = f"v{API_VERSION}"
     rate_limits: RateLimits = RateLimits()
     back_pressures: BackPressures = BackPressures()
-    request_timeout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
+    request_timeout: int = Field(
+        default=30,
+        json_schema_extra={"env": REQUEST_TIMEOUT_ENV_VAR},
+    )
 
     model_config = {
         "env_prefix": ENV_VAR_PCAPIS_PREFIX,

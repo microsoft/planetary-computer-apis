@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azure-functions/python:4-python3.8
+FROM mcr.microsoft.com/azure-functions/python:4-python3.10
 
 # git required for pip installs from git
 RUN apt update && apt install -y git

@@ -4,7 +4,7 @@ from funclib.models import RenderOptions
 from funclib.raster import ExportFormats
 from pydantic import BaseModel, Field, field_validator, ValidationInfo
 
-from .settings import get_settings, ImageSettings
+from .settings import get_settings
 from .utils import get_geom_from_cql
 
 
