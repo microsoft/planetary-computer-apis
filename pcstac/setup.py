@@ -7,7 +7,7 @@ inst_reqs = [
     "idna>=3.7.0",
     "stac-fastapi.api==3.0.0a3",
     "stac-fastapi.extensions==3.0.0a3",
-    "stac-fastapi.pgstac==3.0.0a1",
+    "stac-fastapi.pgstac==3.0.0a2",
     "stac-fastapi.types==3.0.0a3",
     "orjson==3.10.4",
     # Required due to some imports related to pypgstac CLI usage in startup script

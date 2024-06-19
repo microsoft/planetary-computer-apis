@@ -121,7 +121,7 @@ stac-fastapi-extensions==3.0.0a3
     # via
     #   pcstac (pcstac/setup.py)
     #   stac-fastapi-pgstac
-stac-fastapi-pgstac==3.0.0a1
+stac-fastapi-pgstac==3.0.0a2
     # via pcstac (pcstac/setup.py)
 stac-fastapi-types==3.0.0a3
     # via

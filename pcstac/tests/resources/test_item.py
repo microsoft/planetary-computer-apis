@@ -175,15 +175,16 @@ async def test_item_search_temporal_window_post_date_only(app_client):
     item_date_before = item_date - timedelta(days=1)
     item_date_after = item_date + timedelta(days=1)
 
-    # NOTE: YYYY-MM-DD format is not supported anymore
     params = {
-        "collections": first_item["collection"],
-        "bbox": ",".join([str(coord) for coord in first_item["bbox"]]),
+        "collections": [first_item["collection"]],
+        "intersects": first_item["geometry"],
         "datetime": f"{item_date_before.strftime('%Y-%m-%d')}/"
         f"{item_date_after.strftime('%Y-%m-%d')}",
     }
     resp = await app_client.post("/search", json=params)
-    assert resp.status_code == 400
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    assert resp_json["features"][0]["id"] == first_item["id"]
 
 
 @pytest.mark.asyncio
@@ -275,7 +276,6 @@ async def test_item_search_temporal_window_get_date_only(app_client):
     item_date_before = item_date - timedelta(days=1)
     item_date_after = item_date + timedelta(days=1)
 
-    # NOTE: YYYY-MM-DD format is not supported anymore
     params = {
         "collections": first_item["collection"],
         "bbox": ",".join([str(coord) for coord in first_item["bbox"]]),
@@ -283,10 +283,9 @@ async def test_item_search_temporal_window_get_date_only(app_client):
         f"{item_date_after.strftime('%Y-%m-%d')}",
     }
     resp = await app_client.get("/search", params=params)
-    assert resp.status_code == 400
-
-    # resp_json = resp.json()
-    # assert resp_json["features"][0]["id"] == first_item["id"]
+    assert resp.status_code == 200
+    resp_json = resp.json()
+    assert resp_json["features"][0]["id"] == first_item["id"]
 
 
 @pytest.mark.asyncio
