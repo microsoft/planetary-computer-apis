@@ -26,8 +26,6 @@ class ImageSettings(BaseExporterSettings):
     def get_container_client(self) -> ContainerClient:
         return get_container_client(
             self.output_storage_url,
-            sas_token=self.output_sas,
-            account_key=self.output_account_key,
         )
 
     def get_register_url(self, data_api_url_override: Optional[str] = None) -> str:
