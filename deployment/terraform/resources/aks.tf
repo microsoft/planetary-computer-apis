@@ -74,9 +74,31 @@ resource "azurerm_kubernetes_cluster" "pc" {
   }
 }
 
+resource "azurerm_user_assigned_identity" "stac" {
+  name                = "id-${local.prefix}-stac"
+  location            = var.region
+  resource_group_name = azurerm_resource_group.pc.name
+}
+
+resource "azurerm_federated_identity_credential" "stac" {
+  name                = "federated-id-${local.prefix}"
+  resource_group_name = azurerm_resource_group.pc.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = azurerm_kubernetes_cluster.pc.oidc_issuer_url
+  subject             = "system:serviceaccount:pc:planetary-computer-stac"
+  parent_id           = azurerm_user_assigned_identity.stac.id
+  timeouts {}
+}
+
+resource "azurerm_role_assignment" "cluster-stac-identity-storage-access" {
+  scope                = azurerm_storage_account.pc.id
+  role_definition_name = "Storage Table Data Reader"
+  principal_id         = azurerm_user_assigned_identity.stac.principal_id
+}
+
 # Workload Identity for tiler access to the Azure Maps account
 resource "azurerm_user_assigned_identity" "tiler" {
-  name                = "id-${local.prefix}"
+  name                = "id-${local.prefix}-tiler"
   location            = var.region
   resource_group_name = azurerm_resource_group.pc.name
 }
@@ -96,6 +118,12 @@ resource "azurerm_role_assignment" "cluster-identity-maps-render-token" {
   role_definition_name = "Azure Maps Search and Render Data Reader"
   principal_id         = azurerm_user_assigned_identity.tiler.principal_id
 
+}
+
+resource "azurerm_role_assignment" "cluster-tiler-identity-storage-access" {
+  scope                = azurerm_storage_account.pc.id
+  role_definition_name = "Storage Table Data Reader"
+  principal_id         = azurerm_user_assigned_identity.tiler.principal_id
 }
 
 # add the role to the identity the kubernetes cluster was assigned

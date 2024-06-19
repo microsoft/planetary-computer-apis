@@ -6,21 +6,21 @@ from azure.storage.blob import ContainerClient
 
 def get_container_client(
     container_url: str,
-    sas_token: Optional[str] = None,
     account_key: Optional[str] = None,
 ) -> ContainerClient:
     credential: Optional[Union[str, Dict[str, str], DefaultAzureCredential]] = None
     if account_key:
         # Handle Azurite
-        if "devstoreaccount1" in container_url:
+        if container_url.startswith("http://azurite:"):
             credential = {
                 "account_name": "devstoreaccount1",
                 "account_key": account_key,
             }
         else:
-            credential = account_key
-    elif sas_token:
-        credential = sas_token
+            raise ValueError(
+                "Non-azurite account key provided. "
+                "Account keys can only be used with Azurite emulator."
+            )
     else:
         credential = DefaultAzureCredential()
 

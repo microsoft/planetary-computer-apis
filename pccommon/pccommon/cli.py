@@ -15,20 +15,13 @@ from pccommon.tables import IPExceptionListTable
 from pccommon.version import __version__
 
 
-def get_account_url(account: str, account_url: Optional[str]) -> str:
-    return account_url or f"https://{account}.table.core.windows.net"
-
-
-def load(
-    sas: str, account: str, table: str, type: str, file: str, **kwargs: Any
-) -> int:
-    account_url = get_account_url(account, kwargs.get("account_url"))
+def load(account: str, table: str, type: str, file: str, **kwargs: Any) -> int:
     with open(file) as f:
         rows = json.load(f)
 
     if type == "collection":
-        col_config_table = CollectionConfigTable.from_sas_token(
-            account_url=account_url, sas_token=sas, table_name=table
+        col_config_table = CollectionConfigTable.from_environment(
+            account_name=account, table_name=table
         )
         for coll_id, config in rows.items():
             print("Loading config for collection", coll_id)
@@ -41,8 +34,8 @@ def load(
                 print("========================================")
 
     elif type == "container":
-        cont_config_table = ContainerConfigTable.from_sas_token(
-            account_url=account_url, sas_token=sas, table_name=table
+        cont_config_table = ContainerConfigTable.from_environment(
+            account_name=account, table_name=table
         )
         for path, config in rows.items():
             storage_account, container = path.split("/")
@@ -56,14 +49,13 @@ def load(
     return 0
 
 
-def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
+def dump(account: str, table: str, type: str, **kwargs: Any) -> int:
     output = kwargs.get("output")
-    account_url = get_account_url(account, kwargs.get("account_url"))
     id = kwargs.get("id")
     result: Dict[str, Dict[str, Any]] = {}
     if type == "collection":
-        col_config_table = CollectionConfigTable.from_sas_token(
-            account_url=account_url, sas_token=sas, table_name=table
+        col_config_table = CollectionConfigTable.from_environment(
+            account_name=account, table_name=table
         )
 
         if id:
@@ -77,8 +69,8 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
                 result[collection_id] = col_config.dict()
 
     elif type == "container":
-        con_config_table = ContainerConfigTable.from_sas_token(
-            account_url=account_url, sas_token=sas, table_name=table
+        con_config_table = ContainerConfigTable.from_environment(
+            account_name=account, table_name=table
         )
         if id:
             con_account = kwargs.get("container_account")
@@ -103,12 +95,11 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
     return 0
 
 
-def add_ip_exception(sas: str, account: str, table: str, **kwargs: Any) -> int:
+def add_ip_exception(account: str, table: str, **kwargs: Any) -> int:
     ip_file = kwargs.get("file")
     ip = kwargs.get("ip")
-    account_url = get_account_url(account, kwargs.get("account_url"))
-    ip_table = IPExceptionListTable.from_sas_token(
-        account_url=account_url, sas_token=sas, table_name=table
+    ip_table = IPExceptionListTable.from_environment(
+        account_name=account, table_name=table
     )
     if ip:
         print(f"Adding exception for IP {ip}...")
@@ -139,11 +130,6 @@ def parse_args(args: List[str]) -> Optional[Dict[str, Any]]:
     subparsers = parser0.add_subparsers(dest="command")
 
     def add_common_opts(p: argparse.ArgumentParser, default_table: str) -> None:
-        p.add_argument(
-            "--sas",
-            help="SAS Token for the storage account.",
-            required=True,
-        )
         p.add_argument("--account", help="Storage account name.", required=True)
         p.add_argument("--table", help="Table name.", default=default_table)
         p.add_argument(
