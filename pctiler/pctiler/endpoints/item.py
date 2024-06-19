@@ -1,11 +1,12 @@
 from urllib.parse import quote_plus, urljoin
 
+import pystac
 from fastapi import Query, Request, Response
 from fastapi.templating import Jinja2Templates
 from html_sanitizer.sanitizer import Sanitizer
 from starlette.responses import HTMLResponse
 from titiler.core.factory import MultiBaseTilerFactory
-from titiler.pgstac.dependencies import ItemPathParams  # removed in titiler.pgstac 3.0
+from titiler.pgstac.dependencies import get_stac_item
 
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
@@ -17,6 +18,15 @@ try:
 except ImportError:
     # Try backported to PY<39 `importlib_resources`.
     from importlib_resources import files as resources_files  # type: ignore
+
+
+def ItemPathParams(
+    request: Request,
+    collection: str = Query(..., description="STAC Collection ID"),
+    item: str = Query(..., description="STAC Item ID"),
+) -> pystac.Item:
+    """STAC Item dependency."""
+    return get_stac_item(request.app.state.dbpool, collection, item)
 
 
 # TODO: mypy fails in python 3.9, we need to find a proper way to do this
@@ -65,9 +75,9 @@ def map(
     )
 
     return templates.TemplateResponse(
-        "item_preview.html",
+        request,
+        name="item_preview.html",
         context={
-            "request": request,
             "tileJson": tilejson_url,
             "collectionId": collection_sanitized,
             "itemId": item_sanitized,

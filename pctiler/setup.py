@@ -5,6 +5,7 @@ from setuptools import find_packages, setup
 
 # Runtime requirements, see environment.yaml
 inst_reqs: List[str] = [
+    "fastapi-slim==0.111.0",
     "geojson-pydantic==1.1.0",
     "jinja2==3.1.4",
     "pystac==1.10.1",
@@ -17,14 +18,12 @@ inst_reqs: List[str] = [
     "botocore==1.34.123",
     "pydantic>=2.7,<2.8",
     "idna>=3.7.0",
-    "requests==2.32.2",
+    "requests==2.32.3",
     # titiler-pgstac
     "psycopg[binary,pool]",
     "titiler.pgstac==1.3.0",
-
     # colormap dependencies
     "matplotlib==3.9.0",
-
     "orjson==3.10.4",
     "importlib_resources>=1.1.0;python_version<'3.9'",
 ]

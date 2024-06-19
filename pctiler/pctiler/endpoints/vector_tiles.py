@@ -60,7 +60,7 @@ async def get_tilejson(
     if tileset.center:
         tilejson["center"] = tileset.center
 
-    return tilejson
+    return TileJSON(**tilejson)
 
 
 @vector_tile_router.get(

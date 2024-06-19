@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import logging
 import os
-from typing import Dict, List
+from contextlib import asynccontextmanager
+from typing import Dict, List, AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
@@ -40,18 +41,24 @@ APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 
 settings = get_settings()
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator:
+    """FastAPI Lifespan."""
+    await connect_to_db(app)
+    yield
+    await close_db_connection(app)
+
+
 app = FastAPI(
     title=settings.title,
     openapi_url=settings.openapi_url,
     root_path=APP_ROOT_PATH,
+    lifespan=lifespan,
 )
 
 app.state.service_name = ServiceName.TILER
 
-# Note:
-# With titiler.pgstac >3.0, items endpoint has changed and use path-parameter
-# /collections/{collectionId}/items/{itemId} instead of query-parameter
-# https://github.com/stac-utils/titiler-pgstac/blob/d16102bf331ba588f31e131e65b07637d649b4bd/titiler/pgstac/main.py#L87-L92
 app.include_router(
     item.pc_tile_factory.router,
     prefix=settings.item_endpoint_prefix,
@@ -60,6 +67,11 @@ app.include_router(
 
 app.include_router(
     pg_mosaic.pgstac_mosaic_factory.router,
+    prefix=settings.mosaic_endpoint_prefix,
+    tags=["PgSTAC Mosaic endpoints"],
+)
+pg_mosaic.add_collection_mosaic_info_route(
+    app,
     prefix=settings.mosaic_endpoint_prefix,
     tags=["PgSTAC Mosaic endpoints"],
 )
@@ -107,18 +119,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=[X_REQUEST_ENTITY],
 )
-
-
-@app.on_event("startup")
-async def startup_event() -> None:
-    """Connect to database on startup."""
-    await connect_to_db(app)
-
-
-@app.on_event("shutdown")
-async def shutdown_event() -> None:
-    """Close database connection."""
-    await close_db_connection(app)
 
 
 @app.get("/")

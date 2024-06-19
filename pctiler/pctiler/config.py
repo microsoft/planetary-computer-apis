@@ -4,7 +4,8 @@ from functools import lru_cache
 from urllib.parse import urljoin
 
 from fastapi import Request
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 # Hostname to fetch STAC information from
 STAC_API_URL_ENV_VAR = "STAC_API_URL"

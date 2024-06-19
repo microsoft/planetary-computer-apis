@@ -1,7 +1,7 @@
 from typing import List
 
 import pytest
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from pytest import Config, Item, Parser
 
 
@@ -36,6 +36,9 @@ async def client() -> AsyncClient:
     from pctiler.main import app
 
     await connect_to_db(app)
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
         yield client
     await close_db_connection(app)

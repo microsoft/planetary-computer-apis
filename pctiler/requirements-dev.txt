@@ -9,7 +9,9 @@ affine==2.4.0
 annotated-types==0.7.0
     # via pydantic
 anyio==4.3.0
-    # via httpx
+    # via
+    #   httpx
+    #   starlette
 attrs==23.2.0
     # via
     #   cogeo-mosaic
@@ -56,8 +58,10 @@ cycler==0.12.1
     # via matplotlib
 exceptiongroup==1.2.0
     # via anyio
-fastapi-slim==0.0.1
-    # via titiler-core
+fastapi-slim==0.111.0
+    # via
+    #   pctiler (pctiler/setup.py)
+    #   titiler-core
 fonttools==4.53.0
     # via matplotlib
 geojson-pydantic==1.1.0
@@ -137,6 +141,7 @@ psycopg-pool==3.2.1
 pydantic==2.7.4
     # via
     #   cogeo-mosaic
+    #   fastapi-slim
     #   geojson-pydantic
     #   morecantile
     #   pctiler (pctiler/setup.py)
@@ -184,7 +189,7 @@ rasterio==1.3.10
     #   rio-tiler
     #   supermorecado
     #   titiler-core
-requests==2.32.2
+requests==2.32.3
     # via
     #   pctiler (pctiler/setup.py)
     #   planetary-computer
@@ -207,6 +212,8 @@ sniffio==1.3.1
     #   httpx
 snuggs==1.4.7
     # via rasterio
+starlette==0.37.2
+    # via fastapi-slim
 supermorecado==0.1.2
     # via cogeo-mosaic
 titiler-core==0.18.3
@@ -227,10 +234,12 @@ types-urllib3==1.26.25.14
 typing-extensions==4.10.0
     # via
     #   anyio
+    #   fastapi-slim
     #   psycopg
     #   psycopg-pool
     #   pydantic
     #   pydantic-core
+    #   starlette
     #   titiler-core
 urllib3==1.26.18
     # via
