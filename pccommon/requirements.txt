@@ -119,12 +119,13 @@ pyjwt[crypto]==2.8.0
     # via msal
 redis==4.6.0
     # via pccommon (pccommon/setup.py)
-requests==2.31.0
+requests==2.32.3
     # via
     #   azure-core
     #   google-api-core
     #   msal
     #   opencensus-ext-azure
+    #   pccommon (pccommon/setup.py)
 rsa==4.9
     # via google-auth
 six==1.16.0

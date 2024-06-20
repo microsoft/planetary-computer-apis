@@ -71,7 +71,7 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
             assert col_config
             result[id] = col_config.dict()
         else:
-            for (_, collection_id, col_config) in col_config_table.get_all():
+            for _, collection_id, col_config in col_config_table.get_all():
                 assert collection_id
                 assert col_config
                 result[collection_id] = col_config.dict()
@@ -87,7 +87,7 @@ def dump(sas: str, account: str, table: str, type: str, **kwargs: Any) -> int:
             assert con_config
             result[f"{con_account}/{id}"] = con_config.dict()
         else:
-            for (storage_account, container, con_config) in con_config_table.get_all():
+            for storage_account, container, con_config in con_config_table.get_all():
                 assert con_config
                 result[f"{storage_account}/{container}"] = con_config.dict()
     else:

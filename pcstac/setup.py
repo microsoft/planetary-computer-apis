@@ -17,7 +17,7 @@ inst_reqs = [
 
 extra_reqs = {
     "server": [
-        "uvicorn[standard]>=0.17.0,<0.18.0",
+        "uvicorn[standard]==0.30.1",
     ],
 }
 

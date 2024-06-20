@@ -22,4 +22,8 @@ RUN --mount=type=cache,target=/root/.cache \
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=81
 
-CMD uvicorn pcstac.main:app --host ${APP_HOST} --port ${APP_PORT} --log-level info
+# This value should match that which is used as the root_path in FastAPI, which
+# is typically set via the APP_ROOT_PATH environment variable.
+ENV APP_ROOT_PATH=""
+
+CMD uvicorn pcstac.main:app --host ${APP_HOST} --port ${APP_PORT} --root-path ${APP_ROOT_PATH} --log-level info
