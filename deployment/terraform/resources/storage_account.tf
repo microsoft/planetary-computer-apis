@@ -6,7 +6,20 @@ resource "azurerm_storage_account" "pc" {
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
+
+  # Disabling shared access keys breaks terraform's ability to do subsequent
+  # resource fetching during terraform plan. As a result, this property is
+  # ignored and managed outside of this apply session, via the deploy script.
+  # https://github.com/hashicorp/terraform-provider-azurerm/issues/25218
+
+  # shared_access_key_enabled = false
+  lifecycle {
+    ignore_changes = [
+      shared_access_key_enabled,
+    ]
+  }
 }
+
 
 # Tables
 
