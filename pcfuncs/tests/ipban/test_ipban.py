@@ -63,18 +63,17 @@ def mock_clients(
         "TableEndpoint=http://azurite:10002/devstoreaccount1;"
     )
     # Use Azurite for unit tests and populate the table with initial data
-    table_service_client: TableServiceClient = (
-        TableServiceClient.from_connection_string(CONNECTION_STRING)
-    )
-    table_client: TableClient = table_service_client.create_table_if_not_exists(
+    with TableServiceClient.from_connection_string(
+        CONNECTION_STRING
+    ) as table_service_client, table_service_client.create_table_if_not_exists(
         table_name=TEST_BANNED_IP_TABLE
-    )
-    # Pre-populate the banned ip table
-    populate_banned_ip_table(table_client)
-    yield logs_query_client, table_client
+    ) as table_client:
+        # Pre-populate the banned ip table
+        populate_banned_ip_table(table_client)
+        yield logs_query_client, table_client
 
-    # Delete the test table
-    table_service_client.delete_table(TEST_BANNED_IP_TABLE)
+        # Delete the test table
+        table_service_client.delete_table(TEST_BANNED_IP_TABLE)
 
 
 @pytest.fixture
@@ -82,19 +81,18 @@ def integration_clients(
     mocker: MockerFixture,
 ) -> Generator[Tuple[LogsQueryClient, TableClient], Any, None]:
     credential: DefaultAzureCredential = DefaultAzureCredential()
-    logs_query_client: LogsQueryClient = LogsQueryClient(credential)
-    table_service_client: TableServiceClient = TableServiceClient(
+    with LogsQueryClient(credential) as logs_query_client, TableServiceClient(
         endpoint=settings.storage_account_url, credential=credential
-    )
-    table_client: TableClient = table_service_client.create_table_if_not_exists(
+    ) as table_service_client, table_service_client.create_table_if_not_exists(
         TEST_BANNED_IP_TABLE
-    )
-    # Pre-populate the banned ip table
-    populate_banned_ip_table(table_client)
-    yield logs_query_client, table_client
+    ) as table_client:
 
-    # Delete the test table
-    table_service_client.delete_table(TEST_BANNED_IP_TABLE)
+        # Pre-populate the banned ip table
+        populate_banned_ip_table(table_client)
+        yield logs_query_client, table_client
+
+        # Delete the test table
+        table_service_client.delete_table(TEST_BANNED_IP_TABLE)
 
 
 @pytest.mark.integration

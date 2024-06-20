@@ -40,7 +40,7 @@ class UpdateBannedIPTask:
 
     def update_banned_ips(self, query_result: List[LogsTableRow]) -> None:
         existing_ips = {
-            entity["RowKey"]: entity for entity in self.table_client.list_entities()
+            entity["RowKey"] for entity in self.table_client.list_entities()
         }
         result_ips: Set[str] = set()
         for result in query_result:
