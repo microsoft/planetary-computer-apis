@@ -4,7 +4,7 @@ from typing import Optional
 from cachetools import Cache, LRUCache, cachedmethod
 from cachetools.func import lru_cache
 from cachetools.keys import hashkey
-from pydantic import BaseModel, BaseSettings, Field, PrivateAttr
+from pydantic import BaseModel, BaseSettings, Field, PrivateAttr, validator
 
 from pccommon.config.collections import CollectionConfigTable
 from pccommon.config.containers import ContainerConfigTable
@@ -22,6 +22,16 @@ class TableConfig(BaseModel):
     account_name: str
     table_name: str
     account_url: Optional[str] = None
+
+    @validator("account_url")
+    def validate_url(cls, value: str) -> str:
+        if value and not value.startswith("http://azurite:"):
+            raise ValueError(
+                "Non-azurite account url provided. "
+                "Account keys can only be used with Azurite emulator."
+            )
+
+        return value
 
 
 class PCAPIsConfig(BaseSettings):
