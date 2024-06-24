@@ -128,7 +128,7 @@ variable "image_output_storage_url" {
   type = string
 }
 
-variable "log_analytics_workspace_name" {
+variable "prod_log_analytics_workspace_name" {
   type = string
 }
 

@@ -90,7 +90,7 @@ resource "azurerm_role_assignment" "function-app-storage-table-data-contributor"
 
 data "azurerm_log_analytics_workspace" "prod_log_analytics_workspace" {
   provider            = azurerm.planetary_computer_subscription
-  name                = var.log_analytics_workspace_name
+  name                = var.prod_log_analytics_workspace_name
   resource_group_name = var.pc_resources_rg
 }
 

@@ -22,7 +22,7 @@ module "resources" {
   animation_output_storage_url = "https://pcfilestest.blob.core.windows.net/output/animations"
   image_output_storage_url     = "https://pcfilestest.blob.core.windows.net/output/images"
 
-  log_analytics_workspace_name = "pc-api-loganalytics"
+  prod_log_analytics_workspace_name = "pc-api-loganalytics"
 }
 
 terraform {
