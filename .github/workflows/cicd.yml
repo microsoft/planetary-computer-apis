@@ -2,7 +2,7 @@ name: Planetary Computer APIs CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [main, user/mjm/storage-access-fixes]
     tags: ["*"]
 
 permissions:

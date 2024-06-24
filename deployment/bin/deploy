@@ -49,30 +49,20 @@ while [[ "$#" -gt 0 ]]; do case $1 in
         ;;
     esac done
 
-disable_shared_access_keys() {
-    echo "Disabling shared access key on storage account..."
-    az storage account update \
-        --name ${SAK_STORAGE_ACCOUNT} \
-        --resource-group ${SAK_RESOURCE_GROUP} \
-        --allow-shared-key-access false \
-        --output none
-
-    if [ $? -ne 0 ]; then
-        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        echo "WARNING: Failed to turn off shared key access on the storage account."
-        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        exit 2
-    fi
-}
-
 # Always disable shared access keys on script exit
 trap disable_shared_access_keys EXIT
 
 ###################################
 # Check and configure environment #
 ###################################
-SAK_STORAGE_ACCOUNT=pctapisstagingsa
-SAK_RESOURCE_GROUP=pct-apis-westeurope-staging_rg
+
+# Enable shared access keys on storage accounts that must have properties read
+# [storage_account]=resource_group
+declare -A SAK_STORAGE_ACCOUNTS
+SAK_STORAGE_ACCOUNTS=(
+  ["pctapisstagingsa"]="pct-apis-westeurope-staging_rg"
+  ["pcfilestest"]="pc-test-manual-resources"
+)
 
 if [[ -z ${TERRAFORM_DIR} ]]; then
     echo "Must pass in TERRAFORM_DIR with -t"
@@ -113,16 +103,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     if [[ "${SKIP_TF}" != 1 ]]; then
         echo "Deploying infrastructure with Terraform..."
 
-        echo "Enabling shared key access for storage account..."
-        # Terraform isn't able to read all resources from a storage account if shared key access is disabled
-        # so while we're deploying, we need to enable it. Since we haven't run TF yet, we don't have the name of the account
-        # so they are hardcoded here. This is a temporary workaround until this is resolved
-        # https://github.com/hashicorp/terraform-provider-azurerm/issues/25218
-        az storage account update \
-            --name ${SAK_STORAGE_ACCOUNT} \
-            --resource-group ${SAK_RESOURCE_GROUP} \
-            --allow-shared-key-access true \
-            --output none
+        enable_shared_access_keys
 
         terraform init --upgrade
 
