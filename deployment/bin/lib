@@ -131,3 +131,43 @@ function get_cidr_range() {
     IFS='.' read -r -a ip_parts <<< "$runnerIpAddress"
     echo "${ip_parts[0]}.${ip_parts[1]}.0.0/16"
 }
+
+function disable_shared_access_keys() {
+    echo "Disabling shared access key on storage account..."
+
+    for SAK_STORAGE_ACCOUNT in "${!SAK_STORAGE_ACCOUNTS[@]}"; do
+        SAK_RESOURCE_GROUP=${SAK_STORAGE_ACCOUNTS[$SAK_STORAGE_ACCOUNT]}
+
+        az storage account update \
+            --name ${SAK_STORAGE_ACCOUNT} \
+            --resource-group ${SAK_RESOURCE_GROUP} \
+            --allow-shared-key-access false \
+            --output none
+
+        if [ $? -ne 0 ]; then
+            echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            echo "WARNING: Failed to turn off shared key access on the storage account."
+            echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            exit 2
+        fi
+    done
+}
+
+function enable_shared_access_keys() {
+    echo "Enabling shared key access for storage account..."
+    # Terraform isn't able to read all resources from a storage account if shared key access is disabled
+    # so while we're deploying, we need to enable it. Since we haven't run TF yet, we don't have the name of the account
+    # so they are hardcoded here. This is a temporary workaround until this is resolved
+    # https://github.com/hashicorp/terraform-provider-azurerm/issues/25218
+
+    for SAK_STORAGE_ACCOUNT in "${!SAK_STORAGE_ACCOUNTS[@]}"; do
+        SAK_RESOURCE_GROUP=${SAK_STORAGE_ACCOUNTS[$SAK_STORAGE_ACCOUNT]}
+
+        echo "   - enabling ${SAK_STORAGE_ACCOUNT} / ${SAK_RESOURCE_GROUP}"
+        az storage account update \
+            --name ${SAK_STORAGE_ACCOUNT} \
+            --resource-group ${SAK_RESOURCE_GROUP} \
+            --allow-shared-key-access true \
+            --output none
+    done
+}
