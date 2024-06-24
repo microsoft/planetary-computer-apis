@@ -56,6 +56,10 @@ stac:
     affinity: {}
     autoscaling:
       enabled: false
+    useWorkloadIdentity: false
+    serviceAccount:
+      annotations: {}
+
 
   cert:
     privateKeySecretRef: "letsencrypt-staging"

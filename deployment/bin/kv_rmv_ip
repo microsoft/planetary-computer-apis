@@ -32,6 +32,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         -g ${KEY_VAULT_RESOURCE_GROUP_NAME}  \
         -n ${KEY_VAULT_NAME} \
         --ip-address $cidr \
-        --subscription ${ARM_SUBSCRIPTION_ID}
+        --subscription ${ARM_SUBSCRIPTION_ID} \
+        --output none
 
 fi
