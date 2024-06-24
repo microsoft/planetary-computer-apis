@@ -88,14 +88,14 @@ resource "azurerm_role_assignment" "function-app-storage-table-data-contributor"
   ]
 }
 
-data "azurerm_log_analytics_workspace" "log_analytics_workspace" {
+data "azurerm_log_analytics_workspace" "prod_log_analytics_workspace" {
   provider            = azurerm.log_analytics
   name                = var.log_analytics_workspace_name
   resource_group_name = var.pc_resources_rg
 }
 
 resource "azurerm_role_assignment" "function-app-log-analytics-access" {
-  scope                = data.azurerm_log_analytics_workspace.log_analytics_workspace.id
+  scope                = data.azurerm_log_analytics_workspace.prod_log_analytics_workspace.id
   role_definition_name = "Log Analytics Contributor"
   principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
 
