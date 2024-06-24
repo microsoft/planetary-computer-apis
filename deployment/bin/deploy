@@ -84,6 +84,12 @@ setup_env
 echo "===== Running Deploy ====="
 echo "IMAGE_TAG: ${IMAGE_TAG}"
 
+if [ -z "$ARM_CLIENT_ID" ]; then
+  export ARM_CLIENT_ID=$(az account show --query user.name -o tsv)
+  echo "Using Azure CLI auth with username: ${ARM_CLIENT_ID}"
+fi
+
+
 # ---------------------------------------------------
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then

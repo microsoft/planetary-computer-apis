@@ -13,7 +13,7 @@ services:
 
       - ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID:-a84a690d-585b-4c7c-80d9-851a48af5a50}
       - ARM_TENANT_ID=${ARM_TENANT_ID:-72f988bf-86f1-41af-91ab-2d7cd011db47}
-      - ARM_CLIENT_ID=mmcfarland@microsoft.com
+      - ARM_CLIENT_ID
       - ARM_USE_OIDC
       - ARM_OIDC_TOKEN
       - ACTIONS_ID_TOKEN_REQUEST_URL
