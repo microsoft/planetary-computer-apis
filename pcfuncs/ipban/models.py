@@ -19,6 +19,7 @@ class UpdateBannedIPTask:
 
     def run(self) -> List[LogsTableRow]:
         query_result: List[LogsTableRow] = self.get_blob_logs_query_result()
+        logging.info(f"Kusto query result: {query_result}")
         self.update_banned_ips(query_result)
         return query_result
 
