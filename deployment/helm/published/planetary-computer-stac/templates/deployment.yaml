@@ -19,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "pcstac.selectorLabels" . | nindent 8 }}
+        {{- include "pcstac.labels" . | nindent 8 }}
     spec:
       {{- with .Values.stac.deploy.imagePullSecrets }}
       imagePullSecrets:
@@ -89,20 +89,14 @@ spec:
               value: "{{ .Values.stac.debug }}"
             - name: "PCAPIS_COLLECTION_CONFIG__ACCOUNT_NAME"
               value: "{{ .Values.storage.account_name }}"
-            - name: "PCAPIS_COLLECTION_CONFIG__ACCOUNT_KEY"
-              value: "{{ .Values.storage.account_key }}"
             - name: "PCAPIS_COLLECTION_CONFIG__TABLE_NAME"
               value: "{{ .Values.storage.collection_config_table_name }}"
             - name: "PCAPIS_CONTAINER_CONFIG__ACCOUNT_NAME"
               value: "{{ .Values.storage.account_name }}"
-            - name: "PCAPIS_CONTAINER_CONFIG__ACCOUNT_KEY"
-              value: "{{ .Values.storage.account_key }}"
             - name: "PCAPIS_CONTAINER_CONFIG__TABLE_NAME"
               value: "{{ .Values.storage.container_config_table_name }}"
             - name: "PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_NAME"
               value: "{{ .Values.storage.account_name }}"
-            - name: "PCAPIS_IP_EXCEPTION_CONFIG__ACCOUNT_KEY"
-              value: "{{ .Values.storage.account_key }}"
             - name: "PCAPIS_IP_EXCEPTION_CONFIG__TABLE_NAME"
               value: "{{ .Values.storage.ip_exception_config_table_name }}"
             - name: "PCAPIS_REDIS_HOSTNAME"

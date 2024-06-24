@@ -46,7 +46,7 @@ resource "azurerm_function_app" "pcfuncs" {
   os_type = "linux"
   version = "~4"
   site_config {
-    linux_fx_version          = "PYTHON|3.8"
+    linux_fx_version          = "PYTHON|3.9"
     use_32_bit_worker_process = false
     ftps_state                = "Disabled"
 
