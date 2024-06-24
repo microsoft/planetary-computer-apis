@@ -163,7 +163,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --wait \
         --timeout 2m0s \
         -f ${DEPLOY_VALUES_FILE} \
-        --debug
 
     echo "================"
     echo "==== Tiler ====="
@@ -176,7 +175,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --wait \
         --timeout 2m0s \
         -f ${DEPLOY_VALUES_FILE} \
-        --debug
 
     echo "=================="
     echo "==== Ingress ====="

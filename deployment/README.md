@@ -10,6 +10,8 @@ The logic for the deployment workflow is encapsulated in the [bin/deploy](bin/de
 scripts/console --deploy
 ```
 
+To have access to the remote backend terraform state, the identity (App Registration in CI, or local corp credential if local) will need to have the `Storage Blob Data Owner` role on the `pctesttfstate` storage account.
+
 ## Manual resources
 
 ### Deployment secrets Key Vault
