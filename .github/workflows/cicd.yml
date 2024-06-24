@@ -2,7 +2,7 @@ name: Planetary Computer APIs CI/CD
 
 on:
   push:
-    branches: [main, user/mjm/storage-access-fixes]
+    branches: [main]
     tags: ["*"]
 
 permissions:
@@ -32,7 +32,7 @@ jobs:
 
       - name: Get image tag
         id: get_image_tag
-        run: 
+        run:
           case "${GITHUB_REF}" in
             *tags*)
               echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT ;
@@ -52,12 +52,12 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    # if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - build_and_publish
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Log in with Azure
         uses: azure/login@v1
         with:
