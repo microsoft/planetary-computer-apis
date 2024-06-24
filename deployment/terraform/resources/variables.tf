@@ -11,6 +11,11 @@ variable "pc_test_resources_rg" {
   default = "pc-test-manual-resources"
 }
 
+variable "pc_resources_rg" {
+  type    = string
+  default = "pc-manual-resources"
+}
+
 variable "pc_test_resources_kv" {
   type    = string
   default = "pc-test-deploy-secrets"
@@ -120,6 +125,10 @@ variable "animation_output_storage_url" {
 # Image
 
 variable "image_output_storage_url" {
+  type = string
+}
+
+variable "log_analytics_workspace_name" {
   type = string
 }
 
