@@ -17,11 +17,9 @@ def main(mytimer: func.TimerRequest) -> None:
         datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat()
     )
     logger.info("Updating the ip ban list at %s", utc_timestamp)
-    credential: DefaultAzureCredential = DefaultAzureCredential()
-    with LogsQueryClient(credential) as logs_query_client, TableServiceClient(
-        endpoint=settings.storage_account_url, credential=credential
-    ) as table_service_client, table_service_client.create_table_if_not_exists(
-        settings.banned_ip_table
-    ) as table_client:
-        task = UpdateBannedIPTask(logs_query_client, table_client)
-        task.run()
+    credential: DefaultAzureCredential = DefaultAzureCredential()  
+    with LogsQueryClient(credential) as logs_query_client:
+        with TableServiceClient(endpoint=settings.storage_account_url, credential=credential) as table_service_client:
+            with table_service_client.create_table_if_not_exists(settings.banned_ip_table) as table_client:
+                task = UpdateBannedIPTask(logs_query_client, table_client)
+                task.run()
