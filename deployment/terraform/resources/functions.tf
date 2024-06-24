@@ -96,7 +96,7 @@ data "azurerm_log_analytics_workspace" "prod_log_analytics_workspace" {
 
 resource "azurerm_role_assignment" "function-app-log-analytics-access" {
   scope                = data.azurerm_log_analytics_workspace.prod_log_analytics_workspace.id
-  role_definition_name = "Log Analytics Contributor"
+  role_definition_name = "Log Analytics Reader"
   principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
 
   depends_on = [
