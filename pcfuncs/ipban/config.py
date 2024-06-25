@@ -15,4 +15,4 @@ class Settings(BaseSettings):
 
 
 # Create a global settings instance
-settings = Settings()
+settings = Settings()  # type: ignore
