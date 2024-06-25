@@ -132,6 +132,18 @@ variable "prod_log_analytics_workspace_name" {
   type = string
 }
 
+variable "prod_log_analytics_workspace_id" {
+  type = string
+}
+
+variable "banned_ip_table" {
+  type = string
+}
+
+variable "func_storage_account_url" {
+  type = string
+}
+
 # -----------------
 # Local variables
 

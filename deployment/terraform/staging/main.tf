@@ -23,6 +23,9 @@ module "resources" {
   image_output_storage_url     = "https://pcfilestest.blob.core.windows.net/output/images"
 
   prod_log_analytics_workspace_name = "pc-api-loganalytics"
+  prod_log_analytics_workspace_id   = "78d48390-b6bb-49a9-b7fd-a86f6522e9c4"
+  func_storage_account_url          = "https://pctapisstagingsa.table.core.windows.net/"
+  banned_ip_table                   = "blobstoragebannedip"
 }
 
 terraform {

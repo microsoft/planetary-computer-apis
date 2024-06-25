@@ -41,6 +41,11 @@ resource "azurerm_function_app" "pcfuncs" {
     "IMAGE_OUTPUT_STORAGE_URL"       = var.image_output_storage_url,
     "IMAGE_API_ROOT_URL"             = var.funcs_data_api_url,
     "IMAGE_TILE_REQUEST_CONCURRENCY" = tostring(var.funcs_tile_request_concurrency),
+
+    # IPban function
+    "STORAGE_ACCOUNT_URL"        = var.func_storage_account_url,
+    "BANNED_IP_TABLE"            = var.banned_ip_table,
+    "LOG_ANALYTICS_WORKSPACE_ID" = var.prod_log_analytics_workspace_id,
   }
 
   os_type = "linux"
