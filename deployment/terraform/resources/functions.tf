@@ -41,6 +41,11 @@ resource "azurerm_function_app" "pcfuncs" {
     "IMAGE_OUTPUT_STORAGE_URL"       = var.image_output_storage_url,
     "IMAGE_API_ROOT_URL"             = var.funcs_data_api_url,
     "IMAGE_TILE_REQUEST_CONCURRENCY" = tostring(var.funcs_tile_request_concurrency),
+
+    # IPBan function
+    "STORAGE_ACCOUNT_URL"        = var.func_storage_account_url,
+    "BANNED_IP_TABLE"            = var.banned_ip_table,
+    "LOG_ANALYTICS_WORKSPACE_ID" = var.prod_log_analytics_workspace_id,
   }
 
   os_type = "linux"
@@ -71,6 +76,32 @@ data "azurerm_storage_container" "output" {
 resource "azurerm_role_assignment" "function-app-animation-container-access" {
   scope                = data.azurerm_storage_container.output.resource_manager_id
   role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
+
+  depends_on = [
+    azurerm_function_app.pcfuncs
+  ]
+}
+
+resource "azurerm_role_assignment" "function-app-storage-table-data-contributor" {
+  scope                = azurerm_storage_account.pc.id
+  role_definition_name = "Storage Table Data Contributor"
+  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
+
+  depends_on = [
+    azurerm_function_app.pcfuncs
+  ]
+}
+
+data "azurerm_log_analytics_workspace" "prod_log_analytics_workspace" {
+  provider            = azurerm.planetary_computer_subscription
+  name                = var.prod_log_analytics_workspace_name
+  resource_group_name = var.pc_resources_rg
+}
+
+resource "azurerm_role_assignment" "function-app-log-analytics-access" {
+  scope                = data.azurerm_log_analytics_workspace.prod_log_analytics_workspace.id
+  role_definition_name = "Log Analytics Reader"
   principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
 
   depends_on = [

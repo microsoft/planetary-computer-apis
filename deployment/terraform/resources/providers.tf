@@ -8,6 +8,12 @@ provider "azurerm" {
   # storage_use_azuread = true
 }
 
+provider "azurerm" {
+  alias           = "planetary_computer_subscription"
+  subscription_id = "9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9"
+  features {}
+}
+
 terraform {
   required_version = ">= 0.13"
 

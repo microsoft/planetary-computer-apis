@@ -53,6 +53,7 @@ services:
       - ./pccommon:/home/site/pccommon
       - ./pcfuncs:/home/site/wwwroot
       - .:/opt/src
+      - ~/.azure:/home/.azure
 
   nginx:
     image: pc-apis-nginx
