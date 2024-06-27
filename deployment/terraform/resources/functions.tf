@@ -11,14 +11,14 @@ resource "azurerm_app_service_plan" "pc" {
   }
 }
 
-resource "azurerm_function_app" "pcfuncs" {
-  name                       = "func-${local.prefix}"
-  location                   = azurerm_resource_group.pc.location
-  resource_group_name        = azurerm_resource_group.pc.name
-  app_service_plan_id        = azurerm_app_service_plan.pc.id
-  storage_account_name       = azurerm_storage_account.pc.name
-  storage_account_access_key = azurerm_storage_account.pc.primary_access_key
-  https_only                 = true
+resource "azurerm_linux_function_app" "pcfuncs" {
+  name                          = "func-${local.prefix}"
+  location                      = azurerm_resource_group.pc.location
+  resource_group_name           = azurerm_resource_group.pc.name
+  service_plan_id               = azurerm_app_service_plan.pc.id
+  storage_account_name          = azurerm_storage_account.pc.name
+  storage_uses_managed_identity = true
+  https_only                    = true
 
   identity {
     type = "SystemAssigned"
@@ -48,18 +48,11 @@ resource "azurerm_function_app" "pcfuncs" {
     "LOG_ANALYTICS_WORKSPACE_ID" = var.prod_log_analytics_workspace_id,
   }
 
-  os_type = "linux"
-  version = "~4"
   site_config {
-    linux_fx_version          = "PYTHON|3.9"
-    use_32_bit_worker_process = false
-    ftps_state                = "Disabled"
-
-    cors {
-      allowed_origins = ["*"]
+    application_stack {
+      python_version = "3.9"
     }
   }
-
   lifecycle {
     ignore_changes = [
       tags
@@ -73,23 +66,29 @@ data "azurerm_storage_container" "output" {
   storage_account_name = var.output_storage_account_name
 }
 
+resource "azurerm_role_assignment" "function-app-storage-account-access" {
+  scope                = azurerm_storage_account.pc.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_linux_function_app.pcfuncs.identity[0].principal_id
+}
+
 resource "azurerm_role_assignment" "function-app-animation-container-access" {
   scope                = data.azurerm_storage_container.output.resource_manager_id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app.pcfuncs.identity[0].principal_id
 
   depends_on = [
-    azurerm_function_app.pcfuncs
+    azurerm_linux_function_app.pcfuncs
   ]
 }
 
 resource "azurerm_role_assignment" "function-app-storage-table-data-contributor" {
   scope                = azurerm_storage_account.pc.id
   role_definition_name = "Storage Table Data Contributor"
-  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app.pcfuncs.identity[0].principal_id
 
   depends_on = [
-    azurerm_function_app.pcfuncs
+    azurerm_linux_function_app.pcfuncs
   ]
 }
 
@@ -102,9 +101,9 @@ data "azurerm_log_analytics_workspace" "prod_log_analytics_workspace" {
 resource "azurerm_role_assignment" "function-app-log-analytics-access" {
   scope                = data.azurerm_log_analytics_workspace.prod_log_analytics_workspace.id
   role_definition_name = "Log Analytics Reader"
-  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app.pcfuncs.identity[0].principal_id
 
   depends_on = [
-    azurerm_function_app.pcfuncs
+    azurerm_linux_function_app.pcfuncs
   ]
 }

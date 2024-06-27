@@ -13,18 +13,18 @@ module "resources" {
   cluster_cert_issuer = "letsencrypt"
   cluster_cert_server = "https://acme-v02.api.letsencrypt.org/directory"
 
-  aks_node_count    = 1
-  stac_replica_count = 1
+  aks_node_count      = 1
+  stac_replica_count  = 1
   tiler_replica_count = 1
 
   # Funcs
-  output_storage_account_name = "pcfilestest"
-  output_container_name = "output"
-  funcs_data_api_url = "https://planetarycomputer.microsoft.com/api/data/v1"
+  output_storage_account_name    = "pcfilestest"
+  output_container_name          = "output"
+  funcs_data_api_url             = "https://planetarycomputer.microsoft.com/api/data/v1"
   funcs_tile_request_concurrency = 10
 
   animation_output_storage_url = "https://pcfilestest.blob.core.windows.net/output/animations"
-  image_output_storage_url = "https://pcfilestest.blob.core.windows.net/output/images"
+  image_output_storage_url     = "https://pcfilestest.blob.core.windows.net/output/images"
 
 }
 
