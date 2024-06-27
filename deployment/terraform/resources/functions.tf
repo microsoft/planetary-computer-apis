@@ -49,6 +49,10 @@ resource "azurerm_linux_function_app" "pcfuncs" {
   }
 
   site_config {
+    ftps_state = "Disabled"
+    cors {
+      allowed_origins = ["*"]
+    }
     application_stack {
       python_version = "3.9"
     }
