@@ -142,6 +142,7 @@ function disable_shared_access_keys() {
             --name ${SAK_STORAGE_ACCOUNT} \
             --resource-group ${SAK_RESOURCE_GROUP} \
             --allow-shared-key-access false \
+            --subscription ${ARM_SUBSCRIPTION_ID} \
             --output none
 
         if [ $? -ne 0 ]; then
@@ -168,6 +169,7 @@ function enable_shared_access_keys() {
             --name ${SAK_STORAGE_ACCOUNT} \
             --resource-group ${SAK_RESOURCE_GROUP} \
             --allow-shared-key-access true \
+            --subscription ${ARM_SUBSCRIPTION_ID} \
             --output none
     done
 }
