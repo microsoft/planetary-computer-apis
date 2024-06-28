@@ -25,8 +25,6 @@ resource "azurerm_linux_function_app" "pcfuncs" {
   }
 
   app_settings = {
-    "ENABLE_ORYX_BUILD"              = "true",
-    "SCM_DO_BUILD_DURING_DEPLOYMENT" = "true",
     "FUNCTIONS_WORKER_RUNTIME"       = "python",
     "APP_INSIGHTS_IKEY"              = azurerm_application_insights.pc_application_insights.instrumentation_key,
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.pc_application_insights.instrumentation_key,
