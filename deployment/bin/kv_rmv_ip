@@ -28,9 +28,18 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     cidr=$(get_cidr_range)
 
+    echo "Removing IP $cidr from Key Vault firewall allow list..."
     az keyvault network-rule remove \
         -g ${KEY_VAULT_RESOURCE_GROUP_NAME}  \
         -n ${KEY_VAULT_NAME} \
+        --ip-address $cidr \
+        --subscription ${ARM_SUBSCRIPTION_ID} \
+        --output none
+
+    echo "Removing IP $cidr from Storage firewall allow list..."
+    az storage account network-rule remove \
+        -g ${TFSTATE_SA_RG} \
+        -n ${TFSTATE_SA_NAME} \
         --ip-address $cidr \
         --subscription ${ARM_SUBSCRIPTION_ID} \
         --output none
