@@ -29,18 +29,15 @@ resource "azurerm_linux_function_app" "pcfuncs" {
   }
 
   app_settings = {
-    "FUNCTIONS_WORKER_RUNTIME"       = "python",
-    "APP_INSIGHTS_IKEY"              = azurerm_application_insights.pc_application_insights.instrumentation_key,
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.pc_application_insights.instrumentation_key,
-    "AzureWebJobsDisableHomepage"    = true,
+    "FUNCTIONS_WORKER_RUNTIME" = "python",
+    "APP_INSIGHTS_IKEY"        = azurerm_application_insights.pc_application_insights.instrumentation_key,
 
-    "WEBSITE_RUN_FROM_PACKAGE" = 1,
-
+    # Remote build
     "BUILD_FLAGS"                    = "UseExpressBuild",
     "ENABLE_ORYX_BUILD"              = "true"
     "SCM_DO_BUILD_DURING_DEPLOYMENT" = "1",
-    "WEBSITE_RUN_FROM_PACKAGE"       = "1",
     "XDG_CACHE_HOME"                 = "/tmp/.cache"
+    "AzureWebJobsDisableHomepage"    = true,
 
     # Animation Function
     "ANIMATION_OUTPUT_STORAGE_URL"       = var.animation_output_storage_url,

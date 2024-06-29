@@ -122,7 +122,7 @@ function deploy_funcs() {
     prepare_funcs
 
     pushd /opt/src/pcfuncs_deploy
-    func azure functionapp publish ${FUNCTION_APP_NAME} --python #--no-build
+    func azure functionapp publish ${FUNCTION_APP_NAME} --python
     popd
 }
 
