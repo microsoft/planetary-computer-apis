@@ -28,9 +28,19 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     cidr=$(get_cidr_range)
 
+    echo "Adding IP $cidr to Key Vault firewall allow list..."
     az keyvault network-rule add \
         -g ${KEY_VAULT_RESOURCE_GROUP_NAME}  \
         -n ${KEY_VAULT_NAME} \
+        --ip-address $cidr \
+        --subscription ${ARM_SUBSCRIPTION_ID} \
+        --output none
+
+    # Also add the IP to the terraform state storage account
+    echo "Adding IP $cidr to Storage firewall allow list..."
+    az storage account network-rule add \
+        -g ${TFSTATE_SA_RG} \
+        -n ${TFSTATE_SA_NAME} \
         --ip-address $cidr \
         --subscription ${ARM_SUBSCRIPTION_ID} \
         --output none
