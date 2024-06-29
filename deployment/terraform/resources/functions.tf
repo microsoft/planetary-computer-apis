@@ -1,22 +1,24 @@
-resource "azurerm_app_service_plan" "pc" {
-  name                = "plan-${local.prefix}"
+resource "azurerm_service_plan" "pc" {
+  name                = "app-plan-${local.prefix}"
   location            = azurerm_resource_group.pc.location
   resource_group_name = azurerm_resource_group.pc.name
-  kind                = "functionapp"
-  reserved            = true
+  os_type             = "Linux"
 
-  sku {
-    tier = "Dynamic"
-    size = "Y1"
-  }
+  sku_name = "EP1"
+
 }
 
 resource "azurerm_linux_function_app" "pcfuncs" {
-  name                          = "func-${local.prefix}"
-  location                      = azurerm_resource_group.pc.location
-  resource_group_name           = azurerm_resource_group.pc.name
-  service_plan_id               = azurerm_app_service_plan.pc.id
-  storage_account_name          = azurerm_storage_account.pc.name
+  name                 = "func-${local.prefix}"
+  location             = azurerm_resource_group.pc.location
+  resource_group_name  = azurerm_resource_group.pc.name
+  service_plan_id      = azurerm_service_plan.pc.id
+  storage_account_name = azurerm_storage_account.pc.name
+
+  ftp_publish_basic_authentication_enabled       = false
+  webdeploy_publish_basic_authentication_enabled = false
+
+
   storage_uses_managed_identity = true
   https_only                    = true
 
@@ -29,6 +31,14 @@ resource "azurerm_linux_function_app" "pcfuncs" {
     "APP_INSIGHTS_IKEY"              = azurerm_application_insights.pc_application_insights.instrumentation_key,
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.pc_application_insights.instrumentation_key,
     "AzureWebJobsDisableHomepage"    = true,
+
+    "WEBSITE_RUN_FROM_PACKAGE" = 1,
+
+    "BUILD_FLAGS"                    = "UseExpressBuild",
+    "ENABLE_ORYX_BUILD"              = "true"
+    "SCM_DO_BUILD_DURING_DEPLOYMENT" = "1",
+    "WEBSITE_RUN_FROM_PACKAGE"       = "1",
+    "XDG_CACHE_HOME"                 = "/tmp/.cache"
 
     # Animation Function
     "ANIMATION_OUTPUT_STORAGE_URL"       = var.animation_output_storage_url,
@@ -47,7 +57,9 @@ resource "azurerm_linux_function_app" "pcfuncs" {
   }
 
   site_config {
-    ftps_state = "Disabled"
+    application_insights_key = azurerm_application_insights.pc_application_insights.instrumentation_key
+    ftps_state               = "Disabled"
+
     cors {
       allowed_origins = ["*"]
     }

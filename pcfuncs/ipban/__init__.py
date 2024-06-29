@@ -17,6 +17,7 @@ def main(mytimer: func.TimerRequest) -> None:
         datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat()
     )
     logger.info("Updating the ip ban list at %s", utc_timestamp)
+    logger.info("New RUN")
     credential: DefaultAzureCredential = DefaultAzureCredential()
     with LogsQueryClient(credential) as logs_query_client:
         with TableServiceClient(
