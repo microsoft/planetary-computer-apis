@@ -15,6 +15,8 @@ resource "azurerm_linux_function_app" "pcfuncs" {
   service_plan_id      = azurerm_service_plan.pc.id
   storage_account_name = azurerm_storage_account.pc.name
 
+  virtual_network_subnet_id = azurerm_subnet.function_subnet.id
+
   ftp_publish_basic_authentication_enabled       = false
   webdeploy_publish_basic_authentication_enabled = false
 
@@ -57,6 +59,7 @@ resource "azurerm_linux_function_app" "pcfuncs" {
   }
 
   site_config {
+    vnet_route_all_enabled   = true
     application_insights_key = azurerm_application_insights.pc_application_insights.instrumentation_key
     ftps_state               = "Disabled"
 
@@ -74,11 +77,7 @@ resource "azurerm_linux_function_app" "pcfuncs" {
   }
 }
 
-# Note: this must be in the same subscription as the rest of the deployed infrastructure
-data "azurerm_storage_container" "output" {
-  name                 = var.output_container_name
-  storage_account_name = var.output_storage_account_name
-}
+
 
 resource "azurerm_role_assignment" "function-app-storage-account-access" {
   scope                = azurerm_storage_account.pc.id
@@ -87,7 +86,7 @@ resource "azurerm_role_assignment" "function-app-storage-account-access" {
 }
 
 resource "azurerm_role_assignment" "function-app-animation-container-access" {
-  scope                = data.azurerm_storage_container.output.resource_manager_id
+  scope                = data.azurerm_storage_account.output-storage-account.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_linux_function_app.pcfuncs.identity[0].principal_id
 

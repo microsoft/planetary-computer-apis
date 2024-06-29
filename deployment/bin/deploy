@@ -69,6 +69,14 @@ SAK_STORAGE_ACCOUNTS=(
   ["pcfilestest"]="pc-test-manual-resources"
 )
 
+# Add client IP to firewall for storage accounts that must have properties read
+# [storage_account]=resource_group
+declare -A FW_STORAGE_ACCOUNTS
+FW_STORAGE_ACCOUNTS=(
+    ["pctesttfstate"]="pc-test-manual-resources"
+    ["pctapisstagingsa"]="pct-apis-westeurope-staging_rg"
+)
+
 if [[ -z ${TERRAFORM_DIR} ]]; then
     echo "Must pass in TERRAFORM_DIR with -t"
     exit 1
@@ -100,10 +108,10 @@ fi
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     #########################
-    # Add IP to KV firewall #
+    # Add IP to firewalls #
     #########################
 
-    bin/kv_add_ip
+    add_ip_to_firewalls
 
     #####################
     # Deploy Terraform  #
@@ -129,16 +137,13 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     # Gather terraform output
     gather_tf_output
 
-    deploy_funcs
-
-    exit 0
     popd
 
     ##############################
-    # Remove IP from KV firewall #
+    # Remove IP from firewalls #
     ##############################
 
-    bin/kv_rmv_ip
+    remove_ip_from_firewalls
 
     ############################
     # Render Helm chart values #

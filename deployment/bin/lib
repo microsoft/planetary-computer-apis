@@ -155,20 +155,71 @@ function disable_shared_access_keys() {
 }
 
 function enable_shared_access_keys() {
-    echo "Enabling shared key access for storage account..."
     # Terraform isn't able to read all resources from a storage account if shared key access is disabled
     # so while we're deploying, we need to enable it. Since we haven't run TF yet, we don't have the name of the account
     # so they are hardcoded here. This is a temporary workaround until this is resolved
     # https://github.com/hashicorp/terraform-provider-azurerm/issues/25218
 
+    echo "Enabling shared key access for storage accounts..."
     for SAK_STORAGE_ACCOUNT in "${!SAK_STORAGE_ACCOUNTS[@]}"; do
         SAK_RESOURCE_GROUP=${SAK_STORAGE_ACCOUNTS[$SAK_STORAGE_ACCOUNT]}
 
-        echo "   - enabling ${SAK_STORAGE_ACCOUNT} / ${SAK_RESOURCE_GROUP}"
+        echo "   - ${SAK_RESOURCE_GROUP}.${SAK_STORAGE_ACCOUNT}"
         az storage account update \
             --name ${SAK_STORAGE_ACCOUNT} \
             --resource-group ${SAK_RESOURCE_GROUP} \
             --allow-shared-key-access true \
+            --subscription ${ARM_SUBSCRIPTION_ID} \
+            --output none
+    done
+
+    sleep 10
+}
+
+function add_ip_to_firewalls() {
+    cidr=$(get_cidr_range)
+
+    echo "Adding IP $cidr to Key Vault firewall allow list..."
+    az keyvault network-rule add \
+        -g "${KEY_VAULT_RESOURCE_GROUP_NAME}"  \
+        -n "${KEY_VAULT_NAME}" \
+        --ip-address "$cidr" \
+        --subscription "${ARM_SUBSCRIPTION_ID}" \
+        --output none
+
+    # Also add the IP to the terraform state storage account
+    for FW_STORAGE_ACCOUNT in "${!FW_STORAGE_ACCOUNTS[@]}"; do
+        FW_RESOURCE_GROUP=${FW_STORAGE_ACCOUNTS[$FW_STORAGE_ACCOUNT]}
+        echo "Adding IP $cidr to ${FW_STORAGE_ACCOUNT} Storage firewall allow list..."
+        az storage account network-rule add \
+            -g "${FW_RESOURCE_GROUP}" \
+            -n "${FW_STORAGE_ACCOUNT}" \
+            --ip-address "$cidr" \
+            --subscription "${ARM_SUBSCRIPTION_ID}" \
+            --output none
+    done
+
+    sleep 10
+}
+
+function remove_ip_from_firewalls() {
+    cidr=$(get_cidr_range)
+
+    echo "Removing IP $cidr from Key Vault firewall allow list..."
+    az keyvault network-rule remove \
+        -g ${KEY_VAULT_RESOURCE_GROUP_NAME}  \
+        -n ${KEY_VAULT_NAME} \
+        --ip-address $cidr \
+        --subscription ${ARM_SUBSCRIPTION_ID} \
+        --output none
+
+    for FW_STORAGE_ACCOUNT in "${!FW_STORAGE_ACCOUNTS[@]}"; do
+        FW_RESOURCE_GROUP=${FW_STORAGE_ACCOUNTS[$FW_STORAGE_ACCOUNT]}
+        echo "Removing IP $cidr from ${FW_STORAGE_ACCOUNT} Storage firewall allow list..."
+        az storage account network-rule remove \
+            -g ${FW_RESOURCE_GROUP} \
+            -n ${FW_STORAGE_ACCOUNT} \
+            --ip-address $cidr \
             --subscription ${ARM_SUBSCRIPTION_ID} \
             --output none
     done
