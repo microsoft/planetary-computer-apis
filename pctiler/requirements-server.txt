@@ -21,11 +21,11 @@ attrs==23.2.0
     #   morecantile
     #   rasterio
     #   rio-tiler
-boto3==1.34.123
+boto3==1.34.136
     # via
     #   pctiler (pctiler/setup.py)
     #   rio-tiler
-botocore==1.34.123
+botocore==1.34.136
     # via
     #   boto3
     #   pctiler (pctiler/setup.py)
@@ -251,7 +251,7 @@ typing-extensions==4.10.0
     #   psycopg-pool
     #   pydantic
     #   starlette
-urllib3==1.26.18
+urllib3==1.26.19
     # via
     #   botocore
     #   requests
