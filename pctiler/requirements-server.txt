@@ -227,7 +227,7 @@ snuggs==1.4.7
     # via rasterio
 stac-pydantic==2.0.3
     # via titiler-pgstac
-starlette==0.24.0
+starlette==0.36.2
     # via
     #   fastapi
     #   titiler-pgstac
