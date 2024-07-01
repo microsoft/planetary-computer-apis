@@ -151,7 +151,7 @@ typing-extensions==4.10.0
     #   azure-storage-blob
     #   pydantic
     #   starlette
-urllib3==2.2.1
+urllib3==2.2.2
     # via
     #   pccommon (pccommon/setup.py)
     #   requests

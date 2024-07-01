@@ -13,18 +13,16 @@ inst_reqs: List[str] = [
     "titiler.core==0.10.2",
     "titiler.mosaic==0.10.2",
     "pillow==10.3.0",
-    "boto3==1.34.123",
-    "botocore==1.34.123",
+    "boto3==1.34.136",
+    "botocore==1.34.136",
     "pydantic==1.10.14",
     "idna>=3.7.0",
     "requests==2.32.2",
     # titiler-pgstac
     "psycopg[binary,pool]",
     "titiler.pgstac==0.2.4",
-
     # colormap dependencies
     "matplotlib==3.9.0",
-
     "orjson==3.10.4",
     "importlib_resources>=1.1.0;python_version<'3.9'",
 ]
