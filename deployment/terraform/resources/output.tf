@@ -137,5 +137,5 @@ output "redis_port" {
 # Functions
 
 output "function_app_name" {
-  value = azurerm_function_app.pcfuncs.name
+  value = azurerm_linux_function_app.pcfuncs.name
 }

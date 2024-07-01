@@ -1,35 +1,42 @@
-resource "azurerm_app_service_plan" "pc" {
-  name                = "plan-${local.prefix}"
+resource "azurerm_service_plan" "pc" {
+  name                = "app-plan-${local.prefix}"
   location            = azurerm_resource_group.pc.location
   resource_group_name = azurerm_resource_group.pc.name
-  kind                = "functionapp"
-  reserved            = true
+  os_type             = "Linux"
 
-  sku {
-    tier = "Dynamic"
-    size = "Y1"
-  }
+  sku_name = "EP1"
+
 }
 
-resource "azurerm_function_app" "pcfuncs" {
-  name                       = "func-${local.prefix}"
-  location                   = azurerm_resource_group.pc.location
-  resource_group_name        = azurerm_resource_group.pc.name
-  app_service_plan_id        = azurerm_app_service_plan.pc.id
-  storage_account_name       = azurerm_storage_account.pc.name
-  storage_account_access_key = azurerm_storage_account.pc.primary_access_key
-  https_only                 = true
+resource "azurerm_linux_function_app" "pcfuncs" {
+  name                 = "func-${local.prefix}"
+  location             = azurerm_resource_group.pc.location
+  resource_group_name  = azurerm_resource_group.pc.name
+  service_plan_id      = azurerm_service_plan.pc.id
+  storage_account_name = azurerm_storage_account.pc.name
+
+  virtual_network_subnet_id = azurerm_subnet.function_subnet.id
+
+  ftp_publish_basic_authentication_enabled       = false
+  webdeploy_publish_basic_authentication_enabled = false
+
+
+  storage_uses_managed_identity = true
+  https_only                    = true
 
   identity {
     type = "SystemAssigned"
   }
 
   app_settings = {
-    "ENABLE_ORYX_BUILD"              = "true",
-    "SCM_DO_BUILD_DURING_DEPLOYMENT" = "true",
-    "FUNCTIONS_WORKER_RUNTIME"       = "python",
-    "APP_INSIGHTS_IKEY"              = azurerm_application_insights.pc_application_insights.instrumentation_key,
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.pc_application_insights.instrumentation_key,
+    "FUNCTIONS_WORKER_RUNTIME" = "python",
+    "APP_INSIGHTS_IKEY"        = azurerm_application_insights.pc_application_insights.instrumentation_key,
+
+    # Remote build
+    "BUILD_FLAGS"                    = "UseExpressBuild",
+    "ENABLE_ORYX_BUILD"              = "true"
+    "SCM_DO_BUILD_DURING_DEPLOYMENT" = "1",
+    "XDG_CACHE_HOME"                 = "/tmp/.cache"
     "AzureWebJobsDisableHomepage"    = true,
 
     # Animation Function
@@ -48,18 +55,18 @@ resource "azurerm_function_app" "pcfuncs" {
     "LOG_ANALYTICS_WORKSPACE_ID" = var.prod_log_analytics_workspace_id,
   }
 
-  os_type = "linux"
-  version = "~4"
   site_config {
-    linux_fx_version          = "PYTHON|3.9"
-    use_32_bit_worker_process = false
-    ftps_state                = "Disabled"
+    vnet_route_all_enabled   = true
+    application_insights_key = azurerm_application_insights.pc_application_insights.instrumentation_key
+    ftps_state               = "Disabled"
 
     cors {
       allowed_origins = ["*"]
     }
+    application_stack {
+      python_version = "3.9"
+    }
   }
-
   lifecycle {
     ignore_changes = [
       tags
@@ -67,29 +74,31 @@ resource "azurerm_function_app" "pcfuncs" {
   }
 }
 
-# Note: this must be in the same subscription as the rest of the deployed infrastructure
-data "azurerm_storage_container" "output" {
-  name                 = var.output_container_name
-  storage_account_name = var.output_storage_account_name
+
+
+resource "azurerm_role_assignment" "function-app-storage-account-access" {
+  scope                = azurerm_storage_account.pc.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_linux_function_app.pcfuncs.identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "function-app-animation-container-access" {
-  scope                = data.azurerm_storage_container.output.resource_manager_id
+  scope                = data.azurerm_storage_account.output-storage-account.id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app.pcfuncs.identity[0].principal_id
 
   depends_on = [
-    azurerm_function_app.pcfuncs
+    azurerm_linux_function_app.pcfuncs
   ]
 }
 
 resource "azurerm_role_assignment" "function-app-storage-table-data-contributor" {
   scope                = azurerm_storage_account.pc.id
   role_definition_name = "Storage Table Data Contributor"
-  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app.pcfuncs.identity[0].principal_id
 
   depends_on = [
-    azurerm_function_app.pcfuncs
+    azurerm_linux_function_app.pcfuncs
   ]
 }
 
@@ -102,9 +111,9 @@ data "azurerm_log_analytics_workspace" "prod_log_analytics_workspace" {
 resource "azurerm_role_assignment" "function-app-log-analytics-access" {
   scope                = data.azurerm_log_analytics_workspace.prod_log_analytics_workspace.id
   role_definition_name = "Log Analytics Reader"
-  principal_id         = azurerm_function_app.pcfuncs.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app.pcfuncs.identity[0].principal_id
 
   depends_on = [
-    azurerm_function_app.pcfuncs
+    azurerm_linux_function_app.pcfuncs
   ]
 }

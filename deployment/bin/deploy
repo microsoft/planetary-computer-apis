@@ -14,6 +14,7 @@ function usage() {
 Deploys the project infrastructure.
 
 -t TERRAFORM_DIR: The terraform directory. Required.
+-y: Auto approve the terraform changes.
 --plan: Only run Terraform plan.
 --skip-tf: Skips Terraform apply. Will still gather terraform output
 "
@@ -35,6 +36,10 @@ while [[ "$#" -gt 0 ]]; do case $1 in
         ;;
     --plan)
         PLAN_ONLY=1
+        shift
+        ;;
+    -y)
+        AUTO_APPROVE=-auto-approve
         shift
         ;;
     --help)
@@ -62,6 +67,14 @@ declare -A SAK_STORAGE_ACCOUNTS
 SAK_STORAGE_ACCOUNTS=(
   ["pctapisstagingsa"]="pct-apis-westeurope-staging_rg"
   ["pcfilestest"]="pc-test-manual-resources"
+)
+
+# Add client IP to firewall for storage accounts that must have properties read
+# [storage_account]=resource_group
+declare -A FW_STORAGE_ACCOUNTS
+FW_STORAGE_ACCOUNTS=(
+    ["pctesttfstate"]="pc-test-manual-resources"
+    ["pctapisstagingsa"]="pct-apis-westeurope-staging_rg"
 )
 
 if [[ -z ${TERRAFORM_DIR} ]]; then
@@ -95,10 +108,10 @@ fi
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     #########################
-    # Add IP to KV firewall #
+    # Add IP to firewalls #
     #########################
 
-    bin/kv_add_ip
+    add_ip_to_firewalls
 
     #####################
     # Deploy Terraform  #
@@ -118,7 +131,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             exit 0
         fi
 
-        terraform apply -auto-approve
+        terraform apply "$AUTO_APPROVE"
     fi
 
     # Gather terraform output
@@ -127,10 +140,10 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     popd
 
     ##############################
-    # Remove IP from KV firewall #
+    # Remove IP from firewalls #
     ##############################
 
-    bin/kv_rmv_ip
+    remove_ip_from_firewalls
 
     ############################
     # Render Helm chart values #

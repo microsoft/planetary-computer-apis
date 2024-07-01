@@ -26,6 +26,25 @@ resource "azurerm_subnet" "cache_subnet" {
   service_endpoints    = []
 }
 
+resource "azurerm_subnet" "function_subnet" {
+  name                 = "${local.prefix}-functions-subnet"
+  virtual_network_name = azurerm_virtual_network.pc.name
+  resource_group_name  = azurerm_resource_group.pc.name
+
+  service_endpoints = ["Microsoft.Storage.Global"]
+  delegation {
+    name = "delegation"
+    service_delegation {
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/action",
+      ]
+      name = "Microsoft.Web/serverFarms"
+    }
+  }
+
+  address_prefixes = ["10.3.0.0/26"]
+}
+
 resource "azurerm_network_security_group" "pc" {
   name                = "${local.prefix}-security-group"
   location            = azurerm_resource_group.pc.location
@@ -51,5 +70,10 @@ resource "azurerm_subnet_network_security_group_association" "pc" {
 
 resource "azurerm_subnet_network_security_group_association" "pc-cache" {
   subnet_id                 = azurerm_subnet.cache_subnet.id
+  network_security_group_id = azurerm_network_security_group.pc.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "pc-functions" {
+  subnet_id                 = azurerm_subnet.function_subnet.id
   network_security_group_id = azurerm_network_security_group.pc.id
 }
