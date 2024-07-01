@@ -68,7 +68,7 @@ cycler==0.12.1
     # via matplotlib
 exceptiongroup==1.2.0
     # via anyio
-fastapi==0.91.0
+fastapi==0.109.1
     # via
     #   titiler-core
     #   titiler-pgstac
