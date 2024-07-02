@@ -144,6 +144,17 @@ variable "func_storage_account_url" {
   type = string
 }
 
+variable "sas_node_subnet_name" {
+  type = string
+}
+
+variable "sas_node_subnet_virtual_network_name" {
+  type = string
+}
+
+variable "sas_node_subnet_resource_group_name" {
+  type = string
+}
 # -----------------
 # Local variables
 

@@ -9,7 +9,7 @@ resource "azurerm_storage_account" "pc" {
 
   network_rules {
     default_action             = "Deny"
-    virtual_network_subnet_ids = [azurerm_subnet.node_subnet.id, azurerm_subnet.function_subnet.id]
+    virtual_network_subnet_ids = [azurerm_subnet.node_subnet.id, azurerm_subnet.function_subnet.id, data.azurerm_subnet.sas_node_subnet.id]
   }
 
   # Disabling shared access keys breaks terraform's ability to do subsequent
