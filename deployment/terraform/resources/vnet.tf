@@ -26,6 +26,12 @@ resource "azurerm_subnet" "cache_subnet" {
   service_endpoints    = []
 }
 
+data "azurerm_subnet" "sas_node_subnet" {
+  name                 = var.sas_node_subnet_name
+  virtual_network_name = var.sas_node_subnet_virtual_network_name
+  resource_group_name  = var.sas_node_subnet_resource_group_name
+}
+
 resource "azurerm_subnet" "function_subnet" {
   name                 = "${local.prefix}-functions-subnet"
   virtual_network_name = azurerm_virtual_network.pc.name
