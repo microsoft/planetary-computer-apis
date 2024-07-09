@@ -94,7 +94,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         docker-compose \
             -f docker-compose.yml \
             run --rm \
-            funcs /bin/bash -c "cd /opt/src && scripts/bin/test-funcs"
+            funcs /bin/bash -c "cd /opt/src && scripts/bin/test-funcs ${NO_INTEGRATION}" 
     fi
 
 fi

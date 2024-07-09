@@ -55,6 +55,10 @@ output "cluster_tiler_identity_client_id" {
   value = azurerm_user_assigned_identity.tiler.client_id
 }
 
+output "cluster_stac_identity_client_id" {
+  value = azurerm_user_assigned_identity.stac.client_id
+}
+
 ## Ingress
 
 output "ingress_ip" {
@@ -104,10 +108,6 @@ output "storage_account_name" {
   value = azurerm_storage_account.pc.name
 }
 
-output "storage_account_key" {
-  value = azurerm_storage_account.pc.primary_access_key
-}
-
 output "collection_config_table_name" {
   value = azurerm_storage_table.collectionconfig.name
 }
@@ -137,5 +137,5 @@ output "redis_port" {
 # Functions
 
 output "function_app_name" {
-  value = azurerm_function_app.pcfuncs.name
+  value = azurerm_linux_function_app.pcfuncs.name
 }

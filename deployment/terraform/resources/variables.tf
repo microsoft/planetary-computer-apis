@@ -11,6 +11,11 @@ variable "pc_test_resources_rg" {
   default = "pc-test-manual-resources"
 }
 
+variable "pc_resources_rg" {
+  type    = string
+  default = "pc-manual-resources"
+}
+
 variable "pc_test_resources_kv" {
   type    = string
   default = "pc-test-deploy-secrets"
@@ -123,6 +128,33 @@ variable "image_output_storage_url" {
   type = string
 }
 
+variable "prod_log_analytics_workspace_name" {
+  type = string
+}
+
+variable "prod_log_analytics_workspace_id" {
+  type = string
+}
+
+variable "banned_ip_table" {
+  type = string
+}
+
+variable "func_storage_account_url" {
+  type = string
+}
+
+variable "sas_node_subnet_name" {
+  type = string
+}
+
+variable "sas_node_subnet_virtual_network_name" {
+  type = string
+}
+
+variable "sas_node_subnet_resource_group_name" {
+  type = string
+}
 # -----------------
 # Local variables
 

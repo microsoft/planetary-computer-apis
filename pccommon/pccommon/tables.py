@@ -1,3 +1,4 @@
+import os
 from threading import Lock
 from typing import (
     Any,
@@ -10,17 +11,20 @@ from typing import (
     Tuple,
     Type,
     TypeVar,
+    Union,
 )
 
 import orjson
-from azure.core.credentials import AzureNamedKeyCredential, AzureSasCredential
+from azure.core.credentials import AzureNamedKeyCredential
 from azure.core.exceptions import ResourceNotFoundError
 from azure.data.tables import TableClient, TableEntity, TableServiceClient
+from azure.identity import AzureCliCredential, ManagedIdentityCredential
 from cachetools import Cache, TTLCache, cachedmethod
 from cachetools.keys import hashkey
 from pydantic import BaseModel
 
 from pccommon.constants import (
+    AZURITE_ACCOUNT_KEY,
     DEFAULT_IP_EXCEPTIONS_TTL,
     DEFAULT_TTL,
     IP_EXCEPTION_PARTITION_KEY,
@@ -83,60 +87,49 @@ class TableService:
             self._service_client = None
 
     @classmethod
-    def from_sas_token(
-        cls: Type[T], account_url: str, sas_token: str, table_name: str
-    ) -> T:
-        def _get_clients(
-            _url: str = account_url, _token: str = sas_token, _table: str = table_name
-        ) -> Tuple[Optional[TableServiceClient], TableClient]:
-            table_service_client = TableServiceClient(
-                endpoint=_url,
-                credential=AzureSasCredential(_token),
-            )
-            return (
-                table_service_client,
-                table_service_client.get_table_client(table_name=_table),
-            )
-
-        return cls(_get_clients)
-
-    @classmethod
-    def from_connection_string(
-        cls: Type[T], connection_string: str, table_name: str
-    ) -> T:
-        def _get_clients(
-            _conn_str: str = connection_string, _table: str = table_name
-        ) -> Tuple[Optional[TableServiceClient], TableClient]:
-            table_service_client = TableServiceClient.from_connection_string(
-                conn_str=_conn_str
-            )
-            return (
-                table_service_client,
-                table_service_client.get_table_client(table_name=_table),
-            )
-
-        return cls(_get_clients)
-
-    @classmethod
-    def from_account_key(
+    def from_environment(
         cls: Type[T],
         account_name: str,
-        account_key: str,
         table_name: str,
         account_url: Optional[str] = None,
         ttl: Optional[int] = None,
     ) -> T:
         def _get_clients(
-            _name: str = account_name,
-            _key: str = account_key,
-            _url: Optional[str] = account_url,
+            _account: str = account_name,
             _table: str = table_name,
+            _url: Optional[str] = account_url,
         ) -> Tuple[Optional[TableServiceClient], TableClient]:
-            _url = _url or f"https://{_name}.table.core.windows.net"
-            credential = AzureNamedKeyCredential(name=_name, key=_key)
+            credential: Union[
+                AzureNamedKeyCredential, ManagedIdentityCredential, AzureCliCredential
+            ]
+
+            # Check if the environment is configured to use Azurite and use that key.
+            # Otherwise, we must use a workload identity.
+            if _url:
+                if not _url.startswith("http://azurite:"):
+                    raise ValueError(
+                        "Non-azurite account url provided. "
+                        "Account keys can only be used with Azurite emulator."
+                    )
+
+                url = _url
+                credential = AzureNamedKeyCredential(
+                    name=_account, key=AZURITE_ACCOUNT_KEY
+                )
+            else:
+                client_id = os.environ.get("AZURE_CLIENT_ID")
+                credential = (
+                    ManagedIdentityCredential(client_id=client_id)
+                    if client_id
+                    else AzureCliCredential()
+                )
+
+                url = f"https://{_account}.table.core.windows.net"
+
             table_service_client = TableServiceClient(
-                endpoint=_url, credential=credential
+                endpoint=url, credential=credential
             )
+
             return (
                 table_service_client,
                 table_service_client.get_table_client(table_name=_table),

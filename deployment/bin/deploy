@@ -14,6 +14,7 @@ function usage() {
 Deploys the project infrastructure.
 
 -t TERRAFORM_DIR: The terraform directory. Required.
+-y: Auto approve the terraform changes.
 --plan: Only run Terraform plan.
 --skip-tf: Skips Terraform apply. Will still gather terraform output
 "
@@ -37,6 +38,10 @@ while [[ "$#" -gt 0 ]]; do case $1 in
         PLAN_ONLY=1
         shift
         ;;
+    -y)
+        AUTO_APPROVE=-auto-approve
+        shift
+        ;;
     --help)
         usage
         exit 0
@@ -49,9 +54,28 @@ while [[ "$#" -gt 0 ]]; do case $1 in
         ;;
     esac done
 
+# Always disable shared access keys on script exit
+trap disable_shared_access_keys EXIT
+
 ###################################
 # Check and configure environment #
 ###################################
+
+# Enable shared access keys on storage accounts that must have properties read
+# [storage_account]=resource_group
+declare -A SAK_STORAGE_ACCOUNTS
+SAK_STORAGE_ACCOUNTS=(
+  ["pctapisstagingsa"]="pct-apis-westeurope-staging_rg"
+  ["pcfilestest"]="pc-test-manual-resources"
+)
+
+# Add client IP to firewall for storage accounts that must have properties read
+# [storage_account]=resource_group
+declare -A FW_STORAGE_ACCOUNTS
+FW_STORAGE_ACCOUNTS=(
+    ["pctesttfstate"]="pc-test-manual-resources"
+    ["pctapisstagingsa"]="pct-apis-westeurope-staging_rg"
+)
 
 if [[ -z ${TERRAFORM_DIR} ]]; then
     echo "Must pass in TERRAFORM_DIR with -t"
@@ -73,15 +97,21 @@ setup_env
 echo "===== Running Deploy ====="
 echo "IMAGE_TAG: ${IMAGE_TAG}"
 
+if [ -z "$ARM_CLIENT_ID" ]; then
+  export ARM_CLIENT_ID=$(az account show --query user.name -o tsv)
+  echo "Using Azure CLI auth with username: ${ARM_CLIENT_ID}"
+fi
+
+
 # ---------------------------------------------------
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     #########################
-    # Add IP to KV firewall #
+    # Add IP to firewalls #
     #########################
 
-    bin/kv_add_ip
+    add_ip_to_firewalls
 
     #####################
     # Deploy Terraform  #
@@ -91,6 +121,9 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     if [[ "${SKIP_TF}" != 1 ]]; then
         echo "Deploying infrastructure with Terraform..."
+
+        enable_shared_access_keys
+
         terraform init --upgrade
 
         if [ "${PLAN_ONLY}" ]; then
@@ -98,7 +131,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             exit 0
         fi
 
-        terraform apply -auto-approve
+        terraform apply "$AUTO_APPROVE"
     fi
 
     # Gather terraform output
@@ -107,10 +140,10 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     popd
 
     ##############################
-    # Remove IP from KV firewall #
+    # Remove IP from firewalls #
     ##############################
 
-    bin/kv_rmv_ip
+    remove_ip_from_firewalls
 
     ############################
     # Render Helm chart values #
@@ -142,7 +175,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
-        -f ${DEPLOY_VALUES_FILE}
+        -f ${DEPLOY_VALUES_FILE} \
 
     echo "================"
     echo "==== Tiler ====="
@@ -154,7 +187,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
-        -f ${DEPLOY_VALUES_FILE}
+        -f ${DEPLOY_VALUES_FILE} \
 
     echo "=================="
     echo "==== Ingress ====="

@@ -14,9 +14,9 @@ inst_reqs: List[str] = [
     "titiler.core==0.18.3",
     "titiler.mosaic==0.18.3",
     "pillow==10.3.0",
-    "boto3==1.34.123",
-    "botocore==1.34.123",
     "pydantic>=2.7,<2.8",
+    "boto3==1.34.136",
+    "botocore==1.34.136",
     "idna>=3.7.0",
     "requests==2.32.3",
     # titiler-pgstac

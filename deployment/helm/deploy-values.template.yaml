@@ -42,6 +42,11 @@ stac:
     replicaCount: "{{ tf.stac_replica_count }}"
     podAnnotations:
       "pc/gitsha": "{{ env.GIT_COMMIT }}"
+    useWorkloadIdentity: true
+    serviceAccount:
+      annotations:
+        "azure.workload.identity/client-id": {{ tf.cluster_stac_identity_client_id }}
+        "azure.workload.identity/tenant-id": {{ tf.tenant_id }}
 
   appRootPath: "/stac"
   port: "80"
@@ -86,7 +91,6 @@ tiler:
 
 storage:
   account_name: "{{ tf.storage_account_name }}"
-  account_key: "{{ tf.storage_account_key }}"
   collection_config_table_name: "{{ tf.collection_config_table_name }}"
   container_config_table_name: "{{ tf.container_config_table_name }}"
   ip_exception_config_table_name: "{{ tf.ip_exception_config_table_name }}"

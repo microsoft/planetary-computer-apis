@@ -22,6 +22,14 @@ module "resources" {
   animation_output_storage_url = "https://pcfilestest.blob.core.windows.net/output/animations"
   image_output_storage_url     = "https://pcfilestest.blob.core.windows.net/output/images"
 
+  prod_log_analytics_workspace_name = "pc-api-loganalytics"
+  prod_log_analytics_workspace_id   = "78d48390-b6bb-49a9-b7fd-a86f6522e9c4"
+  func_storage_account_url          = "https://pctapisstagingsa.table.core.windows.net/"
+  banned_ip_table                   = "blobstoragebannedip"
+
+  sas_node_subnet_name                 = "pct-sas-westeurope-staging-node-subnet"
+  sas_node_subnet_virtual_network_name = "pct-sas-westeurope-staging-network"
+  sas_node_subnet_resource_group_name  = "pct-sas-westeurope-staging_rg"
 }
 
 terraform {
@@ -31,6 +39,7 @@ terraform {
     container_name       = "pc-test-api"
     key                  = "pqe-apis.tfstate"
     use_oidc             = true
+    use_azuread_auth     = true
   }
 }
 

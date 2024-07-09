@@ -24,15 +24,6 @@ class ImageSettings(BaseExporterSettings):
         "env_nested_delimiter": "__",  # type: ignore
     }
 
-    # @classmethod
-    # @cachedmethod(lambda cls: cls._cache)
-    # def get(cls) -> "ImageSettings":
-    #     settings = ImageSettings()  # type: ignore
-    #     logger.info(f"API URL: {settings.api_root_url}")
-    #     logger.info(f"Concurrency limit: {settings.tile_request_concurrency}")
-    #     return settings
-
-
 @cached(LRUCache(maxsize=100))  # type: ignore
 def get_settings() -> ImageSettings:
     settings = ImageSettings()  # type: ignore
