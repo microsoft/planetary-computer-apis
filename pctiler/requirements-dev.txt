@@ -18,13 +18,6 @@ attrs==23.2.0
     #   morecantile
     #   rasterio
     #   rio-tiler
-boto3==1.34.136
-    # via pctiler (pctiler/setup.py)
-botocore==1.34.136
-    # via
-    #   boto3
-    #   pctiler (pctiler/setup.py)
-    #   s3transfer
 cachetools==5.3.3
     # via
     #   cogeo-mosaic
@@ -91,10 +84,6 @@ jinja2==3.1.4
     # via
     #   pctiler (pctiler/setup.py)
     #   titiler-core
-jmespath==1.0.1
-    # via
-    #   boto3
-    #   botocore
 kiwisolver==1.4.5
     # via matplotlib
 markupsafe==2.1.5
@@ -172,7 +161,6 @@ pystac-client==0.6.1
     # via planetary-computer
 python-dateutil==2.9.0.post0
     # via
-    #   botocore
     #   matplotlib
     #   pystac
     #   pystac-client
@@ -198,8 +186,6 @@ rio-tiler==6.6.1
     # via
     #   cogeo-mosaic
     #   titiler-core
-s3transfer==0.10.1
-    # via boto3
 shapely==2.0.3
     # via cogeo-mosaic
 simplejson==3.19.2
@@ -242,9 +228,7 @@ typing-extensions==4.10.0
     #   starlette
     #   titiler-core
 urllib3==1.26.18
-    # via
-    #   botocore
-    #   requests
+    # via requests
 zipp==3.19.2
     # via
     #   importlib-metadata

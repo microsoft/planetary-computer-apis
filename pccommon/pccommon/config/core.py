@@ -58,7 +58,7 @@ class PCAPIsConfig(BaseSettings):
     model_config = {
         "env_prefix": ENV_VAR_PCAPIS_PREFIX,
         "env_nested_delimiter": "__",
-        # Mypi is complaining about this with
+        # Mypy is complaining about this with
         # error: Incompatible types (expression has type "str",
         # TypedDict item "extra" has type "Extra")
         "extra": "ignore",  # type: ignore

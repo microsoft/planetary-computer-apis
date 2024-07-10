@@ -28,7 +28,7 @@ inst_reqs = [
 
 extra_reqs = {
     "test": ["pytest", "pytest-asyncio", "types-redis", "types-requests"],
-    "dev": ["pytest", "pytest-asyncio", "types-redis"],
+    "dev": ["pytest", "pytest-asyncio", "types-redis", "types-requests"],
 }
 
 setup(
