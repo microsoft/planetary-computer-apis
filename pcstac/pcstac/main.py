@@ -10,7 +10,12 @@ from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.errors import DEFAULT_STATUS_CODES
-from stac_fastapi.api.models import create_get_request_model, create_post_request_model
+from stac_fastapi.api.models import (
+    create_get_request_model,
+    create_post_request_model,
+    create_request_model,
+)
+from stac_fastapi.extensions.core import TokenPaginationExtension
 from stac_fastapi.api.middleware import ProxyHeaderMiddleware
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
@@ -33,7 +38,7 @@ from pcstac.config import (
     get_settings,
 )
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.search import PCSearch, PCSearchGetRequest, RedisBaseItemCache
+from pcstac.search import PCSearch, PCSearchGetRequest, RedisBaseItemCache, PCItemCollectionUri
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 
@@ -49,6 +54,15 @@ hydrate_mode_label = os.environ.get("USE_API_HYDRATE", "False")
 logger.info(f"API Hydrate mode enabled: {hydrate_mode_label}")
 
 app_settings = get_settings()
+
+items_get_request_model = PCItemCollectionUri
+if any(isinstance(ext, TokenPaginationExtension) for ext in EXTENSIONS):
+    items_get_request_model = create_request_model(
+        model_name="ItemCollectionUri",
+        base_model=PCItemCollectionUri,
+        mixins=[TokenPaginationExtension().GET],
+        request_type="GET",
+    )
 
 search_get_request_model = create_get_request_model(
     EXTENSIONS, base_model=PCSearchGetRequest
@@ -82,6 +96,7 @@ api = PCStacApi(
         default_response_class=ORJSONResponse,
         lifespan=lifespan,
     ),
+    items_get_request_model=items_get_request_model,
     search_get_request_model=search_get_request_model,
     search_post_request_model=search_post_request_model,
     response_class=ORJSONResponse,
