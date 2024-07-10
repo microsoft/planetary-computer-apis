@@ -15,6 +15,23 @@ This scripts is meant to be run inside the funcs container.
 "
 }
 
+while [[ $# -gt 0 ]]; do case $1 in
+    --no-integration)
+        INTEGRATION="--no-integration"
+        shift
+        ;;
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     echo "Running mypy for funcs..."
@@ -27,6 +44,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     flake8 pcfuncs
 
     echo "Running unit tests for funcs..."
-    python -m pytest pcfuncs/tests
+    python -m pytest pcfuncs/tests ${INTEGRATION:+$INTEGRATION}
 
 fi

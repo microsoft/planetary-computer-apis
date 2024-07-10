@@ -10,6 +10,8 @@ The logic for the deployment workflow is encapsulated in the [bin/deploy](bin/de
 scripts/console --deploy
 ```
 
+To have access to the remote backend terraform state, the identity (App Registration in CI, or local corp credential if local) will need to have the `Storage Blob Data Owner` role on the `pctesttfstate` storage account.
+
 ## Manual resources
 
 ### Deployment secrets Key Vault
@@ -40,25 +42,27 @@ Container Registry repo where you published your local images:
 - `ACR_TILER_REPO`
 - `IMAGE_TAG`
 
-__Note:__ Remember to bring down your resources after testing with `terraform destroy`!
+**Note:** Remember to bring down your resources after testing with `terraform destroy`!
 
 ## Loading configuration data
 
 Configuration data is stored in Azure Storage Tables. Use the `pcapis` command line interface that is installed with the `pccommon` package to load data. For example:
 
+```console
+>  az login # Use an account that has "Storage Table Data Contributor" on the account
+>  pcapis load -t collection --account pctapissatyasa  --table collectionconfig --file pccommon/tests/data-files/collection_config.json
 ```
->  pcapis load -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table collectionconfig --file pccommon/tests/data-files/collection_config.json
-```
+
 To dump a single collection config, use:
 
-```
->  pcapis dump -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table collectionconfig --id naip
+```console
+>  pcapis dump -t collection  --account pctapissatyasa  --table collectionconfig --id naip
 ```
 
 For container configs, you must also specify the container account name used as the Partition Key:
 
-```
->  pcapis dump -t collection --sas "${SAS_TOKEN}" --account pctapissatyasa  --table containerconfig --id naip --container-account naipeuwest
+```console
+>  pcapis dump -t collection --account pctapissatyasa  --table containerconfig --id naip --container-account naipeuwest
 ```
 
 Using the `load` command on a single dump file for either config will update the single row.

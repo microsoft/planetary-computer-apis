@@ -4,7 +4,7 @@ from typing import Optional
 from cachetools import Cache, LRUCache, cachedmethod
 from cachetools.func import lru_cache
 from cachetools.keys import hashkey
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, Field, PrivateAttr, validator
 from pydantic_settings import BaseSettings
 from pccommon.config.collections import CollectionConfigTable
 from pccommon.config.containers import ContainerConfigTable
@@ -20,9 +20,18 @@ APP_INSIGHTS_INSTRUMENTATION_KEY = "APP_INSIGHTS_INSTRUMENTATION_KEY"
 
 class TableConfig(BaseModel):
     account_name: str
-    account_key: str
     table_name: str
     account_url: Optional[str] = None
+
+    @validator("account_url")
+    def validate_url(cls, value: str) -> str:
+        if value and not value.startswith("http://azurite:"):
+            raise ValueError(
+                "Non-azurite account url provided. "
+                "Account keys can only be used with Azurite emulator."
+            )
+
+        return value
 
 
 class PCAPIsConfig(BaseSettings):
@@ -57,30 +66,27 @@ class PCAPIsConfig(BaseSettings):
 
     @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("collection"))
     def get_collection_config_table(self) -> CollectionConfigTable:
-        return CollectionConfigTable.from_account_key(
+        return CollectionConfigTable.from_environment(
             account_url=self.collection_config.account_url,
             account_name=self.collection_config.account_name,
-            account_key=self.collection_config.account_key,
             table_name=self.collection_config.table_name,
             ttl=self.table_value_ttl,
         )
 
     @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("container"))
     def get_container_config_table(self) -> ContainerConfigTable:
-        return ContainerConfigTable.from_account_key(
+        return ContainerConfigTable.from_environment(
             account_url=self.container_config.account_url,
             account_name=self.container_config.account_name,
-            account_key=self.container_config.account_key,
             table_name=self.container_config.table_name,
             ttl=self.table_value_ttl,
         )
 
     @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("ip_whitelist"))
     def get_ip_exception_list_table(self) -> IPExceptionListTable:
-        return IPExceptionListTable.from_account_key(
+        return IPExceptionListTable.from_environment(
             account_url=self.ip_exception_config.account_url,
             account_name=self.ip_exception_config.account_name,
-            account_key=self.ip_exception_config.account_key,
             table_name=self.ip_exception_config.table_name,
             ttl=self.table_value_ttl,
         )

@@ -42,6 +42,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Common labels
 */}}
 {{- define "pcstac.labels" -}}
+azure.workload.identity/use: {{ .Values.stac.deploy.useWorkloadIdentity | quote}}
 helm.sh/chart: {{ include "pcstac.chart" . }}
 {{ include "pcstac.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
