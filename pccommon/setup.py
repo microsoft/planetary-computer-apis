@@ -23,11 +23,10 @@ inst_reqs = [
     "html-sanitizer==2.4.4",
     # Soon available as lxml[html_clean]
     "lxml_html_clean==0.1.0",
-    "urllib3>=1.26.18",
+    "urllib3>=2.2.2",
 ]
 
 extra_reqs = {
-    "test": ["pytest", "pytest-asyncio", "types-redis", "types-requests"],
     "dev": ["pytest", "pytest-asyncio", "types-redis", "types-requests"],
 }
 

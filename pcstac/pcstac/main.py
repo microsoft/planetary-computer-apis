@@ -20,6 +20,7 @@ from stac_fastapi.api.models import (
 from stac_fastapi.extensions.core import TokenPaginationExtension
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
+from stac_fastapi.types.search import APIRequest
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
@@ -60,7 +61,7 @@ logger.info(f"API Hydrate mode enabled: {hydrate_mode_label}")
 
 app_settings = get_settings()
 
-items_get_request_model = PCItemCollectionUri
+items_get_request_model: APIRequest = PCItemCollectionUri
 if any(isinstance(ext, TokenPaginationExtension) for ext in EXTENSIONS):
     items_get_request_model = create_request_model(
         model_name="ItemCollectionUri",

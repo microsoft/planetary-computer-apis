@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from fastapi import FastAPI, Path, Query, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import ORJSONResponse
 from psycopg_pool import ConnectionPool
 from titiler.core import dependencies

@@ -16,6 +16,7 @@ from pccommon.redis import cached_result
 from pcstac.contants import CACHE_KEY_BASE_ITEM
 
 DEFAULT_LIMIT: int = 250
+LEGACY_ITEM_DEFAULT_LIMIT: int = 10
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +71,9 @@ class RedisBaseItemCache(BaseItemCache):
 
 @attr.s
 class PCItemCollectionUri(ItemCollectionUri):
-    limit: Annotated[Optional[int], Query()] = attr.ib(default=DEFAULT_LIMIT)
+    limit: Annotated[Optional[int], Query()] = attr.ib(
+        default=LEGACY_ITEM_DEFAULT_LIMIT
+    )
 
 
 def patch_and_convert(interval: Optional[str]) -> Optional[DateTimeType]:

@@ -14,6 +14,7 @@ inst_reqs = [
     "pypgstac[psycopg]>=0.8.5,<0.9",
     "pystac==1.10.1",
     "typing_extensions>=4.6.1",
+    "urllib3>=2.2.2",
 ]
 
 extra_reqs = {
