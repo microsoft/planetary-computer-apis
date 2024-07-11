@@ -112,18 +112,18 @@ smart-open==7.0.4
     # via pypgstac
 sniffio==1.3.1
     # via anyio
-stac-fastapi-api==3.0.0a3
+stac-fastapi-api==3.0.0b2
     # via
     #   pcstac (pcstac/setup.py)
     #   stac-fastapi-extensions
     #   stac-fastapi-pgstac
-stac-fastapi-extensions==3.0.0a3
+stac-fastapi-extensions==3.0.0b2
     # via
     #   pcstac (pcstac/setup.py)
     #   stac-fastapi-pgstac
-stac-fastapi-pgstac==3.0.0a2
+stac-fastapi-pgstac==3.0.0a4
     # via pcstac (pcstac/setup.py)
-stac-fastapi-types==3.0.0a3
+stac-fastapi-types==3.0.0b2
     # via
     #   pcstac (pcstac/setup.py)
     #   stac-fastapi-api

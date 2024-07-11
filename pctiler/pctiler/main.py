@@ -2,7 +2,7 @@
 import logging
 import os
 from contextlib import asynccontextmanager
-from typing import Dict, List, AsyncGenerator
+from typing import AsyncGenerator, Dict, List
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
@@ -17,6 +17,7 @@ from titiler.core.middleware import (
 )
 from titiler.mosaic.errors import MOSAIC_STATUS_CODES
 from titiler.pgstac.db import close_db_connection, connect_to_db
+from titiler.pgstac.factory import add_search_register_route
 
 from pccommon.constants import X_REQUEST_ENTITY
 from pccommon.logging import ServiceName, init_logging
@@ -67,13 +68,32 @@ app.include_router(
 
 app.include_router(
     pg_mosaic.pgstac_mosaic_factory.router,
-    prefix=settings.mosaic_endpoint_prefix,
+    prefix=settings.mosaic_endpoint_prefix + "/{search_id}",
     tags=["PgSTAC Mosaic endpoints"],
 )
 pg_mosaic.add_collection_mosaic_info_route(
     app,
     prefix=settings.mosaic_endpoint_prefix,
     tags=["PgSTAC Mosaic endpoints"],
+)
+
+add_search_register_route(
+    app,
+    prefix=settings.mosaic_endpoint_prefix,
+    tile_dependencies=[
+        pg_mosaic.pgstac_mosaic_factory.layer_dependency,
+        pg_mosaic.pgstac_mosaic_factory.dataset_dependency,
+        pg_mosaic.pgstac_mosaic_factory.pixel_selection_dependency,
+        pg_mosaic.pgstac_mosaic_factory.process_dependency,
+        pg_mosaic.pgstac_mosaic_factory.rescale_dependency,
+        pg_mosaic.pgstac_mosaic_factory.colormap_dependency,
+        pg_mosaic.pgstac_mosaic_factory.render_dependency,
+        pg_mosaic.pgstac_mosaic_factory.reader_dependency,
+        pg_mosaic.pgstac_mosaic_factory.backend_dependency,
+        pg_mosaic.pgstac_mosaic_factory.pgstac_dependency,
+    ],
+    # search_dependency=pg_mosaic.pgstac_mosaic_factory.search_dependency,
+    tags=["PgSTAC Search"],
 )
 
 app.include_router(

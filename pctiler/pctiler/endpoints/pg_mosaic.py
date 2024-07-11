@@ -1,10 +1,11 @@
-from typing import Optional, List
 from dataclasses import dataclass, field
+from typing import List, Optional
 
 from fastapi import FastAPI, Path, Query, Request
 from fastapi.responses import ORJSONResponse
 from psycopg_pool import ConnectionPool
 from titiler.core import dependencies
+from titiler.pgstac.dependencies import SearchIdParams
 from titiler.pgstac.factory import MosaicTilerFactory
 
 from pccommon.config import get_collection_config
@@ -18,11 +19,6 @@ from pctiler.reader import PGSTACBackend, ReaderParams
 class AssetsBidxExprParams(dependencies.AssetsBidxExprParams):
 
     collection: str = Query(None, description="STAC Collection ID")
-
-
-def PathParams(searchid: str = Path(..., description="Search Id")) -> str:
-    """SearchId"""
-    return searchid
 
 
 @dataclass(init=False)
@@ -40,11 +36,11 @@ class BackendParams(dependencies.DefaultDependency):
 
 pgstac_mosaic_factory = MosaicTilerFactory(
     reader=PGSTACBackend,
-    path_dependency=PathParams,
+    path_dependency=SearchIdParams,
     colormap_dependency=PCColorMapParams,
     layer_dependency=AssetsBidxExprParams,
     reader_dependency=ReaderParams,
-    router_prefix=get_settings().mosaic_endpoint_prefix + "/{searchid}",
+    router_prefix=get_settings().mosaic_endpoint_prefix + "/{search_id}",
     backend_dependency=BackendParams,
     add_statistics=False,
 )
