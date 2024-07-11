@@ -32,6 +32,7 @@ from pctiler.endpoints import (
     pg_mosaic,
     vector_tiles,
 )
+from pctiler.middleware import ModifyResponseMiddleware
 
 # Initialize logging
 init_logging(ServiceName.TILER)
@@ -92,8 +93,7 @@ add_search_register_route(
         pg_mosaic.pgstac_mosaic_factory.backend_dependency,
         pg_mosaic.pgstac_mosaic_factory.pgstac_dependency,
     ],
-    # search_dependency=pg_mosaic.pgstac_mosaic_factory.search_dependency,
-    tags=["PgSTAC Search"],
+    tags=["PgSTAC Mosaic endpoints"],
 )
 
 app.include_router(
@@ -124,6 +124,7 @@ add_exception_handlers(app, MOSAIC_STATUS_CODES)
 app.add_exception_handler(Exception, http_exception_handler)
 
 
+app.add_middleware(ModifyResponseMiddleware, route="/mosaic/register")
 app.add_middleware(TraceMiddleware, service_name=app.state.service_name)
 app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
 app.add_middleware(TotalTimeMiddleware)
