@@ -3,7 +3,6 @@ import logging
 from cachetools import LRUCache, cached
 from funclib.settings import BaseExporterSettings
 
-
 IMAGE_SETTINGS_PREFIX = "IMAGE_"
 DEFAULT_CONCURRENCY = 10
 
@@ -23,6 +22,7 @@ class ImageSettings(BaseExporterSettings):
         "env_prefix": IMAGE_SETTINGS_PREFIX,
         "env_nested_delimiter": "__",  # type: ignore
     }
+
 
 @cached(LRUCache(maxsize=100))  # type: ignore
 def get_settings() -> ImageSettings:

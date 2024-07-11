@@ -6,10 +6,10 @@ from urllib.parse import parse_qs, urlparse
 import pystac
 import pytest
 from geojson_pydantic.geometries import Polygon
+from pydantic import TypeAdapter
 from stac_fastapi.pgstac.models.links import CollectionLinks
 from stac_pydantic.shared import UtcDatetime
 from starlette.requests import Request
-from pydantic import TypeAdapter
 
 from pcstac.config import get_settings
 

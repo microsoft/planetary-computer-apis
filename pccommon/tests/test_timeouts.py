@@ -3,7 +3,6 @@ from typing import Any
 
 import pytest
 from fastapi import FastAPI
-
 from httpx import ASGITransport, AsyncClient
 from starlette.status import HTTP_504_GATEWAY_TIMEOUT
 

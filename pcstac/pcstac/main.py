@@ -1,28 +1,28 @@
 """FastAPI application using PGStac."""
 
-from contextlib import asynccontextmanager
 import logging
 import os
-from typing import Any, Dict, AsyncGenerator
+from contextlib import asynccontextmanager
+from typing import Any, AsyncGenerator, Dict
 
+from brotli_asgi import BrotliMiddleware
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.errors import DEFAULT_STATUS_CODES
+from stac_fastapi.api.middleware import ProxyHeaderMiddleware
 from stac_fastapi.api.models import (
     create_get_request_model,
     create_post_request_model,
     create_request_model,
 )
 from stac_fastapi.extensions.core import TokenPaginationExtension
-from stac_fastapi.api.middleware import ProxyHeaderMiddleware
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
-from brotli_asgi import BrotliMiddleware
 
 from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_handler
@@ -38,7 +38,12 @@ from pcstac.config import (
     get_settings,
 )
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.search import PCSearch, PCSearchGetRequest, RedisBaseItemCache, PCItemCollectionUri
+from pcstac.search import (
+    PCItemCollectionUri,
+    PCSearch,
+    PCSearchGetRequest,
+    RedisBaseItemCache,
+)
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
 

@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional
 
 from funclib.models import RenderOptions
 from funclib.raster import ExportFormats
-from pydantic import BaseModel, Field, field_validator, ValidationInfo
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from .settings import get_settings
 from .utils import get_geom_from_cql

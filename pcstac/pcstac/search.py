@@ -1,14 +1,14 @@
-import re
 import logging
+import re
 from typing import Any, Callable, Coroutine, Dict, Optional
 
 import attr
 from fastapi import Query
 from pydantic import Field, field_validator
 from stac_fastapi.api.models import BaseSearchGetRequest, ItemCollectionUri
-from stac_fastapi.types.rfc3339 import str_to_interval, DateTimeType
 from stac_fastapi.pgstac.types.base_item_cache import BaseItemCache
 from stac_fastapi.pgstac.types.search import PgstacSearch
+from stac_fastapi.types.rfc3339 import DateTimeType, str_to_interval
 from starlette.requests import Request
 from typing_extensions import Annotated
 
@@ -70,7 +70,7 @@ class RedisBaseItemCache(BaseItemCache):
 
 @attr.s
 class PCItemCollectionUri(ItemCollectionUri):
-    limit:  Annotated[Optional[int], Query()] = attr.ib(default=DEFAULT_LIMIT)
+    limit: Annotated[Optional[int], Query()] = attr.ib(default=DEFAULT_LIMIT)
 
 
 def patch_and_convert(interval: Optional[str]) -> Optional[DateTimeType]:

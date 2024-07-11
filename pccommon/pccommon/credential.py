@@ -2,7 +2,7 @@ import threading
 from typing import Any
 
 from azure.core.credentials import AccessToken
-from azure.identity import DefaultAzureCredential
+from azure.identity import ManagedIdentityCredential
 
 
 class PcDefaultAzureCredential:
@@ -21,8 +21,8 @@ class PcDefaultAzureCredential:
         return cls.get_credential().get_token(*scopes, **kwargs)
 
     @classmethod
-    def get_credential(cls) -> DefaultAzureCredential:
+    def get_credential(cls) -> ManagedIdentityCredential:
         if cls._instance is None:
             with cls._lock:
-                cls._instance = DefaultAzureCredential()
+                cls._instance = ManagedIdentityCredential()
         return cls._instance
