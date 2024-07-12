@@ -25,7 +25,7 @@ cachetools==5.3.3
     # via
     #   cogeo-mosaic
     #   rio-tiler
-certifi==2024.2.2
+certifi==2024.7.4
     # via
     #   httpcore
     #   httpx
