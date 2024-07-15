@@ -42,18 +42,18 @@ class Settings(BaseSettings):
     vector_tile_endpoint_prefix: str = "/vector"
     vector_tile_sa_base_url: str = Field(
         default="",
-        json_schema_extra={"env": VECTORTILE_SA_BASE_URL_ENV_VAR},
+        validation_alias=VECTORTILE_SA_BASE_URL_ENV_VAR,
     )
 
     debug: bool = os.getenv("TILER_DEBUG", "False").lower() == "true"
     api_version: str = "1.0"
     default_max_items_per_tile: int = Field(
         default=10,
-        json_schema_extra={"env": DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR},
+        validation_alias=DEFAULT_MAX_ITEMS_PER_TILE_ENV_VAR,
     )
     request_timeout: int = Field(
         default=30,
-        json_schema_extra={"env": REQUEST_TIMEOUT_ENV_VAR},
+        validation_alias=REQUEST_TIMEOUT_ENV_VAR,
     )
 
     feature_flags: FeatureFlags = FeatureFlags()

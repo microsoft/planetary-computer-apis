@@ -40,7 +40,7 @@ class PCAPIsConfig(BaseSettings):
 
     app_insights_instrumentation_key: Optional[str] = Field(  # type: ignore
         default=None,
-        json_schema_extra={"env": APP_INSIGHTS_INSTRUMENTATION_KEY},
+        validation_alias=APP_INSIGHTS_INSTRUMENTATION_KEY,
     )
     collection_config: TableConfig
     container_config: TableConfig

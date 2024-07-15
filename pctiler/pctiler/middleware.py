@@ -30,7 +30,7 @@ class ModifyResponseMiddleware:
                 resp_body = json.dumps(ordered_body, ensure_ascii=False).encode("utf-8")
                 message["body"] = resp_body
 
-                # Update the content-length header or the start message
+                # Update the content-length header on the start message
                 headers = MutableHeaders(scope=self.initial_message)
                 headers["Content-Length"] = str(len(resp_body))
 

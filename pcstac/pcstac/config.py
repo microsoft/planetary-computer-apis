@@ -94,15 +94,15 @@ class Settings(BaseSettings):
     debug: bool = False
     tiler_href: str = Field(
         default="",
-        json_schema_extra={"env": TILER_HREF_ENV_VAR},
+        validation_alias=TILER_HREF_ENV_VAR,
     )
     db_max_conn_size: int = Field(
         default=1,
-        json_schema_extra={"env": DB_MAX_CONN_ENV_VAR},
+        validation_alias=DB_MAX_CONN_ENV_VAR,
     )
     db_min_conn_size: int = Field(
         default=1,
-        json_schema_extra={"env": DB_MIN_CONN_ENV_VAR},
+        validation_alias=DB_MIN_CONN_ENV_VAR,
     )
     openapi_url: str = "/openapi.json"
     api_version: str = f"v{API_VERSION}"
@@ -110,7 +110,7 @@ class Settings(BaseSettings):
     back_pressures: BackPressures = BackPressures()
     request_timeout: int = Field(
         default=30,
-        json_schema_extra={"env": REQUEST_TIMEOUT_ENV_VAR},
+        validation_alias=REQUEST_TIMEOUT_ENV_VAR,
     )
 
     model_config = {
