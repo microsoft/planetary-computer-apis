@@ -3,6 +3,7 @@ across all services
 """
 
 import logging
+import re
 import sys
 from typing import Optional, Tuple, Union, cast
 from urllib.parse import urlparse
@@ -67,7 +68,7 @@ class HealthCheckFilter(logging.Filter):
         args = cast(Tuple[str, str, str, str, int], record.args)
         endpoint = args[2]
         status = args[4]
-        if endpoint == "/_mgmt/ping" and status == 200:
+        if re.match(r"/(stac|data)/_mgmt/ping", endpoint) and status == 200:
             return False
 
         return True
