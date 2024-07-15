@@ -3,7 +3,6 @@ across all services
 """
 
 import logging
-import re
 import sys
 from typing import Optional, Tuple, Union, cast
 from urllib.parse import urlparse
