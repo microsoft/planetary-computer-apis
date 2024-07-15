@@ -34,12 +34,11 @@ from pctiler.endpoints import (
 )
 from pctiler.middleware import ModifyResponseMiddleware
 
-# Initialize logging
-init_logging(ServiceName.TILER)
-logger = logging.getLogger(__name__)
-
 # Get the root path if set in the environment
 APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
+
+init_logging(ServiceName.TILER, APP_ROOT_PATH)
+logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
@@ -124,7 +123,7 @@ add_exception_handlers(app, MOSAIC_STATUS_CODES)
 app.add_exception_handler(Exception, http_exception_handler)
 
 
-app.add_middleware(ModifyResponseMiddleware, route="/mosaic/register")
+app.add_middleware(ModifyResponseMiddleware, route=f"{APP_ROOT_PATH}/mosaic/register")
 app.add_middleware(TraceMiddleware, service_name=app.state.service_name)
 app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
 app.add_middleware(TotalTimeMiddleware)

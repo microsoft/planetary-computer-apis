@@ -40,7 +40,7 @@ services:
       - ./pccommon:/opt/src/pccommon
     depends_on:
       - database
-    command: [ "uvicorn", "pctiler.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers" ]
+    command: [ "uvicorn", "pctiler.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers", "--root-path", "/data" ]
 
   funcs:
     image: pc-apis-funcs

@@ -47,13 +47,11 @@ from pcstac.search import (
 )
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
+APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 
 # Initialize logging
-init_logging(ServiceName.STAC)
+init_logging(ServiceName.STAC, APP_ROOT_PATH)
 logger = logging.getLogger(__name__)
-
-# Get the root path if set in the environment
-APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 logger.info(f"APP_ROOT_PATH: {APP_ROOT_PATH}")
 
 hydrate_mode_label = os.environ.get("USE_API_HYDRATE", "False")

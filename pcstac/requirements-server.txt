@@ -155,6 +155,8 @@ typing-extensions==4.12.2
     #   uvicorn
 tzlocal==5.2
     # via dateparser
+urllib3==2.2.2
+    # via pcstac (pcstac/setup.py)
 uvicorn[standard]==0.30.1
     # via pcstac (pcstac/setup.py)
 uvloop==0.19.0

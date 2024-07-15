@@ -29,7 +29,7 @@ inst_reqs: List[str] = [
 extra_reqs = {
     "dev": ["types-requests"],
     "server": [
-        "uvicorn[standard]>=0.17.0,<0.18.0",
+        "uvicorn[standard]==0.30.1",
     ],
 }
 

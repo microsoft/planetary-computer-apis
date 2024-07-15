@@ -41,7 +41,8 @@ ENV MALLOC_TRIM_THRESHOLD_=0
 # TiTiler mosaic config
 ENV MOSAIC_CONCURRENCY 1
 
+ENV APP_ROOT_PATH=""
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=80
 
-CMD uvicorn pctiler.main:app --host ${APP_HOST} --port ${APP_PORT} --log-level info
+CMD uvicorn pctiler.main:app --host ${APP_HOST} --port ${APP_PORT} --root-path ${APP_ROOT_PATH} --log-level info

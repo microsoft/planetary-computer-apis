@@ -61,6 +61,10 @@ class CustomDimensionsFilter(logging.Filter):
 
 # Prevent successful health check pings from being logged
 class HealthCheckFilter(logging.Filter):
+    def __init__(self, app_root_path: str):
+        super().__init__()
+        self.app_root_path = app_root_path
+
     def filter(self, record: logging.LogRecord) -> bool:
         if record.args is not None and len(record.args) != 5:
             return True
@@ -68,7 +72,7 @@ class HealthCheckFilter(logging.Filter):
         args = cast(Tuple[str, str, str, str, int], record.args)
         endpoint = args[2]
         status = args[4]
-        if re.match(r"/(stac|data)/_mgmt/ping", endpoint) and status == 200:
+        if f"{self.app_root_path}/_mgmt/ping" == endpoint and status == 200:
             return False
 
         return True
@@ -76,11 +80,11 @@ class HealthCheckFilter(logging.Filter):
 
 # Initialize logging, including a console handler, and sending all logs containing
 # custom_dimensions to Application Insights
-def init_logging(service_name: str) -> None:
+def init_logging(service_name: str, app_root_path: str) -> None:
     config = get_apis_config()
 
     # Exclude health check endpoint pings from the uvicorn logs
-    logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
+    logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter(app_root_path))
 
     # Setup logging for current package and pccommon
     for package in [PACKAGES[service_name], "pccommon"]:
