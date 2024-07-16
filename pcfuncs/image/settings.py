@@ -10,8 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class ImageSettings(BaseExporterSettings):
-    # _cache: Cache = LRUCache(maxsize=100)
-
     tile_request_concurrency: int = DEFAULT_CONCURRENCY
 
     # Maximum tiles to fetch for a single request

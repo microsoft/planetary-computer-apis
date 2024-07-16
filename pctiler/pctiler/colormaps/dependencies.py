@@ -10,7 +10,7 @@ from typing_extensions import Annotated
 
 
 # Port of titiler.core.dependencies.create_colormap_dependency (0.18.3) which
-# support case-sensitive keys in QueryParams and pydantic validation responses
+# supports case-sensitive keys in QueryParams and the pydantic validation response
 def create_colormap_dependency(
     cmap: ColorMaps, original_casing_keys: List[str]
 ) -> Callable:
