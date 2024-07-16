@@ -37,7 +37,8 @@ custom_colormaps: Dict[str, ColorMapType] = {
 }
 
 for k, v in custom_colormaps.items():
-    registered_cmaps = registered_cmaps.register({k: v})
+    # rio-tiler 6.6.1 doesn't support upper case cmap names
+    registered_cmaps = registered_cmaps.register({k.lower(): v})
 
 
 PCColorMapParams = create_colormap_dependency(registered_cmaps)
