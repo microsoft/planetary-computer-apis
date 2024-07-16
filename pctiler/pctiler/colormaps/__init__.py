@@ -2,10 +2,10 @@ from typing import Dict
 
 from rio_tiler.colormap import cmap
 from rio_tiler.types import ColorMapType
-from titiler.core.dependencies import create_colormap_dependency
 
 from .alos_palsar_mosaic import alos_palsar_mosaic_colormaps
 from .chloris import chloris_colormaps
+from .dependencies import create_colormap_dependency
 from .io_bii import io_bii_colormaps
 from .jrc import jrc_colormaps
 from .lidarusgs import lidar_colormaps
@@ -40,8 +40,9 @@ for k, v in custom_colormaps.items():
     # rio-tiler 6.6.1 doesn't support upper case cmap names
     registered_cmaps = registered_cmaps.register({k.lower(): v})
 
+all_cmap_keys = list(custom_colormaps.keys()) + list(cmap.data.keys())
+PCColorMapParams = create_colormap_dependency(registered_cmaps, all_cmap_keys)
 
-PCColorMapParams = create_colormap_dependency(registered_cmaps)
 
 # Placeholder for non-discrete range colormaps (unsupported)
 # "hgb-above": {

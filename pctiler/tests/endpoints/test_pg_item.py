@@ -28,3 +28,38 @@ async def test_item_preview_xss(client: AsyncClient) -> None:
     # The XSS should be sanitized out of the response
     assert response_xss.status_code == 200
     assert "//</script>" not in response_xss.text
+
+
+@pytest.mark.asyncio
+async def test_item_crop(client: AsyncClient) -> None:
+    """
+    Test the legacy /crop endpoint which is provided by pctiler, backed by the
+    /feature endpoint function from titiler-core
+    """
+    params = {
+        "collection": "naip",
+        "item": "al_m_3008506_nw_16_060_20191118_20200114",
+        "assets": "image",
+        "asset_bidx": "image|1",
+    }
+    geom = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+            "coordinates": [
+                [
+                    [-85.34600303041255, 30.97430719427659],
+                    [-85.34600303041255, 30.9740750264651],
+                    [-85.34403025022365, 30.9740750264651],
+                    [-85.34403025022365, 30.97430719427659],
+                    [-85.34600303041255, 30.97430719427659],
+                ]
+            ],
+            "type": "Polygon",
+        },
+    }
+
+    resp = await client.post("/item/crop.tif", params=params, json=geom)
+
+    assert resp.status_code == 200
+    assert resp.headers["Content-Type"] == "image/tiff; application=geotiff"
