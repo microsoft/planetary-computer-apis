@@ -1,3 +1,5 @@
+# NOTE: we now have https://developmentseed.org/titiler/endpoints/colormaps/ in titiler
+
 from io import BytesIO
 from typing import Sequence
 

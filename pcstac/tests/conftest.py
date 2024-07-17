@@ -8,19 +8,25 @@ import asyncpg
 import pytest
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from pypgstac.db import PgstacDB
 from pypgstac.migrate import Migrate
-from stac_fastapi.api.models import create_get_request_model, create_post_request_model
+from stac_fastapi.api.models import (
+    create_get_request_model,
+    create_post_request_model,
+    create_request_model,
+)
+from stac_fastapi.extensions.core import TokenPaginationExtension
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
+from stac_fastapi.types.search import APIRequest
 
 from pccommon.logging import ServiceName
 from pccommon.redis import connect_to_redis
 from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import EXTENSIONS, TILER_HREF_ENV_VAR
-from pcstac.search import PCSearch, PCSearchGetRequest
+from pcstac.search import PCItemCollectionUri, PCSearch, PCSearchGetRequest
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
@@ -66,6 +72,15 @@ def api_client(pqe_pg):
     search_post_request_model = create_post_request_model(
         EXTENSIONS, base_model=PCSearch
     )
+    items_get_request_model: APIRequest = PCItemCollectionUri
+    if any(isinstance(ext, TokenPaginationExtension) for ext in EXTENSIONS):
+        items_get_request_model = create_request_model(
+            model_name="ItemCollectionUri",
+            base_model=PCItemCollectionUri,
+            mixins=[TokenPaginationExtension().GET],
+            request_type="GET",
+        )
+
     api = PCStacApi(
         title="test title",
         description="test description",
@@ -78,6 +93,7 @@ def api_client(pqe_pg):
         app=FastAPI(root_path="/stac", default_response_class=ORJSONResponse),
         search_get_request_model=search_get_request_model,
         search_post_request_model=search_post_request_model,
+        items_get_request_model=items_get_request_model,
     )
 
     app: FastAPI = api.app
@@ -102,7 +118,9 @@ async def app(api_client) -> AsyncGenerator[FastAPI, None]:
 @pytest.fixture(scope="session")
 async def app_client(app) -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(
-        app=app, base_url="http://test/stac", headers={"X-Forwarded-For": "127.0.0.1"}
+        transport=ASGITransport(app=app),
+        base_url="http://test/stac",
+        headers={"X-Forwarded-For": "127.0.0.1"},
     ) as c:
         yield c
 

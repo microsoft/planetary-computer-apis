@@ -2,7 +2,8 @@ from functools import lru_cache
 from urllib.parse import urljoin
 
 from fastapi import Request
-from pydantic import BaseModel, BaseSettings, Field
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings
 from stac_fastapi.extensions.core import (
     FieldsExtension,
     FilterExtension,
@@ -88,17 +89,38 @@ class Settings(BaseSettings):
         version of application
     """
 
-    api = PCAPIsConfig.from_environment()
+    api: PCAPIsConfig = PCAPIsConfig.from_environment()
 
     debug: bool = False
-    tiler_href: str = Field(env=TILER_HREF_ENV_VAR, default="")
-    db_max_conn_size: int = Field(env=DB_MAX_CONN_ENV_VAR, default=1)
-    db_min_conn_size: int = Field(env=DB_MIN_CONN_ENV_VAR, default=1)
+    tiler_href: str = Field(
+        default="",
+        validation_alias=TILER_HREF_ENV_VAR,
+    )
+    db_max_conn_size: int = Field(
+        default=1,
+        validation_alias=DB_MAX_CONN_ENV_VAR,
+    )
+    db_min_conn_size: int = Field(
+        default=1,
+        validation_alias=DB_MIN_CONN_ENV_VAR,
+    )
     openapi_url: str = "/openapi.json"
     api_version: str = f"v{API_VERSION}"
     rate_limits: RateLimits = RateLimits()
     back_pressures: BackPressures = BackPressures()
-    request_timeout: int = Field(env=REQUEST_TIMEOUT_ENV_VAR, default=30)
+    request_timeout: int = Field(
+        default=30,
+        validation_alias=REQUEST_TIMEOUT_ENV_VAR,
+    )
+
+    model_config = {
+        "env_prefix": ENV_VAR_PCAPIS_PREFIX,
+        "env_nested_delimiter": "__",
+        # Mypi is complaining about this with
+        # error: Incompatible types (expression has type "str",
+        # TypedDict item "extra" has type "Extra")
+        "extra": "ignore",  # type: ignore
+    }
 
     def get_tiler_href(self, request: Request) -> str:
         """Generates the tiler HREF.
@@ -112,11 +134,6 @@ class Settings(BaseSettings):
             return urljoin(base_hostname, self.tiler_href)
         else:
             return self.tiler_href
-
-    class Config:
-        env_prefix = ENV_VAR_PCAPIS_PREFIX
-        extra = "ignore"
-        env_nested_delimiter = "__"
 
 
 @lru_cache

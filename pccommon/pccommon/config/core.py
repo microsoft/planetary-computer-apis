@@ -4,7 +4,8 @@ from typing import Optional
 from cachetools import Cache, LRUCache, cachedmethod
 from cachetools.func import lru_cache
 from cachetools.keys import hashkey
-from pydantic import BaseModel, BaseSettings, Field, PrivateAttr, validator
+from pydantic import BaseModel, Field, PrivateAttr, field_validator
+from pydantic_settings import BaseSettings
 
 from pccommon.config.collections import CollectionConfigTable
 from pccommon.config.containers import ContainerConfigTable
@@ -23,7 +24,7 @@ class TableConfig(BaseModel):
     table_name: str
     account_url: Optional[str] = None
 
-    @validator("account_url")
+    @field_validator("account_url")
     def validate_url(cls, value: str) -> str:
         if value and not value.startswith("http://azurite:"):
             raise ValueError(
@@ -39,7 +40,7 @@ class PCAPIsConfig(BaseSettings):
 
     app_insights_instrumentation_key: Optional[str] = Field(  # type: ignore
         default=None,
-        env=APP_INSIGHTS_INSTRUMENTATION_KEY,
+        validation_alias=APP_INSIGHTS_INSTRUMENTATION_KEY,
     )
     collection_config: TableConfig
     container_config: TableConfig
@@ -54,6 +55,15 @@ class PCAPIsConfig(BaseSettings):
     redis_ttl: int = Field(default=DEFAULT_TTL)
 
     debug: bool = False
+
+    model_config = {
+        "env_prefix": ENV_VAR_PCAPIS_PREFIX,
+        "env_nested_delimiter": "__",
+        # Mypy is complaining about this with
+        # error: Incompatible types (expression has type "str",
+        # TypedDict item "extra" has type "Extra")
+        "extra": "ignore",  # type: ignore
+    }
 
     @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("collection"))
     def get_collection_config_table(self) -> CollectionConfigTable:
@@ -86,8 +96,3 @@ class PCAPIsConfig(BaseSettings):
     @lru_cache(maxsize=1)
     def from_environment(cls) -> "PCAPIsConfig":
         return PCAPIsConfig()  # type: ignore
-
-    class Config:
-        env_prefix = ENV_VAR_PCAPIS_PREFIX
-        extra = "ignore"
-        env_nested_delimiter = "__"

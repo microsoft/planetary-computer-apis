@@ -1,5 +1,6 @@
 services:
   stac-dev:
+    platform: linux/amd64
     image: pc-apis-stac-dev
     build:
       context: .
@@ -63,6 +64,7 @@ services:
     depends_on:
       - stac
   tiler-dev:
+    platform: linux/amd64
     image: pc-apis-tiler-dev
     # For Mac OS M1 user, you'll need to add `platform: linux/amd64`.
     # see https://github.com/developmentseed/titiler/discussions/387#discussioncomment-1643110

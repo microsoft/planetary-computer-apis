@@ -1,79 +1,44 @@
 import logging
-from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
+import re
+from typing import Any, Callable, Coroutine, Dict, Optional
 
 import attr
-from geojson_pydantic.geometries import (
-    GeometryCollection,
-    LineString,
-    MultiLineString,
-    MultiPoint,
-    MultiPolygon,
-    Point,
-    Polygon,
-)
-from pydantic import validator
-from pydantic.types import conint
-from pystac.utils import str_to_datetime
+from fastapi import Query
+from pydantic import Field, field_validator
 from stac_fastapi.api.models import BaseSearchGetRequest, ItemCollectionUri
 from stac_fastapi.pgstac.types.base_item_cache import BaseItemCache
 from stac_fastapi.pgstac.types.search import PgstacSearch
+from stac_fastapi.types.rfc3339 import DateTimeType, str_to_interval
 from starlette.requests import Request
+from typing_extensions import Annotated
 
 from pccommon.redis import cached_result
 from pcstac.contants import CACHE_KEY_BASE_ITEM
 
-DEFAULT_LIMIT = 250
+DEFAULT_LIMIT: int = 250
+LEGACY_ITEM_DEFAULT_LIMIT: int = 10
 
 logger = logging.getLogger(__name__)
+
+
+def _patch_datetime(value: str) -> str:
+    values = value.split("/")
+    for ix, v in enumerate(values):
+        if re.match(r"^(\d\d\d\d)\-(\d\d)\-(\d\d)$", v):
+            values[ix] = f"{v}T00:00:00Z"
+    return "/".join(values)
 
 
 class PCSearch(PgstacSearch):
     # Increase the default limit for performance
     # Ignore "Illegal type annotation: call expression not allowed"
-    limit: Optional[conint(ge=1, le=1000)] = DEFAULT_LIMIT  # type:ignore
+    limit: Annotated[Optional[int], Field(strict=True, ge=1, le=1000)] = DEFAULT_LIMIT
 
-    # Can be removed when
-    # https://github.com/stac-utils/stac-fastapi/issues/187 is closed
-    intersects: Optional[
-        Union[
-            Point,
-            MultiPoint,
-            LineString,
-            MultiLineString,
-            Polygon,
-            MultiPolygon,
-            GeometryCollection,
-        ]
-    ]
-
-    @validator("datetime")
-    def validate_datetime(cls, v: str) -> str:
-        """Validate datetime.
-
-        Custom to allow for users to supply dates only.
-        """
-        if "/" in v:
-            values = v.split("/")
-        else:
-            # Single date is interpreted as end date
-            values = ["..", v]
-
-        dates: List[str] = []
-        for value in values:
-            if value == "..":
-                dates.append(value)
-                continue
-
-            str_to_datetime(value)
-            dates.append(value)
-
-        if ".." not in dates:
-            if str_to_datetime(dates[0]) > str_to_datetime(dates[1]):
-                raise ValueError(
-                    "Invalid datetime range, must match format (begin_date, end_date)"
-                )
-
-        return v
+    @field_validator("datetime", mode="before")
+    @classmethod
+    def validate_datetime_before(cls, value: str) -> str:
+        """Add HH-MM-SS and Z to YYYY-MM-DD datetime."""
+        return _patch_datetime(value)
 
 
 class RedisBaseItemCache(BaseItemCache):
@@ -106,9 +71,21 @@ class RedisBaseItemCache(BaseItemCache):
 
 @attr.s
 class PCItemCollectionUri(ItemCollectionUri):
-    limit: Optional[int] = attr.ib(default=DEFAULT_LIMIT)  # type:ignore
+    limit: Annotated[Optional[int], Query()] = attr.ib(
+        default=LEGACY_ITEM_DEFAULT_LIMIT
+    )
+
+
+def patch_and_convert(interval: Optional[str]) -> Optional[DateTimeType]:
+    """Patch datetime to add hh-mm-ss and timezone info."""
+    if interval:
+        interval = _patch_datetime(interval)
+    return str_to_interval(interval)
 
 
 @attr.s
 class PCSearchGetRequest(BaseSearchGetRequest):
-    limit: Optional[int] = attr.ib(default=DEFAULT_LIMIT)  # type:ignore
+    datetime: Annotated[Optional[DateTimeType], Query()] = attr.ib(
+        default=None, converter=patch_and_convert
+    )
+    limit: Annotated[Optional[int], Query()] = attr.ib(default=DEFAULT_LIMIT)

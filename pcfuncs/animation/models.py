@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from dateutil.relativedelta import relativedelta
 from funclib.models import RenderOptions
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from .constants import MAX_FRAMES
 
@@ -44,12 +44,12 @@ class AnimationRequest(BaseModel):
     data_api_url: Optional[str] = None
     """Override for the data API URL. Useful for testing."""
 
-    @validator("render_params")
+    @field_validator("render_params")
     def _validate_render_params(cls, v: str) -> str:
         RenderOptions.from_query_params(v)
         return v
 
-    @validator("unit")
+    @field_validator("unit")
     def _validate_unit(cls, v: str) -> str:
         if v not in _deltas:
             raise ValueError(

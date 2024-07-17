@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
+from typing import List, Optional
 
-from fastapi import Query, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import ORJSONResponse
 from psycopg_pool import ConnectionPool
 from titiler.core import dependencies
+from titiler.pgstac.dependencies import SearchIdParams
 from titiler.pgstac.factory import MosaicTilerFactory
 
 from pccommon.config import get_collection_config
@@ -34,31 +36,42 @@ class BackendParams(dependencies.DefaultDependency):
 
 pgstac_mosaic_factory = MosaicTilerFactory(
     reader=PGSTACBackend,
+    path_dependency=SearchIdParams,
     colormap_dependency=PCColorMapParams,
     layer_dependency=AssetsBidxExprParams,
     reader_dependency=ReaderParams,
-    router_prefix=get_settings().mosaic_endpoint_prefix,
+    router_prefix=get_settings().mosaic_endpoint_prefix + "/{search_id}",
     backend_dependency=BackendParams,
-    add_map_viewer=False,
     add_statistics=False,
-    add_mosaic_list=False,
 )
 
 
-@pgstac_mosaic_factory.router.get(
-    "/info", response_model=MosaicInfo, response_class=ORJSONResponse
-)
-def mosaic_info(
-    request: Request, collection: str = Query(..., description="STAC Collection ID")
-) -> ORJSONResponse:
-    collection_config = get_collection_config(collection)
-    if not collection_config or not collection_config.mosaic_info:
-        return ORJSONResponse(
-            status_code=404,
-            content=f"No mosaic info available for collection {collection}",
-        )
+def add_collection_mosaic_info_route(
+    app: FastAPI,
+    *,
+    prefix: str = "",
+    tags: Optional[List[str]] = None,
+) -> None:
+    """add `/info` endpoint."""
 
-    return ORJSONResponse(
-        status_code=200,
-        content=collection_config.mosaic_info.dict(by_alias=True, exclude_unset=True),
+    @app.get(
+        f"{prefix}/info",
+        response_model=MosaicInfo,
+        response_class=ORJSONResponse,
     )
+    def mosaic_info(
+        request: Request, collection: str = Query(..., description="STAC Collection ID")
+    ) -> ORJSONResponse:
+        collection_config = get_collection_config(collection)
+        if not collection_config or not collection_config.mosaic_info:
+            return ORJSONResponse(
+                status_code=404,
+                content=f"No mosaic info available for collection {collection}",
+            )
+
+        return ORJSONResponse(
+            status_code=200,
+            content=collection_config.mosaic_info.model_dump(
+                by_alias=True, exclude_unset=True
+            ),
+        )

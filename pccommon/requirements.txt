@@ -4,11 +4,13 @@
 #
 #    pip-compile --extra=server --output-file=pccommon/requirements.txt ./pccommon/setup.py
 #
-anyio==4.3.0
+annotated-types==0.7.0
+    # via pydantic
+anyio==4.4.0
     # via starlette
 async-timeout==4.0.3
     # via redis
-azure-core==1.30.1
+azure-core==1.30.2
     # via
     #   azure-data-tables
     #   azure-identity
@@ -28,27 +30,27 @@ cachetools==5.3.3
     # via
     #   google-auth
     #   pccommon (pccommon/setup.py)
-certifi==2024.2.2
+certifi==2024.7.4
     # via requests
 cffi==1.16.0
     # via cryptography
 charset-normalizer==3.3.2
     # via requests
-cryptography==42.0.5
+cryptography==42.0.8
     # via
     #   azure-identity
     #   azure-storage-blob
     #   msal
     #   pyjwt
-exceptiongroup==1.2.0
+exceptiongroup==1.2.1
     # via anyio
-fastapi==0.90.1
+fastapi-slim==0.111.0
     # via pccommon (pccommon/setup.py)
-google-api-core==2.18.0
+google-api-core==2.19.0
     # via opencensus
-google-auth==2.29.0
+google-auth==2.30.0
     # via google-api-core
-googleapis-common-protos==1.63.0
+googleapis-common-protos==1.63.1
     # via google-api-core
 html-sanitizer==2.4.4
     # via pccommon (pccommon/setup.py)
@@ -62,7 +64,7 @@ isodate==0.6.1
     # via
     #   azure-data-tables
     #   azure-storage-blob
-lxml==5.2.1
+lxml==5.2.2
     # via
     #   html-sanitizer
     #   lxml-html-clean
@@ -70,11 +72,11 @@ lxml-html-clean==0.1.0
     # via
     #   html-sanitizer
     #   pccommon (pccommon/setup.py)
-msal==1.28.0
+msal==1.28.1
     # via
     #   azure-identity
     #   msal-extensions
-msal-extensions==0.3.1
+msal-extensions==1.1.0
     # via azure-identity
 multidict==6.0.5
     # via yarl
@@ -88,8 +90,10 @@ opencensus-ext-azure==1.1.13
     # via pccommon (pccommon/setup.py)
 opencensus-ext-logging==0.1.1
     # via pccommon (pccommon/setup.py)
-orjson==3.10.4
+orjson==3.10.5
     # via pccommon (pccommon/setup.py)
+packaging==24.1
+    # via msal-extensions
 portalocker==2.8.2
     # via msal-extensions
 proto-plus==1.23.0
@@ -101,22 +105,29 @@ protobuf==4.25.3
     #   proto-plus
 psutil==5.9.8
     # via opencensus-ext-azure
-pyasn1==0.5.1
+pyasn1==0.6.0
     # via
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.3.0
+pyasn1-modules==0.4.0
     # via google-auth
-pycparser==2.21
+pycparser==2.22
     # via cffi
-pydantic==1.10.14
+pydantic==2.7.4
     # via
-    #   fastapi
+    #   fastapi-slim
     #   pccommon (pccommon/setup.py)
+    #   pydantic-settings
+pydantic-core==2.18.4
+    # via pydantic
+pydantic-settings==2.3.3
+    # via pccommon (pccommon/setup.py)
 pyhumps==3.5.3
     # via pccommon (pccommon/setup.py)
 pyjwt[crypto]==2.8.0
     # via msal
+python-dotenv==1.0.1
+    # via pydantic-settings
 redis==4.6.0
     # via pccommon (pccommon/setup.py)
 requests==2.32.3
@@ -137,19 +148,21 @@ sniffio==1.3.1
     # via anyio
 soupsieve==2.5
     # via beautifulsoup4
-starlette==0.22.0
+starlette==0.37.2
     # via
-    #   fastapi
+    #   fastapi-slim
     #   pccommon (pccommon/setup.py)
 types-cachetools==4.2.9
     # via pccommon (pccommon/setup.py)
-typing-extensions==4.10.0
+typing-extensions==4.12.2
     # via
     #   anyio
     #   azure-core
     #   azure-data-tables
     #   azure-storage-blob
+    #   fastapi-slim
     #   pydantic
+    #   pydantic-core
     #   starlette
 urllib3==2.2.2
     # via

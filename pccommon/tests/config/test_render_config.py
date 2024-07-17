@@ -74,12 +74,12 @@ def test_get_render_config() -> None:
 
 def test_render_config_parse_max_items() -> None:
     config = {
-        "render_params": [],
+        "render_params": {},
         "minzoom": 8,
         "max_items_per_tile": 10,
     }
 
-    parsed = DefaultRenderConfig.parse_obj(config)
+    parsed = DefaultRenderConfig.model_validate(config)
     assert parsed.max_items_per_tile == config["max_items_per_tile"]
 
 

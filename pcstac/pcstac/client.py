@@ -45,18 +45,6 @@ class PCClient(CoreCrudClient):
 
     extra_conformance_classes: List[str] = attr.ib(factory=list)
 
-    def conformance_classes(self) -> List[str]:
-        """Generate conformance classes list."""
-        base_conformance_classes = self.base_conformance_classes.copy()
-
-        for extension in self.extensions:
-            extension_classes = getattr(extension, "conformance_classes", [])
-            base_conformance_classes.extend(extension_classes)
-
-        base_conformance_classes.extend(self.extra_conformance_classes)
-
-        return sorted(list(set(base_conformance_classes)))
-
     def inject_collection_extras(
         self,
         collection: Collection,
@@ -227,7 +215,7 @@ class PCClient(CoreCrudClient):
             )
             return item_collection
 
-        search_json = search_request.json()
+        search_json = search_request.model_dump_json()
         add_stac_attributes_from_search(search_json, request)
 
         logger.info(

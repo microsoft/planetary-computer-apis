@@ -78,7 +78,7 @@ class RenderOptions(BaseModel):
 
     @property
     def encoded_query_string(self) -> str:
-        options = self.dict(
+        options = self.model_dump(
             exclude_defaults=True, exclude_none=True, exclude_unset=True
         )
         encoded_options: List[str] = []

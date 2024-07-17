@@ -2,7 +2,6 @@ from typing import Any, Dict, Optional
 
 from buildpg import render
 from fastapi import Request
-from fastapi.responses import JSONResponse
 from stac_fastapi.pgstac.extensions.filter import FiltersClient
 from stac_fastapi.types.errors import NotFoundError
 
@@ -13,7 +12,7 @@ from pcstac.contants import CACHE_KEY_QUERYABLES
 class PCFiltersClient(FiltersClient):
     async def get_queryables(
         self, request: Request, collection_id: Optional[str] = None, **kwargs: Any
-    ) -> JSONResponse:
+    ) -> Dict[str, Any]:
         """Override pgstac backend get_queryables to make use of cached results"""
 
         async def _fetch() -> Dict:
@@ -34,6 +33,4 @@ class PCFiltersClient(FiltersClient):
                 return queryables
 
         cache_key = f"{CACHE_KEY_QUERYABLES}:{collection_id}"
-        queryables = await cached_result(_fetch, cache_key, request)
-        headers = {"Content-Type": "application/schema+json"}
-        return JSONResponse(queryables, headers=headers)
+        return await cached_result(_fetch, cache_key, request)

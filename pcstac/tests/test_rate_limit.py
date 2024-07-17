@@ -2,7 +2,7 @@ import time
 
 import pytest
 from fastapi import FastAPI
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 
 from pccommon.constants import HTTP_429_TOO_MANY_REQUESTS
 
@@ -13,7 +13,9 @@ async def test_rate_limit_collection(app: FastAPI):
 
     # set the ip to one that doesn't have the rate limit exception
     async with AsyncClient(
-        app=app, base_url="http://test", headers={"X-Forwarded-For": "127.0.0.2"}
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+        headers={"X-Forwarded-For": "127.0.0.2"},
     ) as app_client:
         resp = None
         for _ in range(0, 400):
@@ -40,7 +42,9 @@ async def test_rate_limit_collection_ip_Exception(app_client: AsyncClient):
 async def test_reregistering_rate_limit_script(app: FastAPI, app_client: AsyncClient):
     # set the ip to one that doesn't have the rate limit exception
     async with AsyncClient(
-        app=app, base_url="http://test", headers={"X-Forwarded-For": "127.0.0.2"}
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+        headers={"X-Forwarded-For": "127.0.0.2"},
     ) as app_client:
 
         async def _hash_exists():

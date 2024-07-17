@@ -1,13 +1,11 @@
-from enum import Enum
-from typing import Dict, Optional
+from typing import Dict
 
-from fastapi import Query
 from rio_tiler.colormap import cmap
 from rio_tiler.types import ColorMapType
-from titiler.core.dependencies import ColorMapParams
 
 from .alos_palsar_mosaic import alos_palsar_mosaic_colormaps
 from .chloris import chloris_colormaps
+from .dependencies import create_colormap_dependency
 from .io_bii import io_bii_colormaps
 from .jrc import jrc_colormaps
 from .lidarusgs import lidar_colormaps
@@ -39,22 +37,11 @@ custom_colormaps: Dict[str, ColorMapType] = {
 }
 
 for k, v in custom_colormaps.items():
-    registered_cmaps = registered_cmaps.register({k: v})
+    # rio-tiler 6.6.1 doesn't support upper case cmap names
+    registered_cmaps = registered_cmaps.register({k.lower(): v})
 
-PCColorMapNames = Enum(  # type: ignore
-    "ColorMapNames", [(a, a) for a in sorted(registered_cmaps.list())]
-)
-
-
-def PCColorMapParams(
-    colormap_name: PCColorMapNames = Query(None, description="Colormap name"),
-    colormap: str = Query(None, description="JSON encoded custom Colormap"),
-) -> Optional[ColorMapType]:
-    if colormap_name:
-        cm = custom_colormaps.get(colormap_name.value)
-        if cm:
-            return cm
-    return ColorMapParams(colormap_name, colormap)
+all_cmap_keys = list(custom_colormaps.keys()) + list(cmap.data.keys())
+PCColorMapParams = create_colormap_dependency(registered_cmaps, all_cmap_keys)
 
 
 # Placeholder for non-discrete range colormaps (unsupported)

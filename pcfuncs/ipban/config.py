@@ -1,17 +1,16 @@
 # config.py
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    storage_account_url: str = Field(env="STORAGE_ACCOUNT_URL")
-    banned_ip_table: str = Field(env="BANNED_IP_TABLE")
-    log_analytics_workspace_id: str = Field(env="LOG_ANALYTICS_WORKSPACE_ID")
+    storage_account_url: str
+    banned_ip_table: str
+    log_analytics_workspace_id: str
 
     # Time and threshold settings
-    time_window_in_hours: int = Field(default=24, env="TIME_WINDOW_IN_HOURS")
-    threshold_read_count_in_gb: int = Field(
-        default=5120, env="THRESHOLD_READ_COUNT_IN_GB"
-    )
+    time_window_in_hours: int = Field(default=24)
+    threshold_read_count_in_gb: int = Field(default=5120)
 
 
 # Create a global settings instance

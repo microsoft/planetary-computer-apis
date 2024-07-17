@@ -49,22 +49,15 @@ class ItemSTACReader(PgSTACReader):
 
     def _get_asset_info(self, asset: str) -> AssetInfo:
         """return asset's url."""
-        asset_url = BlobCDN.transform_if_available(
-            super()._get_asset_info(asset)["url"]
-        )
+        info = super()._get_asset_info(asset)
+        asset_url = BlobCDN.transform_if_available(info["url"])
 
         if self.input.collection_id:
             render_config = get_render_config(self.input.collection_id)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
-        asset_info = self.input.assets[asset]
-        info = AssetInfo(url=asset_url)
-
-        if "file:header_size" in asset_info.extra_fields:
-            h = asset_info.extra_fields["file:header_size"]
-            info["env"] = {"GDAL_INGESTED_BYTES_AT_OPEN": h}
-
+        info["url"] = asset_url
         return info
 
 
@@ -119,7 +112,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
     request: Optional[Request] = attr.ib(default=None)
 
     # Override from PGSTACBackend to use collection
-    def assets_for_tile(
+    def assets_for_tile(  # type: ignore
         self, x: int, y: int, z: int, collection: Optional[str] = None, **kwargs: Any
     ) -> List[Dict]:
         settings = get_settings()
@@ -166,12 +159,11 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
         return assets
 
     # override from PGSTACBackend to pass through collection
-    def tile(
+    def tile(  # type: ignore
         self,
         tile_x: int,
         tile_y: int,
         tile_z: int,
-        reverse: bool = False,
         collection: Optional[str] = None,
         scan_limit: Optional[int] = None,
         items_limit: Optional[int] = None,
@@ -199,8 +191,6 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
             )
 
         ts = time.perf_counter()
-        if reverse:
-            mosaic_assets = list(reversed(mosaic_assets))
 
         def _reader(
             item: Dict[str, Any], x: int, y: int, z: int, **kwargs: Any

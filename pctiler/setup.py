@@ -5,22 +5,21 @@ from setuptools import find_packages, setup
 
 # Runtime requirements, see environment.yaml
 inst_reqs: List[str] = [
-    "geojson-pydantic==0.4.2",
+    "fastapi-slim==0.111.0",
+    "geojson-pydantic==1.1.0",
     "jinja2==3.1.4",
     "pystac==1.10.1",
-    "planetary-computer==0.4.9",
+    "planetary-computer==1.0.0",
     "rasterio==1.3.10",
-    "titiler.core==0.10.2",
-    "titiler.mosaic==0.10.2",
+    "titiler.core==0.18.3",
+    "titiler.mosaic==0.18.3",
     "pillow==10.3.0",
-    "boto3==1.34.136",
-    "botocore==1.34.136",
-    "pydantic==1.10.14",
+    "pydantic>=2.7,<2.8",
     "idna>=3.7.0",
-    "requests==2.32.2",
+    "requests==2.32.3",
     # titiler-pgstac
     "psycopg[binary,pool]",
-    "titiler.pgstac==0.2.4",
+    "titiler.pgstac==1.3.0",
     # colormap dependencies
     "matplotlib==3.9.0",
     "orjson==3.10.4",
@@ -30,7 +29,7 @@ inst_reqs: List[str] = [
 extra_reqs = {
     "dev": ["types-requests"],
     "server": [
-        "uvicorn[standard]>=0.17.0,<0.18.0",
+        "uvicorn[standard]==0.30.1",
     ],
 }
 

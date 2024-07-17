@@ -2,16 +2,26 @@
 
 import logging
 import os
-from typing import Any, Dict
+from contextlib import asynccontextmanager
+from typing import Any, AsyncGenerator, Dict
 
+from brotli_asgi import BrotliMiddleware
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.errors import DEFAULT_STATUS_CODES
-from stac_fastapi.api.models import create_get_request_model, create_post_request_model
+from stac_fastapi.api.middleware import ProxyHeaderMiddleware
+from stac_fastapi.api.models import (
+    create_get_request_model,
+    create_post_request_model,
+    create_request_model,
+)
+from stac_fastapi.extensions.core import TokenPaginationExtension
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
+from stac_fastapi.types.search import APIRequest
+from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
@@ -29,16 +39,19 @@ from pcstac.config import (
     get_settings,
 )
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
-from pcstac.search import PCSearch, PCSearchGetRequest, RedisBaseItemCache
+from pcstac.search import (
+    PCItemCollectionUri,
+    PCSearch,
+    PCSearchGetRequest,
+    RedisBaseItemCache,
+)
 
 DEBUG: bool = os.getenv("DEBUG") == "TRUE" or False
+APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 
 # Initialize logging
-init_logging(ServiceName.STAC)
+init_logging(ServiceName.STAC, APP_ROOT_PATH)
 logger = logging.getLogger(__name__)
-
-# Get the root path if set in the environment
-APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 logger.info(f"APP_ROOT_PATH: {APP_ROOT_PATH}")
 
 hydrate_mode_label = os.environ.get("USE_API_HYDRATE", "False")
@@ -46,10 +59,29 @@ logger.info(f"API Hydrate mode enabled: {hydrate_mode_label}")
 
 app_settings = get_settings()
 
+items_get_request_model: APIRequest = PCItemCollectionUri
+if any(isinstance(ext, TokenPaginationExtension) for ext in EXTENSIONS):
+    items_get_request_model = create_request_model(
+        model_name="ItemCollectionUri",
+        base_model=PCItemCollectionUri,
+        mixins=[TokenPaginationExtension().GET],
+        request_type="GET",
+    )
+
 search_get_request_model = create_get_request_model(
     EXTENSIONS, base_model=PCSearchGetRequest
 )
 search_post_request_model = create_post_request_model(EXTENSIONS, base_model=PCSearch)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator:
+    """FastAPI Lifespan."""
+    await connect_to_db(app)
+    await connect_to_redis(app)
+    yield
+    await close_db_connection(app)
+
 
 api = PCStacApi(
     title=API_TITLE,
@@ -63,11 +95,29 @@ api = PCStacApi(
     ),
     client=PCClient.create(post_request_model=search_post_request_model),
     extensions=EXTENSIONS,
-    app=FastAPI(root_path=APP_ROOT_PATH, default_response_class=ORJSONResponse),
+    app=FastAPI(
+        root_path=APP_ROOT_PATH,
+        default_response_class=ORJSONResponse,
+        lifespan=lifespan,
+    ),
+    items_get_request_model=items_get_request_model,
     search_get_request_model=search_get_request_model,
     search_post_request_model=search_post_request_model,
     response_class=ORJSONResponse,
     exceptions={**DEFAULT_STATUS_CODES, **PC_DEFAULT_STATUS_CODES},
+    middlewares=[
+        Middleware(BrotliMiddleware),
+        Middleware(ProxyHeaderMiddleware),
+        Middleware(TraceMiddleware, service_name=ServiceName.STAC),
+        # Note: If requests are being sent through an application gateway like
+        # nginx-ingress, you may need to configure CORS through that system.
+        Middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_methods=["GET", "POST"],
+            allow_headers=["*"],
+        ),
+    ],
 )
 
 app: FastAPI = api.app
@@ -75,31 +125,6 @@ app: FastAPI = api.app
 app.state.service_name = ServiceName.STAC
 
 add_timeout(app, app_settings.request_timeout)
-
-app.add_middleware(TraceMiddleware, service_name=app.state.service_name)
-
-# Note: If requests are being sent through an application gateway like
-# nginx-ingress, you may need to configure CORS through that system.
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
-)
-
-
-@app.on_event("startup")
-async def startup_event() -> None:
-    """Connect to database on startup."""
-    await connect_to_db(app)
-    await connect_to_redis(app)
-
-
-@app.on_event("shutdown")
-async def shutdown_event() -> None:
-    """Close database connection."""
-    await close_db_connection(app)
-
 
 app.add_exception_handler(Exception, http_exception_handler)
 

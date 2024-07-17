@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import logging
 import os
-from typing import Dict, List
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator, Dict, List
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
@@ -16,6 +17,7 @@ from titiler.core.middleware import (
 )
 from titiler.mosaic.errors import MOSAIC_STATUS_CODES
 from titiler.pgstac.db import close_db_connection, connect_to_db
+from titiler.pgstac.factory import add_search_register_route
 
 from pccommon.constants import X_REQUEST_ENTITY
 from pccommon.logging import ServiceName, init_logging
@@ -30,28 +32,34 @@ from pctiler.endpoints import (
     pg_mosaic,
     vector_tiles,
 )
-
-# Initialize logging
-init_logging(ServiceName.TILER)
-logger = logging.getLogger(__name__)
+from pctiler.middleware import ModifyResponseMiddleware
 
 # Get the root path if set in the environment
 APP_ROOT_PATH = os.environ.get("APP_ROOT_PATH", "")
 
+init_logging(ServiceName.TILER, APP_ROOT_PATH)
+logger = logging.getLogger(__name__)
+
 settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator:
+    """FastAPI Lifespan."""
+    await connect_to_db(app)
+    yield
+    await close_db_connection(app)
+
 
 app = FastAPI(
     title=settings.title,
     openapi_url=settings.openapi_url,
     root_path=APP_ROOT_PATH,
+    lifespan=lifespan,
 )
 
 app.state.service_name = ServiceName.TILER
 
-# Note:
-# With titiler.pgstac >3.0, items endpoint has changed and use path-parameter
-# /collections/{collectionId}/items/{itemId} instead of query-parameter
-# https://github.com/stac-utils/titiler-pgstac/blob/d16102bf331ba588f31e131e65b07637d649b4bd/titiler/pgstac/main.py#L87-L92
 app.include_router(
     item.pc_tile_factory.router,
     prefix=settings.item_endpoint_prefix,
@@ -60,7 +68,30 @@ app.include_router(
 
 app.include_router(
     pg_mosaic.pgstac_mosaic_factory.router,
+    prefix=settings.mosaic_endpoint_prefix + "/{search_id}",
+    tags=["PgSTAC Mosaic endpoints"],
+)
+pg_mosaic.add_collection_mosaic_info_route(
+    app,
     prefix=settings.mosaic_endpoint_prefix,
+    tags=["PgSTAC Mosaic endpoints"],
+)
+
+add_search_register_route(
+    app,
+    prefix=settings.mosaic_endpoint_prefix,
+    tile_dependencies=[
+        pg_mosaic.pgstac_mosaic_factory.layer_dependency,
+        pg_mosaic.pgstac_mosaic_factory.dataset_dependency,
+        pg_mosaic.pgstac_mosaic_factory.pixel_selection_dependency,
+        pg_mosaic.pgstac_mosaic_factory.process_dependency,
+        pg_mosaic.pgstac_mosaic_factory.rescale_dependency,
+        pg_mosaic.pgstac_mosaic_factory.colormap_dependency,
+        pg_mosaic.pgstac_mosaic_factory.render_dependency,
+        pg_mosaic.pgstac_mosaic_factory.reader_dependency,
+        pg_mosaic.pgstac_mosaic_factory.backend_dependency,
+        pg_mosaic.pgstac_mosaic_factory.pgstac_dependency,
+    ],
     tags=["PgSTAC Mosaic endpoints"],
 )
 
@@ -92,6 +123,7 @@ add_exception_handlers(app, MOSAIC_STATUS_CODES)
 app.add_exception_handler(Exception, http_exception_handler)
 
 
+app.add_middleware(ModifyResponseMiddleware, route=f"{APP_ROOT_PATH}/mosaic/register")
 app.add_middleware(TraceMiddleware, service_name=app.state.service_name)
 app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
 app.add_middleware(TotalTimeMiddleware)
@@ -107,18 +139,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=[X_REQUEST_ENTITY],
 )
-
-
-@app.on_event("startup")
-async def startup_event() -> None:
-    """Connect to database on startup."""
-    await connect_to_db(app)
-
-
-@app.on_event("shutdown")
-async def shutdown_event() -> None:
-    """Close database connection."""
-    await close_db_connection(app)
 
 
 @app.get("/")
