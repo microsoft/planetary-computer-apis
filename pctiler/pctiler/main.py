@@ -71,6 +71,11 @@ app.include_router(
     prefix=settings.mosaic_endpoint_prefix + "/{search_id}",
     tags=["PgSTAC Mosaic endpoints"],
 )
+app.include_router(
+    pg_mosaic.legacy_mosaic_router,
+    prefix=settings.mosaic_endpoint_prefix,
+    tags=["PgSTAC Mosaic endpoints"],
+)
 pg_mosaic.add_collection_mosaic_info_route(
     app,
     prefix=settings.mosaic_endpoint_prefix,

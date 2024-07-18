@@ -1,11 +1,10 @@
 import logging
-from typing import Annotated, Callable, Optional
+from typing import Annotated, Optional
 from urllib.parse import quote_plus, urljoin
 
 import fastapi
 import pystac
-import starlette
-from fastapi import Body, Depends, HTTPException, Query, Request, Response
+from fastapi import Body, Depends, Query, Request, Response
 from fastapi.templating import Jinja2Templates
 from geojson_pydantic.features import Feature
 from html_sanitizer.sanitizer import Sanitizer
@@ -18,6 +17,7 @@ from titiler.pgstac.dependencies import get_stac_item
 from pccommon.config import get_render_config
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
+from pctiler.endpoints.dependencies import get_endpoint_function
 from pctiler.reader import ItemSTACReader, ReaderParams
 
 try:
@@ -158,17 +158,3 @@ def geojson_crop(  # type: ignore
         env=env,
     )
     return result
-
-
-def get_endpoint_function(
-    router: fastapi.APIRouter, path: str, method: str
-) -> Callable:
-    for route in router.routes:
-        match, _ = route.matches({"type": "http", "path": path, "method": method})
-        if match == starlette.routing.Match.FULL:
-            # The abstract BaseRoute doesn't have a `.endpoint` attribute,
-            # but all of its subclasses do.
-            return route.endpoint  # type: ignore [attr-defined]
-
-    logger.warning(f"Could not find endpoint. method={method} path={path}")
-    raise HTTPException(detail="Internal system error", status_code=500)

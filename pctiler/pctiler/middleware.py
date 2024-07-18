@@ -1,5 +1,4 @@
 import json
-from collections import OrderedDict
 
 from starlette.datastructures import MutableHeaders
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
@@ -23,11 +22,16 @@ class ModifyResponseMiddleware:
             elif message_type == "http.response.body":
                 # Rewrite id to searchid for backwards compatibility, keep key order
                 body = json.loads(message["body"])
-                ordered_body = OrderedDict()
-                ordered_body["searchid"] = body.get("id")
-                ordered_body.update(body)
+                body["searchid"] = body.get("id")
 
-                resp_body = json.dumps(ordered_body, ensure_ascii=False).encode("utf-8")
+                updated_links = []
+                for link in body.get("links", []):
+                    link["href"] = link["href"].replace("/{tileMatrixSetId}", "")
+                    updated_links.append(link)
+
+                body["links"] = updated_links
+
+                resp_body = json.dumps(body, ensure_ascii=False).encode("utf-8")
                 message["body"] = resp_body
 
                 # Update the content-length header on the start message
