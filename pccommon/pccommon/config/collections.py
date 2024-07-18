@@ -24,6 +24,7 @@ class CamelModel(BaseModel):
         # https://docs.pydantic.dev/latest/api/config/#pydantic.alias_generators.to_camel
         "alias_generator": camelize,
         "populate_by_name": True,
+        "use_enum_values": True,
     }
 
 
@@ -267,7 +268,9 @@ class RenderOptions(CamelModel):
 
     name: str
     description: Optional[str] = None
-    type: Optional[RenderOptionType] = Field(default=RenderOptionType.raster_tile)
+    type: Optional[RenderOptionType] = Field(
+        default=RenderOptionType.raster_tile, validate_default=True
+    )
     options: Optional[str]
     vector_options: Optional[VectorTileOptions] = None
     min_zoom: int
