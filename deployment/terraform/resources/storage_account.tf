@@ -10,11 +10,6 @@ resource "azurerm_storage_account" "pc" {
   network_rules {
     default_action             = "Deny"
     virtual_network_subnet_ids = [azurerm_subnet.node_subnet.id, azurerm_subnet.function_subnet.id, data.azurerm_subnet.sas_node_subnet.id]
-
-    private_link_access {
-      endpoint_resource_id = "/subscriptions/a84a690d-585b-4c7c-80d9-851a48af5a50/providers/Microsoft.Security/datascanners/storageDataScanner"
-      endpoint_tenant_id   = "72f988bf-86f1-41af-91ab-2d7cd011db47"
-    }
   }
 
   # Disabling shared access keys breaks terraform's ability to do subsequent
@@ -65,9 +60,4 @@ resource "azurerm_storage_account_network_rules" "pcfunc-vnet-access" {
 
   default_action             = "Deny"
   virtual_network_subnet_ids = [azurerm_subnet.function_subnet.id]
-
-  private_link_access {
-    endpoint_resource_id = "/subscriptions/a84a690d-585b-4c7c-80d9-851a48af5a50/providers/Microsoft.Security/datascanners/storageDataScanner"
-    endpoint_tenant_id   = "72f988bf-86f1-41af-91ab-2d7cd011db47"
-  }
 }

@@ -143,7 +143,8 @@ function disable_shared_access_keys() {
             --resource-group ${SAK_RESOURCE_GROUP} \
             --allow-shared-key-access false \
             --subscription ${ARM_SUBSCRIPTION_ID} \
-            --output none
+            --output none \
+            --only-show-errors
 
         if [ $? -ne 0 ]; then
             echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -170,7 +171,8 @@ function enable_shared_access_keys() {
             --resource-group ${SAK_RESOURCE_GROUP} \
             --allow-shared-key-access true \
             --subscription ${ARM_SUBSCRIPTION_ID} \
-            --output none
+            --output none \
+            --only-show-errors
     done
 
     sleep 10
@@ -185,7 +187,8 @@ function add_ip_to_firewalls() {
         -n "${KEY_VAULT_NAME}" \
         --ip-address "$cidr" \
         --subscription "${ARM_SUBSCRIPTION_ID}" \
-        --output none
+        --output none \
+        --only-show-errors
 
     # Also add the IP to the terraform state storage account
     for FW_STORAGE_ACCOUNT in "${!FW_STORAGE_ACCOUNTS[@]}"; do
@@ -196,7 +199,8 @@ function add_ip_to_firewalls() {
             -n "${FW_STORAGE_ACCOUNT}" \
             --ip-address "$cidr" \
             --subscription "${ARM_SUBSCRIPTION_ID}" \
-            --output none
+        --output none \
+        --only-show-errors
     done
 
     sleep 10
@@ -211,7 +215,8 @@ function remove_ip_from_firewalls() {
         -n ${KEY_VAULT_NAME} \
         --ip-address $cidr \
         --subscription ${ARM_SUBSCRIPTION_ID} \
-        --output none
+        --output none \
+        --only-show-errors
 
     for FW_STORAGE_ACCOUNT in "${!FW_STORAGE_ACCOUNTS[@]}"; do
         FW_RESOURCE_GROUP=${FW_STORAGE_ACCOUNTS[$FW_STORAGE_ACCOUNT]}
@@ -221,6 +226,7 @@ function remove_ip_from_firewalls() {
             -n ${FW_STORAGE_ACCOUNT} \
             --ip-address $cidr \
             --subscription ${ARM_SUBSCRIPTION_ID} \
-            --output none
+            --output none \
+            --only-show-errors
     done
 }
