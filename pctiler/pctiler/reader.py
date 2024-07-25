@@ -1,7 +1,8 @@
 import logging
 import time
+import urllib.parse
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Optional, Set, Tuple, Type
 
 import attr
 import morecantile
@@ -12,6 +13,7 @@ from geojson_pydantic import Polygon
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
+from rio_tiler.io.stac import DEFAULT_VALID_TYPE
 from rio_tiler.types import AssetInfo
 from starlette.requests import Request
 from titiler.core.dependencies import DefaultDependency
@@ -46,6 +48,9 @@ class ItemSTACReader(PgSTACReader):
     # We make request an optional attribute to avoid re-writing
     # the whole list of attribute
     request: Optional[Request] = attr.ib(default=None)
+    include_asset_types: Set[str] = attr.ib(
+        default=DEFAULT_VALID_TYPE | {"application/wmo-GRIB2"}
+    )
 
     def _get_asset_info(self, asset: str) -> AssetInfo:
         """return asset's url."""
@@ -57,7 +62,19 @@ class ItemSTACReader(PgSTACReader):
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
-        info["url"] = asset_url
+        vrt_params = {}
+
+        if subdataset_name := self.request.query_params.get("subdataset_name"):
+            vrt_params["sd_name"] = subdataset_name
+
+        if subdataset_bands := self.request.query_params.getlist("subdataset_bands"):
+            vrt_params["bands"] = ",".join([str(band) for band in subdataset_bands])
+
+        if vrt_params:
+            params = urllib.parse.urlencode(vrt_params, safe=",")
+            asset_url = f"vrt:///vsicurl/{asset_url}?{params}"
+
+        info = AssetInfo(url=asset_url)
         return info
 
 
@@ -90,7 +107,6 @@ class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
-        info = AssetInfo(url=asset_url)
         if "file:header_size" in self.input["assets"][asset]:
             info["env"] = {
                 "GDAL_INGESTED_BYTES_AT_OPEN": self.input["assets"][asset][
@@ -98,6 +114,19 @@ class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
                 ]
             }
 
+        vrt_params = {}
+
+        if subdataset_name := self.request.query_params.get("subdataset_name"):
+            vrt_params["sd_name"] = subdataset_name
+
+        if subdataset_bands := self.request.query_params.getlist("subdataset_bands"):
+            vrt_params["bands"] = ",".join([str(band) for band in subdataset_bands])
+
+        if vrt_params:
+            params = urllib.parse.urlencode(vrt_params, safe=",")
+            asset_url = f"vrt:///vsicurl/{asset_url}?{params}"
+
+        info = AssetInfo(url=asset_url)
         return info
 
 
