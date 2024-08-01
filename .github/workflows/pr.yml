@@ -10,9 +10,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set Azurite Default Key
-        run: echo "AZURITE_DEFAULT_KEY=${{ secrets.AZURITE_DEFAULT_KEY }}" >> $GITHUB_ENV
+        run: echo "AZURITE_ACCOUNT_KEY=${{ secrets.AZURITE_ACCOUNT_KEY }}" >> $GITHUB_ENV
 
       - name: Run cibuild
         run: ./scripts/cibuild
