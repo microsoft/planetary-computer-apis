@@ -1,3 +1,5 @@
+import os
+
 from opencensus.trace.attributes_helper import COMMON_ATTRIBUTES
 
 DEFAULT_COLLECTION_CONFIG_TABLE_NAME = "collectionconfig"
@@ -34,7 +36,4 @@ HTTP_METHOD = COMMON_ATTRIBUTES["HTTP_METHOD"]
 # This is the Azurite storage account key.
 # This is not a key for a real Storage Account and is publicly accessible
 # on Azurite's GitHub repo. This is used only in development.
-AZURITE_ACCOUNT_KEY = (
-    "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUz"
-    "FT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
-)
+AZURITE_ACCOUNT_KEY: str = os.environ.get("AZURITE_ACCOUNT_KEY", "")
