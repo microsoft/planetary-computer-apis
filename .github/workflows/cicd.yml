@@ -24,6 +24,11 @@ jobs:
           tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
           subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
 
+      - name: Set Azurite Default Key
+        run: |
+          echo "AZURITE_ACCOUNT_KEY=${{ secrets.AZURITE_ACCOUNT_KEY }}" >> $GITHUB_ENV
+          echo "Using Azurite default key: $AZURITE_ACCOUNT_KEY"
+
       - name: Authenticate
         run: ./scripts/ciauthenticate
 

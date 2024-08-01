@@ -13,6 +13,8 @@ from ipban.config import settings
 from ipban.models import UpdateBannedIPTask
 from pytest_mock import MockerFixture
 
+from pccommon.constants import AZURITE_ACCOUNT_KEY
+
 MOCK_LOGS_QUERY_RESULT = [("192.168.1.1", 8000), ("192.168.1.4", 12000)]
 TEST_ID = str(uuid.uuid4()).replace("-", "")  # dash is not allowed in table name
 TEST_BANNED_IP_TABLE = f"testblobstoragebannedip{TEST_ID}"
@@ -58,8 +60,7 @@ def mock_clients(
     logs_query_client.query_workspace.return_value = mock_response
     CONNECTION_STRING: str = (
         "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
-        "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsu"
-        "Fq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
+        f"AccountKey={AZURITE_ACCOUNT_KEY};"
         "TableEndpoint=http://azurite:10002/devstoreaccount1;"
     )
 
