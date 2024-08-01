@@ -24,6 +24,9 @@ jobs:
           tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
           subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
 
+      - name: Set Azurite Default Key
+        run: echo "AZURITE_DEFAULT_KEY=${{ secrets.AZURITE_DEFAULT_KEY }}" >> $GITHUB_ENV
+
       - name: Authenticate
         run: ./scripts/ciauthenticate
 
@@ -43,6 +46,9 @@ jobs:
               echo "acr=pccomponentstest" >> $GITHUB_OUTPUT
               ;;
           esac
+
+      - name: Use Azurite Default Key
+        run: echo "Using Azurite default key: $AZURITE_DEFAULT_KEY"
 
       - name: Publish images
         run: ./scripts/cipublish --acr ${{steps.get_image_tag.outputs.acr}} --tag ${{steps.get_image_tag.outputs.tag}}
