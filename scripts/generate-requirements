@@ -5,28 +5,28 @@ set -e
 echo "== Generating requirements.txt ..."
 pip_compile_options="--emit-index-url --annotate --verbose"
 
-docker-compose \
+docker compose \
     -f docker-compose.yml \
     -f docker-compose.dev.yml \
     run --rm \
     stac-dev \
     pip-compile ./pcstac/setup.py --extra server -o pcstac/requirements-server.txt $pip_compile_options
 
-docker-compose \
+docker compose \
     -f docker-compose.yml \
     -f docker-compose.dev.yml \
     run --rm \
     tiler-dev \
     pip-compile ./pctiler/setup.py --extra server -o pctiler/requirements-server.txt $pip_compile_options
 
-docker-compose \
+docker compose \
     -f docker-compose.yml \
     -f docker-compose.dev.yml \
     run --rm \
     tiler-dev \
     pip-compile ./pctiler/setup.py --extra dev -o pctiler/requirements-dev.txt $pip_compile_options
 
-docker-compose \
+docker compose \
     -f docker-compose.yml \
     -f docker-compose.dev.yml \
     run --rm \
