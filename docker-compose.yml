@@ -7,8 +7,6 @@ services:
       context: .
       dockerfile: pcstac/Dockerfile
     env_file: ${PC_STAC_ENV_FILE:-./pc-stac.dev.env}
-    environment:
-      - AZURITE_ACCOUNT_KEY=${AZURITE_ACCOUNT_KEY}
     ports:
       - "8081:8081"
     volumes:
