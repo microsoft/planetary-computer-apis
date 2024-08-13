@@ -29,14 +29,14 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     if [ "${RESTART_SERVERS}" ]; then
         echo "==Bringing down servers.."
-        docker-compose \
+        docker compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             down --remove-orphans
     fi
 
     echo "==Building images..."
-    docker-compose \
+    docker compose \
         -f docker-compose.yml \
         -f docker-compose.dev.yml \
         build ${NO_CACHE}

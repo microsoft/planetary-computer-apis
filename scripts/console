@@ -57,7 +57,7 @@ while [[ "$#" > 0 ]]; do case $1 in
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     if [[ "${DB_CONSOLE}" ]]; then
-        docker-compose \
+        docker compose \
             -f docker-compose.yml \
             exec database psql postgres://username:password@database:5432/postgis
 
@@ -65,7 +65,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     fi
 
     if [[ "${DEV_TILER_CONSOLE}" ]]; then
-        docker-compose \
+        docker compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             run --rm \
@@ -75,7 +75,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     fi
 
     if [[ "${FUNCS_CONSOLE}" ]]; then
-        docker-compose \
+        docker compose \
             -f docker-compose.yml \
             run --rm \
             funcs /bin/bash
@@ -84,7 +84,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     fi
 
     if [[ "${DEPLOY_CONSOLE}" ]]; then
-        GIT_COMMIT="$(git rev-parse --short HEAD)" docker-compose \
+        GIT_COMMIT="$(git rev-parse --short HEAD)" docker compose \
             -f deployment/docker-compose.yml \
             run --rm \
             deploy /bin/bash
@@ -93,7 +93,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     fi
 
     if [[ "${DEV_STAC_CONSOLE}" ]]; then
-        docker-compose \
+        docker compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             run --rm \

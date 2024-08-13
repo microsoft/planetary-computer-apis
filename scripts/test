@@ -65,7 +65,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     if [ -z "${TILER_ONLY}${STAC_ONLY}${FUNCS_ONLY}" ]; then
 
-        docker-compose \
+        docker compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             run --rm \
@@ -73,7 +73,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     fi
 
     if [ -z "${STAC_ONLY}${COMMON_ONLY}${FUNCS_ONLY}" ]; then
-        docker-compose \
+        docker compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             run --rm \
@@ -82,7 +82,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     if [ -z "${TILER_ONLY}${COMMON_ONLY}${FUNCS_ONLY}" ]; then
 
-        docker-compose \
+        docker compose \
             -f docker-compose.yml \
             -f docker-compose.dev.yml \
             run --rm \
@@ -91,7 +91,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
     if [ -z "${STAC_ONLY}${TILER_ONLY}${COMMON_ONLY}" ]; then
 
-        docker-compose \
+        docker compose \
             -f docker-compose.yml \
             run --rm \
             funcs /bin/bash -c "cd /opt/src && scripts/bin/test-funcs ${NO_INTEGRATION}" 

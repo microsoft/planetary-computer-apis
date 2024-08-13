@@ -61,6 +61,14 @@ This project uses a variation on [scripts to rule them all](https://github.com/g
 
 #### Environment setup and building images
 
+Before setting up the local environment, ensure that you have set the AZURITE_ACCOUNT_KEY environment variable. 
+The account key can be found in the [Azurite GitHub repository](https://github.com/Azure/Azurite?tab=readme-ov-file#usage-with-azure-storage-sdks-or-tools)
+
+For example, you can set the environment variable in your terminal with:
+```console
+> export AZURITE_ACCOUNT_KEY=<azurite_account_key>
+```
+
 To set up a local environment, use
 
 ```console

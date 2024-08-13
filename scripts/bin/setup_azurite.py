@@ -14,6 +14,7 @@ import pccommon
 from pccommon.config.collections import CollectionConfig, CollectionConfigTable
 from pccommon.config.containers import ContainerConfig, ContainerConfigTable
 from pccommon.constants import (
+    AZURITE_ACCOUNT_KEY,
     DEFAULT_COLLECTION_CONFIG_TABLE_NAME,
     DEFAULT_CONTAINER_CONFIG_TABLE_NAME,
     DEFAULT_IP_EXCEPTION_CONFIG_TABLE_NAME,
@@ -27,9 +28,7 @@ ADDITIONAL_CONFIG_PATH = TEST_DATA_DIR / "additional-config"
 
 AZURITE_CONNECT_STRING = (
     "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
-    "AccountKey="
-    "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq"
-    "/K1SZFPTOtr/KBHBeksoGMGw==;"
+    f"AccountKey={AZURITE_ACCOUNT_KEY};"
     "BlobEndpoint=http://azurite:10000/devstoreaccount1;"
     "QueueEndpoint=http://azurite:10001/devstoreaccount1;"
     "TableEndpoint=http://azurite:10002/devstoreaccount1;"

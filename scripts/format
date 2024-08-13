@@ -16,31 +16,31 @@ Runs formatting for the project.
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
-    docker-compose  \
+    docker compose  \
         -f docker-compose.yml \
         -f docker-compose.dev.yml \
         run --rm \
         stac-dev scripts/bin/format-common;
 
-    docker-compose  \
+    docker compose  \
         -f docker-compose.yml \
         -f docker-compose.dev.yml \
         run --rm \
         tiler-dev scripts/bin/format-tiler;
 
-    docker-compose  \
+    docker compose  \
         -f docker-compose.yml \
         -f docker-compose.dev.yml \
         run --rm \
         stac-dev scripts/bin/format-stac;
 
-    docker-compose  \
+    docker compose  \
         -f docker-compose.yml \
         -f docker-compose.dev.yml \
         run --rm \
         funcs /bin/bash -c "cd /opt/src && scripts/bin/format-funcs";
 
-    docker-compose  \
+    docker compose  \
         -f docker-compose.yml \
         -f docker-compose.dev.yml \
         run --rm \

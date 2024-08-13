@@ -11,6 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set Azurite Default Key
+        run: |
+          echo "AZURITE_ACCOUNT_KEY=${{ secrets.AZURITE_ACCOUNT_KEY }}" >> $GITHUB_ENV
+          echo "Using Azurite default key: $AZURITE_ACCOUNT_KEY"
+
       - name: Run cibuild
         run: ./scripts/cibuild
 
@@ -22,5 +27,11 @@ jobs:
         with:
           python-version: "3.10" # stac-api-validator requires >= 3.10
           cache: "pip"
+
+      - name: Set Azurite Default Key
+        run: |
+          echo "AZURITE_ACCOUNT_KEY=${{ secrets.AZURITE_ACCOUNT_KEY }}" >> $GITHUB_ENV
+          echo "Using Azurite default key: $AZURITE_ACCOUNT_KEY"
+
       - name: Validate
         run: ./scripts/validate
