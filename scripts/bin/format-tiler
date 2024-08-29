@@ -19,6 +19,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Formatting tiler..."
     isort --overwrite-in-place pctiler/pctiler
     isort  --overwrite-in-place pctiler/tests
-    black pctiler/pctiler
-    black pctiler/tests
+    black --line-length 120 pctiler/pctiler
+    black --line-length 120 pctiler/tests
 fi

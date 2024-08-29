@@ -19,5 +19,5 @@ This script is meant to be run inside the stac-dev container.
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Formatting scripts..."
     isort --overwrite-in-place scripts/bin
-    black scripts/bin
+    black --line-length 120 scripts/bin
 fi

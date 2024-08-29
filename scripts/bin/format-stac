@@ -20,10 +20,10 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Formatting stac..."
     isort --overwrite-in-place pcstac/pcstac
     isort --overwrite-in-place pcstac/tests
-    black pcstac/pcstac
-    black pcstac/tests
+    black --line-length 120 pcstac/pcstac
+    black --line-length 120 pcstac/tests
 
     echo "Formatting common..."
     isort --overwrite-in-place pccommon
-    black pccommon
+    black --line-length 120 pccommon
 fi

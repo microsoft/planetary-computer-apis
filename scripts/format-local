@@ -1,0 +1,19 @@
+#!/bin/bash
+isort --overwrite-in-place pccommon
+isort --overwrite-in-place pccommon/pccommon
+isort --overwrite-in-place pccommon/tests
+isort --overwrite-in-place pcfuncs
+isort --overwrite-in-place scripts/bin
+isort --overwrite-in-place pctiler/pctiler
+isort --overwrite-in-place pctiler/tests
+isort --overwrite-in-place pcstac/pcstac
+isort --overwrite-in-place pcstac/tests
+black --line-length 120 pccommon/pccommon
+black --line-length 120 pccommon/tests
+black --line-length 120 pcfuncs
+black --line-length 120 scripts/bin
+black --line-length 120 pcstac/pcstac
+black --line-length 120 pcstac/tests
+black --line-length 120 pccommon
+black --line-length 120 pctiler/pctiler
+black --line-length 120 pctiler/tests

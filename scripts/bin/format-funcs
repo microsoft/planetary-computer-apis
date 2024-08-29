@@ -18,5 +18,5 @@ This scripts is meant to be run inside the funcs container.
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Formatting funcs..."
     isort --overwrite-in-place pcfuncs
-    black pcfuncs
+    black --line-length 120 pcfuncs
 fi

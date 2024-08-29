@@ -38,7 +38,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     mypy pctiler/pctiler
 
     echo "Running black for tiler..."
-    black --check pctiler/pctiler pctiler/tests
+    black --line-length 120 --check pctiler/pctiler pctiler/tests
 
     echo "Running flake8 for tiler..."
     flake8 pctiler/pctiler pctiler/tests

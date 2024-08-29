@@ -20,6 +20,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     echo "Formatting common..."
     isort --overwrite-in-place pccommon/pccommon
     isort --overwrite-in-place pccommon/tests
-    black pccommon/pccommon
-    black pccommon/tests
+    black --line-length 120 pccommon/pccommon
+    black --line-length 120 pccommon/tests
 fi
