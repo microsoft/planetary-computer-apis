@@ -38,7 +38,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     mypy pcfuncs
 
     echo "Running black for funcs..."
-    black --line-length 120 --check pcfuncs
+    black --check pcfuncs
 
     echo "Running flake8 for funcs..."
     flake8 pcfuncs

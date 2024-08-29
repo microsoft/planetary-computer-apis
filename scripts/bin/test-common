@@ -22,7 +22,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     mypy pccommon
 
     echo "Running black for common..."
-    black --line-length 120 --check pccommon
+    black --check pccommon
 
     echo "Running flake8 for common..."
     flake8 pccommon/pccommon pccommon/tests

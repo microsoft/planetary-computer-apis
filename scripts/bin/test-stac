@@ -22,7 +22,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     mypy pcstac/pcstac
 
     echo "Running black for stac..."
-    black --line-length 120 --check pcstac/pcstac pcstac/tests
+    black --check pcstac/pcstac pcstac/tests
 
     echo "Running flake8 for stac..."
     flake8 pcstac/pcstac pcstac/tests
