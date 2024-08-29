@@ -13,7 +13,7 @@ jobs:
 
       - name: Set Azurite Default Key
         run: |
-          echo curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite
+          echo "curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite"
           echo "AZURITE_ACCOUNT_KEY="$(curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
           echo "Using Azurite default key: $AZURITE_ACCOUNT_KEY"
 
