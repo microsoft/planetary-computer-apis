@@ -10,8 +10,8 @@ from titiler.core.dependencies import ColorFormulaParams
 from titiler.core.factory import img_endpoint_params
 from titiler.core.resources.enums import ImageType
 from titiler.pgstac.dependencies import SearchIdParams, TmsTileParams
-from titiler.pgstac.factory import MosaicTilerFactory
 from titiler.pgstac.extensions import searchInfoExtension
+from titiler.pgstac.factory import MosaicTilerFactory
 
 from pccommon.config import get_collection_config
 from pccommon.config.collections import MosaicInfo
@@ -23,7 +23,6 @@ from pctiler.reader import PGSTACBackend, ReaderParams
 
 @dataclass
 class AssetsBidxExprParams(dependencies.AssetsBidxExprParams):
-
     collection: str = Query(None, description="STAC Collection ID")
 
 
@@ -46,10 +45,11 @@ pgstac_mosaic_factory = MosaicTilerFactory(
     colormap_dependency=PCColorMapParams,
     layer_dependency=AssetsBidxExprParams,
     reader_dependency=ReaderParams,
-    router_prefix=get_settings().mosaic_endpoint_prefix + "/{search_id}", # reverts /searches back to /mosaic
+    router_prefix=get_settings().mosaic_endpoint_prefix
+    + "/{search_id}",  # reverts /searches back to /mosaic
     backend_dependency=BackendParams,
     add_statistics=False,
-    extensions=[searchInfoExtension()]
+    extensions=[searchInfoExtension()],
 )
 
 
