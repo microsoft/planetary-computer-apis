@@ -1,0 +1,7 @@
+#!/bin/bash
+
+docker compose \
+    -f docker-compose.yml \
+    -f docker-compose.dev.yml \
+    run --rm \
+    tiler-dev python3 -m pytest pctiler/tests/endpoints/test_pg_mosaic.py

@@ -11,6 +11,7 @@ from titiler.core.factory import img_endpoint_params
 from titiler.core.resources.enums import ImageType
 from titiler.pgstac.dependencies import SearchIdParams, TmsTileParams
 from titiler.pgstac.factory import MosaicTilerFactory
+from titiler.pgstac.extensions import searchInfoExtension
 
 from pccommon.config import get_collection_config
 from pccommon.config.collections import MosaicInfo
@@ -45,9 +46,10 @@ pgstac_mosaic_factory = MosaicTilerFactory(
     colormap_dependency=PCColorMapParams,
     layer_dependency=AssetsBidxExprParams,
     reader_dependency=ReaderParams,
-    router_prefix=get_settings().mosaic_endpoint_prefix + "/{search_id}",
+    router_prefix=get_settings().mosaic_endpoint_prefix + "/{search_id}", # reverts /searches back to /mosaic
     backend_dependency=BackendParams,
     add_statistics=False,
+    extensions=[searchInfoExtension()]
 )
 
 
