@@ -11,9 +11,9 @@ This repository contains two components of the Planetary Computer APIs: the STAC
 The `pcstac` project provides a STAC API which indexes Microsoft's publicly available [geospatial data](https://planetarycomputer.microsoft.com/catalog) and an API for searching through this large collection.
 The `pctiler` provides visualization and data access capabilities for the data in the Planetary Computer.
 
-## Azure Functions
+## Azure Functions (a.k.a. Funcs)
 
-This repository also contains Azure Functions that provide additional endpoints for working with Planetary Computer data and metadata. This includes Function endpoints for generating images and animations based on STAC searches, using the tiler to render mosaiced data from Collections
+This repository also contains Azure Functions that provide additional endpoints for working with Planetary Computer data and metadata. This includes Function endpoints for generating images and animations based on STAC searches, using the tiler to render mosaiced data from Collections.
 
 ## Collection configuration
 
@@ -61,26 +61,27 @@ This project uses a variation on [scripts to rule them all](https://github.com/g
 
 #### Environment setup and building images
 
-Before setting up the local environment, ensure that you have set the AZURITE_ACCOUNT_KEY environment variable. 
-The account key can be found in the [Azurite GitHub repository](https://github.com/Azure/Azurite?tab=readme-ov-file#usage-with-azure-storage-sdks-or-tools)
+Before setting up the local environment, you must set the AZURITE_ACCOUNT_KEY environment variable to the Azurite default
+account key, a string that can be [found here](https://github.com/Azure/Azurite?tab=readme-ov-file#usage-with-azure-storage-sdks-or-tools).
 
 For example, you can set the environment variable in your terminal with:
+
 ```console
-> export AZURITE_ACCOUNT_KEY=<azurite_account_key>
+export AZURITE_ACCOUNT_KEY=<azurite_account_key>
 ```
 
-To set up a local environment, use
+To set up a local environment, use:
 
 ```console
-> ./scripts/setup
+./scripts/setup
 ```
 
 This will build containers, apply database migrations, and load the development data.
 
-After migrations and development database loading are in place, you can rebuild the docker images with
+After migrations and development database loading are in place, you can rebuild the docker images with:
 
 ```console
-> ./scripts/update
+./scripts/update
 ```
 
 `pip` dependencies in `setup.py` are collected and installed through requirements files.
@@ -99,10 +100,12 @@ az login
 To run the servers, use
 
 ```console
-> ./scripts/server
+./scripts/server
 ```
 
 This will bring up the development database, STAC API, Tiler, Azure Functions, and other services.
+
+To test the tiler, try going to <http://localhost:8080/data/mosaic/info?collection=naip>.
 
 #### Testing and and formatting
 
