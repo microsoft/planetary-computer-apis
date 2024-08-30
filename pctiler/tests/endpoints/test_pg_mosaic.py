@@ -163,7 +163,7 @@ async def test_bad_searchid(client: AsyncClient) -> None:
 
     # does not match the one we registered in the fixture
     expected_content_hash = "9b989f86a149628eabfde894fb965982"
-    
+
     formatted_route = route.format(
         searchId=expected_content_hash, z=16, x=17218, y=26838
     )
