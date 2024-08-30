@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Set Azurite Default Key
-        run: echo "AZURITE_ACCOUNT_KEY=$(echo curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
+        run: echo "AZURITE_ACCOUNT_KEY=$(curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
 
       - name: Test
         run: echo $AZURITE_ACCOUNT_KEY
@@ -30,9 +30,7 @@ jobs:
           cache: "pip"
 
       - name: Set Azurite Default Key
-        run: |
-          echo "AZURITE_ACCOUNT_KEY="$(curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
-          echo "Using Azurite default key: $AZURITE_ACCOUNT_KEY"
+        run: echo "AZURITE_ACCOUNT_KEY=$(curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
 
       - name: Validate
         run: ./scripts/validate
