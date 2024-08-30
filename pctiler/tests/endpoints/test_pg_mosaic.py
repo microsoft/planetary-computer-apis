@@ -132,7 +132,7 @@ async def test_mosaic_tile_routes(
 async def test_info_path_with_searchid(
     client: AsyncClient, register_search: REGISTER_TYPE
 ) -> None:
-    # route source code is here https://github.com/developmentseed/titiler/blob/main/src/titiler/mosaic/titiler/mosaic/factory.py#L157
+    # route source code is in titiler/mosaic/titiler/mosaic/factory.py#L157
     # the searchId functionality is added by titiler-pgstac
     route = "mosaic/{searchId}/info"
     expected_content_hash, _ = register_search
@@ -146,7 +146,10 @@ async def test_info_path_with_searchid(
 
 async def test_info_path_with_bad_searchid(client: AsyncClient) -> None:
     route = "mosaic/{searchId}/info"
-    expected_content_hash = "9b989f86a149628eabfde894fb965982"  # does not match the one we registered in the fixture
+
+    # does not match the one we registered in the fixture
+    expected_content_hash = "9b989f86a149628eabfde894fb965982"
+
     formatted_route = route.format(searchId=expected_content_hash)
     url = (
         f"/{formatted_route}?asset_bidx=image%7C1%2C2%2C3&assets=image&collection=naip"
@@ -157,7 +160,10 @@ async def test_info_path_with_bad_searchid(client: AsyncClient) -> None:
 
 async def test_bad_searchid(client: AsyncClient) -> None:
     route = "mosaic/tiles/{searchId}/{z}/{x}/{y}"
-    expected_content_hash = "9b989f86a149628eabfde894fb965982"  # does not match the one we registered in the fixture
+
+    # does not match the one we registered in the fixture
+    expected_content_hash = "9b989f86a149628eabfde894fb965982"
+    
     formatted_route = route.format(
         searchId=expected_content_hash, z=16, x=17218, y=26838
     )
