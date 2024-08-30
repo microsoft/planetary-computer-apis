@@ -15,7 +15,7 @@ jobs:
         run: echo "AZURITE_ACCOUNT_KEY=$(curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
 
       - name: Verify Azurite Key was retrieved correctly
-        if: ($AZURITE_ACCOUNT_KEY | cut -b 1-4) == 'Eby8'
+        if: contains(env.AZURITE_ACCOUNT_KEY, 'Eby8')
         run: echo GOT HERE
 
       - name: Run cibuild
