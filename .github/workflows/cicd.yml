@@ -47,7 +47,7 @@ jobs:
           case "${GITHUB_REF}" in
             *tags*)
               echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT ;
-              ./scripts/cipublish --acr pccomponents --tag ${{tag}}
+              ./scripts/cipublish --acr pccomponents --tag $tag
               ;;
             *)
               echo "Publishing to pccomponentstest as latest" ;
