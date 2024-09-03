@@ -16,6 +16,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get Most Recent Tag
+        id: most-recent-tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
       - name: Log in with Azure
         uses: azure/login@v1
@@ -35,25 +41,25 @@ jobs:
       - name: Run cibuild
         run: ./scripts/cibuild
 
-      - name: Get image tag
-        id: get_image_tag
+      - name: Publish Image
+        id: publish_image
         run:
           case "${GITHUB_REF}" in
             *tags*)
               echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT ;
-              echo "acr=pccomponents" >> $GITHUB_OUTPUT
+              ./scripts/cipublish --acr pccomponents --tag ${{tag}}
               ;;
             *)
+              echo "Publishing to pccomponentstest as latest" ;
               echo "tag=latest" >> $GITHUB_OUTPUT ;
-              echo "acr=pccomponentstest" >> $GITHUB_OUTPUT
+              ./scripts/cipublish --acr pccomponentstest --tag latest ;
+              echo "Also publishing to pccomponents ACR with unique tag" ;
+              ./scripts/cipublish --acr pccomponents --tag ${{ steps.most-recent-tag.outputs.tag }}.${{ github.run_number }}
               ;;
           esac
 
-      - name: Publish images
-        run: ./scripts/cipublish --acr ${{steps.get_image_tag.outputs.acr}} --tag ${{steps.get_image_tag.outputs.tag}}
-
     outputs:
-      image_tag: ${{ steps.get_image_tag.outputs.tag }}
+      image_tag: ${{ steps.publish_image.outputs.tag }}
 
   deploy:
     runs-on: ubuntu-latest
