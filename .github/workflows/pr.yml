@@ -11,6 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: 'Get Previous tag'
+        id: most-recent-tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: TEMPORARY
+        run: echo ${{ github.run_number }} && echo ${{ github.ref_name }} && echo ${{ steps.most-recent-tag.outputs.tag }}
+
       - name: Set Azurite Default Key
         run: echo "AZURITE_ACCOUNT_KEY=$(curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
 
@@ -25,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10" # stac-api-validator requires >= 3.10
