@@ -18,7 +18,7 @@ jobs:
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
       - name: TEMPORARY
-        run: echo ${{ github.run_number }} && echo ${{ github.ref_name }} && echo ${{ steps.most-recent-tag.outputs.tag }}
+        run: echo (${{ steps.most-recent-tag.outputs.tag }}.${{ github.run_number }})
 
       - name: Set Azurite Default Key
         run: echo "AZURITE_ACCOUNT_KEY=$(curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
