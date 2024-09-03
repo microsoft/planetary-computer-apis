@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: TEMPORARY
+        run: echo ${{ github.run_number }} && echo ${{ github.ref_name }}
+
       - name: Set Azurite Default Key
         run: |
           echo "AZURITE_ACCOUNT_KEY=${{ secrets.AZURITE_ACCOUNT_KEY }}" >> $GITHUB_ENV
@@ -23,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10" # stac-api-validator requires >= 3.10
