@@ -4,7 +4,7 @@ from typing import Any, List, Optional, Type
 from urllib.parse import urljoin
 
 import attr
-from fastapi import Request
+from fastapi import HTTPException, Request
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.types.errors import NotFoundError
 from stac_fastapi.types.stac import (
@@ -215,7 +215,12 @@ class PCClient(CoreCrudClient):
             )
             return item_collection
 
+        # Block searches that don't specify a collection
+        if search_request.collections is None and "collection=" not in str(request.url):
+            raise HTTPException(status_code=422, detail="collection is required")
+
         search_json = search_request.model_dump_json()
+
         add_stac_attributes_from_search(search_json, request)
 
         logger.info(
