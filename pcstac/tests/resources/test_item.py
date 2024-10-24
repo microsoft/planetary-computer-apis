@@ -396,6 +396,69 @@ async def test_item_search_get_filter_extension_cql(app_client):
 
 
 @pytest.mark.asyncio
+async def test_search_using_filter_with_collectionid(app_client):
+    """Test POST search with JSONB query (cql json filter extension)
+    that includes a collectionid in the filter and no where else"""
+    items_resp = await app_client.get("/collections/naip/items")
+    assert items_resp.status_code == 200
+
+    first_item = items_resp.json()["features"][0]
+
+    # EPSG is a JSONB key
+    body = {
+        "filter": {
+            "op": "and",
+            "args": [
+                {"op": "=", "args": [{"property": "collection"}, "naip"]},
+                {
+                    "op": "=",
+                    "args": [
+                        {"property": "proj:epsg"},
+                        first_item["properties"]["proj:epsg"],
+                    ],
+                },
+            ],
+        }
+    }
+    resp = await app_client.post("/search", json=body)
+    resp_json = resp.json()
+
+    assert resp.status_code == 200
+    assert len(resp_json["features"]) == 12
+    assert (
+        resp_json["features"][0]["properties"]["proj:epsg"]
+        == first_item["properties"]["proj:epsg"]
+    )
+
+
+@pytest.mark.asyncio
+async def test_search_using_filter_without_collectionid(app_client):
+    """Test POST search with JSONB query (cql json filter extension)
+    that includes a collectionid in the filter and no where else"""
+    items_resp = await app_client.get("/collections/naip/items")
+    assert items_resp.status_code == 200
+
+    first_item = items_resp.json()["features"][0]
+
+    # EPSG is a JSONB key
+    body = {
+        "filter": {
+            "args": [
+                {
+                    "op": "=",
+                    "args": [
+                        {"property": "proj:epsg"},
+                        first_item["properties"]["proj:epsg"],
+                    ],
+                },
+            ],
+        }
+    }
+    resp = await app_client.post("/search", json=body)
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_get_missing_item_collection(app_client):
     """Test reading a collection which does not exist"""
     resp = await app_client.get("/collections/invalid-collection/items")
@@ -638,7 +701,9 @@ async def test_search_get_page_limits(app_client):
     assert len(resp_json["features"]) == 12
 
 
-@pytest.mark.skip(reason="Are these params even valid?  they dont match the model")
+@pytest.mark.skip(
+    reason="Are these params even valid? they are not within filter field"
+)
 @pytest.mark.asyncio
 async def test_search_post_page_limits(app_client):
     params = {"op": "=", "args": [{"property": "collection"}, "naip"]}

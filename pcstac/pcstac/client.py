@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 from typing import Any, List, Optional, Type
@@ -216,7 +217,11 @@ class PCClient(CoreCrudClient):
             return item_collection
 
         # Block searches that don't specify a collection
-        if search_request.collections is None and "collection=" not in str(request.url):
+        if (
+            search_request.collections is None
+            and "collection=" not in str(request.url)
+            and '{"property": "collection"}' not in json.dumps(search_request.filter)
+        ):
             raise HTTPException(status_code=422, detail="collection is required")
 
         search_json = search_request.model_dump_json()
