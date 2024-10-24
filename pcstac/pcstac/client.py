@@ -1,10 +1,10 @@
-import json
 import logging
 import time
 from typing import Any, List, Optional, Type
 from urllib.parse import urljoin
 
 import attr
+import orjson
 from fastapi import HTTPException, Request
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.types.errors import NotFoundError
@@ -220,7 +220,8 @@ class PCClient(CoreCrudClient):
         if (
             search_request.collections is None
             and "collection=" not in str(request.url)
-            and '{"property": "collection"}' not in json.dumps(search_request.filter)
+            and '{"property":"collection"}'
+            not in orjson.dumps(search_request.filter).decode("utf-8")
         ):
             raise HTTPException(status_code=422, detail="collection is required")
 
