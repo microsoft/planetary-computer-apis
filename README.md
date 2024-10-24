@@ -103,16 +103,21 @@ To run the servers, use
 ./scripts/server
 ```
 
-This will bring up the development database, STAC API, Tiler, Azure Functions, and other services.
+This will bring up the development database, STAC API, Tiler, Azure Functions, and other services.  If at this point something errors out (e.g. nginx complaining about a config file), try deleting the containers/images and rerunning `./scripts/setup`.
 
-To test the tiler, try going to <http://localhost:8080/data/mosaic/info?collection=naip>.
+The STAC API can be found at <http://localhost:8080/stac/> (goes through nginx) or <http://localhost:8081> directly.
+
+To hit the tiler, try going to <http://localhost:8080/data/mosaic/info?collection=naip>, although it will fail due to lack of an authorization header.
 
 #### Testing and and formatting
 
-To run tests, use
+To run tests, use one of the following (note, you don't need `./scripts/server` running).  If you get an immediate error related to library stubs, just run it again.  The tiler tests may fail locally, TBD why.
 
 ```console
 ./scripts/test
+./scripts/test --stac
+./scripts/test --tiler
+./scripts/test --common
 ```
 
 To format code, use
