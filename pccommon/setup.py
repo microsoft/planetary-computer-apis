@@ -22,7 +22,7 @@ inst_reqs = [
     "idna>=3.7.0",
     "html-sanitizer==2.4.4",
     # Soon available as lxml[html_clean]
-    "lxml_html_clean==0.1.0",
+    "lxml_html_clean==0.4.0",
     "urllib3>=2.2.2",
 ]
 
