@@ -68,7 +68,7 @@ lxml==5.2.2
     # via
     #   html-sanitizer
     #   lxml-html-clean
-lxml-html-clean==0.1.0
+lxml-html-clean==0.4.0
     # via
     #   html-sanitizer
     #   pccommon (pccommon/setup.py)
