@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 inst_reqs: List[str] = [
     "fastapi-slim==0.111.0",
     "geojson-pydantic==1.1.0",
-    "jinja2==3.1.4",
+    "jinja2==3.1.5",
     "pystac==1.10.1",
     "planetary-computer==1.0.0",
     "rasterio==1.3.10",
