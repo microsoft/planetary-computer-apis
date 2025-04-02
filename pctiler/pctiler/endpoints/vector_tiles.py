@@ -56,11 +56,11 @@ async def get_tilejson(
     }
 
     if tileset.bounds:
-        tilejson["bounds"] = tileset.bounds
+        tilejson["bounds"] = tileset.bounds  # type: ignore
     if tileset.center:
-        tilejson["center"] = tileset.center
+        tilejson["center"] = tileset.center  # type: ignore
 
-    return TileJSON(**tilejson)
+    return TileJSON(**tilejson)  # type: ignore
 
 
 @vector_tile_router.get(

@@ -21,6 +21,9 @@ extra_reqs = {
     "server": [
         "uvicorn[standard]==0.30.1",
     ],
+    "dev": [
+        "types-requests"
+    ]
 }
 
 setup(

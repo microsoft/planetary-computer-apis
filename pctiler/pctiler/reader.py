@@ -153,7 +153,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
                     "zxy": f"{z}/{x}/{y}",
                     "count": len(assets),
                 },
-                self.request,
+                self.request,  # type: ignore
             ),
         )
         return assets
@@ -219,7 +219,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
                     "zxy": f"{tile_z}/{tile_x}/{tile_y}",
                     "count": len(mosaic_assets),
                 },
-                self.request,
+                self.request,  # type: ignore
             ),
         )
 
