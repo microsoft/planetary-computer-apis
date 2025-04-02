@@ -210,8 +210,8 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"="${DNS_LABEL}" \
         --set controller.image.registry="mcr.microsoft.com" \
         --set controller.image.image="oss/kubernetes/ingress/nginx-ingress-controller" \
-        --set controller.image.tag="v1.9.6-patched" \
-        --set controller.image.digest="sha256:2383717ea3edd1652b97e5b82adf15a3e7f091d0d5d0eceb8dce4410e3a6a292" \
+        --set controller.image.tag="v1.11.5" \
+        --set controller.image.digest="sha256:58dc07ebe8524c598137291d319a7fc0ec7f450ea43e5c22c2516c56bb7282fb" \
         --version "4.8.3"\
         --wait \
         --timeout 2m0s \

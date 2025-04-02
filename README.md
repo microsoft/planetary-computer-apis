@@ -67,7 +67,7 @@ account key, a string that can be [found here](https://github.com/Azure/Azurite?
 For example, you can set the environment variable in your terminal with:
 
 ```console
-export AZURITE_ACCOUNT_KEY=<azurite_account_key>
+export AZURITE_ACCOUNT_KEY=$(curl -s https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)
 ```
 
 To set up a local environment, use:
