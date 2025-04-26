@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Annotated, Optional
 from urllib.parse import quote_plus, urljoin
@@ -15,6 +16,7 @@ from titiler.core.resources.enums import ImageType
 from titiler.pgstac.dependencies import get_stac_item
 
 from pccommon.config import get_render_config
+from pccommon.redis import cached_result
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.endpoints.dependencies import get_endpoint_function
@@ -29,13 +31,35 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-def ItemPathParams(
+async def ItemPathParams(
     request: Request,
     collection: str = Query(..., description="STAC Collection ID"),
     item: str = Query(..., description="STAC Item ID"),
 ) -> pystac.Item:
-    """STAC Item dependency."""
-    return get_stac_item(request.app.state.dbpool, collection, item)
+    """
+    STAC Item dependency.
+
+    We cache the STAC item in redis to ameliorate high call volumes to the
+    tiler, which can bottleneck on reading from pgstac.
+    For example, say you have a few thousand calls/second to the tiler to get
+    crops of STAC item assets. Unintuitively, the bottleneck will become the
+    large number of small queries to pgstac. Pretty soon, pgstac will be
+    overwhelmed with queued queries and all the client requests will start to
+    timeout.
+
+    We attempt to avoid this by reducing the queries sent to pgstac.
+    """
+
+    # Async to sync nonsense
+    def _get_stac_item_dict() -> dict:
+        return get_stac_item(request.app.state.dbpool, collection, item).to_dict()
+
+    async def _get_stac_item() -> dict:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, _get_stac_item_dict)
+
+    _item = await cached_result(_get_stac_item, f"/{collection}/{item}", request)
+    return pystac.Item.from_dict(_item)
 
 
 # TODO: mypy fails in python 3.9, we need to find a proper way to do this
