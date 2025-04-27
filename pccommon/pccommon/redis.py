@@ -125,9 +125,7 @@ async def cached_result(
         # Don't fail on redis failure
         logger.error(
             f"Error in cache read: {e}",
-            extra=get_custom_dimensions(
-                {"cache_key": host_cache_key}, request
-            ),
+            extra=get_custom_dimensions({"cache_key": host_cache_key}, request),
         )
         if settings.debug:
             raise
