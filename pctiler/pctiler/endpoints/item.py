@@ -16,7 +16,7 @@ from titiler.core.resources.enums import ImageType
 from titiler.pgstac.dependencies import get_stac_item
 
 from pccommon.config import get_render_config
-from pccommon.redis import cached_result
+from pccommon.redis import cached_result, stac_item_cache_key
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.endpoints.dependencies import get_endpoint_function
@@ -57,11 +57,11 @@ async def ItemPathParams(
         )
         return stac_item.to_dict()
 
-    async def _get_stac_item() -> dict:
+    async def _fetch() -> dict:
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _get_stac_item_dict)
 
-    _item = await cached_result(_get_stac_item, f"/{collection}/{item}", request)
+    _item = await cached_result(_fetch, stac_item_cache_key(collection, item), request)
     return pystac.Item.from_dict(_item)
 
 

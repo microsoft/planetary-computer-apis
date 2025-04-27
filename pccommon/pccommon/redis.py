@@ -14,6 +14,7 @@ from starlette.datastructures import State
 from pccommon.config.core import PCAPIsConfig
 from pccommon.constants import (
     BACKPRESSURE_KEY_PREFIX,
+    CACHE_KEY_ITEM,
     HTTP_429_TOO_MANY_REQUESTS,
     RATE_LIMIT_KEY_PREFIX,
 )
@@ -323,3 +324,8 @@ def back_pressure(
         return _wrapper
 
     return _decorator
+
+
+def stac_item_cache_key(collection: str, item: str) -> str:
+    """Generate a cache key for a STAC item."""
+    return f"{CACHE_KEY_ITEM}:{collection}:{item}"
