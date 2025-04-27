@@ -4,5 +4,4 @@ extend-ignore = E203, W503
 exclude =
     .git
     __pycache__
-    setup.py
     .venv
