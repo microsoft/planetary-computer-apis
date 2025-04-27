@@ -63,6 +63,14 @@ while [[ $# -gt 0 ]]; do case $1 in
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
+    if docker ps | grep -q redis; then
+        echo "Flushing redis"
+        docker compose \
+            -f docker-compose.yml \
+            exec redis \
+            redis-cli -a devcache -p 6380 FLUSHALL
+    fi
+
     if [ -z "${TILER_ONLY}${STAC_ONLY}${FUNCS_ONLY}" ]; then
 
         docker compose \

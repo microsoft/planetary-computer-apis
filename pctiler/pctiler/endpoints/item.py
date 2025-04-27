@@ -39,15 +39,14 @@ async def ItemPathParams(
     """
     STAC Item dependency.
 
-    We cache the STAC item in redis to ameliorate high call volumes to the
-    tiler, which can bottleneck on reading from pgstac.
+    We attempt to read STAC item in from the redis cache to ameliorate high
+    call volumes to the tiler, which can bottleneck on reading from pgstac.
     For example, say you have a few thousand calls/second to the tiler to get
-    crops of STAC item assets. Unintuitively, the bottleneck will become the
-    large number of small queries to pgstac. Pretty soon, pgstac will be
-    overwhelmed with queued queries and all the client requests will start to
-    timeout.
-
-    We attempt to avoid this by reducing the queries sent to pgstac.
+    crops of STAC item assets. Presumably, someone will have run a STAC query to
+    enumerage those items and fill the cache. Without the cache the bottleneck
+    will become the large number of small, single-item queries to pgstac.
+    Pretty soon, pgstac will be overwhelmed with queued queries and all the
+    client requests will start to timeout.
     """
 
     # Async to sync nonsense
@@ -61,7 +60,9 @@ async def ItemPathParams(
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _get_stac_item_dict)
 
-    _item = await cached_result(_fetch, stac_item_cache_key(collection, item), request)
+    _item = await cached_result(
+        _fetch, stac_item_cache_key(collection, item), request, read_only=True
+    )
     return pystac.Item.from_dict(_item)
 
 

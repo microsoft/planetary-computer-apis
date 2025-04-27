@@ -105,9 +105,15 @@ async def register_scripts(state: State) -> None:
 
 
 async def cached_result(
-    fn: Callable[[], Coroutine[Any, Any, T]], cache_key: str, request: Request
+    fn: Callable[[], Coroutine[Any, Any, T]],
+    cache_key: str,
+    request: Request,
+    read_only: bool = False,
 ) -> T:
-    """Either get the result from redis or run the function and cache the result."""
+    """Either get the result from redis or run the function and cache the result.
+
+    If `read_only` is True, only attempt to read from the cache, do not write to it.
+    """
     host = request.url.hostname
     host_cache_key = f"{cache_key}:{host}"
     settings = PCAPIsConfig.from_environment()
@@ -140,6 +146,9 @@ async def cached_result(
             {"cache_key": host_cache_key, "duration": f"{te - ts:0.4f}"}, request
         ),
     )
+    if read_only:
+        return result
+
     try:
         if r:
             await r.set(host_cache_key, orjson.dumps(result), settings.redis_ttl)
