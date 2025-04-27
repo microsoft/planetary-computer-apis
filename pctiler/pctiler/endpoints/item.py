@@ -60,8 +60,21 @@ async def ItemPathParams(
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, _get_stac_item_dict)
 
+    # It would have been great to reuse the cached value that the STAC service
+    # fills, but there are two problems:
+    # 1. titiler's get_stac_item() returns just the STAC item content from the database
+    #    without injected links, and calling stac_fastapi here to reproduct
+    #    the behavior of the STAC API feels wrong.
+    # 2. We have no guarantee of temporal locality between the two services.
+    #    In practice, say a client first enumerates many STAC items for analysis
+    #    (cache filled). Then some time has passed, the cache expires, and the
+    #    client starts issuing tiler calls to read asset data. Then, the cache,
+    #    which was full, will be empty and we will have to call pgstac again.
+    # It remains to be seen how we will handle this situation in general,
+    # but for now we will make the STAC service and the tiler use different
+    # keys in the cache, so they can individually fill their own caches.
     _item = await cached_result(
-        _fetch, stac_item_cache_key(collection, item), request, read_only=True
+        _fetch, f"tiler:{stac_item_cache_key(collection, item)}", request
     )
     return pystac.Item.from_dict(_item)
 
