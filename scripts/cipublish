@@ -51,18 +51,31 @@ if [[ -z ${IMAGE_TAG} ]]; then
 fi
 
 function install_oras() {
-    # https://oras.land/docs/installation/
-    VERSION="1.1.0"
-    curl -LO "https://github.com/oras-project/oras/releases/download/v${VERSION}/oras_${VERSION}_linux_amd64.tar.gz"
-    mkdir -p oras-install/
-    tar -zxf oras_${VERSION}_*.tar.gz -C oras-install/
-    sudo mv oras-install/oras /usr/local/bin/
-    rm -rf oras_${VERSION}_*.tar.gz oras-install/
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS: install with Homebrew
+        if ! command -v brew &> /dev/null; then
+            echo "Homebrew is not installed. Please install Homebrew first."
+            exit 1
+        fi
+        brew install oras
+    else
+        # https://oras.land/docs/installation/
+        VERSION="1.2.2"
+        curl -LO "https://github.com/oras-project/oras/releases/download/v${VERSION}/oras_${VERSION}_linux_amd64.tar.gz"
+        mkdir -p oras-install/
+        tar -zxf oras_${VERSION}_*.tar.gz -C oras-install/
+        sudo mv oras-install/oras /usr/local/bin/
+        rm -rf oras_${VERSION}_*.tar.gz oras-install/
+    fi
 }
 
 function deprecate_image() {
     local full_image_name_with_digest=$1
-    deprecated_since=$(date --utc --iso-8601=seconds) 
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        deprecated_since=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    else
+        deprecated_since=$(date --utc --iso-8601=seconds)
+    fi
     if oras discover $full_image_name_with_digest -o json | jq '.manifests[].annotations' | grep -q "vnd.microsoft.lifecycle.end-of-life.date" ; then
         echo "Lifecycle metadata annotation for $full_image_name_with_digest already exists, skip."
     else

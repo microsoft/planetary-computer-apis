@@ -124,8 +124,10 @@ async def cached_result(
     except Exception as e:
         # Don't fail on redis failure
         logger.error(
-            f"Error in cache: {e}",
-            extra=get_custom_dimensions({"cache_key": host_cache_key}, request),
+            f"Error in cache read: {e}",
+            extra=get_custom_dimensions(
+                {"cache_key": host_cache_key}, request
+            ),
         )
         if settings.debug:
             raise
@@ -145,8 +147,10 @@ async def cached_result(
     except Exception as e:
         # Don't fail on redis failure
         logger.error(
-            f"Error in cache: {e}",
-            extra=get_custom_dimensions({"cache_key": host_cache_key}, request),
+            f"Error in cache write: {e}",
+            extra=get_custom_dimensions(
+                {"cache_key": host_cache_key, "cache_value_type": type(result)}, request
+            ),
         )
         if settings.debug:
             raise

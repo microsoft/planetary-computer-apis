@@ -52,7 +52,10 @@ async def ItemPathParams(
 
     # Async to sync nonsense
     def _get_stac_item_dict() -> dict:
-        return get_stac_item(request.app.state.dbpool, collection, item).to_dict()
+        stac_item: pystac.Item = get_stac_item(
+            request.app.state.dbpool, collection, item
+        )
+        return stac_item.to_dict()
 
     async def _get_stac_item() -> dict:
         loop = asyncio.get_running_loop()
