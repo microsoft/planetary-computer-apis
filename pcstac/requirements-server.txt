@@ -42,7 +42,7 @@ fire==0.4.0
     # via pypgstac
 geojson-pydantic==1.1.0
     # via stac-pydantic
-h11==0.14.0
+h11==0.16.0
     # via uvicorn
 httptools==0.6.1
     # via uvicorn
