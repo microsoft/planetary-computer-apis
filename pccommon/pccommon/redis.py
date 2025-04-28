@@ -14,6 +14,7 @@ from starlette.datastructures import State
 from pccommon.config.core import PCAPIsConfig
 from pccommon.constants import (
     BACKPRESSURE_KEY_PREFIX,
+    CACHE_KEY_ITEM,
     HTTP_429_TOO_MANY_REQUESTS,
     RATE_LIMIT_KEY_PREFIX,
 )
@@ -104,9 +105,15 @@ async def register_scripts(state: State) -> None:
 
 
 async def cached_result(
-    fn: Callable[[], Coroutine[Any, Any, T]], cache_key: str, request: Request
+    fn: Callable[[], Coroutine[Any, Any, T]],
+    cache_key: str,
+    request: Request,
+    read_only: bool = False,
 ) -> T:
-    """Either get the result from redis or run the function and cache the result."""
+    """Either get the result from redis or run the function and cache the result.
+
+    If `read_only` is True, only attempt to read from the cache, do not write to it.
+    """
     host = request.url.hostname
     host_cache_key = f"{cache_key}:{host}"
     settings = PCAPIsConfig.from_environment()
@@ -124,7 +131,7 @@ async def cached_result(
     except Exception as e:
         # Don't fail on redis failure
         logger.error(
-            f"Error in cache: {e}",
+            f"Error in cache read: {e}",
             extra=get_custom_dimensions({"cache_key": host_cache_key}, request),
         )
         if settings.debug:
@@ -139,14 +146,19 @@ async def cached_result(
             {"cache_key": host_cache_key, "duration": f"{te - ts:0.4f}"}, request
         ),
     )
+    if read_only:
+        return result
+
     try:
         if r:
             await r.set(host_cache_key, orjson.dumps(result), settings.redis_ttl)
     except Exception as e:
         # Don't fail on redis failure
         logger.error(
-            f"Error in cache: {e}",
-            extra=get_custom_dimensions({"cache_key": host_cache_key}, request),
+            f"Error in cache write: {e}",
+            extra=get_custom_dimensions(
+                {"cache_key": host_cache_key, "cache_value_type": type(result)}, request
+            ),
         )
         if settings.debug:
             raise
@@ -321,3 +333,8 @@ def back_pressure(
         return _wrapper
 
     return _decorator
+
+
+def stac_item_cache_key(collection: str, item: str) -> str:
+    """Generate a cache key for a STAC item."""
+    return f"{CACHE_KEY_ITEM}:{collection}:{item}"

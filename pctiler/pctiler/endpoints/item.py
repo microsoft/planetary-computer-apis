@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Annotated, Optional
 from urllib.parse import quote_plus, urljoin
@@ -15,6 +16,7 @@ from titiler.core.resources.enums import ImageType
 from titiler.pgstac.dependencies import get_stac_item
 
 from pccommon.config import get_render_config
+from pccommon.redis import cached_result, stac_item_cache_key
 from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.endpoints.dependencies import get_endpoint_function
@@ -29,13 +31,52 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-def ItemPathParams(
+async def ItemPathParams(
     request: Request,
     collection: str = Query(..., description="STAC Collection ID"),
     item: str = Query(..., description="STAC Item ID"),
 ) -> pystac.Item:
-    """STAC Item dependency."""
-    return get_stac_item(request.app.state.dbpool, collection, item)
+    """
+    STAC Item dependency.
+
+    We attempt to read STAC item in from the redis cache to ameliorate high
+    call volumes to the tiler, which can bottleneck on reading from pgstac.
+    For example, say you have a few thousand calls/second to the tiler to get
+    crops of STAC item assets. Presumably, someone will have run a STAC query to
+    enumerage those items and fill the cache. Without the cache the bottleneck
+    will become the large number of small, single-item queries to pgstac.
+    Pretty soon, pgstac will be overwhelmed with queued queries and all the
+    client requests will start to timeout.
+    """
+
+    # Async to sync nonsense
+    def _get_stac_item_dict() -> dict:
+        stac_item: pystac.Item = get_stac_item(
+            request.app.state.dbpool, collection, item
+        )
+        return stac_item.to_dict()
+
+    async def _fetch() -> dict:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, _get_stac_item_dict)
+
+    # It would have been great to reuse the cached value that the STAC service
+    # fills, but there are two problems:
+    # 1. titiler's get_stac_item() returns just the STAC item content from the database
+    #    without injected links, and calling stac_fastapi here to reproduct
+    #    the behavior of the STAC API feels wrong.
+    # 2. We have no guarantee of temporal locality between the two services.
+    #    In practice, say a client first enumerates many STAC items for analysis
+    #    (cache filled). Then some time has passed, the cache expires, and the
+    #    client starts issuing tiler calls to read asset data. Then, the cache,
+    #    which was full, will be empty and we will have to call pgstac again.
+    # It remains to be seen how we will handle this situation in general,
+    # but for now we will make the STAC service and the tiler use different
+    # keys in the cache, so they can individually fill their own caches.
+    _item = await cached_result(
+        _fetch, f"tiler:{stac_item_cache_key(collection, item)}", request
+    )
+    return pystac.Item.from_dict(_item)
 
 
 # TODO: mypy fails in python 3.9, we need to find a proper way to do this

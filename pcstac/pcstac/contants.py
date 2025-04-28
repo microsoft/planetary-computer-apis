@@ -1,7 +1,6 @@
 CACHE_KEY_COLLECTIONS = "/collections"
 CACHE_KEY_COLLECTION = "/collection"
 CACHE_KEY_ITEMS = "/items"
-CACHE_KEY_ITEM = "/item"
 CACHE_KEY_QUERYABLES = "/queryables"
 CACHE_KEY_SEARCH = "/search"
 CACHE_KEY_LANDING_PAGE = "/landing-page"

@@ -84,7 +84,7 @@ After migrations and development database loading are in place, you can rebuild 
 ./scripts/update
 ```
 
-`pip` dependencies in `setup.py` are collected and installed through requirements files.
+`pip` dependencies in `pyproject.toml` are collected and installed through requirements files.
 If you modify dependencies, run `./scripts/generate-requirements` to regenerate
 `requirements-*.txt` used by Dockerfiles otherwise your dependency change will not
 be realized.

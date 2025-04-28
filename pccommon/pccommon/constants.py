@@ -2,6 +2,8 @@ import os
 
 from opencensus.trace.attributes_helper import COMMON_ATTRIBUTES
 
+CACHE_KEY_ITEM = "/item"
+
 DEFAULT_COLLECTION_CONFIG_TABLE_NAME = "collectionconfig"
 DEFAULT_CONTAINER_CONFIG_TABLE_NAME = "containerconfig"
 DEFAULT_IP_EXCEPTION_CONFIG_TABLE_NAME = "ipexceptionlist"

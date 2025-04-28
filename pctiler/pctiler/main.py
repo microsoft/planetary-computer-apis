@@ -23,6 +23,7 @@ from pccommon.constants import X_REQUEST_ENTITY
 from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_handler
 from pccommon.openapi import fixup_schema
+from pccommon.redis import connect_to_redis
 from pctiler.config import get_settings
 from pctiler.endpoints import (
     configuration,
@@ -47,6 +48,7 @@ settings = get_settings()
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     """FastAPI Lifespan."""
     await connect_to_db(app)
+    await connect_to_redis(app)
     yield
     await close_db_connection(app)
 

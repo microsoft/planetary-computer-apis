@@ -18,15 +18,14 @@ from stac_fastapi.types.stac import (
 
 from pccommon.config import get_all_render_configs, get_render_config
 from pccommon.config.collections import DefaultRenderConfig
-from pccommon.constants import DEFAULT_COLLECTION_REGION
+from pccommon.constants import CACHE_KEY_ITEM, DEFAULT_COLLECTION_REGION
 from pccommon.logging import get_custom_dimensions
-from pccommon.redis import back_pressure, cached_result, rate_limit
+from pccommon.redis import back_pressure, cached_result, rate_limit, stac_item_cache_key
 from pccommon.tracing import add_stac_attributes_from_search
 from pcstac.config import API_DESCRIPTION, API_LANDING_PAGE_ID, API_TITLE, get_settings
 from pcstac.contants import (
     CACHE_KEY_COLLECTION,
     CACHE_KEY_COLLECTIONS,
-    CACHE_KEY_ITEM,
     CACHE_KEY_ITEMS,
     CACHE_KEY_LANDING_PAGE,
     CACHE_KEY_SEARCH,
@@ -288,7 +287,7 @@ class PCClient(CoreCrudClient):
             )
             return item
 
-        cache_key = f"{CACHE_KEY_ITEM}:{collection_id}:{item_id}"
+        cache_key = stac_item_cache_key(collection_id, item_id)
         return await cached_result(_fetch, cache_key, request)
 
     @classmethod

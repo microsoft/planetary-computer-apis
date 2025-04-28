@@ -117,7 +117,7 @@ services:
 
   redis:
     image: redis:6.2.6-buster
-    command: redis-server --port 6380 --requirepass devcache
+    command: redis-server --port 6380 --requirepass devcache --loglevel debug
     ports:
       - "6380:6380"
     volumes:

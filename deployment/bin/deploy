@@ -176,6 +176,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --wait \
         --timeout 2m0s \
         -f ${DEPLOY_VALUES_FILE} \
+        --debug 
 
     echo "================"
     echo "==== Tiler ====="
@@ -188,6 +189,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --wait \
         --timeout 2m0s \
         -f ${DEPLOY_VALUES_FILE} \
+        --debug 
 
     echo "=================="
     echo "==== Ingress ====="
@@ -199,7 +201,8 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --kube-context "${KUBE_CONTEXT}" \
         --wait \
         --timeout 2m0s \
-        -f ${DEPLOY_VALUES_FILE}
+        -f ${DEPLOY_VALUES_FILE} \
+        --debug 
 
     echo "Installing ingress-nginx..."
     helm upgrade --install nginx-ingress helm/ingress-nginx-4.8.3.tgz \
@@ -215,7 +218,8 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         --version "4.8.3"\
         --wait \
         --timeout 2m0s \
-        -f bin/nginx-values.yaml
+        -f bin/nginx-values.yaml \
+        --debug 
 
     #########################
     # Deploy Azure Function #

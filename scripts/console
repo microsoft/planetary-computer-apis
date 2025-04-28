@@ -42,6 +42,10 @@ while [[ "$#" > 0 ]]; do case $1 in
         DEPLOY_CONSOLE=1
         shift
         ;;
+    --redis)
+        REDIS=1
+        shift
+        ;;
     --help)
         usage
         exit 0
@@ -61,6 +65,16 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             -f docker-compose.yml \
             exec database psql postgres://username:password@database:5432/postgis
 
+        exit 0
+    fi
+
+    if [[ "${REDIS}" ]]; then
+        docker compose \
+            -f docker-compose.yml \
+            exec -it \
+            redis /bin/bash
+        # exampe commands:
+        # redis-cli -a devcache -p 6380 keys "*"
         exit 0
     fi
 

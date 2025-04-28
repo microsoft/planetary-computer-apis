@@ -4,6 +4,8 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from pytest import Config, Item, Parser
 
+from pccommon.redis import connect_to_redis
+
 
 def pytest_addoption(parser: Parser) -> None:
     parser.addoption(
@@ -36,6 +38,7 @@ async def client() -> AsyncClient:
     from pctiler.main import app
 
     await connect_to_db(app)
+    await connect_to_redis(app)
     async with AsyncClient(
         transport=ASGITransport(app=app),
         base_url="http://test",
