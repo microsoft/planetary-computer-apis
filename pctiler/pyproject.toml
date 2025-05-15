@@ -7,12 +7,11 @@ name = "pctiler"
 dynamic = ["version"]
 description = "Planetary Computer API - Tiler."
 license = { text = "MIT" }
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dependencies = [
-    "fastapi-slim==0.111.0",
-    "geojson-pydantic==1.1.0",
+    "fastapi==0.115.12",
+    "geojson-pydantic==2.0.0",
     "idna>=3.7.0",
-    "importlib_resources>=1.1.0;python_version<'3.9'",
     "jinja2==3.1.5",
     "matplotlib==3.9.0",
     "orjson==3.10.4",
@@ -21,11 +20,11 @@ dependencies = [
     "psycopg[binary,pool]",
     "pydantic>=2.7,<2.8",
     "pystac==1.10.1",
-    "rasterio==1.3.10",
+    "rasterio==1.4.3",
     "requests==2.32.3",
-    "titiler.core==0.18.3",
-    "titiler.mosaic==0.18.3",
-    "titiler.pgstac==1.3.0",
+    "titiler.core==0.22.1",
+    "titiler.mosaic==0.22.1",
+    "titiler.pgstac==1.8.0",
 ]
 
 [project.optional-dependencies]

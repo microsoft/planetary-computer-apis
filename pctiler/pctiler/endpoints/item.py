@@ -3,9 +3,11 @@ import logging
 from typing import Annotated, Optional
 from urllib.parse import quote_plus, urljoin
 
+import jinja2
 import fastapi
 import pystac
-from fastapi import Body, Depends, Query, Request, Response
+from pydantic import Field
+from fastapi import Body, Depends, Query, Request, Response, Path
 from fastapi.templating import Jinja2Templates
 from geojson_pydantic.features import Feature
 from html_sanitizer.sanitizer import Sanitizer
@@ -13,6 +15,7 @@ from starlette.responses import HTMLResponse
 from titiler.core.dependencies import CoordCRSParams, DstCRSParams
 from titiler.core.factory import MultiBaseTilerFactory, img_endpoint_params
 from titiler.core.resources.enums import ImageType
+from titiler.core.models.mapbox import TileJSON
 from titiler.pgstac.dependencies import get_stac_item
 
 from pccommon.config import get_render_config
@@ -21,12 +24,6 @@ from pctiler.colormaps import PCColorMapParams
 from pctiler.config import get_settings
 from pctiler.endpoints.dependencies import get_endpoint_function
 from pctiler.reader import ItemSTACReader, ReaderParams
-
-try:
-    from importlib.resources import files as resources_files  # type: ignore
-except ImportError:
-    # Try backported to PY<39 `importlib_resources`.
-    from importlib_resources import files as resources_files  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -79,11 +76,10 @@ async def ItemPathParams(
     return pystac.Item.from_dict(_item)
 
 
-# TODO: mypy fails in python 3.9, we need to find a proper way to do this
-templates = Jinja2Templates(
-    directory=str(resources_files(__package__) / "templates")  # type: ignore
+jinja2_env = jinja2.Environment(
+    loader=jinja2.ChoiceLoader([jinja2.PackageLoader(__package__, "templates")])
 )
-
+templates = Jinja2Templates(env=jinja2_env)
 
 pc_tile_factory = MultiBaseTilerFactory(
     reader=ItemSTACReader,
@@ -135,17 +131,20 @@ def map(
         },
     )
 
-
+# crop/feature endpoint compat with titiler<0.15 (`/crop` was renamed `/feature`)
 @pc_tile_factory.router.post(
     r"/crop",
+    operation_id=f"{self.operation_prefix}postDataForGeoJSONCrop",
     **img_endpoint_params,
 )
 @pc_tile_factory.router.post(
     r"/crop.{format}",
+            operation_id=f"{self.operation_prefix}postDataForGeoJSONWithFormatCrop",
     **img_endpoint_params,
 )
 @pc_tile_factory.router.post(
     r"/crop/{width}x{height}.{format}",
+    operation_id=f"{self.operation_prefix}postDataForGeoJSONWithSizesAndFormatCrop",
     **img_endpoint_params,
 )
 def geojson_crop(  # type: ignore
@@ -155,7 +154,9 @@ def geojson_crop(  # type: ignore
     ],
     format: Annotated[
         ImageType,
-        "Default will be automatically defined if the output image needs a mask (png) or not (jpeg).",  # noqa: E501,F722
+        Field(
+            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."
+        ),
     ] = None,  # type: ignore[assignment]
     src_path=Depends(pc_tile_factory.path_dependency),
     coord_crs=Depends(CoordCRSParams),
@@ -164,14 +165,6 @@ def geojson_crop(  # type: ignore
     dataset_params=Depends(pc_tile_factory.dataset_dependency),
     image_params=Depends(pc_tile_factory.img_part_dependency),
     post_process=Depends(pc_tile_factory.process_dependency),
-    rescale=Depends(pc_tile_factory.rescale_dependency),
-    color_formula: Annotated[
-        Optional[str],
-        Query(
-            title="Color Formula",  # noqa: F722
-            description="rio-color formula (info: https://github.com/mapbox/rio-color)",  # noqa: E501,F722
-        ),
-    ] = None,
     colormap=Depends(pc_tile_factory.colormap_dependency),
     render_params=Depends(pc_tile_factory.render_dependency),
     reader_params=Depends(pc_tile_factory.reader_dependency),
@@ -191,11 +184,159 @@ def geojson_crop(  # type: ignore
         dataset_params=dataset_params,
         image_params=image_params,
         post_process=post_process,
-        rescale=rescale,
-        color_formula=color_formula,
         colormap=colormap,
         render_params=render_params,
         reader_params=reader_params,
+        env=env,
+    )
+    return result
+
+
+# /tiles endpoint compat with titiler<0.15, Optional `tileMatrixSetId`
+@pc_tile_factory.router.get(
+    "/tiles/{z}/{x}/{y}",
+    operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTile",
+    **img_endpoint_params,
+)
+@pc_tile_factory.router.get(
+    "/tiles/{z}/{x}/{y}.{format}",
+    operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTileWithFormat",
+    **img_endpoint_params,
+)
+@pc_tile_factory.router.get(
+    "/tiles/{z}/{x}/{y}@{scale}x",
+    operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTileWithScale",
+    **img_endpoint_params,
+)
+@pc_tile_factory.router.get(
+    "/tiles/{z}/{x}/{y}@{scale}x.{format}",
+    operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTileWithFormatAndScale",
+    **img_endpoint_params,
+)
+def tile_compat(
+    request: fastapi.Request,
+    z: Annotated[
+        int,
+        Path(
+            description="Identifier (Z) selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile.",
+        ),
+    ],
+    x: Annotated[
+        int,
+        Path(
+            description="Column (X) index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix.",
+        ),
+    ],
+    y: Annotated[
+        int,
+        Path(
+            description="Row (Y) index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix.",
+        ),
+    ],
+    scale: Annotated[
+        int,
+        Field(
+            gt=0, le=4, description="Tile size scale. 1=256x256, 2=512x512..."
+        ),
+    ] = 1,
+    format: Annotated[
+        ImageType,
+        Field(
+            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."
+        ),
+    ] = None,
+    src_path=Depends(pc_tile_factory.path_dependency),
+    reader_params=Depends(pc_tile_factory.reader_dependency),
+    tile_params=Depends(pc_tile_factory.tile_dependency),
+    layer_params=Depends(pc_tile_factory.layer_dependency),
+    dataset_params=Depends(pc_tile_factory.dataset_dependency),
+    post_process=Depends(pc_tile_factory.process_dependency),
+    colormap=Depends(pc_tile_factory.colormap_dependency),
+    render_params=Depends(pc_tile_factory.render_dependency),
+    env=Depends(pc_tile_factory.environment_dependency),
+) -> Response:
+    """tiles endpoints compat."""
+    endpoint = get_endpoint_function(
+        pc_tile_factory.router, path="/tiles/{tileMatrixSetId}/{z}/{x}/{y}", method=request.method
+    )
+    result = endpoint(
+        z=z,
+        x=x,
+        y=y,
+        tileMatrixSetId="WebMercatorQuad",
+        scale=scale,
+        format=format,
+        src_path=src_path,
+        reader_params=reader_params,
+        tile_params=tile_params,
+        layer_params=layer_params,
+        dataset_params=dataset_params,
+        post_process=post_process,
+        colormap=colormap,
+        render_params=render_params,
+        env=env,
+    )
+    return result
+
+
+# /tilejson.json endpoint compat with titiler<0.15, Optional `tileMatrixSetId`
+@pc_tile_factory.router.get(
+    "/tilejson.json",
+    response_model=TileJSON,
+    responses={200: {"description": "Return a tilejson"}},
+    response_model_exclude_none=True,
+    operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTileJSON",
+)
+def tilejson_compat(
+    request: fastapi.Request,
+    tile_format: Annotated[
+        Optional[ImageType],
+        Query(
+            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg).",
+        ),
+    ] = None,
+    tile_scale: Annotated[
+        int,
+        Query(
+            gt=0, lt=4, description="Tile size scale. 1=256x256, 2=512x512..."
+        ),
+    ] = 1,
+    minzoom: Annotated[
+        Optional[int],
+        Query(description="Overwrite default minzoom."),
+    ] = None,
+    maxzoom: Annotated[
+        Optional[int],
+        Query(description="Overwrite default maxzoom."),
+    ] = None,
+    src_path=Depends(pc_tile_factory.path_dependency),
+    reader_params=Depends(pc_tile_factory.reader_dependency),
+    tile_params=Depends(pc_tile_factory.tile_dependency),
+    layer_params=Depends(pc_tile_factory.layer_dependency),
+    dataset_params=Depends(pc_tile_factory.dataset_dependency),
+    post_process=Depends(pc_tile_factory.process_dependency),
+    colormap=Depends(pc_tile_factory.colormap_dependency),
+    render_params=Depends(pc_tile_factory.render_dependency),
+    env=Depends(pc_tile_factory.environment_dependency),
+) -> Response:
+    """tilejson endpoint compat."""
+    endpoint = get_endpoint_function(
+        pc_tile_factory.router, path="/{tileMatrixSetId}/tilejson.json", method=request.method
+    )
+    result = endpoint(
+        tileMatrixSetId="WebMercatorQuad",
+        tile_format=tile_format,
+        tile_scale=tile_scale,
+        minzoom=minzoom,
+        maxzoom=maxzoom,
+        src_path=src_path,
+        reader_params=reader_params,
+        tile_params=tile_params,
+        layer_params=layer_params,
+        dataset_params=dataset_params,
+        post_process=post_process,
+        colormap=colormap,
+        render_params=render_params,
         env=env,
     )
     return result
