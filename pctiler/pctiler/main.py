@@ -96,7 +96,6 @@ add_search_register_route(
         pg_mosaic.pgstac_mosaic_factory.assets_accessor_dependency,
         pg_mosaic.pgstac_mosaic_factory.reader_dependency,
         pg_mosaic.pgstac_mosaic_factory.backend_dependency,
-        pg_mosaic.pgstac_mosaic_factory.pgstac_dependency,
     ],
     tags=["PgSTAC Mosaic endpoints"],
 )
