@@ -234,7 +234,7 @@ def rate_limit(
     """
 
     def _decorator(
-        fn: Callable[..., Coroutine[Any, Any, T]]
+        fn: Callable[..., Coroutine[Any, Any, T]],
     ) -> Callable[..., Coroutine[Any, Any, T]]:
         async def _wrapper(*args: Any, **kwargs: Any) -> T:
             request: Optional[Request] = kwargs.get("request")
@@ -320,7 +320,7 @@ def back_pressure(
     """
 
     def _decorator(
-        fn: Callable[..., Coroutine[Any, Any, T]]
+        fn: Callable[..., Coroutine[Any, Any, T]],
     ) -> Callable[..., Coroutine[Any, Any, T]]:
         async def _wrapper(*args: Any, **kwargs: Any) -> T:
             request: Optional[Request] = kwargs.get("request")

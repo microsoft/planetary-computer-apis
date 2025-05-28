@@ -3,19 +3,19 @@ import logging
 from typing import Annotated, Optional
 from urllib.parse import quote_plus, urljoin
 
-import jinja2
 import fastapi
+import jinja2
 import pystac
-from pydantic import Field
-from fastapi import Body, Depends, Query, Request, Response, Path
+from fastapi import Body, Depends, Path, Query, Request, Response
 from fastapi.templating import Jinja2Templates
 from geojson_pydantic.features import Feature
 from html_sanitizer.sanitizer import Sanitizer
+from pydantic import Field
 from starlette.responses import HTMLResponse
 from titiler.core.dependencies import CoordCRSParams, DstCRSParams
 from titiler.core.factory import MultiBaseTilerFactory, img_endpoint_params
-from titiler.core.resources.enums import ImageType
 from titiler.core.models.mapbox import TileJSON
+from titiler.core.resources.enums import ImageType
 from titiler.pgstac.dependencies import get_stac_item
 
 from pccommon.config import get_render_config
@@ -131,6 +131,7 @@ def map(
         },
     )
 
+
 # crop/feature endpoint compat with titiler<0.15 (`/crop` was renamed `/feature`)
 @pc_tile_factory.router.post(
     r"/crop",
@@ -139,7 +140,7 @@ def map(
 )
 @pc_tile_factory.router.post(
     r"/crop.{format}",
-            operation_id=f"{self.operation_prefix}postDataForGeoJSONWithFormatCrop",
+    operation_id=f"{self.operation_prefix}postDataForGeoJSONWithFormatCrop",
     **img_endpoint_params,
 )
 @pc_tile_factory.router.post(
@@ -235,9 +236,7 @@ def tile_compat(
     ],
     scale: Annotated[
         int,
-        Field(
-            gt=0, le=4, description="Tile size scale. 1=256x256, 2=512x512..."
-        ),
+        Field(gt=0, le=4, description="Tile size scale. 1=256x256, 2=512x512..."),
     ] = 1,
     format: Annotated[
         ImageType,
@@ -257,7 +256,9 @@ def tile_compat(
 ) -> Response:
     """tiles endpoints compat."""
     endpoint = get_endpoint_function(
-        pc_tile_factory.router, path="/tiles/{tileMatrixSetId}/{z}/{x}/{y}", method=request.method
+        pc_tile_factory.router,
+        path="/tiles/{tileMatrixSetId}/{z}/{x}/{y}",
+        method=request.method,
     )
     result = endpoint(
         z=z,
@@ -297,9 +298,7 @@ def tilejson_compat(
     ] = None,
     tile_scale: Annotated[
         int,
-        Query(
-            gt=0, lt=4, description="Tile size scale. 1=256x256, 2=512x512..."
-        ),
+        Query(gt=0, lt=4, description="Tile size scale. 1=256x256, 2=512x512..."),
     ] = 1,
     minzoom: Annotated[
         Optional[int],
@@ -321,7 +320,9 @@ def tilejson_compat(
 ) -> Response:
     """tilejson endpoint compat."""
     endpoint = get_endpoint_function(
-        pc_tile_factory.router, path="/{tileMatrixSetId}/tilejson.json", method=request.method
+        pc_tile_factory.router,
+        path="/{tileMatrixSetId}/tilejson.json",
+        method=request.method,
     )
     result = endpoint(
         tileMatrixSetId="WebMercatorQuad",

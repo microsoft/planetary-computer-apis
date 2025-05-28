@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Annotated, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, FastAPI, Query, Request, Response, Path
+from fastapi import APIRouter, Depends, FastAPI, Path, Query, Request, Response
 from fastapi.responses import ORJSONResponse
 from psycopg_pool import ConnectionPool
 from pydantic import Field
@@ -86,6 +86,7 @@ def add_collection_mosaic_info_route(
 
 legacy_mosaic_router = APIRouter()
 
+
 # Compat with titiler-pgstac<0.3.0, (`/tiles/{search_id}/...` was renamed `/{search_id}/tiles/...`)
 @legacy_mosaic_router.get("/tiles/{search_id}/{z}/{x}/{y}", **img_endpoint_params)
 @legacy_mosaic_router.get(
@@ -114,7 +115,6 @@ legacy_mosaic_router = APIRouter()
 )
 def tile_routes(  # type: ignore
     request: Request,
-    search_id=Depends(pgstac_mosaic_factory.path_dependency),
     z: Annotated[
         int,
         Path(
@@ -133,6 +133,7 @@ def tile_routes(  # type: ignore
             description="Row (Y) index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix.",
         ),
     ],
+    search_id=Depends(pgstac_mosaic_factory.path_dependency),
     tileMatrixSetId: Annotated[  # type: ignore
         Literal[tuple(pgstac_mosaic_factory.supported_tms.list())],
         f"Identifier selecting one of the TileMatrixSetId supported (default: 'WebMercatorQuad')",  # noqa: E501,F722

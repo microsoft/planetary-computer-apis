@@ -1,6 +1,6 @@
-import warnings
 import logging
 import time
+import warnings
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Type
 
@@ -11,10 +11,10 @@ from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
 from geojson_pydantic import Polygon
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
+from rio_tiler.io.stac import STAC_ALTERNATE_KEY
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
 from rio_tiler.types import AssetInfo
-from rio_tiler.io.stac import STAC_ALTERNATE_KEY
 from starlette.requests import Request
 from titiler.core.dependencies import DefaultDependency
 from titiler.pgstac import backend as pgstac_mosaic
