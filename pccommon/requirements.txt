@@ -8,7 +8,7 @@ annotated-types==0.7.0
     # via pydantic
 anyio==4.4.0
     # via starlette
-async-timeout==4.0.3
+async-timeout==5.0.1
     # via redis
 azure-core==1.30.2
     # via
@@ -42,7 +42,7 @@ cryptography==42.0.8
     #   azure-storage-blob
     #   msal
     #   pyjwt
-exceptiongroup==1.2.1
+exceptiongroup==1.3.0
     # via anyio
 fastapi-slim==0.111.0
     # via pccommon (pccommon/pyproject.toml)
@@ -160,6 +160,7 @@ typing-extensions==4.12.2
     #   azure-core
     #   azure-data-tables
     #   azure-storage-blob
+    #   exceptiongroup
     #   fastapi-slim
     #   pydantic
     #   pydantic-core
