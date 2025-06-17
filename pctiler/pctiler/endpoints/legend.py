@@ -70,7 +70,7 @@ async def get_classmap_legend(
 
     keys = list(classmap.keys())  # type: ignore
     trimmed_keys = keys[trim_start : len(keys) - trim_end]
-    trimmed_map = {k: classmap[k] for k in trimmed_keys}
+    trimmed_map = {k: classmap[k] for k in trimmed_keys}  # type: ignore
 
     return JSONResponse(content=trimmed_map)
 
@@ -155,7 +155,7 @@ def make_colormap(name: str, trim_start: int, length: int) -> ListedColormap:
     if len(cm) > 256 or max(cm) >= 256:
         raise Exception("Cannot make a colormap for discrete colormap")
 
-    colors = make_lut(cm)
+    colors = make_lut(cm)  # type: ignore
 
     colors = colors[trim_start : length + 1]
     # rescale to 0-1

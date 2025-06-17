@@ -132,20 +132,23 @@ def map(
     )
 
 
+prefix = pc_tile_factory.operation_prefix
+
+
 # crop/feature endpoint compat with titiler<0.15 (`/crop` was renamed `/feature`)
 @pc_tile_factory.router.post(
     r"/crop",
-    operation_id=f"{self.operation_prefix}postDataForGeoJSONCrop",
+    operation_id=f"{prefix}postDataForGeoJSONCrop",
     **img_endpoint_params,
 )
 @pc_tile_factory.router.post(
     r"/crop.{format}",
-    operation_id=f"{self.operation_prefix}postDataForGeoJSONWithFormatCrop",
+    operation_id=f"{prefix}postDataForGeoJSONWithFormatCrop",
     **img_endpoint_params,
 )
 @pc_tile_factory.router.post(
     r"/crop/{width}x{height}.{format}",
-    operation_id=f"{self.operation_prefix}postDataForGeoJSONWithSizesAndFormatCrop",
+    operation_id=f"{prefix}postDataForGeoJSONWithSizesAndFormatCrop",
     **img_endpoint_params,
 )
 def geojson_crop(  # type: ignore
@@ -156,7 +159,7 @@ def geojson_crop(  # type: ignore
     format: Annotated[
         ImageType,
         Field(
-            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."
+            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."  # noqa: F722,E501
         ),
     ] = None,  # type: ignore[assignment]
     src_path=Depends(pc_tile_factory.path_dependency),
@@ -196,52 +199,56 @@ def geojson_crop(  # type: ignore
 # /tiles endpoint compat with titiler<0.15, Optional `tileMatrixSetId`
 @pc_tile_factory.router.get(
     "/tiles/{z}/{x}/{y}",
-    operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTile",
+    operation_id=f"{prefix}getWebMercatorQuadTile",
     **img_endpoint_params,
 )
 @pc_tile_factory.router.get(
     "/tiles/{z}/{x}/{y}.{format}",
-    operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTileWithFormat",
+    operation_id=f"{prefix}getWebMercatorQuadTileWithFormat",
     **img_endpoint_params,
 )
 @pc_tile_factory.router.get(
     "/tiles/{z}/{x}/{y}@{scale}x",
-    operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTileWithScale",
+    operation_id=f"{prefix}getWebMercatorQuadTileWithScale",
     **img_endpoint_params,
 )
 @pc_tile_factory.router.get(
     "/tiles/{z}/{x}/{y}@{scale}x.{format}",
-    operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTileWithFormatAndScale",
+    operation_id=f"{prefix}getWebMercatorQuadTileWithFormatAndScale",
     **img_endpoint_params,
 )
-def tile_compat(
+def tile_compat(  # type: ignore
     request: fastapi.Request,
     z: Annotated[
         int,
         Path(
-            description="Identifier (Z) selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile.",
+            description="Identifier (Z) selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile.",  # noqa: F722,E501
         ),
     ],
     x: Annotated[
         int,
         Path(
-            description="Column (X) index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix.",
+            description="Column (X) index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix.",  # noqa: F722,E501
         ),
     ],
     y: Annotated[
         int,
         Path(
-            description="Row (Y) index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix.",
+            description="Row (Y) index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix.",  # noqa: F722,E501
         ),
     ],
     scale: Annotated[
         int,
-        Field(gt=0, le=4, description="Tile size scale. 1=256x256, 2=512x512..."),
+        Field(
+            gt=0,
+            le=4,
+            description="Tile size scale. 1=256x256, 2=512x512...",  # noqa: F722,E501
+        ),
     ] = 1,
     format: Annotated[
-        ImageType,
+        Optional[ImageType],
         Field(
-            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."
+            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."  # noqa: F722,E501
         ),
     ] = None,
     src_path=Depends(pc_tile_factory.path_dependency),
@@ -288,25 +295,29 @@ def tile_compat(
     response_model_exclude_none=True,
     operation_id=f"{pc_tile_factory.operation_prefix}getWebMercatorQuadTileJSON",
 )
-def tilejson_compat(
+def tilejson_compat(  # type: ignore
     request: fastapi.Request,
     tile_format: Annotated[
         Optional[ImageType],
         Query(
-            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg).",
+            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."  # noqa: F722,E501
         ),
     ] = None,
     tile_scale: Annotated[
         int,
-        Query(gt=0, lt=4, description="Tile size scale. 1=256x256, 2=512x512..."),
+        Query(
+            gt=0,
+            lt=4,
+            description="Tile size scale. 1=256x256, 2=512x512...",  # noqa: E501,F722
+        ),
     ] = 1,
     minzoom: Annotated[
         Optional[int],
-        Query(description="Overwrite default minzoom."),
+        Query(description="Overwrite default minzoom."),  # noqa: F722
     ] = None,
     maxzoom: Annotated[
         Optional[int],
-        Query(description="Overwrite default maxzoom."),
+        Query(description="Overwrite default maxzoom."),  # noqa: F722
     ] = None,
     src_path=Depends(pc_tile_factory.path_dependency),
     reader_params=Depends(pc_tile_factory.reader_dependency),

@@ -160,7 +160,9 @@ class MosaicSTACReader(SimpleSTACReader):
             info["media_type"] = media_type
 
         if header_size := asset_info.get("file:header_size"):
-            info["env"]["GDAL_INGESTED_BYTES_AT_OPEN"] = header_size
+            info["env"].update(  # type: ignore
+                {"GDAL_INGESTED_BYTES_AT_OPEN": header_size}
+            )
 
         if bands := asset_info.get("raster:bands"):
             stats = [

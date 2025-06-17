@@ -6,7 +6,6 @@ from fastapi.responses import ORJSONResponse
 from psycopg_pool import ConnectionPool
 from pydantic import Field
 from titiler.core import dependencies
-from titiler.core.dependencies import ColorFormulaParams
 from titiler.core.factory import img_endpoint_params
 from titiler.core.resources.enums import ImageType
 from titiler.pgstac.dependencies import SearchIdParams
@@ -87,7 +86,8 @@ def add_collection_mosaic_info_route(
 legacy_mosaic_router = APIRouter()
 
 
-# Compat with titiler-pgstac<0.3.0, (`/tiles/{search_id}/...` was renamed `/{search_id}/tiles/...`)
+# Compat with titiler-pgstac<0.3.0,
+# (`/tiles/{search_id}/...` was renamed `/{search_id}/tiles/...`)
 @legacy_mosaic_router.get("/tiles/{search_id}/{z}/{x}/{y}", **img_endpoint_params)
 @legacy_mosaic_router.get(
     "/tiles/{search_id}/{z}/{x}/{y}.{format}", **img_endpoint_params
@@ -118,25 +118,25 @@ def tile_routes(  # type: ignore
     z: Annotated[
         int,
         Path(
-            description="Identifier (Z) selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile.",
+            description="Identifier (Z) selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile.",  # noqa: F722,E501
         ),
     ],
     x: Annotated[
         int,
         Path(
-            description="Column (X) index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix.",
+            description="Column (X) index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix.",  # noqa: F722,E501
         ),
     ],
     y: Annotated[
         int,
         Path(
-            description="Row (Y) index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix.",
+            description="Row (Y) index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix.",  # noqa: F722,E501
         ),
     ],
     search_id=Depends(pgstac_mosaic_factory.path_dependency),
     tileMatrixSetId: Annotated[  # type: ignore
         Literal[tuple(pgstac_mosaic_factory.supported_tms.list())],
-        f"Identifier selecting one of the TileMatrixSetId supported (default: 'WebMercatorQuad')",  # noqa: E501,F722
+        "Identifier selecting one of the TileMatrixSetId supported (default: 'WebMercatorQuad')",  # noqa: E501,F722
     ] = "WebMercatorQuad",
     scale: Annotated[  # type: ignore
         Optional[Annotated[int, Field(gt=0, le=4)]],
@@ -145,7 +145,7 @@ def tile_routes(  # type: ignore
     format: Annotated[
         Optional[ImageType],
         Field(
-            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."
+            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."  # noqa: F722,E501
         ),
     ] = None,
     backend_params=Depends(pgstac_mosaic_factory.backend_dependency),
