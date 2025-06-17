@@ -6,37 +6,37 @@
 #
 annotated-types==0.7.0
     # via pydantic
-anyio==4.4.0
+anyio==4.9.0
     # via starlette
 async-timeout==5.0.1
     # via redis
-azure-core==1.30.2
+azure-core==1.34.0
     # via
     #   azure-data-tables
     #   azure-identity
     #   azure-storage-blob
     #   opencensus-ext-azure
-azure-data-tables==12.5.0
+azure-data-tables==12.7.0
     # via pccommon (pccommon/pyproject.toml)
-azure-identity==1.16.1
+azure-identity==1.23.0
     # via
     #   opencensus-ext-azure
     #   pccommon (pccommon/pyproject.toml)
-azure-storage-blob==12.20.0
+azure-storage-blob==12.25.1
     # via pccommon (pccommon/pyproject.toml)
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.4
     # via html-sanitizer
-cachetools==5.3.3
+cachetools==5.5.2
     # via
     #   google-auth
     #   pccommon (pccommon/pyproject.toml)
-certifi==2024.7.4
+certifi==2025.6.15
     # via requests
-cffi==1.16.0
+cffi==1.17.1
     # via cryptography
-charset-normalizer==3.3.2
+charset-normalizer==3.4.2
     # via requests
-cryptography==42.0.8
+cryptography==45.0.4
     # via
     #   azure-identity
     #   azure-storage-blob
@@ -44,41 +44,41 @@ cryptography==42.0.8
     #   pyjwt
 exceptiongroup==1.3.0
     # via anyio
-fastapi-slim==0.111.0
+fastapi==0.112.3
     # via pccommon (pccommon/pyproject.toml)
-google-api-core==2.19.0
+google-api-core==2.25.1
     # via opencensus
-google-auth==2.30.0
+google-auth==2.40.3
     # via google-api-core
-googleapis-common-protos==1.63.1
+googleapis-common-protos==1.70.0
     # via google-api-core
-html-sanitizer==2.4.4
+html-sanitizer==2.5.0
     # via pccommon (pccommon/pyproject.toml)
-idna==3.7
+idna==3.10
     # via
     #   anyio
     #   pccommon (pccommon/pyproject.toml)
     #   requests
     #   yarl
-isodate==0.6.1
+isodate==0.7.2
     # via
     #   azure-data-tables
     #   azure-storage-blob
-lxml==5.2.2
+lxml==5.4.0
     # via
     #   html-sanitizer
     #   lxml-html-clean
-lxml-html-clean==0.1.0
+lxml-html-clean==0.4.2
     # via
     #   html-sanitizer
     #   pccommon (pccommon/pyproject.toml)
-msal==1.28.1
+msal==1.32.3
     # via
     #   azure-identity
     #   msal-extensions
-msal-extensions==1.1.0
+msal-extensions==1.3.1
     # via azure-identity
-multidict==6.0.5
+multidict==6.5.0
     # via yarl
 opencensus==0.11.4
     # via
@@ -86,88 +86,93 @@ opencensus==0.11.4
     #   opencensus-ext-logging
 opencensus-context==0.1.3
     # via opencensus
-opencensus-ext-azure==1.1.13
+opencensus-ext-azure==1.1.15
     # via pccommon (pccommon/pyproject.toml)
 opencensus-ext-logging==0.1.1
     # via pccommon (pccommon/pyproject.toml)
-orjson==3.10.5
+orjson==3.10.18
     # via pccommon (pccommon/pyproject.toml)
-packaging==24.1
-    # via msal-extensions
-portalocker==2.8.2
-    # via msal-extensions
-proto-plus==1.23.0
+propcache==0.3.2
+    # via yarl
+proto-plus==1.26.1
     # via google-api-core
-protobuf==4.25.3
+protobuf==6.31.1
     # via
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==5.9.8
+psutil==7.0.0
     # via opencensus-ext-azure
-pyasn1==0.6.0
+pyasn1==0.6.1
     # via
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.4.0
+pyasn1-modules==0.4.2
     # via google-auth
 pycparser==2.22
     # via cffi
-pydantic==2.7.4
+pydantic==2.11.7
     # via
-    #   fastapi-slim
+    #   fastapi
     #   pccommon (pccommon/pyproject.toml)
     #   pydantic-settings
-pydantic-core==2.18.4
+pydantic-core==2.33.2
     # via pydantic
-pydantic-settings==2.3.3
+pydantic-settings==2.9.1
     # via pccommon (pccommon/pyproject.toml)
-pyhumps==3.5.3
+pyhumps==3.8.0
     # via pccommon (pccommon/pyproject.toml)
-pyjwt[crypto]==2.8.0
+pyjwt[crypto]==2.10.1
     # via msal
-python-dotenv==1.0.1
+python-dotenv==1.1.0
     # via pydantic-settings
-redis==4.6.0
+redis==6.2.0
     # via pccommon (pccommon/pyproject.toml)
-requests==2.32.3
+requests==2.32.4
     # via
     #   azure-core
     #   google-api-core
     #   msal
     #   opencensus-ext-azure
     #   pccommon (pccommon/pyproject.toml)
-rsa==4.9
+rsa==4.9.1
     # via google-auth
-six==1.16.0
+six==1.17.0
     # via
     #   azure-core
-    #   isodate
     #   opencensus
 sniffio==1.3.1
     # via anyio
-soupsieve==2.5
+soupsieve==2.7
     # via beautifulsoup4
-starlette==0.37.2
+starlette==0.38.6
     # via
-    #   fastapi-slim
+    #   fastapi
     #   pccommon (pccommon/pyproject.toml)
-types-cachetools==4.2.9
+types-cachetools==6.0.0.20250525
     # via pccommon (pccommon/pyproject.toml)
-typing-extensions==4.12.2
+typing-extensions==4.14.0
     # via
     #   anyio
     #   azure-core
     #   azure-data-tables
+    #   azure-identity
     #   azure-storage-blob
+    #   beautifulsoup4
     #   exceptiongroup
-    #   fastapi-slim
+    #   fastapi
+    #   multidict
     #   pydantic
     #   pydantic-core
     #   starlette
-urllib3==2.2.2
+    #   typing-inspection
+typing-inspection==0.4.1
+    # via
+    #   pydantic
+    #   pydantic-settings
+urllib3==2.4.0
     # via
     #   pccommon (pccommon/pyproject.toml)
     #   requests
-yarl==1.9.4
+yarl==1.20.1
     # via azure-data-tables
