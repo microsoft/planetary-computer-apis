@@ -227,7 +227,7 @@ typing-extensions==4.10.0
     #   pydantic-core
     #   starlette
     #   titiler-core
-urllib3==1.26.18
+urllib3==2.5.0
     # via requests
 zipp==3.19.2
     # via
