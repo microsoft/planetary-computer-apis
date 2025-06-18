@@ -1,5 +1,6 @@
 import logging
 import time
+import warnings
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Type
 
@@ -10,13 +11,14 @@ from cogeo_mosaic.errors import NoAssetFoundError
 from fastapi import HTTPException
 from geojson_pydantic import Polygon
 from rio_tiler.errors import InvalidAssetName, MissingAssets, TileOutsideBounds
+from rio_tiler.io.stac import STAC_ALTERNATE_KEY
 from rio_tiler.models import ImageData
 from rio_tiler.mosaic import mosaic_reader
 from rio_tiler.types import AssetInfo
 from starlette.requests import Request
 from titiler.core.dependencies import DefaultDependency
-from titiler.pgstac import mosaic as pgstac_mosaic
-from titiler.pgstac.reader import PgSTACReader
+from titiler.pgstac import backend as pgstac_mosaic
+from titiler.pgstac.reader import PgSTACReader, SimpleSTACReader
 from titiler.pgstac.settings import CacheSettings
 
 from pccommon.cdn import BlobCDN
@@ -48,22 +50,77 @@ class ItemSTACReader(PgSTACReader):
     request: Optional[Request] = attr.ib(default=None)
 
     def _get_asset_info(self, asset: str) -> AssetInfo:
-        """return asset's url."""
-        info = super()._get_asset_info(asset)
-        asset_url = BlobCDN.transform_if_available(info["url"])
+        """Validate asset names and return asset's info.
 
-        if self.input.collection_id:
-            render_config = get_render_config(self.input.collection_id)
+        Args:
+            asset (str): STAC asset name.
+
+        Returns:
+            AssetInfo: STAC asset info.
+
+        """
+        asset, vrt_options = self._parse_vrt_asset(asset)
+        if asset not in self.assets:
+            raise InvalidAssetName(
+                f"'{asset}' is not valid, should be one of {self.assets}"
+            )
+
+        asset_info = self.item.assets[asset]
+        extras = asset_info.extra_fields
+
+        info = AssetInfo(
+            url=asset_info.get_absolute_href() or asset_info.href,
+            metadata=extras if not vrt_options else None,
+        )
+
+        if STAC_ALTERNATE_KEY and extras.get("alternate"):
+            if alternate := extras["alternate"].get(STAC_ALTERNATE_KEY):
+                info["url"] = alternate["href"]
+
+        asset_url = BlobCDN.transform_if_available(info["url"])
+        if self.item.collection_id:
+            render_config = get_render_config(self.item.collection_id)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
         info["url"] = asset_url
+
+        if asset_info.media_type:
+            info["media_type"] = asset_info.media_type
+
+        # https://github.com/stac-extensions/file
+        if head := extras.get("file:header_size"):
+            info["env"] = {"GDAL_INGESTED_BYTES_AT_OPEN": head}
+
+        # https://github.com/stac-extensions/raster
+        if extras.get("raster:bands") and not vrt_options:
+            bands = extras.get("raster:bands")
+            stats = [
+                (b["statistics"]["minimum"], b["statistics"]["maximum"])
+                for b in bands
+                if {"minimum", "maximum"}.issubset(b.get("statistics", {}))
+            ]
+            # check that stats data are all double and make warning if not
+            if (
+                stats
+                and all(isinstance(v, (int, float)) for stat in stats for v in stat)
+                and len(stats) == len(bands)
+            ):
+                info["dataset_statistics"] = stats
+            else:
+                warnings.warn(
+                    "Some statistics data in STAC are invalid, they will be ignored."
+                )
+
+        if vrt_options:
+            info["url"] = f"vrt://{info['url']}?{vrt_options}"
+
         return info
 
 
 @attr.s
-class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
-    """Custom version of titiler.pgstac.mosaic.CustomSTACReader)."""
+class MosaicSTACReader(SimpleSTACReader):
+    """Custom version of titiler.pgstac.reader.SimpleSTACReader."""
 
     # We make request an optional attribute to avoid re-writing
     # the whole list of attribute
@@ -79,24 +136,45 @@ class MosaicSTACReader(pgstac_mosaic.CustomSTACReader):
             str: STAC asset href.
 
         """
+        asset, vrt_options = self._parse_vrt_asset(asset)
         if asset not in self.assets:
-            raise InvalidAssetName(f"{asset} is not valid")
+            raise InvalidAssetName(
+                f"{asset} is not valid. Should be one of {self.assets}"
+            )
 
-        asset_url = BlobCDN.transform_if_available(self.input["assets"][asset]["href"])
+        asset_info = self.input["assets"][asset]
+        info = AssetInfo(
+            url=asset_info["href"],
+            env={},
+        )
 
-        collection = self.input.get("collection", None)
-        if collection:
+        asset_url = BlobCDN.transform_if_available(info["url"])
+        if collection := self.input.get("collection", None):
             render_config = get_render_config(collection)
             if render_config and render_config.requires_token:
                 asset_url = pc.sign(asset_url)
 
-        info = AssetInfo(url=asset_url)
-        if "file:header_size" in self.input["assets"][asset]:
-            info["env"] = {
-                "GDAL_INGESTED_BYTES_AT_OPEN": self.input["assets"][asset][
-                    "file:header_size"
-                ]
-            }
+        info["url"] = asset_url
+
+        if media_type := asset_info.get("type"):
+            info["media_type"] = media_type
+
+        if header_size := asset_info.get("file:header_size"):
+            info["env"].update(  # type: ignore
+                {"GDAL_INGESTED_BYTES_AT_OPEN": header_size}
+            )
+
+        if bands := asset_info.get("raster:bands"):
+            stats = [
+                (b["statistics"]["minimum"], b["statistics"]["maximum"])
+                for b in bands
+                if {"minimum", "maximum"}.issubset(b.get("statistics", {}))
+            ]
+            if len(stats) == len(bands):
+                info["dataset_statistics"] = stats
+
+        if vrt_options:
+            info["url"] = f"vrt://{info['url']}?{vrt_options}"
 
         return info
 
@@ -200,7 +278,7 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
             ) as src_dst:
                 return src_dst.tile(x, y, z, **kwargs)
 
-        tile = mosaic_reader(
+        img, used_assets = mosaic_reader(
             mosaic_assets,
             _reader,
             tile_x,
@@ -223,4 +301,4 @@ class PGSTACBackend(pgstac_mosaic.PGSTACBackend):
             ),
         )
 
-        return tile
+        return img, [x["id"] for x in used_assets]

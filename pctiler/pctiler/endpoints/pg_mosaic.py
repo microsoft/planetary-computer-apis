@@ -1,15 +1,14 @@
 from dataclasses import dataclass, field
 from typing import Annotated, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, FastAPI, Query, Request, Response
+from fastapi import APIRouter, Depends, FastAPI, Path, Query, Request, Response
 from fastapi.responses import ORJSONResponse
 from psycopg_pool import ConnectionPool
 from pydantic import Field
 from titiler.core import dependencies
-from titiler.core.dependencies import ColorFormulaParams
 from titiler.core.factory import img_endpoint_params
 from titiler.core.resources.enums import ImageType
-from titiler.pgstac.dependencies import SearchIdParams, TmsTileParams
+from titiler.pgstac.dependencies import SearchIdParams
 from titiler.pgstac.extensions import searchInfoExtension
 from titiler.pgstac.factory import MosaicTilerFactory
 
@@ -40,7 +39,7 @@ class BackendParams(dependencies.DefaultDependency):
 
 
 pgstac_mosaic_factory = MosaicTilerFactory(
-    reader=PGSTACBackend,
+    backend=PGSTACBackend,
     path_dependency=SearchIdParams,
     colormap_dependency=PCColorMapParams,
     layer_dependency=AssetsBidxExprParams,
@@ -87,6 +86,8 @@ def add_collection_mosaic_info_route(
 legacy_mosaic_router = APIRouter()
 
 
+# Compat with titiler-pgstac<0.3.0,
+# (`/tiles/{search_id}/...` was renamed `/{search_id}/tiles/...`)
 @legacy_mosaic_router.get("/tiles/{search_id}/{z}/{x}/{y}", **img_endpoint_params)
 @legacy_mosaic_router.get(
     "/tiles/{search_id}/{z}/{x}/{y}.{format}", **img_endpoint_params
@@ -114,58 +115,75 @@ legacy_mosaic_router = APIRouter()
 )
 def tile_routes(  # type: ignore
     request: Request,
+    z: Annotated[
+        int,
+        Path(
+            description="Identifier (Z) selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile.",  # noqa: F722,E501
+        ),
+    ],
+    x: Annotated[
+        int,
+        Path(
+            description="Column (X) index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix.",  # noqa: F722,E501
+        ),
+    ],
+    y: Annotated[
+        int,
+        Path(
+            description="Row (Y) index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix.",  # noqa: F722,E501
+        ),
+    ],
     search_id=Depends(pgstac_mosaic_factory.path_dependency),
-    tile=Depends(TmsTileParams),
     tileMatrixSetId: Annotated[  # type: ignore
         Literal[tuple(pgstac_mosaic_factory.supported_tms.list())],
-        f"Identifier selecting one of the TileMatrixSetId supported (default: '{pgstac_mosaic_factory.default_tms}')",  # noqa: E501,F722
-    ] = pgstac_mosaic_factory.default_tms,
+        "Identifier selecting one of the TileMatrixSetId supported (default: 'WebMercatorQuad')",  # noqa: E501,F722
+    ] = "WebMercatorQuad",
     scale: Annotated[  # type: ignore
         Optional[Annotated[int, Field(gt=0, le=4)]],
         "Tile size scale. 1=256x256, 2=512x512...",  # noqa: E501,F722
     ] = None,
     format: Annotated[
         Optional[ImageType],
-        "Default will be automatically defined if the output image needs a mask (png) or not (jpeg).",  # noqa: E501,F722
+        Field(
+            description="Default will be automatically defined if the output image needs a mask (png) or not (jpeg)."  # noqa: F722,E501
+        ),
     ] = None,
+    backend_params=Depends(pgstac_mosaic_factory.backend_dependency),
+    reader_params=Depends(pgstac_mosaic_factory.reader_dependency),
+    assets_accessor_params=Depends(pgstac_mosaic_factory.assets_accessor_dependency),
     layer_params=Depends(pgstac_mosaic_factory.layer_dependency),
     dataset_params=Depends(pgstac_mosaic_factory.dataset_dependency),
     pixel_selection=Depends(pgstac_mosaic_factory.pixel_selection_dependency),
     tile_params=Depends(pgstac_mosaic_factory.tile_dependency),
     post_process=Depends(pgstac_mosaic_factory.process_dependency),
-    rescale=Depends(pgstac_mosaic_factory.rescale_dependency),
-    color_formula=Depends(ColorFormulaParams),
     colormap=Depends(pgstac_mosaic_factory.colormap_dependency),
     render_params=Depends(pgstac_mosaic_factory.render_dependency),
-    pgstac_params=Depends(pgstac_mosaic_factory.pgstac_dependency),
-    backend_params=Depends(pgstac_mosaic_factory.backend_dependency),
-    reader_params=Depends(pgstac_mosaic_factory.reader_dependency),
     env=Depends(pgstac_mosaic_factory.environment_dependency),
 ) -> Response:
     """Create map tile."""
     endpoint = get_endpoint_function(
         pgstac_mosaic_factory.router,
-        path="/tiles/{z}/{x}/{y}",
+        path="/tiles/{tileMatrixSetId}/{z}/{x}/{y}",
         method=request.method,
     )
     result = endpoint(
         search_id=search_id,
-        tile=tile,
+        z=z,
+        x=x,
+        y=y,
         tileMatrixSetId=tileMatrixSetId,
         scale=scale,
         format=format,
-        tile_params=tile_params,
+        backend_params=backend_params,
+        reader_params=reader_params,
+        assets_accessor_params=assets_accessor_params,
         layer_params=layer_params,
         dataset_params=dataset_params,
         pixel_selection=pixel_selection,
+        tile_params=tile_params,
         post_process=post_process,
-        rescale=rescale,
-        color_formula=color_formula,
         colormap=colormap,
         render_params=render_params,
-        pgstac_params=pgstac_params,
-        backend_params=backend_params,
-        reader_params=reader_params,
         env=env,
     )
     return result

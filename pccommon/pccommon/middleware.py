@@ -84,6 +84,8 @@ def add_timeout(app: FastAPI, timeout_seconds: float) -> None:
                         depends=depends, path=route.path_format
                     ),
                 )
+            # TODO: `get_body_field` was updated after fastapi==0.112.4
+            # https://github.com/fastapi/fastapi/blob/999eeb6c76ff37f94612dd140ce8091932f56c54/fastapi/dependencies/utils.py#L830-L832  # noqa: E501
             route.body_field = get_body_field(
                 dependant=route.dependant, name=route.unique_id
             )

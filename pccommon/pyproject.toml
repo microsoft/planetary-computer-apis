@@ -13,7 +13,7 @@ dependencies = [
     "azure-identity>=1.16.1",
     "azure-storage-blob>=12.20.0",
     "cachetools~=5.3",
-    "fastapi-slim>=0.111.0",
+    "fastapi==0.112.3",
     "html-sanitizer>=2.4.4",
     "idna>=3.7.0",
     "lxml_html_clean>=0.1.0",

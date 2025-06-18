@@ -92,12 +92,10 @@ add_search_register_route(
         pg_mosaic.pgstac_mosaic_factory.dataset_dependency,
         pg_mosaic.pgstac_mosaic_factory.pixel_selection_dependency,
         pg_mosaic.pgstac_mosaic_factory.process_dependency,
-        pg_mosaic.pgstac_mosaic_factory.rescale_dependency,
-        pg_mosaic.pgstac_mosaic_factory.colormap_dependency,
         pg_mosaic.pgstac_mosaic_factory.render_dependency,
+        pg_mosaic.pgstac_mosaic_factory.assets_accessor_dependency,
         pg_mosaic.pgstac_mosaic_factory.reader_dependency,
         pg_mosaic.pgstac_mosaic_factory.backend_dependency,
-        pg_mosaic.pgstac_mosaic_factory.pgstac_dependency,
     ],
     tags=["PgSTAC Mosaic endpoints"],
 )
