@@ -25,13 +25,7 @@ from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_han
 from pccommon.openapi import fixup_schema
 from pccommon.redis import connect_to_redis
 from pctiler.config import get_settings
-from pctiler.endpoints import (
-    health,
-    item,
-    legend,
-    pg_mosaic,
-    vector_tiles,
-)
+from pctiler.endpoints import health, item, legend, pg_mosaic, vector_tiles
 from pctiler.middleware import ModifyResponseMiddleware
 
 # Get the root path if set in the environment
