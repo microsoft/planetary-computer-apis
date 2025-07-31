@@ -26,7 +26,6 @@ from pccommon.openapi import fixup_schema
 from pccommon.redis import connect_to_redis
 from pctiler.config import get_settings
 from pctiler.endpoints import (
-    configuration,
     health,
     item,
     legend,
@@ -112,12 +111,6 @@ app.include_router(
     vector_tiles.vector_tile_router,
     prefix=settings.vector_tile_endpoint_prefix,
     tags=["Collection vector tile endpoints"],
-)
-
-app.include_router(
-    configuration.configuration_router,
-    prefix=settings.configuration_endpoint_prefix,
-    tags=["Map configuration endpoints"],
 )
 
 app.include_router(health.health_router, tags=["Liveliness/Readiness"])
