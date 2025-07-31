@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: pcstac/Dockerfile.dev
+      additional_contexts:
+        pc-apis-stac: "service:stac"
     environment:
       - ENVIRONMENT=development
       - POSTGRES_USER=username
@@ -73,6 +75,8 @@ services:
     build:
       context: .
       dockerfile: pctiler/Dockerfile.dev
+      additional_contexts:
+        pc-apis-tiler: "service:tiler"
     environment:
       - ENVIRONMENT=development
       - FF_VRT="yes"

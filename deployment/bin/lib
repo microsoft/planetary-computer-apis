@@ -83,7 +83,8 @@ function cluster_login() {
     echo "Converting kubeconfig..."
     kubelogin convert-kubeconfig \
         -l azurecli \
-        --kubeconfig=kubeconfig
+        --kubeconfig=kubeconfig \
+        --yes
     export KUBECONFIG=kubeconfig
 }
 
