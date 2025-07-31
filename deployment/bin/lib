@@ -84,7 +84,6 @@ function cluster_login() {
     kubelogin convert-kubeconfig \
         -l azurecli \
         --kubeconfig=kubeconfig \
-        --yes
     export KUBECONFIG=kubeconfig
 }
 
