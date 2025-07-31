@@ -9,6 +9,7 @@ RUN tdnf install -y \
     jq \
     git \
     azure-cli \
+    icu \
     && tdnf clean all
 
 # Install Azure Function Tools
