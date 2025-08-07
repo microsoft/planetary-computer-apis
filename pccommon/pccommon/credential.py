@@ -24,5 +24,5 @@ class PcDefaultAzureCredential:
     def get_credential(cls) -> DefaultAzureCredential:
         if cls._instance is None:
             with cls._lock:
-                cls._instance = DefaultAzureCredential()
+                cls._instance = DefaultAzureCredential() # CodeQL [SM05139] Automatically switches to managed identity in production
         return cls._instance
