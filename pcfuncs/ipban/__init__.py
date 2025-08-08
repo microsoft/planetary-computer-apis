@@ -17,7 +17,9 @@ def main(mytimer: func.TimerRequest) -> None:
         datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat()
     )
     logger.info("Updating the ip ban list at %s", utc_timestamp)
-    credential: DefaultAzureCredential = DefaultAzureCredential()
+    credential: DefaultAzureCredential = (
+        DefaultAzureCredential()  # CodeQL [SM05139] Used only as servicability module not deployed in production
+    )
     with LogsQueryClient(credential) as logs_query_client:
         with TableServiceClient(
             endpoint=settings.storage_account_url, credential=credential
