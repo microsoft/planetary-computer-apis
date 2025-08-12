@@ -85,7 +85,9 @@ def add_timeout(app: FastAPI, timeout_seconds: float) -> None:
                     ),
                 )
             route.body_field = get_body_field(
-                dependant=route.dependant, name=route.unique_id
+                flat_dependant=route.dependant,
+                name=route.unique_id,
+                embed_body_fields=True,
             )
             route.app = request_response(route.get_route_handler())
 
