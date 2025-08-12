@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 def recursive_itemfix(schema: Any) -> None:
     try:
-        if type(schema["items"]) == list:
+        if isinstance(schema["items"], list):
             schema["items"] = schema["items"][0]
     except KeyError:
         pass
@@ -15,7 +15,7 @@ def recursive_itemfix(schema: Any) -> None:
         pass
 
     for _, v in schema.items():
-        if type(v) == dict:
+        if isinstance(v, dict):
             recursive_itemfix(v)
 
 
