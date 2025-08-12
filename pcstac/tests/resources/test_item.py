@@ -530,7 +530,7 @@ async def test_pagination_post(app_client):
         idx += 1
         page_data = page.json()
         item_ids.append(page_data["features"][0]["id"])
-        next_link = list(filter(lambda l: l["rel"] == "next", page_data["links"]))
+        next_link = [link for link in page_data["links"] if link["rel"] == "next"]
         if not next_link:
             break
         # Merge request bodies
@@ -562,7 +562,7 @@ async def test_pagination_token_idempotent(app_client):
 
     # Get the next link
     page_data = page.json()
-    next_link = list(filter(lambda l: l["rel"] == "next", page_data["links"]))
+    next_link = [link for link in page_data["links"] if link["rel"] == "next"]
 
     # Confirm token is idempotent
     resp1 = await app_client.get(

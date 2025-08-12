@@ -9,6 +9,7 @@ from fastapi.applications import FastAPI
 from fastapi.dependencies.utils import (
     get_body_field,
     get_dependant,
+    get_flat_dependant,
     get_parameterless_sub_dependant,
 )
 from fastapi.responses import PlainTextResponse
@@ -85,7 +86,9 @@ def add_timeout(app: FastAPI, timeout_seconds: float) -> None:
                     ),
                 )
             route.body_field = get_body_field(
-                dependant=route.dependant, name=route.unique_id
+                flat_dependant=get_flat_dependant(route.dependant),
+                name=route.unique_id,
+                embed_body_fields=True,
             )
             route.app = request_response(route.get_route_handler())
 

@@ -107,7 +107,7 @@ def integration_clients(
 
 @pytest.mark.integration
 def test_update_banned_ip_integration(
-    integration_clients: Tuple[LogsQueryClient, TableClient]
+    integration_clients: Tuple[LogsQueryClient, TableClient],
 ) -> None:
     logger.info(f"Test id: {TEST_ID} - integration test is running")
     logs_query_client, table_client = integration_clients
