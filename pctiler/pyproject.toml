@@ -9,7 +9,7 @@ description = "Planetary Computer API - Tiler."
 license = { text = "MIT" }
 requires-python = ">=3.7"
 dependencies = [
-    "fastapi-slim==0.111.0",
+    "fastapi-slim==0.116.1",
     "geojson-pydantic==1.1.0",
     "idna>=3.7.0",
     "importlib_resources>=1.1.0;python_version<'3.9'",
