@@ -1,9 +1,7 @@
-FROM mcr.microsoft.com/cbl-mariner/base/python:3.9
+FROM mcr.microsoft.com/azurelinux/base/python:3.12
 
 RUN tdnf install -y ca-certificates build-essential \
     && tdnf clean all
-
-ENV CURL_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 
 WORKDIR /opt/src
 
