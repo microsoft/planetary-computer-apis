@@ -87,7 +87,7 @@ idna==3.10
     #   httpx
     #   pctiler (pctiler/pyproject.toml)
     #   requests
-jinja2==3.1.5
+jinja2==3.1.6
     # via
     #   pctiler (pctiler/pyproject.toml)
     #   titiler-core
@@ -196,7 +196,7 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.3
+requests==2.32.4
     # via
     #   pctiler (pctiler/pyproject.toml)
     #   planetary-computer

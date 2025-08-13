@@ -6,7 +6,7 @@
 
 azure-functions
 
-requests==2.32.3
+requests==2.32.4
 aiohttp==3.9.5
 dateutils==0.6.12
 mercantile==1.2.1
