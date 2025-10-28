@@ -219,7 +219,7 @@ sniffio==1.3.1
     # via anyio
 snuggs==1.4.7
     # via rasterio
-starlette==0.47.2
+starlette==0.49.1
     # via fastapi-slim
 supermorecado==0.1.2
     # via cogeo-mosaic
