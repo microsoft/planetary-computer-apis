@@ -26,7 +26,7 @@ jobs:
       - name: Log in with Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
+          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}   # CodeQL [SM05115] justification: Required pattern for Azure OIDC authentication - parsing trusted Microsoft-managed service principal credentials for official azure/login action. No user input or code execution involved.
           tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
           subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
 
