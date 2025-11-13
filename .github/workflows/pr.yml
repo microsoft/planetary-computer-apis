@@ -28,10 +28,5 @@ jobs:
           python-version: "3.10" # stac-api-validator requires >= 3.10
           cache: "pip"
 
-      - name: Set Azurite Default Key
-        run: |
-          # This is the publicly documented Azurite development key
-          echo "AZURITE_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBHeksoGMGw==" >> $GITHUB_ENV
-
       - name: API Validator
         run: ./scripts/validate
