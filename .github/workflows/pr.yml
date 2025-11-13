@@ -11,11 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set Azurite Default Key
-        run: |
-          # This is the publicly documented Azurite development key
-          echo "AZURITE_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBHeksoGMGw==" >> $GITHUB_ENV
-
       - name: Run cibuild
         run: ./scripts/cibuild
 
