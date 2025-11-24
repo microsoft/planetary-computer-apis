@@ -13,6 +13,8 @@ jobs:
 
       - name: Run cibuild
         run: ./scripts/cibuild
+        env:
+          AZURITE_ACCOUNT_KEY: Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
 
   validate:
     runs-on: ubuntu-latest
