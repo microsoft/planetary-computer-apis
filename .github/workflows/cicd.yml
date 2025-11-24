@@ -26,9 +26,9 @@ jobs:
       - name: Log in with Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
-          tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
-          subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
+          client-id: ${{ secrets.SECURE_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.SECURE_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.SECURE_AZURE_SUBSCRIPTION_ID }}
 
       - name: Set Azurite Default Key
         run: |
@@ -72,9 +72,9 @@ jobs:
       - name: Log in with Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
-          tenant-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
-          subscription-id: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
+          client-id: ${{ secrets.SECURE_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.SECURE_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.SECURE_AZURE_SUBSCRIPTION_ID }}
 
       - name: Get image tag
         id: get_image_tag
@@ -94,7 +94,7 @@ jobs:
         env:
           IMAGE_TAG: ${{needs.build_and_publish.outputs.image_tag}}
           ENVIRONMENT: staging
-          ARM_CLIENT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).clientId }}
-          ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).subscriptionId }}
-          ARM_TENANT_ID: ${{ fromJSON(secrets.SECURE_AZURE_CREDENTIALS).tenantId }}
+          ARM_CLIENT_ID: ${{ secrets.SECURE_AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.SECURE_AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.SECURE_AZURE_TENANT_ID }}
           ARM_USE_OIDC: true
