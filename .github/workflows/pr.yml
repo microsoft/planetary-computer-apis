@@ -11,17 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set Azurite Default Key
-        run: |
-          # Azurite uses a well-known development account key that is publicly documented
-          # https://github.com/Azure/Azurite/blob/main/README.md
-          # This key is safe to use in CI/testing environments and is not a real storage account key
-          echo "AZURITE_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==" >> $GITHUB_ENV
-
       - name: Run cibuild
         run: ./scripts/cibuild
-        env:
-          AZURITE_ACCOUNT_KEY: Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
 
   validate:
     runs-on: ubuntu-latest
