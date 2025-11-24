@@ -11,15 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set Azurite Default Key
-        run: echo "AZURITE_ACCOUNT_KEY=$(curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
-
-      - name: Verify Azurite Key was retrieved correctly
-        if: "!startsWith(env.AZURITE_ACCOUNT_KEY, 'Eby8')"
-        run: echo Failed to find key at learn.microsoft.com && exit 1
-
       - name: Run cibuild
         run: ./scripts/cibuild
+        env:
+          AZURITE_ACCOUNT_KEY: ${{ secrets.AZURITE_ACCOUNT_KEY }}
 
   validate:
     runs-on: ubuntu-latest
@@ -30,8 +25,7 @@ jobs:
           python-version: "3.10" # stac-api-validator requires >= 3.10
           cache: "pip"
 
-      - name: Set Azurite Default Key
-        run: echo "AZURITE_ACCOUNT_KEY=$(curl https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite | grep "Account key:" | cut -b 24-111)" >> $GITHUB_ENV
-
       - name: API Validator
         run: ./scripts/validate
+        env:
+          AZURITE_ACCOUNT_KEY: ${{ secrets.AZURITE_ACCOUNT_KEY }}
