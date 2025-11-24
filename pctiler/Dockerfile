@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/azurelinux/base/python:3.12
 
-RUN tdnf install -y ca-certificates build-essential \
+RUN tdnf update -y \
+    && tdnf install -y ca-certificates build-essential \
     && tdnf clean all
 
 WORKDIR /opt/src
