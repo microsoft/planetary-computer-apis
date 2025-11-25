@@ -43,17 +43,18 @@ jobs:
 
       - name: Publish Image
         id: publish_image
-        run:
+        run: |
           case "${GITHUB_REF}" in
             *tags*)
-              echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT ;
-              ./scripts/cipublish --acr pccomponents --tag $tag
+              tag=${GITHUB_REF/refs\/tags\//}
+              echo "tag=${tag}" >> $GITHUB_OUTPUT
+              ./scripts/cipublish --acr pccomponents --tag ${tag}
               ;;
             *)
-              echo "Publishing to pccomponentstest as latest" ;
-              echo "tag=latest" >> $GITHUB_OUTPUT ;
-              ./scripts/cipublish --acr pccomponentstest --tag latest ;
-              echo "Also publishing to pccomponents ACR with unique tag" ;
+              echo "Publishing to pccomponentstest as latest"
+              echo "tag=latest" >> $GITHUB_OUTPUT
+              ./scripts/cipublish --acr pccomponentstest --tag latest
+              echo "Also publishing to pccomponents ACR with unique tag"
               ./scripts/cipublish --acr pccomponents --tag ${{ steps.most-recent-tag.outputs.tag }}.${{ github.run_number }}
               ;;
           esac
