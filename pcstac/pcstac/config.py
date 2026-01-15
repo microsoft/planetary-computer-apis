@@ -40,7 +40,7 @@ EXTENSIONS = [
         client=PCFiltersClient(),
         conformance_classes=[
             FilterConformanceClasses.FILTER,
-            FilterConformanceClasses.ITEM_SEARCH_FILTER,
+            FilterConformanceClasses.SEARCH,
             FilterConformanceClasses.BASIC_CQL2,
             FilterConformanceClasses.CQL2_JSON,
             FilterConformanceClasses.CQL2_TEXT,

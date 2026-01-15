@@ -220,7 +220,7 @@ class PCClient(CoreCrudClient):
             search_request.collections is None
             and "collection=" not in str(request.url)
             and '{"property":"collection"}'
-            not in orjson.dumps(search_request.filter).decode("utf-8")
+            not in orjson.dumps(search_request.filter_expr).decode("utf-8")
         ):
             raise HTTPException(status_code=422, detail="collection is required")
 
@@ -303,6 +303,6 @@ class PCClient(CoreCrudClient):
             title=API_TITLE,
             description=API_DESCRIPTION,
             extra_conformance_classes=extra_conformance_classes,
-            post_request_model=post_request_model,
+            pgstac_search_model=post_request_model,
         )
         return it

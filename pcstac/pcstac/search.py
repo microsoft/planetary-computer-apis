@@ -8,7 +8,7 @@ from pydantic import Field, field_validator
 from stac_fastapi.api.models import BaseSearchGetRequest, ItemCollectionUri
 from stac_fastapi.pgstac.types.base_item_cache import BaseItemCache
 from stac_fastapi.pgstac.types.search import PgstacSearch
-from stac_fastapi.types.rfc3339 import DateTimeType, str_to_interval
+from stac_fastapi.types.search import DateTimeQueryType, Limit, _validate_datetime
 from starlette.requests import Request
 from typing_extensions import Annotated
 
@@ -71,21 +71,31 @@ class RedisBaseItemCache(BaseItemCache):
 
 @attr.s
 class PCItemCollectionUri(ItemCollectionUri):
-    limit: Annotated[Optional[int], Query()] = attr.ib(
-        default=LEGACY_ITEM_DEFAULT_LIMIT
-    )
+    limit: Annotated[
+        Optional[Limit],
+        Query(
+            description="Limits the number of results that are included in each page of the response (capped to 10_000)."  # noqa: E501
+        ),
+    ] = attr.ib(default=LEGACY_ITEM_DEFAULT_LIMIT)
 
 
-def patch_and_convert(interval: Optional[str]) -> Optional[DateTimeType]:
+def patch_and_convert(value: Optional[str]) -> Optional[str]:
     """Patch datetime to add hh-mm-ss and timezone info."""
-    if interval:
-        interval = _patch_datetime(interval)
-    return str_to_interval(interval)
+    if value:
+        value = _patch_datetime(value)
+    return value
 
 
 @attr.s
 class PCSearchGetRequest(BaseSearchGetRequest):
-    datetime: Annotated[Optional[DateTimeType], Query()] = attr.ib(
-        default=None, converter=patch_and_convert
+    datetime: DateTimeQueryType = attr.ib(
+        default=None,
+        converter=patch_and_convert,
+        validator=_validate_datetime,
     )
-    limit: Annotated[Optional[int], Query()] = attr.ib(default=DEFAULT_LIMIT)
+    limit: Annotated[
+        Optional[Limit],
+        Query(
+            description="Limits the number of results that are included in each page of the response (capped to 10_000)."  # noqa: E501
+        ),
+    ] = attr.ib(default=DEFAULT_LIMIT)

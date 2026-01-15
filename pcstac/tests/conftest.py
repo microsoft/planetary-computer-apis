@@ -11,6 +11,7 @@ from fastapi.responses import ORJSONResponse
 from httpx import ASGITransport, AsyncClient
 from pypgstac.db import PgstacDB
 from pypgstac.migrate import Migrate
+from stac_fastapi.api.app import StacApi as PCStacApi
 from stac_fastapi.api.models import (
     create_get_request_model,
     create_post_request_model,
@@ -23,7 +24,6 @@ from stac_fastapi.types.search import APIRequest
 
 from pccommon.logging import ServiceName
 from pccommon.redis import connect_to_redis
-from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import EXTENSIONS, TILER_HREF_ENV_VAR
 from pcstac.search import PCItemCollectionUri, PCSearch, PCSearchGetRequest
@@ -85,7 +85,7 @@ def api_client(pqe_pg):
         title="test title",
         description="test description",
         api_version="1.0.0",
-        settings=Settings(debug=True),
+        settings=Settings(debug=True, root_path="/stac"),
         client=PCClient.create(
             post_request_model=search_post_request_model,
         ),
@@ -118,8 +118,8 @@ async def app(api_client) -> AsyncGenerator[FastAPI, None]:
 @pytest.fixture(scope="session")
 async def app_client(app) -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test/stac",
+        transport=ASGITransport(app=app, root_path="/stac"),
+        base_url="http://test",
         headers={"X-Forwarded-For": "127.0.0.1"},
     ) as c:
         yield c
