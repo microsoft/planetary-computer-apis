@@ -18,7 +18,7 @@ geometry='{"type":"Polygon","coordinates":[[[-85.3125,30.9375],[-85.3125,31],[-8
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     scripts/setup
     which stac-api-validator >/dev/null || pip install stac-api-validator==0.6.7
-    stac-api-validator --root-url http://localhost:8080/stac/ \
+    stac-api-validator --log-level DEBUG --root-url http://localhost:8080/stac/ \
         --conformance collections \
         --conformance core \
         --collection naip \
