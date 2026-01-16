@@ -4,6 +4,8 @@
 #
 #    pip-compile --extra=dev --extra=server --output-file=pcstac/requirements-server.txt ./pcstac/pyproject.toml
 #
+annotated-doc==0.0.4
+    # via fastapi
 annotated-types==0.7.0
     # via pydantic
 anyio==4.10.0
@@ -32,9 +34,9 @@ click==8.1.8
     #   uvicorn
 dateparser==1.2.2
     # via pygeofilter
-fastapi-slim==0.116.1
+fastapi==0.128.0
     # via stac-fastapi-types
-fire==0.4.0
+fire==0.7.1
     # via pypgstac
 geojson-pydantic==2.0.0
     # via stac-pydantic
@@ -42,6 +44,8 @@ h11==0.16.0
     # via uvicorn
 httptools==0.6.4
     # via uvicorn
+hydraters==0.1.3
+    # via pypgstac
 idna==3.10
     # via
     #   anyio
@@ -55,7 +59,7 @@ orjson==3.10.4
     #   pcstac (pcstac/pyproject.toml)
     #   pypgstac
     #   stac-fastapi-pgstac
-plpygis==0.2.2
+plpygis==0.6.1
     # via pypgstac
 psycopg[binary]==3.1.20
     # via pypgstac
@@ -65,7 +69,7 @@ psycopg-pool==3.1.9
     # via pypgstac
 pydantic==2.11.7
     # via
-    #   fastapi-slim
+    #   fastapi
     #   geojson-pydantic
     #   pydantic-settings
     #   pypgstac
@@ -79,7 +83,7 @@ pygeofilter==0.3.1
     # via stac-fastapi-pgstac
 pygeoif==1.5.1
     # via pygeofilter
-pypgstac[psycopg]==0.8.6
+pypgstac[psycopg]==0.9.6
     # via
     #   pcstac (pcstac/pyproject.toml)
     #   stac-fastapi-pgstac
@@ -101,25 +105,23 @@ pyyaml==6.0.2
 regex==2025.7.34
     # via dateparser
 six==1.17.0
-    # via
-    #   fire
-    #   python-dateutil
+    # via python-dateutil
 smart-open==7.3.0.post1
     # via pypgstac
 sniffio==1.3.1
     # via anyio
-stac-fastapi-api==3.0.0b2
+stac-fastapi-api==5.0.3
     # via
     #   pcstac (pcstac/pyproject.toml)
     #   stac-fastapi-extensions
     #   stac-fastapi-pgstac
-stac-fastapi-extensions==3.0.0b2
+stac-fastapi-extensions==5.0.3
     # via
     #   pcstac (pcstac/pyproject.toml)
     #   stac-fastapi-pgstac
-stac-fastapi-pgstac==3.0.0a4
+stac-fastapi-pgstac==4.0.4
     # via pcstac (pcstac/pyproject.toml)
-stac-fastapi-types==3.0.0b2
+stac-fastapi-types==5.0.3
     # via
     #   pcstac (pcstac/pyproject.toml)
     #   stac-fastapi-api
@@ -132,7 +134,7 @@ stac-pydantic==3.1.5
 starlette==0.47.2
     # via
     #   brotli-asgi
-    #   fastapi-slim
+    #   fastapi
 tenacity==8.1.0
     # via pypgstac
 termcolor==3.1.0
@@ -142,7 +144,7 @@ types-requests==2.32.4.20250809
 typing-extensions==4.14.1
     # via
     #   anyio
-    #   fastapi-slim
+    #   fastapi
     #   pcstac (pcstac/pyproject.toml)
     #   psycopg
     #   psycopg-pool

@@ -10,6 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, StarletteHTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
+from stac_fastapi.api.app import StacApi as PCStacApi
 from stac_fastapi.api.errors import DEFAULT_STATUS_CODES
 from stac_fastapi.api.middleware import ProxyHeaderMiddleware
 from stac_fastapi.api.models import (
@@ -29,13 +30,13 @@ from pccommon.logging import ServiceName, init_logging
 from pccommon.middleware import TraceMiddleware, add_timeout, http_exception_handler
 from pccommon.openapi import fixup_schema
 from pccommon.redis import connect_to_redis
-from pcstac.api import PCStacApi
 from pcstac.client import PCClient
 from pcstac.config import (
     API_DESCRIPTION,
     API_TITLE,
     API_VERSION,
     EXTENSIONS,
+    STAC_API_VERSION,
     get_settings,
 )
 from pcstac.errors import PC_DEFAULT_STATUS_CODES
@@ -92,6 +93,7 @@ api = PCStacApi(
         db_min_conn_size=app_settings.db_min_conn_size,
         base_item_cache=RedisBaseItemCache,
         debug=DEBUG,
+        root_path=APP_ROOT_PATH,
     ),
     client=PCClient.create(post_request_model=search_post_request_model),
     extensions=EXTENSIONS,
@@ -148,9 +150,15 @@ def custom_openapi() -> Dict[str, Any]:
         return app.openapi_schema
     else:
         schema = get_openapi(
-            title="Planetary Computer STAC API",
+            title=API_TITLE,
             version=app_settings.api_version,
             routes=app.routes,
         )
-        app.openapi_schema = fixup_schema(app.root_path, schema)
-        return schema
+        fixed_schema = fixup_schema(
+            app.root_path, schema, tag=f"STAC API {STAC_API_VERSION}"
+        )
+        app.openapi_schema = fixed_schema
+        return fixed_schema
+
+
+app.openapi = custom_openapi  # type: ignore

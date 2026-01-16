@@ -1,5 +1,4 @@
 services:
-
   stac:
     platform: linux/amd64
     image: pc-apis-stac
@@ -17,7 +16,7 @@ services:
       - azurite
       - redis
     command: >
-      bash -c "pypgstac pgready && uvicorn pcstac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers --root-path '/stac'"
+      bash -c "pypgstac pgready && uvicorn pcstac.main:app --host 0.0.0.0 --port 8081 --reload --proxy-headers --root-path /stac"
 
   tiler:
     image: pc-apis-tiler
@@ -29,7 +28,7 @@ services:
       dockerfile: pctiler/Dockerfile
     env_file: ${PC_TILER_ENV_FILE:-./pc-tiler.dev.env}
     environment:
-        # Allow proxied managed identity requests in dev
+      # Allow proxied managed identity requests in dev
       - IDENTITY_ENDPOINT=http://token-proxy:8086/dev/token
       - IMDS_ENDPOINT=active
     ports:
@@ -40,7 +39,19 @@ services:
       - ./pccommon:/opt/src/pccommon
     depends_on:
       - database
-    command: [ "uvicorn", "pctiler.main:app", "--host", "0.0.0.0", "--port", "8082", "--reload", "--proxy-headers", "--root-path", "/data" ]
+    command:
+      [
+        "uvicorn",
+        "pctiler.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8082",
+        "--reload",
+        "--proxy-headers",
+        "--root-path",
+        "/data",
+      ]
 
   funcs:
     image: pc-apis-funcs
@@ -58,11 +69,8 @@ services:
       - ~/.azure:/home/.azure
 
   nginx:
-    image: pc-apis-nginx
+    image: nginx:1.29.4
     container_name: pc-apis-nginx
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
     links:
       - database
       - azurite
@@ -78,14 +86,16 @@ services:
 
   database:
     container_name: pc-stac-db
-    image: pc-apis-stac-db
-    build:
-      context: ./pgstac
-      dockerfile: Dockerfile
+    platform: linux/amd64
+    image: postgis/postgis:17-3.5
     environment:
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=postgis
+      - POSTGIS_MAJOR=3
+      - PGUSER=postgres
+      - PGDATABASE=postgres
+      - PGHOST=localhost
     ports:
       - "5432:5432"
     volumes:
@@ -106,7 +116,8 @@ services:
     container_name: pcapis-azurite
     image: mcr.microsoft.com/azure-storage/azurite:3.35.0
     hostname: azurite
-    command: "azurite --silent --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost
+    command:
+      "azurite --silent --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost
       0.0.0.0 -l /workspace"
     ports:
       - "10000:10000" # Blob
