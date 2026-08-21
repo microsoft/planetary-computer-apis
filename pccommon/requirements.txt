@@ -24,10 +24,8 @@ azure-storage-blob==12.26.0
     # via pccommon (pccommon/pyproject.toml)
 beautifulsoup4==4.13.4
     # via html-sanitizer
-cachetools==5.5.2
-    # via
-    #   google-auth
-    #   pccommon (pccommon/pyproject.toml)
+cachetools==6.2.6 ; python_version >= "3.9"
+    # via pccommon (pccommon/pyproject.toml)
 certifi==2025.8.3
     # via requests
 cffi==1.17.1
@@ -38,13 +36,14 @@ cryptography==45.0.6
     # via
     #   azure-identity
     #   azure-storage-blob
+    #   google-auth
     #   msal
     #   pyjwt
 fastapi-slim==0.116.1
     # via pccommon (pccommon/pyproject.toml)
 google-api-core==2.25.1
     # via opencensus
-google-auth==2.40.3
+google-auth==2.56.3
     # via google-api-core
 googleapis-common-protos==1.70.0
     # via google-api-core
@@ -100,9 +99,7 @@ protobuf==6.31.1
 psutil==7.0.0
     # via opencensus-ext-azure
 pyasn1==0.6.1
-    # via
-    #   pyasn1-modules
-    #   rsa
+    # via pyasn1-modules
 pyasn1-modules==0.4.2
     # via google-auth
 pycparser==2.22
@@ -133,8 +130,6 @@ requests==2.32.4
     #   msal
     #   opencensus-ext-azure
     #   pccommon (pccommon/pyproject.toml)
-rsa==4.9.1
-    # via google-auth
 six==1.17.0
     # via
     #   azure-core
