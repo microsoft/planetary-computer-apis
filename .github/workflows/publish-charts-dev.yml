@@ -16,19 +16,19 @@ jobs:
         contents: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
         with:
           fetch-depth: 0 # Required due to the way Git works, without it this action won't be able to find any or the correct tags
 
       - name: "Get Previous tag"
         id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1.2.2"
+        uses: "WyriHaximus/github-action-get-previous-tag@dc52ee2c1eb91ebf1d540ea7bd2f6424fb00f573" # v1.2.2
         with:
           fallback: 2022.2.0
 
       - name: "Get next minor version"
         id: semvers
-        uses: "WyriHaximus/github-action-next-semvers@v1"
+        uses: "WyriHaximus/github-action-next-semvers@d079934efaf011a4cf8912d4637097fe35d32b93" # v1
         with:
           version: ${{ steps.previoustag.outputs.tag }}
 
