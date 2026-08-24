@@ -24,7 +24,7 @@ azure-storage-blob==12.26.0
     # via pccommon (pccommon/pyproject.toml)
 beautifulsoup4==4.13.4
     # via html-sanitizer
-cachetools==6.2.6 ; python_version >= "3.9"
+cachetools==7.1.7
     # via pccommon (pccommon/pyproject.toml)
 certifi==2025.8.3
     # via requests
@@ -142,7 +142,7 @@ starlette==0.47.2
     # via
     #   fastapi-slim
     #   pccommon (pccommon/pyproject.toml)
-types-cachetools==6.1.0.20250717
+types-cachetools==7.0.0.20260713
     # via pccommon (pccommon/pyproject.toml)
 typing-extensions==4.14.1
     # via
