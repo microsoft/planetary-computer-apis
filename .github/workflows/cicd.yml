@@ -1,101 +1,101 @@
-name: Planetary Computer APIs CI/CD
-
-on:
-  push:
-    branches: [main]
-    tags: ["*"]
-
-permissions:
-  id-token: write
-  contents: read
-
-jobs:
-  build_and_publish:
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Get Most Recent Tag
-        id: most-recent-tag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-
-      - name: Log in with Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.SECURE_AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.SECURE_AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.SECURE_AZURE_SUBSCRIPTION_ID }}
-
-      - name: Set Azurite Default Key
-        run: |
-          echo "AZURITE_ACCOUNT_KEY=${{ secrets.AZURITE_ACCOUNT_KEY }}" >> $GITHUB_ENV
-          echo "Using Azurite default key: $AZURITE_ACCOUNT_KEY"
-
-      - name: Authenticate
-        run: ./scripts/ciauthenticate
-
-      - name: Run cibuild
-        run: ./scripts/cibuild
-
-      - name: Publish Image
-        id: publish_image
-        run: |
-          case "${GITHUB_REF}" in
-            *tags*)
-              tag=${GITHUB_REF/refs\/tags\//}
-              echo "tag=${tag}" >> $GITHUB_OUTPUT
-              ./scripts/cipublish --acr pccomponents --tag ${tag}
-              ;;
-            *)
-              echo "Publishing to pccomponentstest as latest"
-              echo "tag=latest" >> $GITHUB_OUTPUT
-              ./scripts/cipublish --acr pccomponentstest --tag latest
-              echo "Also publishing to pccomponents ACR with unique tag"
-              ./scripts/cipublish --acr pccomponents --tag ${{ steps.most-recent-tag.outputs.tag }}.${{ github.run_number }}
-              ;;
-          esac
-
-    outputs:
-      image_tag: ${{ steps.publish_image.outputs.tag }}
-
-  deploy:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs:
-      - build_and_publish
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Log in with Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.SECURE_AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.SECURE_AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.SECURE_AZURE_SUBSCRIPTION_ID }}
-
-      - name: Get image tag
-        id: get_image_tag
-        if: ${{ github.base_ref }}
-        run:
-          case "${GITHUB_REF}" in
-            *tags*)
-              echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
-              ;;
-            *)
-              echo "tag=latest" >> $GITHUB_OUTPUT
-              ;;
-          esac
-
-      - name: Deploy
-        run: ./scripts/cideploy
-        env:
-          IMAGE_TAG: ${{needs.build_and_publish.outputs.image_tag}}
-          ENVIRONMENT: staging
-          ARM_CLIENT_ID: ${{ secrets.SECURE_AZURE_CLIENT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.SECURE_AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.SECURE_AZURE_TENANT_ID }}
-          ARM_USE_OIDC: true
+# name: Planetary Computer APIs CI/CD
+#
+# on:
+#   push:
+#     branches: [main]
+#     tags: ["*"]
+#
+# permissions:
+#   id-token: write
+#   contents: read
+#
+# jobs:
+#   build_and_publish:
+#
+#     runs-on: ubuntu-latest
+#
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+#
+#       - name: Get Most Recent Tag
+#         id: most-recent-tag
+#         uses: "WyriHaximus/github-action-get-previous-tag@v1"
+#
+#       - name: Log in with Azure
+#         uses: azure/login@v1
+#         with:
+#           client-id: ${{ secrets.SECURE_AZURE_CLIENT_ID }}
+#           tenant-id: ${{ secrets.SECURE_AZURE_TENANT_ID }}
+#           subscription-id: ${{ secrets.SECURE_AZURE_SUBSCRIPTION_ID }}
+#
+#       - name: Set Azurite Default Key
+#         run: |
+#           echo "AZURITE_ACCOUNT_KEY=${{ secrets.AZURITE_ACCOUNT_KEY }}" >> $GITHUB_ENV
+#           echo "Using Azurite default key: $AZURITE_ACCOUNT_KEY"
+#
+#       - name: Authenticate
+#         run: ./scripts/ciauthenticate
+#
+#       - name: Run cibuild
+#         run: ./scripts/cibuild
+#
+#       - name: Publish Image
+#         id: publish_image
+#         run: |
+#           case "${GITHUB_REF}" in
+#             *tags*)
+#               tag=${GITHUB_REF/refs\/tags\//}
+#               echo "tag=${tag}" >> $GITHUB_OUTPUT
+#               ./scripts/cipublish --acr pccomponents --tag ${tag}
+#               ;;
+#             *)
+#               echo "Publishing to pccomponentstest as latest"
+#               echo "tag=latest" >> $GITHUB_OUTPUT
+#               ./scripts/cipublish --acr pccomponentstest --tag latest
+#               echo "Also publishing to pccomponents ACR with unique tag"
+#               ./scripts/cipublish --acr pccomponents --tag ${{ steps.most-recent-tag.outputs.tag }}.${{ github.run_number }}
+#               ;;
+#           esac
+#
+#     outputs:
+#       image_tag: ${{ steps.publish_image.outputs.tag }}
+#
+#   deploy:
+#     runs-on: ubuntu-latest
+#     if: ${{ github.ref == 'refs/heads/main' }}
+#     needs:
+#       - build_and_publish
+#     steps:
+#       - uses: actions/checkout@v3
+#
+#       - name: Log in with Azure
+#         uses: azure/login@v1
+#         with:
+#           client-id: ${{ secrets.SECURE_AZURE_CLIENT_ID }}
+#           tenant-id: ${{ secrets.SECURE_AZURE_TENANT_ID }}
+#           subscription-id: ${{ secrets.SECURE_AZURE_SUBSCRIPTION_ID }}
+#
+#       - name: Get image tag
+#         id: get_image_tag
+#         if: ${{ github.base_ref }}
+#         run:
+#           case "${GITHUB_REF}" in
+#             *tags*)
+#               echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+#               ;;
+#             *)
+#               echo "tag=latest" >> $GITHUB_OUTPUT
+#               ;;
+#           esac
+#
+#       - name: Deploy
+#         run: ./scripts/cideploy
+#         env:
+#           IMAGE_TAG: ${{needs.build_and_publish.outputs.image_tag}}
+#           ENVIRONMENT: staging
+#           ARM_CLIENT_ID: ${{ secrets.SECURE_AZURE_CLIENT_ID }}
+#           ARM_SUBSCRIPTION_ID: ${{ secrets.SECURE_AZURE_SUBSCRIPTION_ID }}
+#           ARM_TENANT_ID: ${{ secrets.SECURE_AZURE_TENANT_ID }}
+#           ARM_USE_OIDC: true
