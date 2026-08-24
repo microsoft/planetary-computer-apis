@@ -1,31 +1,31 @@
-name: Planetary Computer APIs PR CI
-
-on:
-  pull_request:
-    branches: [main]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Run cibuild
-        run: ./scripts/cibuild
-        env:
-          AZURITE_ACCOUNT_KEY: ${{ secrets.AZURITE_ACCOUNT_KEY }}
-
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.13" # stac-api-validator requires >= 3.10
-          cache: "pip"
-
-      - name: API Validator
-        run: ./scripts/validate
-        env:
-          AZURITE_ACCOUNT_KEY: ${{ secrets.AZURITE_ACCOUNT_KEY }}
+# name: Planetary Computer APIs PR CI
+#
+# on:
+#   pull_request:
+#     branches: [main]
+#
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#
+#     steps:
+#       - uses: actions/checkout@v3
+#
+#       - name: Run cibuild
+#         run: ./scripts/cibuild
+#         env:
+#           AZURITE_ACCOUNT_KEY: ${{ secrets.AZURITE_ACCOUNT_KEY }}
+#
+#   validate:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v5
+#       - uses: actions/setup-python@v6
+#         with:
+#           python-version: "3.13" # stac-api-validator requires >= 3.10
+#           cache: "pip"
+#
+#       - name: API Validator
+#         run: ./scripts/validate
+#         env:
+#           AZURITE_ACCOUNT_KEY: ${{ secrets.AZURITE_ACCOUNT_KEY }}

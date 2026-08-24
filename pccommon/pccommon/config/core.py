@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from cachetools import Cache, LRUCache, cachedmethod
+from cachetools import Cache, LRUCache
 from cachetools.func import lru_cache
 from cachetools.keys import hashkey
 from pydantic import BaseModel, Field, PrivateAttr, field_validator
@@ -65,32 +65,53 @@ class PCAPIsConfig(BaseSettings):
         "extra": "ignore",  # type: ignore
     }
 
-    @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("collection"))
     def get_collection_config_table(self) -> CollectionConfigTable:
-        return CollectionConfigTable.from_environment(
+        key = hashkey("collection")
+        try:
+            return self._cache[key]
+        except KeyError:
+            pass
+
+        table = CollectionConfigTable.from_environment(
             account_url=self.collection_config.account_url,
             account_name=self.collection_config.account_name,
             table_name=self.collection_config.table_name,
             ttl=self.table_value_ttl,
         )
+        self._cache[key] = table
+        return table
 
-    @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("container"))
     def get_container_config_table(self) -> ContainerConfigTable:
-        return ContainerConfigTable.from_environment(
+        key = hashkey("container")
+        try:
+            return self._cache[key]
+        except KeyError:
+            pass
+
+        table = ContainerConfigTable.from_environment(
             account_url=self.container_config.account_url,
             account_name=self.container_config.account_name,
             table_name=self.container_config.table_name,
             ttl=self.table_value_ttl,
         )
+        self._cache[key] = table
+        return table
 
-    @cachedmethod(cache=lambda self: self._cache, key=lambda _: hashkey("ip_whitelist"))
     def get_ip_exception_list_table(self) -> IPExceptionListTable:
-        return IPExceptionListTable.from_environment(
+        key = hashkey("ip_whitelist")
+        try:
+            return self._cache[key]
+        except KeyError:
+            pass
+
+        table = IPExceptionListTable.from_environment(
             account_url=self.ip_exception_config.account_url,
             account_name=self.ip_exception_config.account_name,
             table_name=self.ip_exception_config.table_name,
             ttl=self.table_value_ttl,
         )
+        self._cache[key] = table
+        return table
 
     @classmethod
     @lru_cache(maxsize=1)
