@@ -159,7 +159,7 @@ typing-inspection==0.4.1
     #   pydantic-settings
 tzlocal==5.3.1
     # via dateparser
-urllib3==2.5.0
+urllib3==2.6.0
     # via
     #   pcstac (pcstac/pyproject.toml)
     #   types-requests
