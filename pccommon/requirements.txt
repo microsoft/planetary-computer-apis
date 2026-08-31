@@ -8,7 +8,7 @@ annotated-types==0.7.0
     # via pydantic
 anyio==4.10.0
     # via starlette
-azure-core==1.35.0
+azure-core==1.38.0
     # via
     #   azure-data-tables
     #   azure-identity
