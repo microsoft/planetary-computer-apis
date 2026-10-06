@@ -43,9 +43,7 @@ click==8.1.8
     #   rasterio
     #   uvicorn
 click-plugins==1.1.1.2
-    # via
-    #   cogeo-mosaic
-    #   rasterio
+    # via cogeo-mosaic
 cligj==0.7.2
     # via
     #   cogeo-mosaic
@@ -184,7 +182,7 @@ pytz==2025.2
     # via planetary-computer
 pyyaml==6.0.2
     # via uvicorn
-rasterio==1.4.4
+rasterio==1.5.0
     # via
     #   cogeo-mosaic
     #   pctiler (pctiler/pyproject.toml)

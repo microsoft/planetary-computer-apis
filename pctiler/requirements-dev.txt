@@ -41,9 +41,7 @@ click==8.1.8
     #   planetary-computer
     #   rasterio
 click-plugins==1.1.1.2
-    # via
-    #   cogeo-mosaic
-    #   rasterio
+    # via cogeo-mosaic
 cligj==0.7.2
     # via
     #   cogeo-mosaic
@@ -175,7 +173,7 @@ python-dotenv==1.1.1
     #   pydantic-settings
 pytz==2025.2
     # via planetary-computer
-rasterio==1.4.4
+rasterio==1.5.0
     # via
     #   cogeo-mosaic
     #   pctiler (pctiler/pyproject.toml)
