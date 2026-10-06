@@ -21,7 +21,9 @@ dependencies = [
     "psycopg[binary,pool]",
     "pydantic>=2.7,<2.8",
     "pystac==1.10.1",
-    "rasterio==1.3.10",
+    # GDAL >= 3.10 is needed to avoid one-pixel seams between adjacent COGs in mosaics.
+    # Skip 1.5.1: its bundled GDAL 3.12.4 reads north-up NetCDF upside down (rasterio#3640).
+    "rasterio==1.5.0",
     "requests>=2.32.4",
     "titiler.core==0.18.3",
     "titiler.mosaic==0.18.3",
