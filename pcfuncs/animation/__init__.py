@@ -3,7 +3,7 @@ import logging
 from typing import Callable, List
 
 import azure.functions as func
-from funclib.errors import BBoxTooLargeError
+from funclib.errors import BBoxTooLargeError, InvalidInputError
 from funclib.stamps.branding import LogoStamp
 from funclib.stamps.progress_bar import ProgressBarStamp
 from funclib.stamps.stamp import ImageStamp
@@ -42,7 +42,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             body=response.json(),
         )
-    except BBoxTooLargeError as e:
+    except (BBoxTooLargeError, InvalidInputError) as e:
         logging.exception(e)
         return func.HttpResponse(
             status_code=400,
