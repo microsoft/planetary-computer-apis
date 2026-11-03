@@ -42,7 +42,7 @@ class AnimationRequest(BaseModel):
     show_progressbar: bool = Field(default=True, alias="showProgressBar")
 
     data_api_url: Optional[str] = None
-    """Override for the data API URL. Useful for testing."""
+    """Must match the server-configured API root URL when supplied."""
 
     @field_validator("render_params")
     def _validate_render_params(cls, v: str) -> str:

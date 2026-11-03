@@ -8,6 +8,7 @@ from urllib.parse import urlsplit
 
 import aiohttp
 import mercantile
+from funclib.errors import InvalidInputError
 from funclib.models import RenderOptions
 from funclib.raster import (
     Bbox,
@@ -33,6 +34,36 @@ class TilerError(Exception):
     def __init__(self, msg: str, resp: aiohttp.ClientResponse):
         super().__init__(msg)
         self.resp = resp
+
+
+async def register_search_and_get_tile_url(
+    cql: Dict[str, Any],
+    render_options: RenderOptions,
+    settings: BaseExporterSettings,
+    data_api_url_override: Optional[str] = None,
+) -> str:
+    register_url = settings.get_register_url(data_api_url_override)
+    async with aiohttp.ClientSession() as session:
+        resp = await session.post(register_url, json=cql, allow_redirects=False)
+        if 300 <= resp.status < 400:
+            raise InvalidInputError("Data API redirects are not allowed.")
+        resp.raise_for_status()
+        mosaic_info = await resp.json()
+        tilejson_href = [
+            link["href"] for link in mosaic_info["links"] if link["rel"] == "tilejson"
+        ][0]
+        settings.validate_api_url(tilejson_href)
+        tile_url = f"{tilejson_href}?{render_options.encoded_query_string}"
+
+        resp = await session.get(tile_url, allow_redirects=False)
+        if 300 <= resp.status < 400:
+            raise InvalidInputError("Data API redirects are not allowed.")
+        resp.raise_for_status()
+        tilejson = await resp.json()
+        tile_url = settings.validate_api_url(tilejson["tiles"][0])
+
+        scheme, netloc, path, _, _ = urlsplit(tile_url)
+        return f"{scheme}://{netloc}{path}".replace("@1x", "@2x")
 
 
 @dataclass
@@ -126,28 +157,10 @@ class TileSet(ABC, Generic[T]):
         settings: BaseExporterSettings,
         data_api_url_override: Optional[str] = None,
     ) -> U:
-        register_url = settings.get_register_url(data_api_url_override)
-
-        async with aiohttp.ClientSession() as session:
-            # Register the search and get the tilejson_url back
-            resp = await session.post(register_url, json=cql)
-            mosaic_info = await resp.json()
-            tilejson_href = [
-                link["href"]
-                for link in mosaic_info["links"]
-                if link["rel"] == "tilejson"
-            ][0]
-            tile_url = f"{tilejson_href}?{render_options.encoded_query_string}"
-
-            # Get the full tile path template
-            resp = await session.get(tile_url)
-            tilejson = await resp.json()
-            tile_url = tilejson["tiles"][0]
-
-            scheme, netloc, path, _, _ = urlsplit(tile_url)
-            tile_url = f"{scheme}://{netloc}{path}".replace("@1x", "@2x")
-
-            return cls(tile_url, render_options)
+        tile_url = await register_search_and_get_tile_url(
+            cql, render_options, settings, data_api_url_override
+        )
+        return cls(tile_url, render_options)
 
 
 class GDALTileSet(TileSet[GDALRaster]):
@@ -160,7 +173,11 @@ class PILTileSet(TileSet[PILRaster]):
         async def _f() -> io.BytesIO:
             async with aiohttp.ClientSession() as session:
                 async with self._async_limit:
-                    async with session.get(url) as resp:
+                    async with session.get(url, allow_redirects=False) as resp:
+                        if 300 <= resp.status < 400:
+                            raise InvalidInputError(
+                                "Data API redirects are not allowed."
+                            )
                         if resp.status == 200:
                             return io.BytesIO(await resp.read())
                         else:
@@ -174,6 +191,8 @@ class PILTileSet(TileSet[PILRaster]):
                 is_throttle=lambda e: isinstance(e, TilerError),
                 strategy=BackoffStrategy(waits=[0.2, 0.5, 0.75, 1, 2]),
             )
+        except InvalidInputError:
+            raise
         except Exception:
             logger.warning(f"Tile request failed with backoff: {url}")
             img_bytes = Image.new("RGB", (self.tile_size, self.tile_size), "gray")

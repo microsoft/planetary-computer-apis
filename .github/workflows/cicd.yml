@@ -43,19 +43,22 @@
 #
 #       - name: Publish Image
 #         id: publish_image
+#         env:
+#           MOST_RECENT_TAG: ${{ steps.most-recent-tag.outputs.tag }}
+#           RUN_NUMBER: ${{ github.run_number }}
 #         run: |
 #           case "${GITHUB_REF}" in
 #             *tags*)
 #               tag=${GITHUB_REF/refs\/tags\//}
 #               echo "tag=${tag}" >> $GITHUB_OUTPUT
-#               ./scripts/cipublish --acr pccomponents --tag ${tag}
+#               ./scripts/cipublish --acr pccomponents --tag "${tag}"
 #               ;;
 #             *)
 #               echo "Publishing to pccomponentstest as latest"
 #               echo "tag=latest" >> $GITHUB_OUTPUT
 #               ./scripts/cipublish --acr pccomponentstest --tag latest
 #               echo "Also publishing to pccomponents ACR with unique tag"
-#               ./scripts/cipublish --acr pccomponents --tag ${{ steps.most-recent-tag.outputs.tag }}.${{ github.run_number }}
+#               ./scripts/cipublish --acr pccomponents --tag "${MOST_RECENT_TAG}.${RUN_NUMBER}"
 #               ;;
 #           esac
 #

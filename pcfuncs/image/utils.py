@@ -1,11 +1,12 @@
 import io
 import os
 from typing import Any, Dict, List, Optional, Union
-from urllib.parse import urlsplit
 from uuid import uuid4
 
 import aiohttp
+from funclib.errors import InvalidInputError
 from funclib.models import RenderOptions
+from funclib.tiles import register_search_and_get_tile_url as register_tile_url
 
 from .settings import get_settings
 
@@ -14,10 +15,11 @@ async def get_min_zoom(
     collection_id: str, data_api_url_override: Optional[str] = None
 ) -> Optional[int]:
     settings = get_settings()
+    url = settings.get_mosaic_info_url(collection_id, data_api_url_override)
     async with aiohttp.ClientSession() as session:
-        resp = await session.get(
-            settings.get_mosaic_info_url(collection_id, data_api_url_override)
-        )
+        resp = await session.get(url, allow_redirects=False)
+        if 300 <= resp.status < 400:
+            raise InvalidInputError("Data API redirects are not allowed.")
         if not resp.status == 200:
             return None
         mosaic_info = await resp.json()
@@ -109,21 +111,4 @@ async def register_search_and_get_tile_url(
     data_api_url_override: Optional[str] = None,
 ) -> str:
     settings = get_settings()
-    register_url = settings.get_register_url(data_api_url_override)
-
-    async with aiohttp.ClientSession() as session:
-        # Register the search and get the tilejson_url back
-        resp = await session.post(register_url, json=cql)
-        mosaic_info = await resp.json()
-        tilejson_href = [
-            link["href"] for link in mosaic_info["links"] if link["rel"] == "tilejson"
-        ][0]
-        tile_url = f"{tilejson_href}?{render_options.encoded_query_string}"
-
-        # Get the full tile path template
-        resp = await session.get(tile_url)
-        tilejson = await resp.json()
-        tile_url = tilejson["tiles"][0]
-
-        scheme, netloc, path, _, _ = urlsplit(tile_url)
-        return f"{scheme}://{netloc}{path}".replace("@1x", "@2x")
+    return await register_tile_url(cql, render_options, settings, data_api_url_override)

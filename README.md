@@ -15,6 +15,13 @@ The `pctiler` provides visualization and data access capabilities for the data i
 
 This repository also contains Azure Functions that provide additional endpoints for working with Planetary Computer data and metadata. This includes Function endpoints for generating images and animations based on STAC searches, using the tiler to render mosaiced data from Collections.
 
+Image and animation exports only contact the data API configured by the server.
+The optional request field `data_api_url` must match that configured API root
+(a trailing slash is allowed); arbitrary per-request API overrides are rejected.
+For local testing, set `IMAGE_API_ROOT_URL` and `ANIMATION_API_ROOT_URL` on the
+server instead. TileJSON links and tile templates must use the configured API's
+origin, and redirects are not followed.
+
 ## Collection configuration
 
 See [collection config](./docs/collection-config.md) for more on developing collection configurations.

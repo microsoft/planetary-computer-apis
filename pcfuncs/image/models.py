@@ -44,7 +44,7 @@ class ImageRequest(BaseModel):
     """If true, the image will be masked with the input geometry."""
 
     data_api_url: Optional[str] = None
-    """Override for the data API URL. Useful for testing."""
+    """Must match the server-configured API root URL when supplied."""
 
     def get_geometry(self) -> Dict[str, Any]:
         assert self.geometry
